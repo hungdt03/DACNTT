@@ -1,0 +1,4 @@
+﻿Chạy lệnh migration:
+Add-Migration InitialCreate -Project SocialNetwork.Infrastructure -StartupProject SocialNetwork.API -OutputDir Persistence/Migrations
+Chạy lệnh Update Database:
+Update-Database -Project SocialNetwork.Infrastructure -StartupProject SocialNetwork.API

@@ -1,0 +1,73 @@
+# General
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs/
+.vscode/
+.idea/
+
+# Build outputs
+**/bin/
+**/obj/
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ASP.NET Core specific
+secrets.json
+*.pfx
+*.p12
+appsettings.Development.json
+
+# Node.js (if used in frontend)
+node_modules/
+dist/
+
+# NuGet packages
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+.nuget/
+
+# Publish outputs
+publish/
+wwwroot/
+
+# Testing tools
+TestResults/
+*.trx
+*.coverage
+.coverage/
+
+# Rider and Resharper
+_ReSharper.Caches/
+
+# Dependency files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Coverage reports
+coverage/
+
+# Ignore runtime-generated files
+*.pid
+*.pid.lock
+
+# Solution-specific folders
+SocialNetwork.API/bin/
+SocialNetwork.API/obj/
+SocialNetwork.Infrastructure/bin/
+SocialNetwork.Infrastructure/obj/
+SocialNetwork.API.Domain/bin/
+SocialNetwork.API.Domain/obj/
+SocialNetwork.API.Application/bin/
+SocialNetwork.API.Application/obj/

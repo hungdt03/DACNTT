@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+:root {
+    font-family: 'Nunito', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.custom-modal .ant-modal-close {
+    display: none;
+}
+
+.scrollbar-w-2::-webkit-scrollbar {
+    width: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.scrollbar-h-4::-webkit-scrollbar {
+    height: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #e8eaec;
+    border-radius: 1000px;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
