@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
+using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Comment.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Mappers;
 
 namespace SocialNetwork.Application.Features.Comment.Handlers
 {
@@ -75,11 +77,13 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
             }
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            await _unitOfWork.CommentRepository.CreateCommentAsync(comment);
+            var savedComment = await _unitOfWork.CommentRepository.CreateCommentAsync(comment);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            return new BaseResponse()
+            var response = ApplicationMapper.MapToComment(savedComment);
+            return new DataResponse<CommentResponse>()
             {
+                Data = response,
                 IsSuccess = true,
                 Message = "Tải bình luận thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,

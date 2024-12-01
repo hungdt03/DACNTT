@@ -1,5 +1,5 @@
 import { Avatar, Divider, Modal, Popover, Tooltip, message } from "antd";
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import images from "../../assets";
 import { Bookmark, Edit, Lock, MoreHorizontal, User } from "lucide-react";
 import { ChatBubbleLeftIcon, HeartIcon, ShareIcon } from "@heroicons/react/24/outline";
@@ -15,6 +15,11 @@ import { formatTime } from "../../utils/date";
 import { PostReaction } from "./PostReaction";
 import { PrivacyType } from "../../constants/privacy";
 import commentService from "../../services/commentService";
+import { ReactionType } from "../../constants/reaction";
+import reactionService from "../../services/reactionService";
+import { ReactionResource } from "../../types/reaction";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
 
 export const PostMoreAction: FC = () => {
     return <div className="flex flex-col items-start rounded-md">
@@ -53,6 +58,50 @@ const getPrivacyPost = (privacy: PrivacyType): ReactNode => {
     }
 }
 
+const getBtnReaction = (reactionType: ReactionType | 'UNKNOWN', handleSaveReaction: (reactionType: ReactionType) => void): ReactNode => {
+    if (reactionType === ReactionType.LIKE) {
+        return <button onClick={() => handleSaveReaction(ReactionType.LIKE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            <img alt="like" src={svgReaction.like} className="w-4 h-4 hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
+            <span className="text-primary">Thích</span>
+        </button>
+    } else if (reactionType === ReactionType.LOVE) {
+        return <button onClick={() => handleSaveReaction(ReactionType.LOVE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            <img alt="like" src={svgReaction.love} className="w-4 h-4 hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
+            <span className="text-red-600">Yêu thích</span>
+        </button>
+    } else if (reactionType === ReactionType.CARE) {
+        return <button onClick={() => handleSaveReaction(ReactionType.CARE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            <img alt="like" src={svgReaction.care} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
+            <span className="text-yellow-500">Thương thương</span>
+        </button>
+    } else if (reactionType === ReactionType.SAD) {
+        return <button onClick={() => handleSaveReaction(ReactionType.SAD)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            <img alt="like" src={svgReaction.sad} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
+            <span className="text-yellow-500">Buồn</span>
+        </button>
+    } else if (reactionType === ReactionType.HAHA) {
+        return <button onClick={() => handleSaveReaction(ReactionType.HAHA)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            <img alt="like" src={svgReaction.haha} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
+            <span className="text-yellow-500">Haha</span>
+        </button>
+    } else if (reactionType === ReactionType.WOW) {
+        return <button onClick={() => handleSaveReaction(ReactionType.WOW)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            <img alt="like" src={svgReaction.wow} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
+            <span className="text-orange-500">Wow</span>
+        </button>
+    } else if (reactionType === ReactionType.ANGRY) {
+        return <button onClick={() => handleSaveReaction(ReactionType.ANGRY)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            <img alt="like" src={svgReaction.angry} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
+            <span className="text-orange-600">Phẫn nộ</span>
+        </button>
+    }
+
+    return <button  onClick={() => handleSaveReaction(ReactionType.LIKE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+        <HeartIcon className="h-5 w-5 text-gray-500" />
+        <span>Thích</span>
+    </button>
+}
+
 type PostProps = {
     post: PostResource
 }
@@ -64,6 +113,11 @@ export type CommentRequest = {
     replyToUserId: string | null;
 }
 
+export type ReactionRequest = {
+    postId: string;
+    reactionType: ReactionType;
+}
+
 
 const Post: FC<PostProps> = ({
     post
@@ -71,7 +125,24 @@ const Post: FC<PostProps> = ({
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
+    const [reactions, setReactions] = useState<ReactionResource[]>();
+    const { user } = useSelector(selectAuth)
+    const [reaction, setReaction] = useState<ReactionResource | null>();
 
+    const fetchReactions = async () => {
+        const response = await reactionService.getAllReactionsByPostId(post.id);
+
+        if (response.isSuccess) {
+            setReactions(response.data)
+
+            const findMyReaction = response.data.find(s => s.user.id === user?.id);
+            setReaction(findMyReaction)
+        }
+    }
+
+    useEffect(() => {
+        fetchReactions();
+    }, [post])
 
     const handleCreateComment = async (values: BoxCommentType) => {
         const comment: CommentRequest = {
@@ -82,7 +153,23 @@ const Post: FC<PostProps> = ({
         };
 
         const response = await commentService.createComment(comment);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleSaveReaction = async (reactionType: ReactionType) => {
+        const payload: ReactionRequest = {
+            postId: post.id,
+            reactionType
+        };
+
+
+        const response = await reactionService.saveReaction(payload);
+        if (response.isSuccess) {
+            fetchReactions()
             message.success(response.message)
         } else {
             message.error(response.message)
@@ -123,20 +210,20 @@ const Post: FC<PostProps> = ({
                     <img src={svgReaction.love} className="w-5 h-5 mx-[5px]" />
                     <img src={svgReaction.care} className="w-5 h-5 mx-[5px]" />
                 </Avatar.Group>
-                <span className="hover:underline">112</span>
+                <span className="hover:underline">{reactions?.length}</span>
             </button>
             <div className="flex gap-x-4 items-center">
-                <button className="hover:underline text-gray-500">17 bình luận</button>
+                <button className="hover:underline text-gray-500">{post.comments} bình luận</button>
                 <button className="hover:underline text-gray-500">17 lượt chia sẻ</button>
             </div>
         </div>
         <Divider className='my-0' />
         <div className="flex items-center justify-between gap-x-4">
-            <Popover content={<PostReaction />}>
-                <button className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
-                    <HeartIcon className="h-5 w-5 text-gray-500" />
-                    <span>Thích</span>
-                </button>
+            <Popover content={<PostReaction
+                onSelect={handleSaveReaction}
+            />}>
+
+                {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
             </Popover>
             <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />

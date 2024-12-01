@@ -17,6 +17,7 @@ import { PostResource } from "../../types/post";
 import { BoxCommentType } from "../BoxSendComment";
 import { Pagination } from "../../types/response";
 
+
 type CommentItemProps = {
     parentComment: CommentResource | null;
     comment: CommentResource;
@@ -39,6 +40,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     level
 }) => {
     const isReplying = replyToId === comment.id;
+
+    const [content, setContent] = useState<string>('')
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         size: 6,
@@ -52,6 +55,11 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             setPagination(response.pagination)
             updatedComments(commentId, fetchedReplies)
         }
+    }
+
+    const handleReplyComment = (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | null) => {
+        replyComment(values, parentCommentId, replyToUserId);
+        setContent('')
     }
 
     return (
@@ -87,7 +95,6 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             {/* Render comment con */}
             {comment.isHaveChildren && (
                 <div className="relative flex flex-col gap-y-3 pl-6">
-                    {/* <div className="absolute -top-[60px] left-[16px] bottom-0 w-[2px] bg-green-300"></div> */}
                     {comment?.replies?.map((child) => (
                         <CommentItem
                             parentComment={comment}
@@ -110,10 +117,11 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                         <>
                             <div className="absolute left-4 w-[28px] -top-[24px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>
                             <div className={cn(level === 3 ? "pl-0" : "pl-4")}>
-                                <BoxReplyComment onSubmit={(values => replyComment(values, comment.id, comment.user.id))} />
+                                <BoxReplyComment value={content} onContentChange={(newValue) => setContent(newValue)} onSubmit={(values => handleReplyComment(values, comment.id, comment.user.id))} />
                             </div>
                         </>
                     )}
+                  
                 </div>
             )}
 
@@ -125,7 +133,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                     }
                     <div className={cn(level === 3 ? "pl-0" : "pl-10")}>
                         {level >= 3 && <div className="absolute -left-6 w-[24px] -top-[28px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>}
-                        <BoxReplyComment onSubmit={(values => replyComment(values, comment.id, comment.user.id))} />
+                        <BoxReplyComment value={content} onContentChange={(newValue) => setContent(newValue)} onSubmit={(values => replyComment(values, comment.id, comment.user.id))} />
                     </div>
                 </div>
             )}
@@ -180,6 +188,8 @@ export const CommentList: React.FC<CommentListProps> = ({
     );
 };
 
+
+
 type PostModalProps = {
     post: PostResource;
 }
@@ -219,10 +229,18 @@ const PostModal: FC<PostModalProps> = ({
         const response = await commentService.createComment(comment);
         if (response.isSuccess) {
             message.success(response.message)
+
+            if (response.data.parentCommentId) {
+                handleUpdateCommentList(response.data.parentCommentId, [response.data])
+            }
+
+            return true;
         } else {
             message.error(response.message)
+            return false;
         }
     }
+
 
     const updateRepliesInComments = (
         comments: CommentResource[],
@@ -232,7 +250,7 @@ const PostModal: FC<PostModalProps> = ({
         return comments.map((comment) => {
             if (comment.id === commentId) {
                 const updatedReplies = comment.replies ? [...comment.replies, ...fetchedReplies] : [...fetchedReplies];
-                return { ...comment, replies: updatedReplies };
+                return { ...comment, isHaveChildren: true, replies: updatedReplies };
             }
 
             if (comment.replies && comment.replies.length > 0) {

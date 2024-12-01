@@ -23,6 +23,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Posts
                 .Include(p => p.User)
+                .Include(p => p.Comments)
                 .Include(p => p.Medias)
                 .OrderByDescending(p => p.DateCreated)
                 .ToListAsync();

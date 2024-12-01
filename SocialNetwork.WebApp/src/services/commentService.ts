@@ -17,7 +17,7 @@ class CommentService {
     }
 
 
-    createComment(payload: CommentRequest): Promise<BaseResponse> {
+    createComment(payload: CommentRequest): Promise<DataResponse<CommentResource>> {
         return axiosInterceptor.post('/api/comments', payload)
     }
 

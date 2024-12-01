@@ -15,24 +15,25 @@ type BoxReplyCommentProps = {
     onRemoveFileUrl?: (url: string | undefined) => void;
     onContentChange?: (content: string) => void;
     onSubmit?: (data: BoxReplyCommentType) => void;
+    value?: string;
 }
 
 const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     onFileChange,
     onRemoveFileUrl,
     onContentChange,
-    onSubmit
+    onSubmit,
+    value
 }) => {
 
     const [fileList, setFileList] = useState<UploadFile[] | any[]>([]);
-    const [content, setContent] = useState<string>('')
+    const [content, setContent] = useState<string>(value ?? '')
 
     const handleRemoveFile = (file: UploadFile) => {
         const updatedFileList = [...fileList.filter(item => item.uid !== file.uid)]
         setFileList(updatedFileList)
         onRemoveFileUrl?.(file.url)
     }
-
 
     const props: UploadProps = {
         name: 'file',
@@ -57,15 +58,15 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     }
 
     const handleContentChange = (messageValue: string) => {
-        onContentChange?.(messageValue)
         setContent(messageValue)
+        onContentChange?.(messageValue)
     }
 
     return <div className="flex flex-col items-start gap-y-2 mb-2">
         <div className="flex items-center gap-x-2 w-full">
             <Avatar size='small' className="flex-shrink-0" src={images.user} />
             <div className={cn("bg-gray-100 px-1 rounded-3xl w-full flex items-center justify-between py-[2px]")}>
-                <input onChange={e => handleContentChange(e.target.value)} className="px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập bình luận" />
+                <input onChange={e => handleContentChange(e.target.value)} value={content} className="px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập bình luận" />
                 <div className="flex items-center gap-x-2">
                    {fileList.length === 0 &&  <button className="-mb-2">
                         <Upload {...props}>

@@ -18,7 +18,7 @@ namespace SocialNetwork.Application.Mappers
             };
         } 
 
-        public static PostResponse MapToPost(Post post)
+        public static PostResponse MapToPost(Post post, int countComments = 0)
         {
             return new PostResponse
             {
@@ -27,7 +27,8 @@ namespace SocialNetwork.Application.Mappers
                 Privacy = post.Privacy,
                 CreatedAt = post.DateCreated,
                 Medias = post.Medias != null ? post.Medias.Select(MapToPostMedia).ToList() : new(),
-                User = post.User != null ? MapToUser(post.User) : null
+                User = post.User != null ? MapToUser(post.User) : null,
+                Comments = countComments
             };
         }
 
@@ -53,6 +54,17 @@ namespace SocialNetwork.Application.Mappers
                 ParentCommentId = comment.ParentCommentId,
                 User = comment.User != null ? MapToUser(comment.User) : null,
                 IsHaveChildren = comment.Replies != null && comment.Replies.Count > 0,
+            };
+        }
+
+        public static ReactionResponse MapToReaction(Reaction reaction)
+        {
+            return new ReactionResponse
+            {
+                Id = reaction.Id,
+                PostId = reaction.Id,
+                ReactionType = reaction.Type,
+                User = reaction.User != null ? MapToUser(reaction.User) : null
             };
         }
     }

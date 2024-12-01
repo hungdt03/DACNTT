@@ -14,6 +14,7 @@ namespace SocialNetwork.Application.DTOs
         public List<MediaResponse> Medias { get; set; }
         public UserResponse User { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
+        public int Comments { get; set; }
 
     }
 }

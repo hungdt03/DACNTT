@@ -15,18 +15,22 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public ICommentRepository CommentRepository {  get; }
 
+        public IReactionRepository ReactionRepository { get; }
+
         public UnitOfWork
         (
                 AppDbContext context, 
                 IUserRepository userRepository, 
                 IPostRepository postRepository, 
-                ICommentRepository commentRepository
+                ICommentRepository commentRepository,
+                IReactionRepository reactionRepository
         )
         {
             _context = context;
             UserRepository = userRepository;
             PostRepository = postRepository;
             CommentRepository = commentRepository;
+            ReactionRepository = reactionRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

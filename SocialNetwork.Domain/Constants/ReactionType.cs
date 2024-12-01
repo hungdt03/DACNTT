@@ -8,7 +8,7 @@ namespace SocialNetwork.Domain.Constants
         public const string WOW = "WOW";
         public const string HAHA = "HAHA";
         public const string SAD = "SAD";
-        public const string HUNGRY = "HUNGRY";
+        public const string ANGRY = "ANGRY";
         public const string CARE = "CARE";
     }
 }

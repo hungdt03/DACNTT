@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Entity;
 using SocialNetwork.Infrastructure.DBContext;
-using System.ComponentModel.Design;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -16,9 +15,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _dbContext = dbContext;
         }
 
-        public async Task CreateCommentAsync(Comment comment)
+        public async Task<int> CountCommentsByPostIdAsync(Guid postId)
         {
-            await _dbContext.Comments.AddAsync(comment);
+            return await _dbContext.Comments.CountAsync(s => s.PostId == postId);
+        }
+
+        public async Task<Comment> CreateCommentAsync(Comment comment)
+        {
+            return (await _dbContext.Comments.AddAsync(comment)).Entity;
         }
 
         public async Task<(List<Comment> Comments, int TotalCount)> GetAllRepliesByCommentIdAsync(Guid commentId, int pageNumber, int pageSize)

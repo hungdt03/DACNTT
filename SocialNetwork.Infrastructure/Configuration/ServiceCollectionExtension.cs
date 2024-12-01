@@ -33,6 +33,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
+            services.AddScoped<IReactionRepository, ReactionRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
@@ -95,32 +96,7 @@ namespace SocialNetwork.Infrastructure.Configuration
 
                     options.Events = new JwtBearerEvents
                     {
-                        OnAuthenticationFailed = async context =>
-                        {
-                            var exception = context.Exception;
-                            var response = context.Response;
-
-                            var errorResponse = new BaseResponse
-                            {
-                                IsSuccess = false,
-                                StatusCode = System.Net.HttpStatusCode.Unauthorized, 
-                                Message = "Có lỗi xảy ra trong quá trình xác thực. Vui lòng thử lại!"
-                            };
-
-                            if (exception is SecurityTokenExpiredException)
-                            {
-                                errorResponse.Message = "Token đã hết hạn";
-                            }
-                            else if (exception is SecurityTokenInvalidSignatureException)
-                            {
-                                errorResponse.Message = "Token không hợp lệ";
-                            }
-
-                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                            context.Response.ContentType = "application/json";
-
-                            await response.WriteAsJsonAsync(errorResponse);
-                        },
+                       
                         OnMessageReceived = context =>
                         {
                             var accessToken = context.Request.Query["access_token"];

@@ -8,7 +8,8 @@ export type PostResource = {
     privacy: PrivacyType;
     user: UserResource;
     createdAt: Date;
-    medias: PostMediaResource[]
+    medias: PostMediaResource[];
+    comments: number;
 }
 
 export type PostMediaResource = {
