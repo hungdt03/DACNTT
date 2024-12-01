@@ -1,11 +1,13 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Features.Auth.Commands;
+using SocialNetwork.Application.Features.Auth.Queries;
 
 namespace SocialNetwork.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -29,6 +31,14 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> SignIn([FromBody] LoginCommand command)
         {
             var response = await mediator.Send(command);
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpGet("principal")]
+        public async Task<IActionResult> GetPrincipal()
+        {
+            var response = await mediator.Send(new GetPrincipalQuery());
             return Ok(response);
         }
     }

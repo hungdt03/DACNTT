@@ -1,3 +1,5 @@
+import { PostMediaResource } from "../../../types/post"
+
 export type ImageProps = {
-    items: string[]
+    items: PostMediaResource[]
 }

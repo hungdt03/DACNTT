@@ -1,9 +1,14 @@
-export type Comment = {
-    id: number;
+import { UserResource } from "./user";
+
+export type CommentResource = {
+    id: string; 
     content: string;
-    user: string;
-    createdAt: string;
-    commentParentId: number | null; // null nếu là bình luận cấp 1
-    children?: Comment[];
-  };
-  
+    parentCommentId?: string | null;
+    replyToUserId?: string | null;
+    replyToUserName?: string | null; 
+    mediaUrl?: string | null; 
+    user: UserResource;
+    createdAt: Date; 
+    isHaveChildren: boolean;
+    replies: CommentResource[]
+};

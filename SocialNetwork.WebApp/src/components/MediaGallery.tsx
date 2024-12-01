@@ -5,9 +5,11 @@ import SwiperCore, { Swiper as SwiperType } from "swiper";
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 SwiperCore.use([Navigation]);
 import 'swiper/css';
+import { PostMediaResource } from "../types/post";
+import { MediaType } from "../constants/media";
 
 interface MediaGalleryProps {
-    medias: string[];
+    medias: PostMediaResource[];
     currentPreview: number;
 }
 
@@ -113,15 +115,15 @@ const MediaGallery: FC<MediaGalleryProps> = ({
                 {medias.map((item, index) => {
                     return <SwiperSlide key={index}>
                         <div className="relative flex justify-center items-center w-full aspect-[16/9] overflow-hidden">
-                            {isVideo(item) ? (
+                            {item.mediaType === MediaType.VIDEO ? (
                                 <video
-                                    src={item}
+                                    src={item.mediaUrl}
                                     className="w-full h-full object-contain bg-black"
                                     controls
                                 />
                             ) : (
                                 <img
-                                    src={item}
+                                    src={item.mediaUrl}
                                     className="w-full h-full object-contain bg-black"
                                 />
                             )}

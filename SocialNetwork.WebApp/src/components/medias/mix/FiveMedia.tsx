@@ -4,6 +4,7 @@ import { isVideo } from "../utils";
 import { CloseOutlined } from '@ant-design/icons'                  
 import { Modal } from "antd";
 import MediaGallery from "../../MediaGallery";
+import { MediaType } from "../../../constants/media";
 
 const FiveMedia: FC<MixMediaProps> = ({
     items
@@ -20,36 +21,36 @@ const FiveMedia: FC<MixMediaProps> = ({
     return <>
         <div className="flex flex-col gap-2">
             <div className="grid grid-cols-3 gap-2">
-                {items.slice(0, 3).map((item, index) => isVideo(item) ? (
+                {items.slice(0, 3).map((item, index) => item.mediaType === MediaType.VIDEO ? (
                     <video
-                        key={index}
-                        src={item}
+                        key={item.id}
+                        src={item.mediaUrl}
                         className="w-full min-h-[200px] object-cover"
                         onClick={() => handlePreview(index)}
                         controls
                     />
                 ) : (
                     <img
-                        key={index}
-                        src={item}
+                        key={item.id}
+                        src={item.mediaUrl}
                         className="w-full h-full object-cover"
                         onClick={() => handlePreview(index)}
                     />
                 ))}
             </div>
             <div className="grid grid-cols-2 gap-2">
-                {items.slice(3).map((item, index) => isVideo(item) ? (
+                {items.slice(3).map((item, index) => item.mediaType === MediaType.VIDEO ? (
                     <video
-                        key={index + 3}
-                        src={item}
+                        key={item.id}
+                        src={item.mediaUrl}
                         className="w-full h-full object-cover"
                         onClick={() => handlePreview(index + 3)}
                         controls
                     />
                 ) : (
                     <img
-                        key={index}
-                        src={item}
+                        key={item.id}
+                        src={item.mediaUrl}
                         className="w-full h-full object-cover"
                         onClick={() => handlePreview(index + 3)}
                     />

@@ -9,11 +9,14 @@ import SignInPage from "../pages/SignInPage";
 import SignUpPage from "../pages/SignUpPage";
 import ChatLayout from "../layouts/ChatLayout/ChatLayout";
 import ChatPage from "../pages/ChatPage";
+import AuthGuard from "./authGuard";
+import NotFoundPage from "../pages/errors/NotFoundPage";
+import GuestGuard from "./guestGuard";
 
 const appRouter = createBrowserRouter([
     {
         path: '/',
-        element: <MainLayout />,
+        element: <AuthGuard element={<MainLayout />} />,
         children: [
             {
                 path: '',
@@ -23,7 +26,7 @@ const appRouter = createBrowserRouter([
     },
     {
         path: '/',
-        element: <AuthLayout />,
+        element: <GuestGuard element={<AuthLayout />} />,
         children: [
             {
                 path: 'sign-in',
@@ -37,7 +40,7 @@ const appRouter = createBrowserRouter([
     },
     {
         path: '/',
-        element: <HeaderOnlyLayout />,
+        element: <AuthGuard element={<HeaderOnlyLayout />} />,
         children: [
             {
                 path: 'groups',
@@ -51,7 +54,7 @@ const appRouter = createBrowserRouter([
     },
     {
         path: '/chat',
-        element: <ChatLayout />,
+        element: <AuthGuard element={<ChatLayout />} />,
         children: [
             {
                 path: ':id',
@@ -59,6 +62,10 @@ const appRouter = createBrowserRouter([
             }
         ]
     },
+    {
+        path: '*',
+        element: <NotFoundPage />
+    }
 ])
 
 export default appRouter;

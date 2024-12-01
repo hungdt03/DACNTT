@@ -3,9 +3,39 @@ import { FC } from "react";
 import images from "../../assets";
 import useModal from "../../hooks/useModal";
 import CreatePostModal from "../modals/CreatePostModal";
+import postService from "../../services/postService";
+import { Id, toast } from "react-toastify";
 
-const PostCreator: FC = () => {
+type PostCreatorProps = {
+    onSuccess?: (toastId: Id, message: string) => void;
+    onFalied?: (toastId: Id, message: string) => void;
+}
+
+const PostCreator: FC<PostCreatorProps> = ({
+    onSuccess,
+    onFalied
+}) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
+
+    const handleCreatePostAsync = async (values: FormData): Promise<boolean> => {
+        const toastId: Id = toast.loading('Đang tạo bài viết... Vui lòng không refresh lại trang');
+        handleOk()
+
+        try {
+            const response = await postService.createPost(values);
+            console.log(response)
+            if (response.isSuccess) {
+                onSuccess?.(toastId, response.message)
+                return true;
+            } else {
+                onFalied?.(toastId, response.message)
+                return false;
+            }
+        } catch (error) {
+            onFalied?.(toastId, error as string)
+            return false;
+        }
+    }
 
     return <div className="p-4 rounded-md bg-white flex flex-col gap-y-4 shadow">
         <div className="flex items-center gap-x-4">
@@ -29,7 +59,9 @@ const PostCreator: FC = () => {
         </div>
 
         <Modal title={<p className="text-center font-semibold text-xl">Tạo bài viết</p>} footer={[]} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            <CreatePostModal />
+            <CreatePostModal
+                onSubmit={handleCreatePostAsync}
+            />
         </Modal>
     </div>
 };

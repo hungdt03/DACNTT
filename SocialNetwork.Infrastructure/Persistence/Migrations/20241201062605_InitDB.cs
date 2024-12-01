@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -263,13 +263,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RawContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HtmlContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Background = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Background = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Privacy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    OriginalPostId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OriginalPostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
@@ -374,12 +373,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MediaType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MediaUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MediaType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MediaUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReplyToUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReplyToUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ParentCommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
@@ -392,11 +392,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Comments_Comments_CommentId",
-                        column: x => x.CommentId,
-                        principalTable: "Comments",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Comments_Comments_ParentCommentId",
                         column: x => x.ParentCommentId,
@@ -629,11 +624,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "IX_ChatRoomMembers_UserId",
                 table: "ChatRoomMembers",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Comments_CommentId",
-                table: "Comments",
-                column: "CommentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_ParentCommentId",

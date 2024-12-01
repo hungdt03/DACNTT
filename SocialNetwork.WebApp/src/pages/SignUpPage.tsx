@@ -1,26 +1,49 @@
 import { FC } from "react";
 import { Formik, Form, Field } from 'formik';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import images from "../assets";
+import authService from "../services/authService";
+import { toast } from "react-toastify";
+import signUpSchema from "../schemas/signUpSchema";
+
+export type SignUpRequest = {
+    fullName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+}
+
 
 const SignUpPage: FC = () => {
+    const navigate = useNavigate();
+
+
+    const handleSignUpAsync = async (values: SignUpRequest) => {
+        const response = await authService.signUp(values);
+        if(response.isSuccess) {
+            toast.success(response.message)
+            navigate('/sign-in');
+        } else {
+            toast.error(response.message)
+        }
+    }
+
     return <div className="flex flex-col gap-y-6 items-center justify-center h-full p-8">
 
-        <img className="w-20 h-20" src={images.facebook} />
+        <img alt="facebook" className="w-20 h-20" src={images.facebook} />
         <span className="font-bold text-2xl text-primary">ĐĂNG KÍ TÀI KHOẢN</span>
 
-        <Formik
+        <Formik<SignUpRequest>
             initialValues={{
                 email: '',
                 fullName: '',
                 password: '',
                 confirmPassword: '',
             }}
-            onSubmit={values => {
-                console.log(values);
-            }}
+            onSubmit={handleSignUpAsync}
+            validationSchema={signUpSchema}
         >
-            {({ errors, touched, isValidating }) => (
+            {({ errors, touched }) => (
                 <Form className="flex flex-col gap-y-4 w-full">
                     <div className="flex flex-col gap-y-1">
                         <label htmlFor="fullName" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
@@ -53,7 +76,7 @@ const SignUpPage: FC = () => {
                         {errors.confirmPassword && touched.confirmPassword && <div className="text-sm pl-3 text-red-500">{errors.confirmPassword}</div>}
 
                     </div>
-                    <button className="w-full py-2 mt-4 px-3 rounded-3xl text-white bg-primary" type="submit">Đăng nhập</button>
+                    <button className="w-full py-2 mt-4 px-3 rounded-3xl text-white bg-primary" type="submit">Đăng kí</button>
                     <div className="flex items-center gap-x-2 justify-center">
                         <span>Đã có tài khoản?</span>
                         <Link className="text-primary" to='/sign-in'>Đăng nhập</Link>

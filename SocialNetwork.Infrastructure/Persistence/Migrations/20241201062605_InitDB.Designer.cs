@@ -12,8 +12,8 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241127135145_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241201062605_InitDB")]
+    partial class InitDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,9 +229,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CommentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -243,11 +240,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("MediaType")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MediaUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ParentCommentId")
@@ -256,13 +251,17 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("PostId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ReplyToUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReplyToUserName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CommentId");
 
                     b.HasIndex("ParentCommentId");
 
@@ -535,6 +534,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Background")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -544,11 +546,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DateUpdated")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("HtmlContent")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("OriginalPostId")
+                    b.Property<Guid?>("OriginalPostId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("PostType")
@@ -556,10 +554,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Privacy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RawContent")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -855,12 +849,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Comment", b =>
                 {
-                    b.HasOne("SocialNetwork.Domain.Entity.Comment", null)
-                        .WithMany("Replies")
-                        .HasForeignKey("CommentId");
-
                     b.HasOne("SocialNetwork.Domain.Entity.Comment", "ParentComment")
-                        .WithMany()
+                        .WithMany("Replies")
                         .HasForeignKey("ParentCommentId")
                         .OnDelete(DeleteBehavior.NoAction);
 
@@ -1029,8 +1019,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasOne("SocialNetwork.Domain.Entity.Post", "OriginalPost")
                         .WithMany("Shares")
                         .HasForeignKey("OriginalPostId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialNetwork.Domain.Entity.User", "User")
                         .WithMany("Posts")

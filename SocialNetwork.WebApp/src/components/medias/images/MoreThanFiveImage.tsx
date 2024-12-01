@@ -1,5 +1,5 @@
 import { Image } from "antd";
-import { FC, useState } from "react";
+import React, { FC, useState } from "react";
 import { ImageProps } from "./ImageProps";
 
 
@@ -27,12 +27,14 @@ const MoreThanFiveImage: FC<ImageProps> = ({ items }) => {
                 <div className="grid grid-cols-3 gap-2">
                     {visibleImages.slice(0, 3).map((image, index) => (
                         <Image
-                            key={index}
-                            src={image}
+                            key={image.id}
+                            src={image.mediaUrl}
                             alt={`Post Image ${index + 1}`}
-                            className="w-full h-full object-cover"
+                            className="object-cover"
+                            width='100%'
+                            height='100%'
                             preview={{
-                                mask: null,
+                                mask: 'Xem',
                             }}
                             onClick={() => {
                                 setCurrentIndex(index)
@@ -43,34 +45,37 @@ const MoreThanFiveImage: FC<ImageProps> = ({ items }) => {
 
                 <div className="grid grid-cols-2 gap-2">
                     {visibleImages.slice(3, 5).map((image, index) => (
-                        <>
-                            {index === 0 && <div key={index}>
+                        <React.Fragment key={image.id}>
+                            {index === 0 && <div >
                                 <Image
-                                    src={image}
+                                    src={image.mediaUrl}
                                     alt={`Post Image ${index + 4}`}
-                                    className="w-full h-full object-cover"
+                                    className="object-cover"
+                                    width='100%'
+                                    height='100%'
                                     preview={{
-                                        mask: null,
+                                        mask: 'Xem',
                                     }}
                                     onClick={() => {
-                                        console.log(index)
+                                        
                                         setCurrentIndex(3)
                                     }}
                                 />
                             </div>}
-                            {index === 1 && extraImages.length > 0 && <div className="relative mb-2">
+                            {index === 1 && extraImages.length > 0 && <div className="relative overflow-hidden">
                                 {extraImages.map((extra, index) => (
-                                    <div key={index} className="absolute inset-0">
+                                    <div key={extra.id} className="absolute inset-0">
                                         <Image
-                                            src={extra}
-                                            key={index}
+                                            src={extra.mediaUrl}
                                             alt={`Post Image ${index + 4}`}
-                                            className="w-full h-full object-cover"
+                                            className="object-cover"
+                                            width='100%'
+                                            height='100%'
                                             style={{
-                                                zIndex: 50 - index
+                                                zIndex: 50 - index + 1
                                             }}
                                             preview={{
-                                                mask: null,
+                                                mask: 'Xem',
                                             }}
                                         />
                                     </div>
@@ -87,7 +92,7 @@ const MoreThanFiveImage: FC<ImageProps> = ({ items }) => {
                                 </button>
                             </div>}
 
-                        </>
+                        </React.Fragment>
                     ))}
                 </div>
             </div>

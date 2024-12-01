@@ -10,4 +10,7 @@ const getBase64 = (file: FileType): Promise<string> =>
         reader.onerror = (error) => reject(error);
     });
 
-export { getBase64 }
+const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/jpg'];
+const videoTypes = ['video/mp4', 'video/avi', 'video/mkv', 'video/webm'];
+
+export { getBase64, imageTypes, videoTypes }

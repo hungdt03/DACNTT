@@ -5,6 +5,7 @@ namespace SocialNetwork.Application.Interfaces
     {
         public IUserRepository UserRepository { get; }
         public IPostRepository PostRepository { get; }
+        public ICommentRepository CommentRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(CancellationToken cancellationToken = default);

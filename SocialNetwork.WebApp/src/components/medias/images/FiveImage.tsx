@@ -7,10 +7,19 @@ const FiveImage: FC<ImageProps> = ({
 }) => {
     return <div className="flex flex-col gap-2">
         <div className="grid grid-cols-3 gap-2">
-            {items.slice(0, 3).map((item, index) => <Image key={index} src={item} className="w-full h-full object-cover" />)}
+            {items.slice(0, 3).map((item, index) => <Image preview={{
+                mask: 'Xem',
+            }} key={index} src={item.mediaUrl} className="object-cover"
+                width='100%'
+                height='100%' />)}
         </div>
         <div className="grid grid-cols-2 gap-2">
-            {items.slice(3).map((item, index) => <Image key={index} src={item} className="w-full h-full object-cover" />)}
+            {items.slice(3).map((item, index) => <Image preview={{
+                mask: 'Xem',
+            }} key={index} src={item.mediaUrl}
+                className="object-cover"
+                width='100%'
+                height='100%' />)}
         </div>
     </div>
 };

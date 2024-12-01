@@ -1,10 +1,10 @@
 import { FC, useState } from "react";
 import { MixMediaProps } from "./MixMediaProps";
-import { isVideo } from "../utils";
 import OneImage from "../images/OneImage";
 import { Modal } from "antd";
 import MediaGallery from "../../MediaGallery";
 import { CloseOutlined } from '@ant-design/icons'
+import { MediaType } from "../../../constants/media";
 
 const OneMedia: FC<MixMediaProps> = ({
     items
@@ -18,8 +18,8 @@ const OneMedia: FC<MixMediaProps> = ({
     };
 
     return <>
-        {isVideo(items[0]) ? <video
-            src={items[0]}
+        {items[0].mediaType === MediaType.VIDEO ? <video
+            src={items[0].mediaUrl}
             className="w-full min-h-[200px] object-cover"
             onClick={() => handlePreview(0)}
             controls

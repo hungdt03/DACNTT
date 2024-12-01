@@ -1,9 +1,9 @@
 import { FC, useState } from "react";
 import { MixMediaProps } from "./MixMediaProps";
-import { isVideo } from "../utils";
 import { Modal } from "antd";
 import { CloseOutlined } from '@ant-design/icons'
 import MediaGallery from "../../MediaGallery";
+import { MediaType } from "../../../constants/media";
 
 const ThreeMedia: FC<MixMediaProps> = ({
     items
@@ -20,16 +20,16 @@ const ThreeMedia: FC<MixMediaProps> = ({
     return <>
         <div className="grid grid-cols-2 gap-2">
             <div className="col-span-1 h-full">
-                {isVideo(items[0]) ? (
+                {items[0].mediaType === MediaType.VIDEO ? (
                     <video
-                        src={items[0]}
+                        src={items[0].mediaUrl}
                         className="w-full h-full object-cover"
                         onClick={() => handlePreview(0)}
                         controls
                     />
                 ) : (
                     <img
-                        src={items[0]}
+                        src={items[0].mediaUrl}
                         className="w-full h-full object-cover"
                         onClick={() => handlePreview(0)}
                     />
@@ -38,18 +38,18 @@ const ThreeMedia: FC<MixMediaProps> = ({
 
             <div className="flex flex-col gap-2">
                 {items.slice(1).map((item, index) => {
-                    return isVideo(item) ? (
+                    return item.mediaType === MediaType.VIDEO ? (
                         <video
-                            src={item}
-                            key={index}
+                            src={item.mediaUrl}
+                            key={item.id}
                             className="w-full h-full object-cover"
                             onClick={() => handlePreview(index + 1)}
                             controls
                         />
                     ) : (
                         <img
-                            key={index}
-                            src={item}
+                            key={item.id}
+                            src={item.mediaUrl}
                             alt={`Post Media ${index + 1}`}
                             className="w-full h-full object-cover"
                             onClick={() => handlePreview(index + 1)}

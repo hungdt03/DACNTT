@@ -23,29 +23,31 @@ namespace SocialNetwork.Infrastructure.Cloudinary
 
             _cloudinary = new CloudinaryDotNet.Cloudinary(account);
         }
-        public async Task<string> UploadAsync(IFormFile file)
+        #region Upload Images
+        public async Task<string> UploadImageAsync(IFormFile file)
         {
             using (var stream = file.OpenReadStream())
             {
                 var uploadParams = new ImageUploadParams()
                 {
                     File = new FileDescription(file.FileName, stream),
-                    Folder = "SocialNetworkStorage",
+                    Folder = "SocialNetworkStorage/Images",
                 };
 
                 var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
                 if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     return uploadResult.SecureUrl.ToString();
                 }
                 else
                 {
-                    throw new AppException("Upload file thất bại");
+                    throw new AppException("Upload hình ảnh thất bại");
                 }
             }
         }
 
-        public async Task<ICollection<string>> UploadMultiAsync(ICollection<IFormFile> files)
+        public async Task<ICollection<string>> UploadMultipleImagesAsync(ICollection<IFormFile> files)
         {
             var uploadResults = new List<string>();
 
@@ -58,10 +60,11 @@ namespace SocialNetwork.Infrastructure.Cloudinary
                         var uploadParams = new ImageUploadParams()
                         {
                             File = new FileDescription(file.FileName, stream),
-                            Folder = "SocialNetworkStorage",
+                            Folder = "SocialNetworkStorage/Images",
                         };
 
                         var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
                         if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
                         {
                             uploadResults.Add(uploadResult.SecureUrl.ToString());
@@ -72,5 +75,60 @@ namespace SocialNetwork.Infrastructure.Cloudinary
 
             return uploadResults;
         }
+        #endregion
+
+        #region Upload Videos
+        public async Task<string> UploadVideoAsync(IFormFile file)
+        {
+            using (var stream = file.OpenReadStream())
+            {
+                var uploadParams = new VideoUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "SocialNetworkStorage/Videos",
+                };
+
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    return uploadResult.SecureUrl.ToString();
+                }
+                else
+                {
+                    throw new AppException("Upload video thất bại");
+                }
+            }
+        }
+
+        public async Task<ICollection<string>> UploadMultipleVideosAsync(ICollection<IFormFile> files)
+        {
+            var uploadResults = new List<string>();
+
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    using (var stream = file.OpenReadStream())
+                    {
+                        var uploadParams = new VideoUploadParams()
+                        {
+                            File = new FileDescription(file.FileName, stream),
+                            Folder = "SocialNetworkStorage/Videos",
+                        };
+
+                        var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                        if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            uploadResults.Add(uploadResult.SecureUrl.ToString());
+                        }
+                    }
+                }
+            }
+
+            return uploadResults;
+        }
+        #endregion
     }
 }

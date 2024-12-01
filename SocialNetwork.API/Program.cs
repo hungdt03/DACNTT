@@ -1,5 +1,6 @@
 using SocialNetwork.API.DI;
 using SocialNetwork.API.Middlewares;
+using System.Text.Json;
 
 namespace SocialNetwork.API
 {
@@ -14,8 +15,11 @@ namespace SocialNetwork.API
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            });
 
             var app = builder.Build();
 

@@ -1,14 +1,15 @@
-import { isVideo } from "../medias/utils";
 import PostMixMedia from '../medias/mix/PosMixMedia'
 import PostImage from "../medias/images/PostImage";
+import { PostMediaResource } from "../../types/post";
+import { MediaType } from "../../constants/media";
 
 interface PostMediaProps {
-    files: string[];
+    files: PostMediaResource[];
 }
 
 const PostMedia: React.FC<PostMediaProps> = ({ files }) => {
     
-    if(files.some(item => isVideo(item))) {
+    if(files.some(item => item.mediaType === MediaType.VIDEO)) {
         return <PostMixMedia items={files} />
     }
 

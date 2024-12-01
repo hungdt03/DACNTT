@@ -23,7 +23,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Configurations
                    .OnDelete(DeleteBehavior.NoAction);  
 
             builder.HasOne(c => c.ParentComment)
-                   .WithMany()
+                   .WithMany(c => c.Replies)
                    .HasForeignKey(c => c.ParentCommentId)
                    .OnDelete(DeleteBehavior.NoAction); 
         }

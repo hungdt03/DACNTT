@@ -4,6 +4,7 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Auth.Commands;
 using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Application.Mappers;
 
 namespace SocialNetwork.Application.Features.Auth.Handlers
 {
@@ -30,9 +31,15 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
 
             var tokens = await tokenService.GenerateTokenAsync(user);
 
-            return new DataResponse<TokenResponse>
+            var response = new AuthResponse
             {
-                Data = tokens,
+                Token = tokens,
+                User = ApplicationMapper.MapToUser(user),
+            };
+
+            return new DataResponse<AuthResponse>
+            {
+                Data = response,
                 IsSuccess = true,
                 Message = "Đăng nhập thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,

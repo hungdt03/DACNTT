@@ -1,22 +1,25 @@
 import { Image, Upload, UploadFile, UploadProps } from "antd";
 import { InboxOutlined } from '@ant-design/icons'
-import { FC, useEffect, useState } from "react";
+import { FC, forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { FileType, getBase64 } from "../../utils/file";
 import UploadButton from "./UploadButton";
+
 
 type UploadMultipleFileProps = {
     onChange?: (fileList: UploadFile[]) => void;
     valueUrls?: string[];
-    onRemoveFileUrl?: (url: string | undefined) => void
+    onRemoveFileUrl?: (url: string | undefined) => void;
 }
+
+type UploadMultipleFileRef = {
+    clear: () => void;
+};
 
 const { Dragger } = Upload;
 
-const UploadMultipleFile: FC<UploadMultipleFileProps> = ({
-    onChange,
-    valueUrls,
-    onRemoveFileUrl
-}) => {
+const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileProps>((
+    { onChange, valueUrls, onRemoveFileUrl }, ref
+) => {
     const [fileList, setFileList] = useState<UploadFile[] | any[]>([]);
     const [previewImageOpen, setPreviewImageOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
@@ -63,6 +66,12 @@ const UploadMultipleFile: FC<UploadMultipleFileProps> = ({
 
     }, [valueUrls])
 
+    useImperativeHandle(ref, () => ({
+        clear() {
+            setFileList([]);
+        },
+    }));
+
     return <>
         {fileList.length === 0 ? (
 
@@ -101,6 +110,6 @@ const UploadMultipleFile: FC<UploadMultipleFileProps> = ({
             </div>
         )}
     </>
-};
+});
 
 export default UploadMultipleFile;

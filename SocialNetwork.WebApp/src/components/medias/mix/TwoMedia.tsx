@@ -1,9 +1,9 @@
 import { FC, useState } from "react";
-import { isVideo } from "../utils";
 import { MixMediaProps } from "./MixMediaProps";
 import { Modal } from "antd";
 import { CloseOutlined } from '@ant-design/icons'
 import MediaGallery from "../../MediaGallery";
+import { MediaType } from "../../../constants/media";
 
 const TwoMedia: FC<MixMediaProps> = ({
     items
@@ -19,16 +19,18 @@ const TwoMedia: FC<MixMediaProps> = ({
     return <>
         <div className="grid grid-cols-2 gap-2">
             {items.map((item, index) => {
-                return isVideo(item) ? (
+                return item.mediaType === MediaType.VIDEO ? (
                     <video
-                        src={item}
+                        key={item.id}
+                        src={item.mediaUrl}
                         className="w-full h-full object-cover"
                         onClick={() => handlePreview(index)}
                         controls
                     />
                 ) : (
                     <img
-                        src={item}
+                        key={item.id}
+                        src={item.mediaUrl}
                         alt={`Post Media ${index + 1}`}
                         className="w-full h-full object-cover"
                         onClick={() => handlePreview(index)}

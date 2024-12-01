@@ -4,6 +4,7 @@ import { MixMediaProps } from "./MixMediaProps";
 import MediaGallery from "../../MediaGallery";
 import { CloseOutlined } from '@ant-design/icons'
 import { Modal } from "antd";
+import { MediaType } from "../../../constants/media";
 
 const MoreThanFiveMedia: FC<MixMediaProps> = ({
     items
@@ -25,17 +26,17 @@ const MoreThanFiveMedia: FC<MixMediaProps> = ({
             <div className="flex flex-col gap-2">
                 <div className="grid grid-cols-3 gap-2">
                     {visibleMedia.slice(0, 3).map((item, index) => (
-                        <div key={index} className="cursor-pointer">
-                            {isVideo(item) ? (
+                        <div key={item.id} className="cursor-pointer">
+                            {item.mediaType === MediaType.VIDEO ? (
                                 <video
-                                    src={item}
+                                    src={item.mediaUrl}
                                     className="w-full h-full object-cover"
                                     onClick={() => handlePreview(index)}
                                     controls
                                 />
                             ) : (
                                 <img
-                                    src={item}
+                                    src={item.mediaUrl}
                                     className="w-full h-full object-cover"
                                     onClick={() => handlePreview(index)}
                                 />
@@ -47,17 +48,17 @@ const MoreThanFiveMedia: FC<MixMediaProps> = ({
                 <div className="grid grid-cols-2 gap-2">
                     {visibleMedia.slice(3, 5).map((item, index) => (
                         <React.Fragment key={index}>
-                            {index === 0 && (<div key={index} className="cursor-pointer">
-                                {isVideo(item) ? (
+                            {index === 0 && (<div key={item.id} className="cursor-pointer">
+                                {item.mediaType === MediaType.VIDEO ? (
                                     <video
-                                        src={item}
+                                        src={item.mediaUrl}
                                         className="w-full h-full object-cover"
                                         onClick={() => handlePreview(3)}
                                         controls
                                     />
                                 ) : (
                                     <img
-                                        src={item}
+                                        src={item.mediaUrl}
                                         alt={`Post Media ${index + 4}`}
                                         className="w-full h-full object-cover"
                                         onClick={() => handlePreview(3)}
@@ -71,9 +72,9 @@ const MoreThanFiveMedia: FC<MixMediaProps> = ({
                                     onClick={() => handlePreview(4)}
                                 >
                                     <div className="absolute inset-0">
-                                        {isVideo(item) ? (
+                                        {item.mediaType === MediaType.VIDEO ? (
                                             <video
-                                                src={item}
+                                                src={item.mediaUrl}
                                                 className="w-full h-full object-cover"
                                                 controls
                                                 style={{
@@ -82,7 +83,7 @@ const MoreThanFiveMedia: FC<MixMediaProps> = ({
                                             />
                                         ) : (
                                             <img
-                                                src={item}
+                                                src={item.mediaUrl}
                                                 alt={`Post Media ${index + 5}`}
                                                 className="w-full h-full object-cover"
                                                 style={{

@@ -11,6 +11,7 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <PackageReference Include="MediatR" Version="11.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
   </ItemGroup>
 
@@ -19,7 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Auth\Validators\" />
+    <Folder Include="Features\User\Commands\" />
+    <Folder Include="Features\User\Handlers\" />
+    <Folder Include="Features\User\Queries\" />
   </ItemGroup>
 
 </Project>

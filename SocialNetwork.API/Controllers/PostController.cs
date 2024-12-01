@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Features.Post.Commands;
+using SocialNetwork.Application.Features.Post.Queries;
 
 namespace SocialNetwork.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
+    [Route("api/posts")]
     [ApiController]
     public class PostController : ControllerBase
     {
@@ -16,13 +18,19 @@ namespace SocialNetwork.API.Controllers
         {
             _mediator = mediator;
         }
-
-        [Authorize]
+        
         [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost]
-        public async Task<IActionResult> CreatePost([FromBody] CreatePostCommand command)
+        public async Task<IActionResult> CreatePost([FromForm] CreatePostCommand command)
         {
             var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllPosts()
+        {
+            var response = await _mediator.Send(new GetAllPostQuery());
             return Ok(response);
         }
     }

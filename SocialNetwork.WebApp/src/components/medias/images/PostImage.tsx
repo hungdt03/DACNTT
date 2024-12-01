@@ -13,6 +13,9 @@ const PostImage: FC<ImageProps> = ({
 }) => {
     let ImageComponent = OneImage;
     switch (items.length) {
+        case 1:
+            ImageComponent = OneImage;
+            break;
         case 2:
             ImageComponent = TwoImage;
             break;

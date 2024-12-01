@@ -1,9 +1,9 @@
 import { FC, useState } from "react";
 import { MixMediaProps } from "./MixMediaProps";
-import { isVideo } from "../utils";
 import { Modal } from "antd";
 import { CloseOutlined } from '@ant-design/icons'
 import MediaGallery from "../../MediaGallery";
+import { MediaType } from "../../../constants/media";
 
 const FourMedia: FC<MixMediaProps> = ({
     items
@@ -19,17 +19,17 @@ const FourMedia: FC<MixMediaProps> = ({
 
     return <>
         <div className="grid grid-cols-2 gap-2">
-            {items.map((item, index) => isVideo(item) ? (
-                <video key={index}
-                    src={item}
+            {items.map((item, index) => item.mediaType === MediaType.VIDEO ? (
+                <video key={item.id}
+                    src={item.mediaUrl}
                     className="w-full object-cover h-full"
                     onClick={() => handlePreview(index)}
                     controls
                 />
             ) : (
                 <img
-                    key={index}
-                    src={item}
+                    key={item.id}
+                    src={item.mediaUrl}
                     className="w-full h-full object-cover"
                     onClick={() => handlePreview(index)}
                 />

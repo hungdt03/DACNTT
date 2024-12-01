@@ -8,7 +8,8 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
 {
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BaseResponse>
     {
-        private readonly UserManager<SocialNetwork.Domain.Entity.User> userManager;
+        public const string AVATAR_URL = "https://www.murrayglass.com/wp-content/uploads/2020/10/avatar-1024x1024.jpeg";
+        private readonly UserManager<Domain.Entity.User> userManager;
 
         public RegisterCommandHandler(UserManager<Domain.Entity.User> userManager)
         {
@@ -26,6 +27,7 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
             user.FullName = request.FullName;
             user.Email = request.Email;
             user.UserName = request.Email;
+            user.Avatar = AVATAR_URL;
 
             var result = await userManager.CreateAsync(user, request.Password);
 

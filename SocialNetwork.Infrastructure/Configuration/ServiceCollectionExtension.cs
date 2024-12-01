@@ -11,6 +11,12 @@ using SocialNetwork.Infrastructure.Options;
 using SocialNetwork.Infrastructure.Persistence.Interceptors;
 using SocialNetwork.Infrastructure.Persistence.Repository;
 using SocialNetwork.Infrastructure.JsonWebToken;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Http;
+using SocialNetwork.Application.Contracts.Responses;
+using SocialNetwork.Infrastructure.Cloudinary;
 
 namespace SocialNetwork.Infrastructure.Configuration
 {
@@ -26,8 +32,10 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<ISaveChangesInterceptor, AuditEntityInterceptor>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 
             // Register DbContext 
@@ -65,7 +73,72 @@ namespace SocialNetwork.Infrastructure.Configuration
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
             });
 
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = configuration["JwtOptions:Issuer"],
+                        ValidateAudience = true,
+                        ValidAudience = configuration["JwtOptions:Audience"],
+                        ValidateIssuerSigningKey = true,
+                        ValidateLifetime = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtOptions:SecretKey"]!))
+                    };
+
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = async context =>
+                        {
+                            var exception = context.Exception;
+                            var response = context.Response;
+
+                            var errorResponse = new BaseResponse
+                            {
+                                IsSuccess = false,
+                                StatusCode = System.Net.HttpStatusCode.Unauthorized, 
+                                Message = "Có lỗi xảy ra trong quá trình xác thực. Vui lòng thử lại!"
+                            };
+
+                            if (exception is SecurityTokenExpiredException)
+                            {
+                                errorResponse.Message = "Token đã hết hạn";
+                            }
+                            else if (exception is SecurityTokenInvalidSignatureException)
+                            {
+                                errorResponse.Message = "Token không hợp lệ";
+                            }
+
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+
+                            await response.WriteAsJsonAsync(errorResponse);
+                        },
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken)
+                                && path.StartsWithSegments("/serverHub"))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+
+                    };
+
+                });
+
             return services;
+
         }
     }
 }

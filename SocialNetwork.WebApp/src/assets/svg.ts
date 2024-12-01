@@ -6,8 +6,14 @@ import haha from './svg/reactions/haha.svg'
 import sad from './svg/reactions/sad.svg'
 import wow from './svg/reactions/wow.svg'
 
+import loading from './svg/loading/loading.svg'
+
 const svgReaction = {
     like, angry, haha, love, sad, wow, care
 }
 
-export { svgReaction }
+const svgShared = {
+    loading
+}
+
+export { svgReaction, svgShared }

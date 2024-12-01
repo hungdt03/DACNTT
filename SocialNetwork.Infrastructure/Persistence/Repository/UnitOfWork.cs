@@ -13,11 +13,20 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public IUserRepository UserRepository { get; }
         public IPostRepository PostRepository { get; }
 
-        public UnitOfWork(AppDbContext context, IUserRepository userRepository, IPostRepository postRepository)
+        public ICommentRepository CommentRepository {  get; }
+
+        public UnitOfWork
+        (
+                AppDbContext context, 
+                IUserRepository userRepository, 
+                IPostRepository postRepository, 
+                ICommentRepository commentRepository
+        )
         {
             _context = context;
             UserRepository = userRepository;
             PostRepository = postRepository;
+            CommentRepository = commentRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
