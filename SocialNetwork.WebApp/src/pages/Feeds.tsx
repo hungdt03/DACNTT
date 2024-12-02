@@ -5,6 +5,8 @@ import { Id, toast } from "react-toastify";
 import { PostResource } from "../types/post";
 import postService from "../services/postService";
 import PostSkeleton from "../components/skeletons/PostSkeleton";
+import { PostType } from "../constants/post-type";
+import SharePost from "../components/posts/SharePost";
 
 const Feeds: FC = () => {
     const [loading, setLoading] = useState(false)
@@ -49,18 +51,14 @@ const Feeds: FC = () => {
             onFalied={handleCreatePostFailed}
         />
        
-        {loading ? <PostSkeleton /> : posts.map(post => <Post key={post.id} post={post} />)}
+        {loading ? <PostSkeleton /> : posts.map(post => {
+            if(post.postType === PostType.SHARE_POST) {
+                return <SharePost onFetch={fetchPosts} key={post.id} post={post} />
+            }
+
+            return <Post onFetch={fetchPosts} key={post.id} post={post} />
+        })}
     </div>
 };
 
 export default Feeds;
-
- {/* <SharePost />
-        <Post />
-        <PostGroup />
-        <SharePost />
-        <PostGroup />
-        <Post />
-        <PostGroup />
-        <SharePost />
-        <PostGroup /> */}

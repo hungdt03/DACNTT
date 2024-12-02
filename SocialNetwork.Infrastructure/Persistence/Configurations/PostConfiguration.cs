@@ -12,9 +12,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Configurations
             builder.HasKey(p => p.Id);
             builder.HasMany(p => p.Medias).WithOne(c => c.Post).HasForeignKey(c => c.PostId);
             builder.HasOne(p => p.User).WithMany(c => c.Posts).HasForeignKey(c => c.UserId);
-            builder.HasOne(p => p.OriginalPost)
+            builder.HasOne(p => p.SharePost)
               .WithMany(p => p.Shares) 
-              .HasForeignKey(p => p.OriginalPostId).OnDelete(DeleteBehavior.NoAction);
+              .HasForeignKey(p => p.SharePostId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

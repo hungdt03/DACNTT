@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDB : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -268,6 +268,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Privacy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SharePostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OriginalPostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
@@ -284,6 +285,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_Posts_Posts_OriginalPostId",
                         column: x => x.OriginalPostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Posts_Posts_SharePostId",
+                        column: x => x.SharePostId,
                         principalTable: "Posts",
                         principalColumn: "Id");
                 });
@@ -729,6 +735,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "IX_Posts_OriginalPostId",
                 table: "Posts",
                 column: "OriginalPostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_SharePostId",
+                table: "Posts",
+                column: "SharePostId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_UserId",

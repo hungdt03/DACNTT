@@ -34,6 +34,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IReactionRepository, ReactionRepository>();
+            services.AddScoped<IPostMediaRepository, PostMediaRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();

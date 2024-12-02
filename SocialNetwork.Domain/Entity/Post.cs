@@ -11,6 +11,8 @@ namespace SocialNetwork.Domain.Entity
         public string PostType { get; set; } 
         public string UserId { get; set; }
         public User User { get; set; }
+        public Guid? SharePostId { get; set; }
+        public Post SharePost { get; set; }
         public Guid? OriginalPostId { get; set; }
         public Post OriginalPost { get; set; }
         public ICollection<Post> Shares { get; set; } = new List<Post>();

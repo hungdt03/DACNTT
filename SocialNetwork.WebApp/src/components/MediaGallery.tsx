@@ -104,7 +104,7 @@ const MediaGallery: FC<MediaGalleryProps> = ({
 
         <div className="relative w-full">
             <Swiper
-                spaceBetween={5}
+                spaceBetween={0}
                 slidesPerView={1}
                 className="w-full"
                 direction="horizontal"

@@ -18,17 +18,24 @@ namespace SocialNetwork.Application.Mappers
             };
         } 
 
-        public static PostResponse MapToPost(Post post, int countComments = 0)
+        public static PostResponse MapToPost(Post post)
         {
+            if (post == null) return null;
             return new PostResponse
             {
                 Id = post.Id,
                 Content = post.Content,
                 Privacy = post.Privacy,
+                SharePostId = post.SharePostId,
+                OriginalPostId = post.OriginalPostId,
                 CreatedAt = post.DateCreated,
+                PostType = post.PostType,
                 Medias = post.Medias != null ? post.Medias.Select(MapToPostMedia).ToList() : new(),
                 User = post.User != null ? MapToUser(post.User) : null,
-                Comments = countComments
+                Comments = post.Comments != null ?post.Comments.Count : 0,
+                Shares = post.Shares != null ?post.Shares.Count : 0,
+                SharePost = MapToPost(post.SharePost),
+                OriginalPost = MapToPost(post.OriginalPost),
             };
         }
 

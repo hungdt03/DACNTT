@@ -10,6 +10,12 @@ export type PostResource = {
     createdAt: Date;
     medias: PostMediaResource[];
     comments: number;
+    shares: number;
+    postType: string;
+    originalPostId: string;
+    sharePost: PostResource;
+    originalPost: PostResource;
+    sharePostId: string;
 }
 
 export type PostMediaResource = {

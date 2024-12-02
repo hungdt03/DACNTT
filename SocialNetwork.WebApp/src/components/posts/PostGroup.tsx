@@ -12,7 +12,7 @@ import SharePostModal from "../modals/SharePostModal";
 import { Link } from "react-router-dom";
 import videos from "../../assets/video";
 import PostMedia from "./PostMedia";
-import BoxSendComment from "../BoxSendComment";
+import BoxSendComment from "../comments/BoxSendComment";
 
 const PostGroup: FC = () => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();

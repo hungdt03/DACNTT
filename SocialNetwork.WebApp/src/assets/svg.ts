@@ -10,7 +10,9 @@ import loading from './svg/loading/loading.svg'
 
 const svgReaction = {
     like, angry, haha, love, sad, wow, care
-}
+} as const;
+
+export type ReactionSvgType = keyof typeof svgReaction; 
 
 const svgShared = {
     loading

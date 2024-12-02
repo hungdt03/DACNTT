@@ -1,6 +1,6 @@
 import { Image, Upload, UploadFile, UploadProps } from "antd";
 import { InboxOutlined } from '@ant-design/icons'
-import { FC, forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { FileType, getBase64 } from "../../utils/file";
 import UploadButton from "./UploadButton";
 
@@ -46,6 +46,7 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
 
     const props: UploadProps = {
         name: 'file',
+        fileList: fileList,
         multiple: true,
         onChange(info) {
             onChange?.(info.fileList)
@@ -59,8 +60,8 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
 
     useEffect(() => {
         if (valueUrls) {
-            setFileList([...valueUrls.map(url => ({
-                url: url
+            setFileList([...valueUrls.map(item => ({
+                url: item
             }))])
         }
 
@@ -73,7 +74,7 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
     }));
 
     return <>
-        {fileList.length === 0 ? (
+        {fileList?.length === 0 ? (
 
             <Dragger {...props} style={{ marginBottom: '20px' }}>
                 <p className="ant-upload-drag-icon">
@@ -94,7 +95,7 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
                     onChange={handleImageChange}
                     onRemove={handleRemoveFile}
                 >
-                    {fileList.length >= 8 ? null : <UploadButton />}
+                    {(fileList?.length ?? 0) >= 8 ? null : <UploadButton />}
                 </Upload>
                 {previewImage && (
                     <Image

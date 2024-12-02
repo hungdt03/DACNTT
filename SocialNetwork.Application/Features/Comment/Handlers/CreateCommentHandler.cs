@@ -9,6 +9,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Comment.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using System.Runtime.InteropServices;
 
 namespace SocialNetwork.Application.Features.Comment.Handlers
 {
@@ -32,20 +33,22 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
             var post = await _unitOfWork.PostRepository.GetPostByIdAsync(request.PostId)
                 ?? throw new AppException("Bài viết không tồn tại");
 
+            var currentUser = await userManager.FindByIdAsync(userId);
+
             var comment = new Domain.Entity.Comment()
             {
                 Content = request.Content,
-                UserId = userId,
+                UserId = currentUser.Id,
                 PostId = request.PostId,
             };
 
-            if (!string.IsNullOrEmpty(request.ReplyToUserId))
+            if (request.ReplyToUserId != userId && !string.IsNullOrEmpty(request.ReplyToUserId))
             {
-                var user = await userManager.FindByIdAsync(userId)
+                var user = await userManager.FindByIdAsync(request.ReplyToUserId)
                     ?? throw new AppException("Thông tin người phản hồi không tồn tại");
 
                 comment.ReplyToUserId = request.ReplyToUserId;
-                comment.ReplyToUserName = user.UserName;
+                comment.ReplyToUserName = user.FullName;
 
             }
 

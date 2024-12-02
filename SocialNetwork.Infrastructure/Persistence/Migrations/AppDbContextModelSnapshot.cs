@@ -554,6 +554,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("SharePostId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -561,6 +564,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OriginalPostId");
+
+                    b.HasIndex("SharePostId");
 
                     b.HasIndex("UserId");
 
@@ -1014,8 +1019,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Post", b =>
                 {
                     b.HasOne("SocialNetwork.Domain.Entity.Post", "OriginalPost")
+                        .WithMany()
+                        .HasForeignKey("OriginalPostId");
+
+                    b.HasOne("SocialNetwork.Domain.Entity.Post", "SharePost")
                         .WithMany("Shares")
-                        .HasForeignKey("OriginalPostId")
+                        .HasForeignKey("SharePostId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialNetwork.Domain.Entity.User", "User")
@@ -1025,6 +1034,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("OriginalPost");
+
+                    b.Navigation("SharePost");
 
                     b.Navigation("User");
                 });

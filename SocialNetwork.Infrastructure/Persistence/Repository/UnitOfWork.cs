@@ -17,13 +17,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public IReactionRepository ReactionRepository { get; }
 
+        public IPostMediaRepository PostMediaRepository { get; }
+
         public UnitOfWork
         (
                 AppDbContext context, 
                 IUserRepository userRepository, 
                 IPostRepository postRepository, 
                 ICommentRepository commentRepository,
-                IReactionRepository reactionRepository
+                IReactionRepository reactionRepository,
+                IPostMediaRepository postMediaRepository
         )
         {
             _context = context;
@@ -31,6 +34,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             PostRepository = postRepository;
             CommentRepository = commentRepository;
             ReactionRepository = reactionRepository;
+            PostMediaRepository = postMediaRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

@@ -15,6 +15,12 @@ namespace SocialNetwork.Application.DTOs
         public UserResponse User { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public int Comments { get; set; }
+        public int Shares { get; set; }
+        public string PostType { get; set; }
+        public Guid? OriginalPostId { get; set; }
+        public Guid? SharePostId { get; set; }
+        public PostResponse SharePost { get; set; }
+        public PostResponse OriginalPost { get; set; }
 
     }
 }

@@ -23,7 +23,6 @@ const PostCreator: FC<PostCreatorProps> = ({
 
         try {
             const response = await postService.createPost(values);
-            console.log(response)
             if (response.isSuccess) {
                 onSuccess?.(toastId, response.message)
                 return true;
@@ -45,16 +44,16 @@ const PostCreator: FC<PostCreatorProps> = ({
         <Divider className="my-2" />
         <div className="flex items-center gap-x-4">
             <button className="py-[6px] px-4 bg-gray-100 flex items-center gap-x-2 rounded-md text-gray-500 text-sm">
-                <img alt="Image" className="w-6 h-6" src={images.photo} />
-                Ảnh
+                <img alt="Ảnh" className="w-6 h-6" src={images.photo} />
+                <span>Ảnh</span>
             </button>
             <button className="py-[6px] px-4 bg-gray-100 flex items-center gap-x-2 rounded-md text-gray-500 text-sm">
                 <img alt="Video" className="w-6 h-6" src={images.video} />
-                Video
+                <span>Video</span>
             </button>
             <button className="py-[6px] px-4 bg-gray-100 flex items-center gap-x-2 rounded-md text-gray-500 text-sm">
                 <img alt="Âm thanh" className="w-6 h-6" src={images.music} />
-                Âm thanh
+                <span> Âm thanh</span>
             </button>
         </div>
 

@@ -14,6 +14,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context = context;
         }
 
+        public async Task<int> CountSharesByPostIdAsync(Guid postId)
+        {
+            return await _context.Posts.CountAsync(s => s.OriginalPostId == postId);
+        }
+
         public async Task CreatePostAsync(Post post)
         {
             await _context.Posts.AddAsync(post);
@@ -25,6 +30,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.User)
                 .Include(p => p.Comments)
                 .Include(p => p.Medias)
+                .Include(p => p.SharePost)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.Medias)
                 .OrderByDescending(p => p.DateCreated)
                 .ToListAsync();
         }
@@ -32,6 +42,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<Post?> GetPostByIdAsync(Guid id)
         {
             return await _context.Posts
+                .Include(p => p.Medias)
+                .Include(p => p.User)
+                .Include(p => p.Comments)
+                .Include(p => p.SharePost)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.Medias)
                 .SingleOrDefaultAsync(p => p.Id == id);
         }
     }
