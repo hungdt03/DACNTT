@@ -13,11 +13,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public IUserRepository UserRepository { get; }
         public IPostRepository PostRepository { get; }
 
-        public ICommentRepository CommentRepository {  get; }
+        public ICommentRepository CommentRepository { get; }
 
         public IReactionRepository ReactionRepository { get; }
 
         public IPostMediaRepository PostMediaRepository { get; }
+
+        public IFriendRequestRepository FriendRequestRepository { get; }
+
+        public IFriendRepository FriendRepository { get; }
+        public INotificationRepository NotificationRepository { get; }
 
         public UnitOfWork
         (
@@ -26,7 +31,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 IPostRepository postRepository, 
                 ICommentRepository commentRepository,
                 IReactionRepository reactionRepository,
-                IPostMediaRepository postMediaRepository
+                IPostMediaRepository postMediaRepository,
+                IFriendRequestRepository friendRequestRepository,
+                IFriendRepository friendRepository,
+                INotificationRepository notificationRepository
         )
         {
             _context = context;
@@ -35,6 +43,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             CommentRepository = commentRepository;
             ReactionRepository = reactionRepository;
             PostMediaRepository = postMediaRepository;
+            FriendRequestRepository = friendRequestRepository;
+            FriendRepository = friendRepository;
+            NotificationRepository = notificationRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

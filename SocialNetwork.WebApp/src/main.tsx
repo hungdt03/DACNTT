@@ -7,25 +7,24 @@ import { ConfigProvider } from 'antd'
 import store from './app/store.ts'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SignalRProvider } from './contexts/SignalRProvider.tsx'
 
-const queryClient = new QueryClient();
 createRoot(document.getElementById('root')!).render(
     //<StrictMode>
-        <ConfigProvider theme={{
-            token: {
-                colorPrimary: '#0ea5e9',
-                fontFamily: "'Nunito', 'Segoe UI', 'Roboto', 'Arial', sans-serif;"
-            },
-        }}>
-            <QueryClientProvider client={queryClient}>
-                <Provider store={store}>
-                    <App />
-                    <ToastContainer />
-                </Provider>
-            </QueryClientProvider>
+    <ConfigProvider theme={{
+        token: {
+            colorPrimary: '#0ea5e9',
+            fontFamily: "'Nunito', 'Segoe UI', 'Roboto', 'Arial', sans-serif;"
+        },
+    }}>
+        <Provider store={store}>
+            {/* <SignalRProvider> */}
+                <App />
+                <ToastContainer />
+            {/* </SignalRProvider> */}
+        </Provider>
 
-        </ConfigProvider>
+    </ConfigProvider>
 
-   // </StrictMode>,
+    // </StrictMode>,
 )

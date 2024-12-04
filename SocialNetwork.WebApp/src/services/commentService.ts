@@ -1,8 +1,7 @@
 
-import { CommentRequest } from '../components/posts/Post';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { CommentResource } from '../types/comment';
-import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
+import { DataResponse, PaginationResponse } from '../types/response';
 
 
 class CommentService {
@@ -17,7 +16,7 @@ class CommentService {
     }
 
 
-    createComment(payload: CommentRequest): Promise<DataResponse<CommentResource>> {
+    createComment(payload: FormData): Promise<DataResponse<CommentResource>> {
         return axiosInterceptor.post('/api/comments', payload)
     }
 

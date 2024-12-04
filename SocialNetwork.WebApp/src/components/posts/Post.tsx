@@ -4,7 +4,7 @@ import images from "../../assets";
 import { MoreHorizontal } from "lucide-react";
 import { ChatBubbleLeftIcon, ShareIcon } from "@heroicons/react/24/outline";
 import { ReactionSvgType, svgReaction } from "../../assets/svg";
-import PostModal from "../modals/PostModal";
+import PostModal, { BoxCommendStateType } from "../modals/PostModal";
 import useModal from "../../hooks/useModal";
 import PostReactionModal from "../modals/PostReactionModal";
 import SharePostModal from "../modals/SharePostModal";
@@ -24,6 +24,7 @@ import { PostMoreAction } from "./PostMoreAction";
 import EditPostModal from "../modals/EditPostModal";
 import { Id, toast } from "react-toastify";
 import postService from "../../services/postService";
+import { Link } from "react-router-dom";
 
 export type CommentRequest = {
     postId: string;
@@ -70,7 +71,10 @@ const Post: FC<PostProps> = ({
     const { user } = useSelector(selectAuth)
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
-    const [content, setContent] = useState<string>('')
+    const [commentData, setCommentData] = useState<BoxCommendStateType>({
+        content: '',
+        fileList: []
+    })
     const [post, setPost] = useState<PostResource>(postParam)
 
     const fetchReactions = async () => {
@@ -93,8 +97,8 @@ const Post: FC<PostProps> = ({
 
     const fetchPostById = async () => {
         const response = await postService.getPostById(post.id);
-        
-        if(response.isSuccess) {
+
+        if (response.isSuccess) {
             setPost(response.data);
         } else {
             toast.error(response.message);
@@ -102,17 +106,21 @@ const Post: FC<PostProps> = ({
     }
 
     const handleCreateComment = async (values: BoxCommentType) => {
-        const comment: CommentRequest = {
-            content: values.content,
-            postId: post.id,
-            parentCommentId: null,
-            replyToUserId: null,
-        };
+        const formData = new FormData();
+        formData.append('content', values.content);
+        formData.append('postId', post.id);
 
-        const response = await commentService.createComment(comment);
+        if (values?.file?.originFileObj) {
+            formData.append('file', values.file.originFileObj, values.file.name);
+        }
+
+        const response = await commentService.createComment(formData);
         if (response.isSuccess) {
             message.success(response.message)
-            setContent('')
+            setCommentData({
+                content: '',
+                fileList: []
+            })
         } else {
             message.error(response.message)
         }
@@ -176,7 +184,7 @@ const Post: FC<PostProps> = ({
             <div className="flex items-center gap-x-2">
                 <Avatar className="w-10 h-10" src={post.user.avatar ?? images.user} />
                 <div className="flex flex-col gap-y-[1px]">
-                    <span className="font-semibold text-[16px] text-gray-600">{post.user.fullName}</span>
+                    <Link to={`/profile/${post.user.id}`} className="font-semibold text-[16px] text-gray-600">{post.user.fullName}</Link>
                     <div className="flex items-center gap-x-2">
                         <Tooltip title='Thứ bảy, 23 tháng 11, 2014 lúc 19:17'>
                             <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
@@ -232,9 +240,18 @@ const Post: FC<PostProps> = ({
         <Divider className='mt-0 mb-2' />
 
         <BoxSendComment
-            value={content}
-            onContentChange={(newValue) => setContent(newValue)}
+            value={commentData.content}
+            onContentChange={(newValue) => setCommentData({
+                ...commentData,
+                content: newValue
+            })}
             onSubmit={handleCreateComment}
+            key={'box-send-comment'}
+            files={commentData.fileList}
+            onFileChange={(file) => setCommentData({
+                ...commentData,
+                fileList: [file]
+            })}
         />
 
         <Modal
@@ -279,7 +296,7 @@ const Post: FC<PostProps> = ({
 
 
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
-            <SharePostModal 
+            <SharePostModal
                 onSuccess={msg => {
                     okSharePost()
                     onFetch?.()

@@ -1,9 +1,12 @@
 import { FC } from "react";
 import images from "../../assets";
-import { Avatar, Button, Divider } from "antd";
+import { Button, Divider } from "antd";
 import { MessageSquareText, MoreHorizontal, Plus, Upload } from "lucide-react";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
 
 const ProfileHeader: FC = () => {
+    const { user } = useSelector(selectAuth)
     return <div className="bg-white w-full shadow">
         <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto overflow-hidden">
             <div className="w-full h-full relative z-10">
@@ -15,10 +18,10 @@ const ProfileHeader: FC = () => {
             </div>
 
             <div className="flex flex-col lg:flex-row items-center lg:items-end -mt-20 gap-x-6 lg:-mt-6 px-8">
-                <img className="lg:w-44 lg:h-44 w-36 h-36 rounded-full border-[1px] border-primary z-30" src={images.user} />
+                <img className="lg:w-44 lg:h-44 w-36 h-36 rounded-full border-[1px] border-primary z-30" src={user?.avatar ?? images.user} />
                 <div className="lg:py-6 py-3 flex flex-col lg:flex-row items-center gap-y-4 lg:gap-y-0 lg:items-end justify-between w-full">
                     <div className="flex flex-col items-center lg:items-start gap-y-1">
-                        <span className="font-bold text-3xl">Lí Đại Cương</span>
+                        <span className="font-bold text-3xl">{user?.fullName}</span>
                         <div className="flex items-center gap-x-3">
                             <span className="text-gray-500">3,8K người theo dõi</span>
                             <div className="bg-primary w-2 h-2 rounded-full"></div>

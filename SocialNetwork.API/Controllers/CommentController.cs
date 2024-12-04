@@ -21,7 +21,7 @@ namespace SocialNetwork.API.Controllers
 
         [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost]
-        public async Task<IActionResult> CreateComment([FromBody] CreateCommentCommand command)
+        public async Task<IActionResult> CreateComment([FromForm] CreateCommentCommand command)
         {
             var response = await mediator.Send(command);
             return Ok(response);

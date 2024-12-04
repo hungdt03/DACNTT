@@ -8,6 +8,9 @@ namespace SocialNetwork.Application.Interfaces
         public ICommentRepository CommentRepository { get; }
         public IReactionRepository ReactionRepository { get; }
         public IPostMediaRepository PostMediaRepository { get; }
+        public IFriendRequestRepository FriendRequestRepository { get; }
+        public IFriendRepository FriendRepository { get; }
+        public INotificationRepository NotificationRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(CancellationToken cancellationToken = default);

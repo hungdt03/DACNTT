@@ -1,5 +1,6 @@
 using SocialNetwork.API.DI;
 using SocialNetwork.API.Middlewares;
+using SocialNetwork.Infrastructure.SignalR;
 using System.Text.Json;
 
 namespace SocialNetwork.API
@@ -9,7 +10,7 @@ namespace SocialNetwork.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddSignalR();
             // Add services to the container.
             builder.Services.RegisterDependencies(builder.Configuration);
             builder.Services.AddControllers();
@@ -37,6 +38,7 @@ namespace SocialNetwork.API
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHub<ServerHub>("/serverHub");
 
             app.Run();
         }

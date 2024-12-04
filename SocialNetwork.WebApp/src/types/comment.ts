@@ -1,3 +1,4 @@
+import { MediaType } from "../constants/media";
 import { UserResource } from "./user";
 
 export type CommentResource = {
@@ -7,6 +8,7 @@ export type CommentResource = {
     replyToUserId?: string | null;
     replyToUserName?: string | null; 
     mediaUrl?: string | null; 
+    mediaType?: MediaType; 
     user: UserResource;
     createdAt: Date; 
     isHaveChildren: boolean;

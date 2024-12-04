@@ -1,0 +1,9 @@
+import { FriendRequestStatus } from "../constants/friend-request";
+import { UserResource } from "./user";
+
+export type FriendRequestResource = {
+    id: string;
+    sender: UserResource;
+    dateCreated: Date;
+    status: FriendRequestStatus;
+}

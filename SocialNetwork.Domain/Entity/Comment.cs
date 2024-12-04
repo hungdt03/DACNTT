@@ -5,7 +5,7 @@ namespace SocialNetwork.Domain.Entity
 {
     public class Comment : BaseAuditableEntity
     {
-        public string Content { get; set; }
+        public string? Content { get; set; }
         public string? MediaType { get; set; }
         public string? MediaUrl { get; set; }
         public string? ReplyToUserId { get; set; }

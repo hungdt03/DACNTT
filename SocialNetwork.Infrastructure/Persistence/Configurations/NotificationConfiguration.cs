@@ -11,7 +11,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<Notification> builder)
         {
             builder.HasKey(x => x.Id);
-            builder.HasOne(n => n.Sender).WithMany().OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(n => n.Recipient).WithMany().OnDelete(DeleteBehavior.NoAction);
         }
     }

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { Formik, Form, Field } from 'formik';
 import { Link } from "react-router-dom";
 import images from "../assets";
@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../app/store";
 import { signIn } from "../features/slices/auth-slice";
+import { Button } from "antd";
 
 export type SignInRequest = {
     email: string;
@@ -17,10 +18,13 @@ export type SignInRequest = {
 
 const SignInPage: FC = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const [loading, setLoading] = useState(false)
 
     const handleLoginAsync = async (values: SignInRequest) => {
+        setLoading(true)
         const response = await authService.signIn(values);
-        if(response.isSuccess) {
+        setLoading(false)
+        if (response.isSuccess) {
             dispatch(signIn(response.data))
             toast.success(response.message)
         } else {
@@ -54,11 +58,11 @@ const SignInPage: FC = () => {
                         <label htmlFor="password" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
                             Mật khẩu
                         </label>
-                        <Field name="password" id='password' placeholder='Mật khẩu' className={cn('border-[1px] outline-none px-6 py-2 rounded-3xl transition-all ease-linear duration-150', (errors.email && touched.email) ? 'border-red-500' : 'border-primary')} />
+                        <Field name="password" type='password' id='password' placeholder='Mật khẩu' className={cn('border-[1px] outline-none px-6 py-2 rounded-3xl transition-all ease-linear duration-150', (errors.email && touched.email) ? 'border-red-500' : 'border-primary')} />
                         {errors.password && touched.password && <div className="text-sm pl-3 text-red-500">{errors.password}</div>}
 
                     </div>
-                    <button className="w-full py-2 mt-4 px-3 rounded-3xl text-white bg-primary" type="submit">Đăng nhập</button>
+                    <Button disabled={loading} htmlType="submit" loading={loading} className="w-full mt-4 px-3 rounded-3xl text-white bg-primary">Đăng nhập</Button>
                     <div className="flex items-center gap-x-2 justify-center">
                         <span>Chưa có tài khoản?</span>
                         <Link className="text-primary" to='/sign-up'>Đăng kí</Link>

@@ -12,6 +12,7 @@ import ChatPage from "../pages/ChatPage";
 import AuthGuard from "./authGuard";
 import NotFoundPage from "../pages/errors/NotFoundPage";
 import GuestGuard from "./guestGuard";
+import UserPage from "../pages/UserPage";
 
 const appRouter = createBrowserRouter([
     {
@@ -49,6 +50,10 @@ const appRouter = createBrowserRouter([
             {
                 path: 'profile',
                 element: <ProfilePage />
+            },
+            {
+                path: 'profile/:id',
+                element: <UserPage />
             },
         ]
     },

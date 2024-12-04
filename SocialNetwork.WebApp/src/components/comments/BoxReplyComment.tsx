@@ -6,9 +6,10 @@ import cn from "../../utils/cn";
 import images from "../../assets";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
+import { isVideo } from "../medias/utils";
 
 export type BoxReplyCommentType = {
-    files: UploadFile;
+    file: UploadFile;
     content: string;
 }
 
@@ -18,6 +19,7 @@ type BoxReplyCommentProps = {
     onContentChange?: (content: string) => void;
     onSubmit?: (data: BoxReplyCommentType) => void;
     value?: string;
+    files?: UploadFile[];
 }
 
 const BoxReplyComment: FC<BoxReplyCommentProps> = ({
@@ -25,10 +27,11 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     onRemoveFileUrl,
     onContentChange,
     onSubmit,
-    value = ''
+    value = '',
+    files = []
 }) => {
 
-    const [fileList, setFileList] = useState<UploadFile[] | any[]>([]);
+    const [fileList, setFileList] = useState<UploadFile[] | any[]>(files);
     const [content, setContent] = useState<string>(value)
     const { user } = useSelector(selectAuth)
 
@@ -55,7 +58,7 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
 
     const handleSubmit = () => {
         onSubmit?.({
-            files: fileList[0],
+            file: fileList[0],
             content
         } as BoxReplyCommentType)
     }
@@ -69,6 +72,10 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
         setContent(value)
     }, [value])
 
+    useEffect(() => {
+        setFileList(files)
+    }, [files])
+
     return <div className="flex flex-col items-start gap-y-2 mb-2">
         <div className="flex items-center gap-x-2 w-full">
             <Avatar size='small' className="flex-shrink-0" src={user?.avatar ?? images.user} />
@@ -80,7 +87,7 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
                             <img alt="upload" className="w-5 h-5" src={images.photo} />
                         </Upload>
                     </button>}
-                    <button disabled={!content} onClick={handleSubmit} className="w-9 h-9 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
+                    <button disabled={!content && fileList.length === 0} onClick={handleSubmit} className="w-9 h-9 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
                         <SendHorizonal size={24} className="text-sky-600" />
                     </button>
                 </div>
@@ -88,18 +95,22 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
         </div>
 
         {fileList.length > 0 && <div className="w-full flex items-center gap-x-2 px-8 py-1">
-            <Image.PreviewGroup>
-                {fileList.map(file => <div key={file.uid} className="relative">
-                    <Image preview={{
+        {fileList.map(file => <div key={file.uid} className="relative">
+                {isVideo(file.name) ?
+                    <video
+                        src={URL.createObjectURL(file.originFileObj)}
+                        className="w-[60px] h-[60px] object-cover"
+                        controls
+                    />
+                    : <Image preview={{
                         mask: null
-                    }} width='60px' height='60px' className="rounded-lg object-cover border-[1px] border-gray-100" src={URL.createObjectURL(file.originFileObj)} />
-                    <button onClick={() => {
-                        handleRemoveFile(file);
-                    }} className="absolute -top-2 -right-2 bg-red-400 shadow p-2 w-4 h-4 flex items-center justify-center rounded-full">
-                        <CloseOutlined className="text-[10px] text-white font-bold" />
-                    </button>
-                </div>)}
-            </Image.PreviewGroup>
+                    }} width='60px' height='60px' className="rounded-lg object-cover border-[1px] border-gray-100" src={URL.createObjectURL(file.originFileObj)} />}
+                <button onClick={() => {
+                    handleRemoveFile(file);
+                }} className="absolute -top-2 -right-2 bg-red-400 shadow p-2 w-4 h-4 flex items-center justify-center rounded-full">
+                    <CloseOutlined className="text-[10px] text-white font-bold" />
+                </button>
+            </div>)}
         </div>}
     </div>
 };

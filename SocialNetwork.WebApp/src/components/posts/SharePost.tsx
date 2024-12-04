@@ -2,11 +2,11 @@ import { FC, useEffect, useState } from "react";
 import useModal from "../../hooks/useModal";
 import { Avatar, Divider, Modal, Popover, Tooltip, message } from "antd";
 import images from "../../assets";
-import {  MoreHorizontal, ShareIcon } from "lucide-react";
+import { MoreHorizontal, ShareIcon } from "lucide-react";
 import { ReactionSvgType, svgReaction } from "../../assets/svg";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import PostReactionModal from "../modals/PostReactionModal";
-import PostModal from "../modals/PostModal";
+import PostModal, { BoxCommendStateType } from "../modals/PostModal";
 import SharePostModal from "../modals/SharePostModal";
 import PostShareInner from "./PostShareInner";
 import BoxSendComment, { BoxCommentType } from "../comments/BoxSendComment";
@@ -25,6 +25,7 @@ import { ReactionResource } from "../../types/reaction";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { useSelector } from "react-redux";
 import EditSharePostModal, { EditSharePostRequest } from "../modals/EditSharePostModal";
+import { Link } from "react-router-dom";
 
 type SharePostProps = {
     post: PostResource;
@@ -44,7 +45,10 @@ const SharePost: FC<SharePostProps> = ({
     const { user } = useSelector(selectAuth)
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
-    const [content, setContent] = useState<string>('')
+    const [commentData, setCommentData] = useState<BoxCommendStateType>({
+        content: '',
+        fileList: []
+    })
     const [post, setPost] = useState<PostResource>(postParam)
 
     const fetchReactions = async () => {
@@ -75,17 +79,20 @@ const SharePost: FC<SharePostProps> = ({
     }
 
     const handleCreateComment = async (values: BoxCommentType) => {
-        const comment: CommentRequest = {
-            content: values.content,
-            postId: post.id,
-            parentCommentId: null,
-            replyToUserId: null,
-        };
+        const formData = new FormData();
+        formData.append('content', values.content);
+        formData.append('postId', post.id);
 
-        const response = await commentService.createComment(comment);
+        if (values?.file?.originFileObj) {
+            formData.append('file', values.file.originFileObj, values.file.name);
+        }
+        const response = await commentService.createComment(formData);
         if (response.isSuccess) {
             message.success(response.message)
-            setContent('')
+            setCommentData({
+                content: '',
+                fileList: []
+            })
         } else {
             message.error(response.message)
         }
@@ -150,7 +157,7 @@ const SharePost: FC<SharePostProps> = ({
                 <Avatar className="w-10 h-10" src={post.user.avatar ?? images.user} />
                 <div className="flex flex-col gap-y-[1px]">
                     <div className="flex items-center gap-x-1">
-                        <span className="font-semibold text-[16px] text-gray-600">{post.user.fullName}</span>
+                        <Link to={`/profile/${post.user.id}`} className="font-semibold text-[16px] text-gray-600">{post.user.fullName}</Link>
                         <p className="text-gray-400">đã chia sẻ bài viết</p>
                     </div>
                     <div className="flex items-center gap-x-2">
@@ -205,9 +212,18 @@ const SharePost: FC<SharePostProps> = ({
         </div>
         <Divider className='mt-0 mb-2' />
         <BoxSendComment
-            value={content}
-            onContentChange={(newValue) => setContent(newValue)}
+            value={commentData.content}
+            onContentChange={(newValue) => setCommentData({
+                ...commentData,
+                content: newValue
+            })}
             onSubmit={handleCreateComment}
+            key={'box-send-comment'}
+            files={commentData.fileList}
+            onFileChange={(file) => setCommentData({
+                ...commentData,
+                fileList: [file]
+            })}
         />
 
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của Bùi Việt</p>} width='700px' footer={[

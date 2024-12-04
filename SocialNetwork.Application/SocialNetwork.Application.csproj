@@ -20,9 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Friend\Queries\" />
     <Folder Include="Features\User\Commands\" />
-    <Folder Include="Features\User\Handlers\" />
-    <Folder Include="Features\User\Queries\" />
   </ItemGroup>
 
 </Project>

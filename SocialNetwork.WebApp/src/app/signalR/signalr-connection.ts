@@ -1,43 +1,56 @@
 import * as signalR from "@microsoft/signalr";
+import { getAccessToken } from "../../utils/auth";
+import { NotificationResource } from "../../types/notification";
 
-const URL = "https://localhost:7000/notificationHub";
+const URL = "http://localhost:5172/serverHub";
 
-class Connector {
+class SignalRConnector {
 
     private connection: signalR.HubConnection;
     public events: (
         onMessageReceived?: (message: any) => void,
+        onNotificationReceived?: (notification: NotificationResource) => void,
     ) => void;
 
-    static instance: Connector;
+    static instance: SignalRConnector;
 
     constructor() {
         this.connection = new signalR.HubConnectionBuilder()
             .withUrl(URL, {
                 skipNegotiation: true, // prevent warning | error when using diffenrent domain with server
                 transport: signalR.HttpTransportType.WebSockets,
+                accessTokenFactory: async () => getAccessToken() ?? '',
             })
             .withAutomaticReconnect()
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
-        this.connection.start()
-        .then(() => console.log("Connected to SignalR"))
-        .catch(err => console.error("Error connecting to SignalR: ", err));
+        this.connection.start().catch(err => console.log(err));
 
-        this.events = (onMessageReceived) => {
-            this.connection.on("ReceiveGeneralNotification", (data) => {
-                onMessageReceived?.(data);
+        this.events = (onMessageReceived, onNotificationReceived) => {
+            this.connection.on("NewMessage", (message: any) => {
+                onMessageReceived?.(message);
             });
 
+            this.connection.on("NewNotification", (notification: NotificationResource) => {
+                onNotificationReceived?.(notification);
+            });
         };
     }
-  
 
-    public static getInstance(): Connector {
-        if (!Connector.instance)
-            Connector.instance = new Connector();
-        return Connector.instance;
+    // public sendMessage = async (message: MessageRequest) => {
+    //     if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
+    //         await this.connection.send("SendMessage", message)
+    //     } else {
+    //         console.error("Chưa kết nối tới Server SignalR");
+    //     }
+
+    // }
+
+    public static getInstance(): SignalRConnector {
+        if (!SignalRConnector.instance)
+            SignalRConnector.instance = new SignalRConnector();
+        return SignalRConnector.instance;
     }
 }
-export default Connector.getInstance;
+export default SignalRConnector.getInstance;

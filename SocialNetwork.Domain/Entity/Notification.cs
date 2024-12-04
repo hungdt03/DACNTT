@@ -6,13 +6,12 @@ namespace SocialNetwork.Domain.Entity
     public class Notification : BaseAuditableEntity
     {
         public string Type { get; set; } // Kiểu thông báo (kết bạn, chia sẻ bài viết, bình luận, phản hồi, v.v.)
+        public string Title { get; set; } // Nội dung thông báo (tóm tắt hoặc mô tả ngắn về hành động)
         public string Content { get; set; } // Nội dung thông báo (tóm tắt hoặc mô tả ngắn về hành động)
-
+        public string ImageUrl { get; set; }
         // Người nhận thông báo
         public string RecipientId { get; set; }
         public User Recipient { get; set; }
-        public string SenderId { get; set; }
-        public User Sender { get; set; }
         public bool IsRead { get; set; }
 
         // Đối tượng mà thông báo liên quan đến (ví dụ: bài viết, bạn bè, bình luận)

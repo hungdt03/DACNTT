@@ -9,6 +9,7 @@ namespace SocialNetwork.Application.DTOs
         public string? ReplyToUserId { get; set; }
         public string? ReplyToUserName { get; set; }
         public string? MediaUrl { get; set; }
+        public string? MediaType { get; set; }
         public UserResponse User { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public bool IsHaveChildren { get; set; }

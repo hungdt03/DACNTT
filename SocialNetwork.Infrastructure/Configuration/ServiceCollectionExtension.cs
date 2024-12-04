@@ -17,6 +17,7 @@ using System.Text;
 using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Infrastructure.Cloudinary;
+using SocialNetwork.Infrastructure.SignalR;
 
 namespace SocialNetwork.Infrastructure.Configuration
 {
@@ -35,9 +36,17 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IReactionRepository, ReactionRepository>();
             services.AddScoped<IPostMediaRepository, PostMediaRepository>();
+            services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
+            services.AddScoped<IFriendRepository, FriendRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ISignalRService, SignalRService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+            services.AddSingleton<ConnectionManager>();
 
 
             // Register DbContext 
@@ -114,6 +123,7 @@ namespace SocialNetwork.Infrastructure.Configuration
 
                 });
 
+           
             return services;
 
         }

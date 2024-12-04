@@ -1,16 +1,17 @@
 import { FC, useEffect, useState } from "react";
-import {  Modal, message } from "antd";
-import { CommentRequest } from "../posts/Post";
-import useModal from "../../hooks/useModal";
-import PostReactionModal from "./PostReactionModal";
+import {   UploadFile, message } from "antd";
 import { CommentResource } from "../../types/comment";
 import commentService from "../../services/commentService";
 import { PostResource } from "../../types/post";
 import BoxSendComment, { BoxCommentType } from "../comments/BoxSendComment";
 import { Pagination } from "../../types/response";
 import { CommentList } from "../comments/CommentList";
+import { Id, toast } from "react-toastify";
 
-
+export type BoxCommendStateType = {
+    fileList: UploadFile[];
+    content: string;
+}
 
 type PostModalProps = {
     post: PostResource;
@@ -20,7 +21,11 @@ const PostModal: FC<PostModalProps> = ({
     post
 }) => {
     const [comments, setComments] = useState<CommentResource[]>([])
-    const [content, setContent] = useState<string>('')
+    const [commentData, setCommentData] = useState<BoxCommendStateType>({
+        content: '',
+        fileList: []
+    })
+
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         size: 6,
@@ -28,20 +33,35 @@ const PostModal: FC<PostModalProps> = ({
     })
 
     const handleCreateComment = async (values: BoxCommentType) => {
-        const comment: CommentRequest = {
-            content: values.content,
-            postId: post.id,
-            parentCommentId: null,
-            replyToUserId: null,
-        };
+        const formData = new FormData();
+        formData.append('content', values.content);
+        formData.append('postId', post.id);
 
-        const response = await commentService.createComment(comment);
+        if(values?.file?.originFileObj) {
+            formData.append('file', values.file.originFileObj, values.file.name);
+        }
+
+        const toastId: Id = toast.loading('Đang viết bình luận... Vui lòng không refresh lại trang');
+        const response = await commentService.createComment(formData);
         if (response.isSuccess) {
-            message.success(response.message)
+            toast.update(toastId, {
+                render: response.message,
+                type: 'success',
+                isLoading: false,
+                autoClose: 3000,
+            });
             setComments((prevComment) => [response.data, ...prevComment])
-            setContent('')
+            setCommentData({
+                content: '',
+                fileList: []
+            })
         } else {
-            message.error(response.message)
+            toast.update(toastId, {
+                render: response.message,
+                type: 'error',
+                isLoading: false,
+                autoClose: 3000,
+            });
         }
     }
 
@@ -58,14 +78,18 @@ const PostModal: FC<PostModalProps> = ({
     }, [post])
 
     const handleReplyComment = async (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | null) => {
-        const comment: CommentRequest = {
-            content: values.content,
-            postId: post.id,
-            parentCommentId: parentCommentId,
-            replyToUserId: replyToUserId,
-        };
 
-        const response = await commentService.createComment(comment);
+        const formData = new FormData();
+        formData.append('content', values.content);
+        formData.append('postId', post.id);
+        formData.append('parentCommentId', parentCommentId as string);
+        formData.append('replyToUserId', replyToUserId as string);
+
+        if(values?.file?.originFileObj) {
+            formData.append('file', values.file.originFileObj, values.file.name);
+        }
+
+        const response = await commentService.createComment(formData);
         if (response.isSuccess) {
             message.success(response.message)
 
@@ -117,7 +141,20 @@ const PostModal: FC<PostModalProps> = ({
         />
 
         <div className="shadow p-4 absolute left-0 right-0 bottom-0 bg-white rounded-b-md">
-            <BoxSendComment value={content} onContentChange={(newValue) => setContent(newValue)} onSubmit={handleCreateComment} key={'box-send-comment'} />
+            <BoxSendComment 
+                value={commentData.content} 
+                onContentChange={(newValue) => setCommentData({
+                    ...commentData,
+                    content: newValue
+                })} 
+                onSubmit={handleCreateComment} 
+                key={'box-send-comment'}
+                files={commentData.fileList}
+                onFileChange={(file) => setCommentData({
+                    ...commentData,
+                    fileList: [file]
+                })}
+             />
         </div>
     </div>
 };

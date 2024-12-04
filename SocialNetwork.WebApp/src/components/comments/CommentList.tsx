@@ -23,15 +23,12 @@ export const CommentList: React.FC<CommentListProps> = ({
     fetchNextPage
 }) => {
     const [replyToId, setReplyToId] = useState<string | null>(null);
-
-
     const handleReply = (id: string) => {
         setReplyToId((prev) => (prev === id ? null : id));
     };
 
-
     return (
-        <div className="flex flex-col gap-y-3">
+        <div className="flex flex-col gap-y-3 py-4">
             {comments.map((comment) => (
                 <CommentItem
                     parentComment={null}
@@ -47,7 +44,7 @@ export const CommentList: React.FC<CommentListProps> = ({
 
             ))}
 
-            {pagination.hasMore && <button onClick={() => fetchNextPage(pagination.page + 1, pagination.size)} className="text-center text-xs font-semibold">Tải thêm bình luận</button>}
+            {pagination.hasMore && <button onClick={() => fetchNextPage(pagination.page + 1, pagination.size)} className="text-center text-xs font-semibold mb-4">Tải thêm bình luận</button>}
         </div>
     );
 };

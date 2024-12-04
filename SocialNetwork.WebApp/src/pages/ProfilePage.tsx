@@ -9,7 +9,7 @@ const ProfilePage: FC = () => {
         <div className="flex flex-col h-full gap-y-4 lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto">
             <div className="grid grid-cols-12 gap-6 h-full">
                 <ProfileLeftSide />
-                <ProfilePostList />
+                {/* <ProfilePostList /> */}
             </div>
         </div >
     </div>

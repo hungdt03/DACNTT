@@ -1,6 +1,7 @@
 ﻿
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Domain.Entity;
+using System.Linq.Expressions;
 
 namespace SocialNetwork.Application.Mappers
 {
@@ -59,6 +60,7 @@ namespace SocialNetwork.Application.Mappers
                 ReplyToUserId = comment.ReplyToUserId,
                 ReplyToUserName = comment.ReplyToUserName,
                 ParentCommentId = comment.ParentCommentId,
+                MediaType = comment.MediaType,
                 User = comment.User != null ? MapToUser(comment.User) : null,
                 IsHaveChildren = comment.Replies != null && comment.Replies.Count > 0,
             };
@@ -72,6 +74,35 @@ namespace SocialNetwork.Application.Mappers
                 PostId = reaction.Id,
                 ReactionType = reaction.Type,
                 User = reaction.User != null ? MapToUser(reaction.User) : null
+            };
+        }
+
+        public static FriendRequestResponse MapToFriendRequest(FriendRequest friendRequest)
+        {
+            return new FriendRequestResponse
+            {
+                Id = friendRequest.Id,
+                Sender = friendRequest.Sender != null ? MapToUser(friendRequest.Sender) : null,
+                SentAt = friendRequest.DateCreated,
+                Status = friendRequest.Status,
+            };
+        }
+
+        public static NotificationResponse MapToNotification(Notification notification)
+        {
+            return new NotificationResponse()
+            {
+                Id = notification.Id,
+                CommentId = notification.CommentId,
+                Content = notification.Content,
+                DateSent = notification.DateSent,
+                FriendRequestId = notification.FriendRequestId,
+                ImageUrl = notification.ImageUrl,
+                IsRead = notification.IsRead,
+                PostId = notification.PostId,
+                Recipient = notification.Recipient != null ? MapToUser(notification.Recipient) : null,
+                Title = notification.Title,
+                Type = notification.Type,
             };
         }
     }

@@ -2,14 +2,16 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Application.Common.Helpers;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Comment.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
-using System.Runtime.InteropServices;
+using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.Comment.Handlers
 {
@@ -18,12 +20,14 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly UserManager<Domain.Entity.User> userManager;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public CreateCommentHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.User> userManager)
+        public CreateCommentHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.User> userManager, ICloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             this.userManager = userManager;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<BaseResponse> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
@@ -41,6 +45,23 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 UserId = currentUser.Id,
                 PostId = request.PostId,
             };
+
+            if(request.File != null)
+            {
+                if (FileValidationHelper.IsImageFile(request.File))
+                {
+                    var url = await _cloudinaryService.UploadImageAsync(request.File);
+                    comment.MediaType = MediaType.IMAGE;
+                    comment.MediaUrl = url;
+                }
+                else if (FileValidationHelper.IsVideoFile(request.File))
+                {
+                    var url = await _cloudinaryService.UploadVideoAsync(request.File);
+                    comment.MediaType = MediaType.VIDEO;
+                    comment.MediaUrl = url;
+                }
+                else throw new AppException("Tập tin không được hỗ trợ");
+            }
 
             if (request.ReplyToUserId != userId && !string.IsNullOrEmpty(request.ReplyToUserId))
             {

@@ -6,9 +6,10 @@ import { useEffect } from "react";
 import { getAccessToken } from "./utils/auth";
 import { initialize } from "./features/slices/auth-slice";
 import authService from "./services/authService";
+import SignalRConnector from './app/signalR/signalr-connection'
 
 function App() {
-
+    
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
@@ -33,6 +34,8 @@ function App() {
                 dispatch(initialize({ isAuthenticated: false, user: undefined }));
             }
         })();
+
+        SignalRConnector()
 
     }, []);
 
