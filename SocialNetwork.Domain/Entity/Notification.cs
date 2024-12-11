@@ -20,7 +20,7 @@ namespace SocialNetwork.Domain.Entity
         public Guid? CommentId { get; set; }
         public Comment Comment { get; set; }
         public Guid? FriendRequestId { get; set; }
-        public FriendRequest FriendRequest { get; set; }
+        public FriendShip FriendRequest { get; set; }
 
         // Thời gian gửi thông báo
         public DateTimeOffset DateSent { get; set; }

@@ -19,9 +19,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public IPostMediaRepository PostMediaRepository { get; }
 
-        public IFriendRequestRepository FriendRequestRepository { get; }
+        public IFriendShipRepository FriendShipRepository { get; }
 
-        public IFriendRepository FriendRepository { get; }
         public INotificationRepository NotificationRepository { get; }
 
         public UnitOfWork
@@ -32,8 +31,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 ICommentRepository commentRepository,
                 IReactionRepository reactionRepository,
                 IPostMediaRepository postMediaRepository,
-                IFriendRequestRepository friendRequestRepository,
-                IFriendRepository friendRepository,
+                IFriendShipRepository friendShipRepository,
                 INotificationRepository notificationRepository
         )
         {
@@ -43,8 +41,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             CommentRepository = commentRepository;
             ReactionRepository = reactionRepository;
             PostMediaRepository = postMediaRepository;
-            FriendRequestRepository = friendRequestRepository;
-            FriendRepository = friendRepository;
+            FriendShipRepository = friendShipRepository;
             NotificationRepository = notificationRepository;
         }
 

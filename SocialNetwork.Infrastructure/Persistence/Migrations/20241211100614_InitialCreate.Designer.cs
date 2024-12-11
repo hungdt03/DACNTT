@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241202152005_InitialCreate")]
+    [Migration("20241211100614_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -230,7 +230,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("DateCreated")
@@ -305,39 +304,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.ToTable("Follows");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Domain.Entity.Friend", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("ConnectedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("DateCreated")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("DateUpdated")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("FirstUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("LastUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FirstUserId");
-
-                    b.HasIndex("LastUserId");
-
-                    b.ToTable("Friends");
-                });
-
-            modelBuilder.Entity("SocialNetwork.Domain.Entity.FriendRequest", b =>
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.FriendShip", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -349,11 +316,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DateUpdated")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SenderId")
+                    b.Property<string>("FriendId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -361,13 +324,17 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ReceiverId");
+                    b.HasIndex("FriendId");
 
-                    b.HasIndex("SenderId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("FriendRequests");
+                    b.ToTable("FriendShips");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Message", b =>
@@ -494,6 +461,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("FriendRequestId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
@@ -504,9 +475,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("SenderId")
+                    b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -521,8 +492,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("PostId");
 
                     b.HasIndex("RecipientId");
-
-                    b.HasIndex("SenderId");
 
                     b.ToTable("Notifications");
                 });
@@ -897,42 +866,23 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Follower");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Domain.Entity.Friend", b =>
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.FriendShip", b =>
                 {
-                    b.HasOne("SocialNetwork.Domain.Entity.User", "FirstUser")
-                        .WithMany("Friends")
-                        .HasForeignKey("FirstUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("SocialNetwork.Domain.Entity.User", "LastUser")
-                        .WithMany()
-                        .HasForeignKey("LastUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("FirstUser");
-
-                    b.Navigation("LastUser");
-                });
-
-            modelBuilder.Entity("SocialNetwork.Domain.Entity.FriendRequest", b =>
-                {
-                    b.HasOne("SocialNetwork.Domain.Entity.User", "Receiver")
+                    b.HasOne("SocialNetwork.Domain.Entity.User", "Friend")
                         .WithMany("RequestReceives")
-                        .HasForeignKey("ReceiverId")
+                        .HasForeignKey("FriendId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("SocialNetwork.Domain.Entity.User", "Sender")
+                    b.HasOne("SocialNetwork.Domain.Entity.User", "User")
                         .WithMany("RequestSends")
-                        .HasForeignKey("SenderId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Receiver");
+                    b.Navigation("Friend");
 
-                    b.Navigation("Sender");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Message", b =>
@@ -988,7 +938,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("CommentId");
 
-                    b.HasOne("SocialNetwork.Domain.Entity.FriendRequest", "FriendRequest")
+                    b.HasOne("SocialNetwork.Domain.Entity.FriendShip", "FriendRequest")
                         .WithMany()
                         .HasForeignKey("FriendRequestId");
 
@@ -1002,12 +952,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("SocialNetwork.Domain.Entity.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.Navigation("Comment");
 
                     b.Navigation("FriendRequest");
@@ -1015,8 +959,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Post");
 
                     b.Navigation("Recipient");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Post", b =>
@@ -1144,8 +1086,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Followers");
 
                     b.Navigation("Followings");
-
-                    b.Navigation("Friends");
 
                     b.Navigation("MessageReadStatuses");
 

@@ -36,8 +36,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<ICommentRepository, CommentRepository>();
             services.AddScoped<IReactionRepository, ReactionRepository>();
             services.AddScoped<IPostMediaRepository, PostMediaRepository>();
-            services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
-            services.AddScoped<IFriendRepository, FriendRepository>();
+            services.AddScoped<IFriendShipRepository, FriendShipRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

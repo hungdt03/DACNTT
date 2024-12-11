@@ -77,12 +77,12 @@ namespace SocialNetwork.Application.Mappers
             };
         }
 
-        public static FriendRequestResponse MapToFriendRequest(FriendRequest friendRequest)
+        public static FriendRequestResponse MapToFriendRequest(FriendShip friendRequest)
         {
             return new FriendRequestResponse
             {
                 Id = friendRequest.Id,
-                Sender = friendRequest.Sender != null ? MapToUser(friendRequest.Sender) : null,
+                Sender = friendRequest.User != null ? MapToUser(friendRequest.User) : null,
                 SentAt = friendRequest.DateCreated,
                 Status = friendRequest.Status,
             };
@@ -103,6 +103,18 @@ namespace SocialNetwork.Application.Mappers
                 Recipient = notification.Recipient != null ? MapToUser(notification.Recipient) : null,
                 Title = notification.Title,
                 Type = notification.Type,
+            };
+        }
+
+        public static FriendResponse MapToFriend(User user)
+        {
+            return new FriendResponse()
+            {
+                Id = user.Id,
+                Avatar = user.Avatar,
+                Bio = user.Bio,
+                Email = user.Email,
+                FullName = user.FullName,
             };
         }
     }

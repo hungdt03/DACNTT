@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
-using SocialNetwork.Application.Features.FriendRequest.Commands;
-using SocialNetwork.Application.Features.FriendRequest.Queries;
+using SocialNetwork.Application.Features.FriendShip.Commands;
+using SocialNetwork.Application.Features.FriendShip.Queries;
 using SocialNetwork.Application.Features.User.Queries;
 
 namespace SocialNetwork.API.Controllers

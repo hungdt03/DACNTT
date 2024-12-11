@@ -11,6 +11,8 @@ import earth from './images/earth.png'
 import tagFriend from './images/tag.png'
 import cover from './images/cover.jpg'
 import coverGroup from './images/cover-group.png'
+import follower from './images/follow.png'
+import userProfile from './images/hr-manager.png'
 
 const images = {
     facebook,
@@ -25,7 +27,9 @@ const images = {
     settings,
     earth,
     tagFriend,
-    coverGroup
+    coverGroup,
+    follower,
+    userProfile
 }
 
 export default images

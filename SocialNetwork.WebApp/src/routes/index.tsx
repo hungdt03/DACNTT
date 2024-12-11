@@ -13,10 +13,12 @@ import AuthGuard from "./authGuard";
 import NotFoundPage from "../pages/errors/NotFoundPage";
 import GuestGuard from "./guestGuard";
 import UserPage from "../pages/UserPage";
+import ErrorBoundaryPage from "../pages/errors/ErrorBoundaryPage";
 
 const appRouter = createBrowserRouter([
     {
         path: '/',
+        errorElement: <ErrorBoundaryPage />,
         element: <AuthGuard element={<MainLayout />} />,
         children: [
             {
@@ -41,6 +43,7 @@ const appRouter = createBrowserRouter([
     },
     {
         path: '/',
+        errorElement: <ErrorBoundaryPage />,
         element: <AuthGuard element={<HeaderOnlyLayout />} />,
         children: [
             {
@@ -59,6 +62,7 @@ const appRouter = createBrowserRouter([
     },
     {
         path: '/chat',
+        errorElement: <ErrorBoundaryPage />,
         element: <AuthGuard element={<ChatLayout />} />,
         children: [
             {

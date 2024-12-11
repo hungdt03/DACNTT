@@ -4,7 +4,7 @@ import { EditSharePostRequest } from '../components/modals/EditSharePostModal';
 import { SharePostRequest } from '../components/modals/SharePostModal';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { PostResource } from '../types/post';
-import { BaseResponse, DataResponse } from '../types/response';
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
 
 class PostService {
@@ -27,8 +27,13 @@ class PostService {
         return axiosInterceptor.put('/api/posts/' + postId, payload)
     }
 
-    getAllPosts() : Promise<DataResponse<PostResource[]>> {
-        return axiosInterceptor.get('/api/posts')
+    getAllPosts(page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts', {
+            params: {
+                page: page,  
+                size: size  
+            }
+        })
     }
 
     getPostById(postId: string) : Promise<DataResponse<PostResource>> {

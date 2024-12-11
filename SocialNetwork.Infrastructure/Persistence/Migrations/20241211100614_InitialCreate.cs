@@ -207,53 +207,27 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FriendRequests",
+                name: "FriendShips",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FriendId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FriendRequests", x => x.Id);
+                    table.PrimaryKey("PK_FriendShips", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FriendRequests_AspNetUsers_ReceiverId",
-                        column: x => x.ReceiverId,
+                        name: "FK_FriendShips_AspNetUsers_FriendId",
+                        column: x => x.FriendId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_FriendRequests_AspNetUsers_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Friends",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FirstUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LastUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ConnectedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Friends", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Friends_AspNetUsers_FirstUserId",
-                        column: x => x.FirstUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Friends_AspNetUsers_LastUserId",
-                        column: x => x.LastUserId,
+                        name: "FK_FriendShips_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
@@ -378,7 +352,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MediaType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MediaUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReplyToUserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -541,9 +515,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RecipientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsRead = table.Column<bool>(type: "bit", nullable: false),
                     PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -561,19 +536,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Notifications_AspNetUsers_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Notifications_Comments_CommentId",
                         column: x => x.CommentId,
                         principalTable: "Comments",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Notifications_FriendRequests_FriendRequestId",
+                        name: "FK_Notifications_FriendShips_FriendRequestId",
                         column: x => x.FriendRequestId,
-                        principalTable: "FriendRequests",
+                        principalTable: "FriendShips",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Notifications_Posts_PostId",
@@ -657,24 +627,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "FollowerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FriendRequests_ReceiverId",
-                table: "FriendRequests",
-                column: "ReceiverId");
+                name: "IX_FriendShips_FriendId",
+                table: "FriendShips",
+                column: "FriendId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FriendRequests_SenderId",
-                table: "FriendRequests",
-                column: "SenderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Friends_FirstUserId",
-                table: "Friends",
-                column: "FirstUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Friends_LastUserId",
-                table: "Friends",
-                column: "LastUserId");
+                name: "IX_FriendShips_UserId",
+                table: "FriendShips",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MessageMedias_MessageId",
@@ -720,11 +680,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "IX_Notifications_RecipientId",
                 table: "Notifications",
                 column: "RecipientId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Notifications_SenderId",
-                table: "Notifications",
-                column: "SenderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PostMedias_PostId",
@@ -797,9 +752,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "Follows");
 
             migrationBuilder.DropTable(
-                name: "Friends");
-
-            migrationBuilder.DropTable(
                 name: "MessageMedias");
 
             migrationBuilder.DropTable(
@@ -830,7 +782,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "FriendRequests");
+                name: "FriendShips");
 
             migrationBuilder.DropTable(
                 name: "ChatRooms");

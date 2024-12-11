@@ -18,10 +18,8 @@ createRoot(document.getElementById('root')!).render(
         },
     }}>
         <Provider store={store}>
-            {/* <SignalRProvider> */}
-                <App />
-                <ToastContainer />
-            {/* </SignalRProvider> */}
+            <App />
+            <ToastContainer />
         </Provider>
 
     </ConfigProvider>

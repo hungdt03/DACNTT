@@ -7,11 +7,11 @@ using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
-using SocialNetwork.Application.Features.FriendRequest.Queries;
+using SocialNetwork.Application.Features.FriendShip.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 
-namespace SocialNetwork.Application.Features.FriendRequest.Handlers
+namespace SocialNetwork.Application.Features.FriendShip.Handlers
 {
     public class GetFriendRequestByUserIdHandler : IRequestHandler<GetFriendRequestByUserIdQuery, BaseResponse>
     {
@@ -27,7 +27,7 @@ namespace SocialNetwork.Application.Features.FriendRequest.Handlers
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
 
-            var friendRequest = await _unitOfWork.FriendRequestRepository.GetFriendRequestBySenderIdAndReceiverIdAsync(userId, request.UserId)
+            var friendRequest = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, request.UserId)
                 ?? throw new AppException("Không tìm thấy lời mời kết bạn nào");
 
             return new DataResponse<FriendRequestResponse>

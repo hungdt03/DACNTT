@@ -25,20 +25,14 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
 
-            var friendRequest = await _unitOfWork.FriendRequestRepository
-                .GetFriendRequestBySenderIdAndReceiverIdAsync(userId, request.FriendId)
-                    ?? throw new AppException("Bạn và người này chưa là bạn bè");
+            var friendRequest = await _unitOfWork.FriendShipRepository
+                .GetFriendShipByUserIdAndFriendIdAsync(userId, request.FriendId);
 
-            if(friendRequest.Status == FriendRequestStatus.PENDING) throw new AppException("Bạn và người này chưa là bạn bè");
-
-            var friend = await _unitOfWork.FriendRepository.
-                GetFriendByFirstUserIdAndLastUserId(userId, request.FriendId)
-                    ?? throw new AppException("Bạn và người này chưa là bạn bè");
+            if (friendRequest?.Status == FriendRequestStatus.PENDING) throw new AppException("Bạn và người này chưa là bạn bè");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            _unitOfWork.FriendRequestRepository.DeleteFriendRequest(friendRequest);
-            _unitOfWork.FriendRepository.DeleteFriend(friend);
+            _unitOfWork.FriendShipRepository.DeleteFriendShip(friendRequest);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

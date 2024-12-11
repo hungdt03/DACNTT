@@ -13,11 +13,10 @@ namespace SocialNetwork.Domain.Entity
         public DateTimeOffset DateJoined { get; set; }
 
         // NAVIGATION PROPERTIES
-        public ICollection<Friend> Friends { get; set; }
         public ICollection<Tag> Tags { get; set; }
         public ICollection<Reaction> Reactions { get; set; }
-        public ICollection<FriendRequest> RequestSends { get; set; }
-        public ICollection<FriendRequest> RequestReceives { get; set; }
+        public ICollection<FriendShip> RequestSends { get; set; }
+        public ICollection<FriendShip> RequestReceives { get; set; }
         public ICollection<Post> Posts { get; set; }
         public ICollection<Comment> Comments { get; set; }
         public ICollection<ChatRoomMember> ChatRoomMembers { get; set; }

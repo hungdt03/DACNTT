@@ -20,7 +20,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
         public async Task<BaseResponse> Handle(GetAllPostQuery request, CancellationToken cancellationToken)
         {
-            var posts = await unitOfWork.PostRepository.GetAllPostsAsync();
+            var (posts, totalCount) = await unitOfWork.PostRepository.GetAllPostsAsync(request.Page, request.Size);
 
             var response = new List<PostResponse>();
             foreach (var post in posts)
@@ -36,9 +36,17 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
             }
 
-            return new DataResponse<List<PostResponse>>()
+            var hasMore = request.Page * request.Size < totalCount;
+
+            return new PaginationResponse<List<PostResponse>>
             {
                 Data = response,
+                Pagination = new Pagination
+                {
+                    Size = request.Size,
+                    Page = request.Page,
+                    HasMore = hasMore,
+                },
                 IsSuccess = true,
                 Message = "Lấy danh sách bài viết thành công",
                 StatusCode = System.Net.HttpStatusCode.OK

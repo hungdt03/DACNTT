@@ -2,7 +2,7 @@
 using MediatR;
 using SocialNetwork.Application.Contracts.Responses;
 
-namespace SocialNetwork.Application.Features.FriendRequest.Commands
+namespace SocialNetwork.Application.Features.FriendShip.Commands
 {
     public class AcceptFriendRequestCommand : IRequest<BaseResponse>
     {

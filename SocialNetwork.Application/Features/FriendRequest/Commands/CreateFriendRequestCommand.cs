@@ -3,7 +3,7 @@ using MediatR;
 using SocialNetwork.Application.Contracts.Responses;
 using System.ComponentModel.DataAnnotations;
 
-namespace SocialNetwork.Application.Features.FriendRequest.Commands
+namespace SocialNetwork.Application.Features.FriendShip.Commands
 {
     public class CreateFriendRequestCommand : IRequest<BaseResponse>
     {

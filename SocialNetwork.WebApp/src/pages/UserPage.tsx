@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import ProfileLeftSide from "../components/profiles/ProfileLeftSide";
-import ProfileUserHeader from "../components/profiles/ProfileUserHeader";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FriendRequestResource } from "../types/friendRequest";
 import { UserResource } from "../types/user";
 import friendRequestService from "../services/friendRequestService";
@@ -10,13 +9,18 @@ import Loading from "../components/Loading";
 import SignalRConnector from '../app/signalR/signalr-connection'
 import { NotificationResource } from "../types/notification";
 import { NotificationType } from "../constants/notification-type";
+import ProfileUserContent from "../components/profiles/ProfileUserContent";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../features/slices/auth-slice";
 
 const UserPage: FC = () => {
     const { id } = useParams();
+    const { user: currentUser } = useSelector(selectAuth)
     const [friendRequest, setFriendRequest] = useState<FriendRequestResource | null>(null)
     const [user, setUser] = useState<UserResource | null>(null)
     const [loading, setLoading] = useState(false)
     const { events } = SignalRConnector()
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchData = async (userId: string) => {
@@ -30,7 +34,11 @@ const UserPage: FC = () => {
             }
         };
 
+        id && id === currentUser?.id && navigate('/profile')
+
         id && fetchData(id);
+
+
     }, [id]);
 
     useEffect(() => {
@@ -65,15 +73,10 @@ const UserPage: FC = () => {
         }
     };
 
-    return <div className="w-full flex flex-col gap-y-4 h-full bg-slate-100">
+    return <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto w-full grid grid-cols-12 gap-4 h-full lg:h-[90vh] bg-slate-100">
         {loading && <Loading />}
-        {id && user && <ProfileUserHeader onRefresh={() => fetchFriendRequestData(id)} user={user} friendRequest={friendRequest} />}
-        <div className="flex flex-col h-full gap-y-4 lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto">
-            <div className="grid grid-cols-12 gap-6 h-full">
-                <ProfileLeftSide />
-                {/* <ProfilePostList /> */}
-            </div>
-        </div >
+        {user && <ProfileLeftSide user={user} />}
+        {id && user && <ProfileUserContent onRefresh={() => fetchFriendRequestData(id)} user={user} friendRequest={friendRequest} />}
     </div>
 };
 

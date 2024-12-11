@@ -1,12 +1,12 @@
 ﻿
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
-using SocialNetwork.Application.Features.FriendRequest.Commands;
+using SocialNetwork.Application.Features.FriendShip.Commands;
 using SocialNetwork.Application.Interfaces;
 using MediatR;
 using SocialNetwork.Domain.Constants;
 
-namespace SocialNetwork.Application.Features.FriendRequest.Handlers
+namespace SocialNetwork.Application.Features.FriendShip.Handlers
 {
     public class CancelFriendRequestHandler : IRequestHandler<CancelFriendRequestCommand, BaseResponse>
     {
@@ -17,7 +17,7 @@ namespace SocialNetwork.Application.Features.FriendRequest.Handlers
         }
         public async Task<BaseResponse> Handle(CancelFriendRequestCommand request, CancellationToken cancellationToken)
         {
-            var friendRequest = await _unitOfWork.FriendRequestRepository.GetFriendRequestByIdAsync(request.RequestId)
+            var friendRequest = await _unitOfWork.FriendShipRepository.GetFriendShipByIdAsync(request.RequestId)
                 ?? throw new AppException("Lời mời kết bạn không tồn tại");
 
             if (friendRequest.Status == FriendRequestStatus.ACCEPTED)
@@ -25,7 +25,7 @@ namespace SocialNetwork.Application.Features.FriendRequest.Handlers
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            _unitOfWork.FriendRequestRepository.DeleteFriendRequest(friendRequest);
+            _unitOfWork.FriendShipRepository.DeleteFriendShip(friendRequest);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

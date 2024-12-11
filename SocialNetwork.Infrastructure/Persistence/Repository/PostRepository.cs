@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Entity;
 using SocialNetwork.Infrastructure.DBContext;
+using System.Drawing.Printing;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -24,9 +25,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.Posts.AddAsync(post);
         }
 
-        public async Task<List<Post>> GetAllPostsAsync()
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsAsync(int page, int size)
         {
-            return await _context.Posts
+            var query = _context.Posts;
+
+            var totalCount = await query.CountAsync();
+
+            var posts = await query
                 .Include(p => p.User)
                 .Include(p => p.Comments)
                 .Include(p => p.Medias)
@@ -36,7 +41,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.OriginalPost)
                     .ThenInclude(p => p.Medias)
                 .OrderByDescending(p => p.DateCreated)
+                .Skip((page - 1) * size)
+                .Take(size)
                 .ToListAsync();
+
+            return (posts, totalCount);
         }
 
         public async Task<Post?> GetPostByIdAsync(Guid id)

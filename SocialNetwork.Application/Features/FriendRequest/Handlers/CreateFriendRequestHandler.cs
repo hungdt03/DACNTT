@@ -5,16 +5,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
-using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
-using SocialNetwork.Application.Features.FriendRequest.Commands;
+using SocialNetwork.Application.Features.FriendShip.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
 
-namespace SocialNetwork.Application.Features.FriendRequest.Handlers
+namespace SocialNetwork.Application.Features.FriendShip.Handlers
 {
     public class CreateFriendRequestHandler : IRequestHandler<CreateFriendRequestCommand, BaseResponse>
     {
@@ -39,20 +37,20 @@ namespace SocialNetwork.Application.Features.FriendRequest.Handlers
             var receiver = await _userManager.FindByIdAsync(request.ReceiverId)
                 ?? throw new AppException("Thông tin người nhận không tồn tại");
 
-            var existedRequest = await _unitOfWork.FriendRequestRepository
-                .GetFriendRequestBySenderIdAndReceiverIdAsync(userId, request.ReceiverId);
+            var existedRequest = await _unitOfWork.FriendShipRepository
+                .GetFriendShipByUserIdAndFriendIdAsync(userId, request.ReceiverId);
 
             if (existedRequest != null) throw new AppException("Đã tồn tại lời mời kết bạn giữa hai người này");
 
-            var newRequest = new Domain.Entity.FriendRequest()
+            var newRequest = new Domain.Entity.FriendShip()
             {
-                ReceiverId = request.ReceiverId,
-                SenderId = userId,
+                FriendId = request.ReceiverId,
+                UserId = userId,
                 Status = FriendRequestStatus.PENDING,
             };
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            await _unitOfWork.FriendRequestRepository.CreateFriendRequestAsync(newRequest);
+            await _unitOfWork.FriendShipRepository.CreateFriendShipAsync(newRequest);
            
 
             var notification = new Domain.Entity.Notification()

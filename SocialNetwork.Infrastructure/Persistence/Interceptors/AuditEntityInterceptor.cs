@@ -35,7 +35,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Interceptors
             foreach (var entry in entries)
             {
                 var entity = (BaseAuditableEntity)entry.Entity;
-                var now = DateTime.UtcNow;
+                var now = DateTimeOffset.UtcNow;
 
                 if (entry.State == EntityState.Added)
                 {

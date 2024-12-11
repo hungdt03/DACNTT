@@ -37,9 +37,8 @@ namespace SocialNetwork.Infrastructure.DBContext
         public DbSet<Post> Posts { get; set; }
         public DbSet<Reaction> Reactions { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public DbSet<Friend> Friends { get; set; }
         public DbSet<Tag> Tags { get; set; }
-        public DbSet<FriendRequest> FriendRequests { get; set; }
+        public DbSet<FriendShip> FriendShips { get; set; }
         public DbSet<Follow> Follows { get; set; }
         public DbSet<PostMedia> PostMedias { get; set; }
         public DbSet<ChatRoom> ChatRooms { get; set; }

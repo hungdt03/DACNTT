@@ -45,9 +45,9 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPosts()
+        public async Task<IActionResult> GetAllPosts([FromQuery] int page = 1, [FromQuery] int size = 8)
         {
-            var response = await _mediator.Send(new GetAllPostQuery());
+            var response = await _mediator.Send(new GetAllPostQuery(page, size));
             return Ok(response);
         }
 
