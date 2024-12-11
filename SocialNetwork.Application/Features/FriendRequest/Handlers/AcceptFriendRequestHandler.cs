@@ -9,7 +9,6 @@ using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 
-
 namespace SocialNetwork.Application.Features.FriendShip.Handlers
 {
     public class AcceptFriendRequestHandler : IRequestHandler<AcceptFriendRequestCommand, BaseResponse>
@@ -31,12 +30,12 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 ?? throw new AppException("Lời mời kết bạn không tồn tại");
 
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            if (friendRequest.Status != FriendRequestStatus.PENDING || friendRequest.UserId == userId)
+            if (friendRequest.Status != FriendShipStatus.PENDING || friendRequest.UserId == userId)
                 throw new AppException("Yêu cầu không hợp lệ");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            friendRequest.Status = FriendRequestStatus.ACCEPTED;
+            friendRequest.Status = FriendShipStatus.ACCEPTED;
 
             var notification = new Domain.Entity.Notification()
             {

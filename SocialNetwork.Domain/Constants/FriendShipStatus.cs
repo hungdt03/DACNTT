@@ -1,7 +1,7 @@
 ﻿
 namespace SocialNetwork.Domain.Constants
 {
-    public class FriendRequestStatus
+    public class FriendShipStatus
     {
         public const string ACCEPTED = "ACCEPTED";
         public const string PENDING = "PENDING";

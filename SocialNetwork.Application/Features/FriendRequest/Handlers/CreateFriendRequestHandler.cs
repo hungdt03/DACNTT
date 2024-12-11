@@ -46,7 +46,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
             {
                 FriendId = request.ReceiverId,
                 UserId = userId,
-                Status = FriendRequestStatus.PENDING,
+                Status = FriendShipStatus.PENDING,
             };
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);

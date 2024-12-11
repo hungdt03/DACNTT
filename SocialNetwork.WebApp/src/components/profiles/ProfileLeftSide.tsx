@@ -18,6 +18,7 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
 
     const fetchFriends = async () => {
         const response = await friendService.getTopSixOfUserFriends(user.id);
+        console.log(response)
         if(response.isSuccess) {
             setFriends(response.data)
         }
@@ -69,7 +70,6 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
                     <Image preview={false} src={friend.avatar ?? images.cover} className="border-[1px] border-primary rounded-md" />
                     <Link to={`/profile/${friend.id}`} className="text-sm font-semibold">{friend.fullName}</Link>
                 </div>)}
-              
             </div>
 
             <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button>

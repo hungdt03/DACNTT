@@ -7,6 +7,8 @@ using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Features.Friend.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Constants;
+using System.Linq;
 
 namespace SocialNetwork.Application.Features.Friend.Handlers
 {
@@ -24,18 +26,19 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
         public async Task<BaseResponse> Handle(GetTopSixMutualFriendsQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(request.UserId);
-            var myFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(userId);
+            var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(request.UserId, FriendShipStatus.ACCEPTED);
+            var myFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(userId, FriendShipStatus.ACCEPTED);
 
             var myFriendsIds = myFriends.Select(f => f.FriendId).ToHashSet();
             var response = new List<FriendResponse>();
 
             foreach (var friend in userFriends)
             {
-                var friendsOfTemp = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(friend.FriendId);
-                var mutualFriendsCount = friendsOfTemp.Count(f => myFriendsIds.Contains(f.FriendId));
+                var friendItem = friend.FriendId == request.UserId ? friend.User : friend.Friend;
+                var friendsOfTemp = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(friendItem.Id, FriendShipStatus.ACCEPTED);
+                var mutualFriendsCount = friendsOfTemp.Count(f => myFriendsIds.Contains(f.UserId == friendItem.Id ? f.FriendId : friendItem.Id));
 
-                var resource = ApplicationMapper.MapToFriend(friend.User);
+                var resource = ApplicationMapper.MapToFriend(friendItem);
                 resource.MutualFriends = mutualFriendsCount;
                 response.Add(resource);
             }

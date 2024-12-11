@@ -25,29 +25,32 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context.FriendShips.Remove(request);
         }
 
-        public async Task<IEnumerable<FriendShip>> GetAllFriendShipsAsyncByUserId(string userId)
+        public async Task<IEnumerable<FriendShip>> GetAllFriendShipsAsyncByUserId(string userId, string status = "PENDING")
         {
             return await _context.FriendShips
-                .Where(s => s.UserId == userId).ToListAsync();
+                 .Include(f => f.User)
+               .Include(f => f.Friend)
+                .Where(s => (s.UserId == userId || s.FriendId == userId) && (string.IsNullOrEmpty(status) || s.Status.Equals(status))).ToListAsync();
         }
 
-        public async Task<FriendShip?> GetFriendShipByIdAsync(Guid id)
+        public async Task<FriendShip?> GetFriendShipByIdAsync(Guid id, string status = "PENDING")
         {
             return await _context.FriendShips
                 .Include(fr => fr.User)
                 .Include(fr => fr.Friend)
-                .SingleOrDefaultAsync(x => x.Id == id);
+                .SingleOrDefaultAsync(x => x.Id == id && (string.IsNullOrEmpty(status) || x.Status.Equals(status)));
         }
 
-        public async Task<FriendShip?> GetFriendShipByUserIdAndFriendIdAsync(string userId, string friendId)
+        public async Task<FriendShip?> GetFriendShipByUserIdAndFriendIdAsync(string userId, string friendId, string status = "PENDING")
         {
             return await _context.FriendShips
-                .Include(f => f.User)
-                .Include(f => f.Friend)
-                .SingleOrDefaultAsync(s =>
-                (s.UserId == userId && s.FriendId == friendId)
-                || (s.UserId == friendId && s.FriendId == userId)
-            );
+               .Include(f => f.User)
+               .Include(f => f.Friend)
+               .SingleOrDefaultAsync(s =>
+                    ((s.UserId == userId && s.FriendId == friendId)
+                    || (s.UserId == friendId && s.FriendId == userId))
+                    && (string.IsNullOrEmpty(status) || s.Status.Equals(status))
+           );
         }
     }
 }

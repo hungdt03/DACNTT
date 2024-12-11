@@ -20,7 +20,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
             var friendRequest = await _unitOfWork.FriendShipRepository.GetFriendShipByIdAsync(request.RequestId)
                 ?? throw new AppException("Lời mời kết bạn không tồn tại");
 
-            if (friendRequest.Status == FriendRequestStatus.ACCEPTED)
+            if (friendRequest.Status == FriendShipStatus.ACCEPTED)
                 throw new AppException("Yêu cầu không hợp lệ");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);

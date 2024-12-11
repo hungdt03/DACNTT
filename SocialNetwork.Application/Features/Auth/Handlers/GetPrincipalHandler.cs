@@ -27,14 +27,10 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
         public async Task<BaseResponse> Handle(GetPrincipalQuery request, CancellationToken cancellationToken)
         {
             var userId = contextAccessor.HttpContext.User.GetUserId();
-            var user = await unitOfWork.UserRepository.GetUserByIdAsync("20923a91-8535-4ce8-a672-25ca843514d5")
+            var user = await unitOfWork.UserRepository.GetUserByIdAsync(userId)
                  ?? throw new AppException("Thông tin user không tồn tại");
 
             var response = ApplicationMapper.MapToUser(user);
-            //response.FollowerCount = user?.Followers?.Count ?? 0;
-            //response.FollowingCount = user?.Followings?.Count ?? 0;
-            //response.PostCount = user?.Posts?.Count ?? 0;
-            //response.FriendCount = user?.Friends?.Count ?? 0;
 
             return new DataResponse<UserResponse>()
             {

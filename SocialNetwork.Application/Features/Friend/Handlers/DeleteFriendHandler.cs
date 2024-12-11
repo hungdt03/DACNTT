@@ -28,7 +28,7 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
             var friendRequest = await _unitOfWork.FriendShipRepository
                 .GetFriendShipByUserIdAndFriendIdAsync(userId, request.FriendId);
 
-            if (friendRequest?.Status == FriendRequestStatus.PENDING) throw new AppException("Bạn và người này chưa là bạn bè");
+            if (friendRequest?.Status == FriendShipStatus.PENDING) throw new AppException("Bạn và người này chưa là bạn bè");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
