@@ -29,14 +29,17 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
             var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(request.UserId, FriendShipStatus.ACCEPTED);
             var myFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(userId, FriendShipStatus.ACCEPTED);
 
-            var myFriendsIds = myFriends.Select(f => f.FriendId).ToHashSet();
+            var myFriendsIds = myFriends.Select(f => f.FriendId != userId ? f.FriendId : f.UserId).ToHashSet();
             var response = new List<FriendResponse>();
 
             foreach (var friend in userFriends)
             {
                 var friendItem = friend.FriendId == request.UserId ? friend.User : friend.Friend;
+
+                if (friendItem.Id == userId) continue;
+
                 var friendsOfTemp = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(friendItem.Id, FriendShipStatus.ACCEPTED);
-                var mutualFriendsCount = friendsOfTemp.Count(f => myFriendsIds.Contains(f.UserId == friendItem.Id ? f.FriendId : friendItem.Id));
+                var mutualFriendsCount = friendsOfTemp.Count(f => myFriendsIds.Contains(f.UserId == friendItem.Id ? f.FriendId : f.UserId));
 
                 var resource = ApplicationMapper.MapToFriend(friendItem);
                 resource.MutualFriends = mutualFriendsCount;

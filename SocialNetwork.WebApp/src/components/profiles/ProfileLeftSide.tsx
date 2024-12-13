@@ -18,8 +18,8 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
 
     const fetchFriends = async () => {
         const response = await friendService.getTopSixOfUserFriends(user.id);
-        console.log(response)
         if(response.isSuccess) {
+            console.log(response)
             setFriends(response.data)
         }
     }
@@ -68,7 +68,8 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
             <div className="grid grid-cols-3 gap-2">
                 {friends.map(friend => <div className="flex flex-col items-start gap-1" key={friend.id}>
                     <Image preview={false} src={friend.avatar ?? images.cover} className="border-[1px] border-primary rounded-md" />
-                    <Link to={`/profile/${friend.id}`} className="text-sm font-semibold">{friend.fullName}</Link>
+                    <Link to={`/profile/${friend.id}`} className="text-sm font-semibold line-clamp-1">{friend.fullName}</Link>
+                    <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>
                 </div>)}
             </div>
 

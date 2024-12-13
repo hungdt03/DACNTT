@@ -43,6 +43,20 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 }
             }
 
+            if (request.Post.RemoveTagIds != null && request.Post.RemoveTagIds.Count > 0)
+            {
+                foreach (var item in post.Tags)
+                {
+                    if (request.Post.RemoveTagIds.Contains(item.Id))
+                    {
+                        var tag = await _unitOfWork.TagRepository.GetTagByIdAsync(item.Id);
+                        if (tag == null) continue;
+
+                        _unitOfWork.TagRepository.DeleteTag(tag);
+                    }
+                }
+            }
+
             var medias = new List<PostMedia>();
             
 
@@ -66,9 +80,27 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 }));
             }
 
+            var tags = new List<Tag>();
+            if (request.Post.TagIds != null && request.Post.TagIds.Count > 0)
+            {
+                foreach (var tag in request.Post.TagIds)
+                {
+                    if (post.Tags.Any(t => t.UserId == tag)) continue;
+                    var tagUser = await _unitOfWork.UserRepository.GetUserByIdAsync(tag)
+                        ?? throw new NotFoundException("Không tìm thấy thẻ user");
+
+                    tags.Add(new Tag()
+                    {
+                        UserId = tagUser.Id,
+                    });
+                }
+
+            }
+
             post.Content = request.Post.Content;
             post.Privacy = request.Post.Privacy;
             post.Medias = (post.Medias ?? new List<PostMedia>()).Concat(medias).ToList();
+            post.Tags = (post.Tags ?? new List<Tag>()).Concat(tags).ToList();
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

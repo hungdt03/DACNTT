@@ -22,4 +22,25 @@ const formatTime = (date: Date): string => {
     }
 }
 
-export { formatTime };
+const formatVietnamDate = (date: Date) : string => {
+    const optionsDate: Intl.DateTimeFormatOptions = {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+    };
+    const optionsTime: Intl.DateTimeFormatOptions = {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false, // Định dạng 24 giờ
+    };
+
+    // Formatter cho ngày và giờ
+    const datePart = new Intl.DateTimeFormat('vi-VN', optionsDate).format(date);
+    const timePart = new Intl.DateTimeFormat('vi-VN', optionsTime).format(date);
+
+    // Kết hợp ngày và giờ
+    return `${datePart} lúc ${timePart}`;
+}
+
+export { formatTime, formatVietnamDate };

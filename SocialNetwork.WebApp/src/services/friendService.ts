@@ -14,6 +14,10 @@ class FriendService {
         return FriendService.instance;
     }
 
+    getAllFriends() : Promise<DataResponse<FriendResource[]>> {
+        return axiosInterceptor.get('/api/friends/')
+    }
+
     getTopSixOfUserFriends(friendId: string) : Promise<DataResponse<FriendResource[]>> {
         return axiosInterceptor.get('/api/friends/top-six/'+ friendId)
     }

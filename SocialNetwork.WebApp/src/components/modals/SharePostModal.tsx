@@ -1,8 +1,7 @@
-import { Avatar, Modal, Popover } from "antd";
+import { Avatar, Popover } from "antd";
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
 import TagFriendModal from "./TagFriendModal";
-import useModal from "../../hooks/useModal";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { PrivacyType } from "../../constants/privacy";
 import { PostResource } from "../../types/post";
@@ -11,16 +10,18 @@ import postService from "../../services/postService";
 import { getButtonPrivacyContent } from "../../utils/post";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
+import { FriendResource } from "../../types/friend";
 
 export type SharePostRequest = {
     content: string;
     privacy: PrivacyType;
     postId?: string;
     originalPostId?: string;
+    tagIds: string[]
 }
 
 type SharePostModalProps = {
-    onSuccess?: (message: string) => void;
+    onSuccess?: (data: PostResource, message: string) => void;
     onFailed?: (message: string) => void;
     post: PostResource
 }
@@ -30,16 +31,17 @@ const SharePostModal: FC<SharePostModalProps> = ({
     onFailed,
     post
 }) => {
-    const { isModalOpen: openTagFriend, handleCancel: cancelTagFriend, showModal: showTagFriend, handleOk: okTagFriend } = useModal()
     const { user } = useSelector(selectAuth)
+    const [tags, setTags] = useState<FriendResource[]>([])
 
     const [postRequest, setPostRequest] = useState<SharePostRequest>({
         content: '',
         privacy: PrivacyType.PUBLIC,
+        tagIds: []
     })
 
     useEffect(() => {
-        if(post.postType === PostType.SHARE_POST) {
+        if (post.postType === PostType.SHARE_POST) {
             setPostRequest({
                 ...postRequest,
                 originalPostId: post.originalPostId,
@@ -57,22 +59,51 @@ const SharePostModal: FC<SharePostModalProps> = ({
     const handleSubmit = async () => {
         const response = await postService.sharePost(postRequest);
 
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setPostRequest({
                 ...postRequest,
                 content: '',
             })
-            onSuccess?.(response.message)
+            onSuccess?.(response.data, response.message)
         } else {
             onFailed?.(response.message)
         }
     }
 
+    const handleTagsChange = (tags: FriendResource[]) => {
+        setTags(tags)
+        setPostRequest({
+            ...postRequest,
+            tagIds: tags.map(tag => tag.id)
+        })
+    }
+
     return <div className="flex flex-col gap-y-4">
         <div className="flex items-center gap-x-2">
-            <Avatar size='large' src={images.user} />
+            <Avatar className="flex-shrink-0" size='large' src={images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
-                <span className="text-[16px] font-semibold">{user?.fullName}</span>
+                <div className="text-[16px] font-semibold">
+                    {user?.fullName}
+                    {tags.length > 0 &&
+                        (() => {
+                            const maxDisplay = 3;
+                            const displayedTags = tags.slice(0, maxDisplay);
+                            const remainingTagsCount = tags.length - maxDisplay;
+
+                            return (
+                                <>
+                                    {' cùng với '}
+                                    {displayedTags.map((tag, index) => (
+                                        <span key={tag.id}>
+                                            {tag.fullName}
+                                            {index < displayedTags.length - 1 ? ', ' : ''}
+                                        </span>
+                                    ))}
+                                    {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
+                                </>
+                            );
+                        })()}
+                </div>
                 <Popover trigger='click' content={<PostPrivacryOption
                     onChange={value => setPostRequest({
                         ...postRequest,
@@ -90,13 +121,24 @@ const SharePostModal: FC<SharePostModalProps> = ({
                     content: e.target.value
                 })} className="text-xl outline-none border-none w-full" rows={4} placeholder="Long ơi, bạn đang nghĩ gì thế" />
             </div>
-           
-        </div>
-        <button onClick={handleSubmit} disabled={!postRequest.content} className="py-[5px] w-full rounded-md font-semibold text-[16px] text-white bg-sky-500">Chia sẻ</button>
 
-        <Modal title={<p className="text-center font-semibold text-xl">Gắn thẻ người khác</p>} footer={[]} open={openTagFriend} onOk={okTagFriend} onCancel={cancelTagFriend}>
-            <TagFriendModal />
-        </Modal>
+            <div className="p-2 rounded-md border-[1px] border-gray-200 flex justify-between items-center">
+                <span>Thêm vào bài viết của bạn</span>
+                <div className="flex items-center gap-x-1">
+                    <Popover trigger='click' placement="right" content={<TagFriendModal
+                        onChange={handleTagsChange}
+                    />} title='Gắn thẻ người khác'>
+                        <button className="p-2 rounded-full hover:bg-gray-100">
+                            <img alt="Tag" className="w-7 h-7" src={images.tagFriend} />
+                        </button>
+                    </Popover>
+                </div>
+            </div>
+
+        </div>
+
+
+        <button onClick={handleSubmit} disabled={!postRequest.content} className="py-[5px] w-full rounded-md font-semibold text-[16px] text-white bg-sky-500">Chia sẻ</button>
     </div>
 };
 

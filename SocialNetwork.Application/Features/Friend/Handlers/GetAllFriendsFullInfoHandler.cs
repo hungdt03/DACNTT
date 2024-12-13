@@ -11,18 +11,18 @@ using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.Friend.Handlers
 {
-    public class GetAllFriendsByUserIdHandler : IRequestHandler<GetAllFriendsQuery, BaseResponse>
+    public class GetAllFriendsFullInfoHandler : IRequestHandler<GetAllFriendsFullInfoQuery, BaseResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
 
-        public GetAllFriendsByUserIdHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public GetAllFriendsFullInfoHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
         }
 
-        public async Task<BaseResponse> Handle(GetAllFriendsQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResponse> Handle(GetAllFriendsFullInfoQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
             var friends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(request.UserId, FriendShipStatus.ACCEPTED);
@@ -33,6 +33,9 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
             foreach (var friend in friends)
             {
                 var friendItem = friend.FriendId == request.UserId ? friend.User : friend.Friend;
+
+                if (friendItem.Id == userId) continue;
+
                 var friendsOfTemp = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(friendItem.Id, FriendShipStatus.ACCEPTED);
                 var mutualFriendsCount = friendsOfTemp.Count(f => myFriendsIds.Contains(f.UserId == friendItem.Id ? f.FriendId : friendItem.Id));
 

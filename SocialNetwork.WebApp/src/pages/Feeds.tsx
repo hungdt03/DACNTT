@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import Post from "../components/posts/Post";
 import PostCreator from "../components/posts/PostCreator";
 import { Id, toast } from "react-toastify";
@@ -14,6 +14,7 @@ const Feeds: FC = () => {
     const [loading, setLoading] = useState(false)
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
     const [posts, setPosts] = useState<PostResource[]>([]);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const fetchPosts = async (page: number, size: number) => {
         setLoading(true)
@@ -32,14 +33,27 @@ const Feeds: FC = () => {
 
     useEffect(() => {
         fetchPosts(pagination.page, pagination.size)
+
+        if (containerRef.current) {
+            containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
     }, [])
 
     const fetchNewPosts = async () => {
         fetchPosts(pagination.page + 1, pagination.size)
     }
 
-    const handleCreatePostSuccess = (toastId: Id, msg: string) => {
-        fetchNewPosts()
+    const fetchPostByID = async (postId: string) => {
+        const response = await postService.getPostById(postId);
+        if(response.isSuccess) {
+            setPosts(prevPosts => [response.data, ...prevPosts])
+        } else {
+            toast.error(response.message)
+        }
+    }
+
+    const handleCreatePostSuccess = (toastId: Id, msg: string, data: PostResource) => {
+        fetchPostByID(data.id)
         toast.update(toastId, {
             render: msg,
             type: 'success',
@@ -57,13 +71,7 @@ const Feeds: FC = () => {
         });
     }
 
-    useEffect(() => {
-        fetchPosts(pagination.page, pagination.size);
-
-    }, []);
-
-
-    return <div className="flex flex-col gap-y-4 pb-20">
+    return <div ref={containerRef} className="flex flex-col gap-y-4 pb-20">
         <PostCreator
             onSuccess={handleCreatePostSuccess}
             onFalied={handleCreatePostFailed}
@@ -71,10 +79,10 @@ const Feeds: FC = () => {
 
         {posts.map(post => {
             if (post.postType === PostType.SHARE_POST) {
-                return <SharePost onFetch={() => fetchPosts(1, pagination.size)} key={post.id} post={post} />;
+                return <SharePost onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
             }
 
-            return <Post onFetch={() => fetchPosts(1, pagination.size)} key={post.id} post={post} />;
+            return <Post onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
         })}
 
         {loading && <PostSkeletonList />} 

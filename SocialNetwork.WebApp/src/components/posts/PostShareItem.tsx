@@ -1,23 +1,22 @@
 import { Avatar, Tooltip } from "antd";
 import { FC } from "react";
 import images from "../../assets";
-import PostMedia from "./PostMedia";
 import { PostResource } from "../../types/post";
 import { getPrivacyPost } from "../../utils/post";
 import { formatTime, formatVietnamDate } from "../../utils/date";
 import cn from "../../utils/cn";
 import { Link } from "react-router-dom";
+import { Eye } from "lucide-react";
 
-type PostShareInnerProps = {
+type PostShareItemProps = {
     post: PostResource
 }
 
-const PostShareInner: FC<PostShareInnerProps> = ({
+const PostShareItem: FC<PostShareItemProps> = ({
     post
 }) => {
-    return <div className="flex flex-col gap-y-2 bg-white rounded-xl overflow-hidden border-[1px] border-gray-200">
-        {post.medias.length > 0 && <PostMedia files={post.medias} />}
-        <div className={cn("px-4 flex flex-col gap-y-2", post.medias.length > 0 ? 'py-6' : 'py-2')}>
+    return <div className="relative flex flex-col gap-y-2 bg-white rounded-xl overflow-hidden border-[1px] border-gray-200">
+        <div className={cn("px-4 flex flex-col gap-y-2 py-2")}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2">
                     <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
@@ -58,8 +57,12 @@ const PostShareInner: FC<PostShareInnerProps> = ({
                 <p className="text-sm text-gray-700">{post.content}</p>
             </div>
         </div>
-
+        <Tooltip title='Xem chi tiết'>
+            <button className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-sky-50 hover:bg-sky-100 border-[1px] border-primary">
+                <Eye size={14} className="text-primary" />
+            </button>
+        </Tooltip>
     </div>
 };
 
-export default PostShareInner;
+export default PostShareItem;

@@ -1,11 +1,7 @@
-import { Avatar, Modal, Popover, Tooltip, UploadFile } from "antd";
+import { Avatar, Popover, Tooltip, UploadFile } from "antd";
 import { FC, useRef, useState } from "react";
 import images from "../../assets";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
-import { Lock, User } from "lucide-react";
 import UploadMultipleFile from "../uploads/UploadMultiFile";
-import useModal from "../../hooks/useModal";
 import TagFriendModal from "./TagFriendModal";
 import { PrivacyType } from "../../constants/privacy";
 import { imageTypes, videoTypes } from "../../utils/file";
@@ -13,13 +9,15 @@ import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { getButtonPrivacyContent } from "../../utils/post";
+import { FriendResource } from "../../types/friend";
 
 
 export type PostForm = {
     content: string;
     images: UploadFile[];
     videos: UploadFile[];
-    privacy: PrivacyType
+    privacy: PrivacyType;
+    tagIds: FriendResource[]
 }
 
 type CreatePostModalProps = {
@@ -30,7 +28,6 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
     onSubmit
 }) => {
     const [showUpload, setShowUpload] = useState(false);
-    const { isModalOpen: openTagFriend, handleCancel: cancelTagFriend, showModal: showTagFriend, handleOk: okTagFriend } = useModal();
     const uploadRef = useRef<{ clear: () => void }>(null);
     const { user } = useSelector(selectAuth)
 
@@ -42,7 +39,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         content: '',
         privacy: PrivacyType.PUBLIC,
         images: [],
-        videos: []
+        videos: [],
+        tagIds: []
     })
 
     const handleUploadFiles = (files: UploadFile[]) => {
@@ -76,6 +74,10 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
             }
         });
 
+        postRequest.tagIds.forEach(tag => {
+            formData.append('tagIds', tag.id);
+        });
+
 
         formData.append("privacy", postRequest.privacy);
         formData.append("content", postRequest.content);
@@ -85,7 +87,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                 content: '',
                 privacy: PrivacyType.PUBLIC,
                 images: [],
-                videos: []
+                videos: [],
+                tagIds: []
             })
 
             handleReset()
@@ -98,9 +101,30 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
 
     return <div className="flex flex-col gap-y-4">
         <div className="flex items-center gap-x-2">
-            <Avatar size='large' src={images.user} />
+            <Avatar className="flex-shrink-0" size='large' src={images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
-                <span className="text-[16px] font-semibold">{user?.fullName}</span>
+                <div className="text-[16px] font-semibold">
+                    {user?.fullName}
+                    {postRequest.tagIds.length > 0 &&
+                        (() => {
+                            const maxDisplay = 3; 
+                            const displayedTags = postRequest.tagIds.slice(0, maxDisplay);
+                            const remainingTagsCount = postRequest.tagIds.length - maxDisplay;
+
+                            return (
+                                <>
+                                    {' cùng với '}
+                                    {displayedTags.map((tag, index) => (
+                                        <span key={tag.id}>
+                                            {tag.fullName}
+                                            {index < displayedTags.length - 1 ? ', ' : ''}
+                                        </span>
+                                    ))}
+                                    {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
+                                </>
+                            );
+                        })()}
+                </div>
                 <Popover trigger='click' content={<PostPrivacryOption
                     onChange={(privacy) => setPostRequest({
                         ...postRequest,
@@ -130,19 +154,21 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                             <img alt="Ảnh" className="w-6 h-6" src={images.photo} />
                         </button>
                     </Tooltip>
-                    <Tooltip title='Gắn thẻ người khác'>
-                        <button onClick={showTagFriend} className="p-2 rounded-full hover:bg-gray-100">
+                    <Popover trigger='click' placement="right" content={<TagFriendModal
+                        onChange={(tags) => setPostRequest({
+                            ...postRequest,
+                            tagIds: tags
+                        })}
+                    />} title='Gắn thẻ người khác'>
+                        <button className="p-2 rounded-full hover:bg-gray-100">
                             <img alt="Tag" className="w-7 h-7" src={images.tagFriend} />
                         </button>
-                    </Tooltip>
+                    </Popover>
                 </div>
             </div>
         </div>
         <button onClick={handleCreatePost} disabled={!postRequest.content} className="py-[5px] w-full rounded-md font-semibold text-[16px] text-white bg-sky-500">Đăng</button>
 
-        <Modal title={<p className="text-center font-semibold text-xl">Gắn thẻ người khác</p>} footer={[]} open={openTagFriend} onOk={okTagFriend} onCancel={cancelTagFriend}>
-            <TagFriendModal />
-        </Modal>
     </div>
 };
 

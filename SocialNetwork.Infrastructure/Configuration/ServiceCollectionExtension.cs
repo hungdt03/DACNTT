@@ -14,8 +14,6 @@ using SocialNetwork.Infrastructure.JsonWebToken;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Http;
-using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Infrastructure.Cloudinary;
 using SocialNetwork.Infrastructure.SignalR;
 
@@ -38,6 +36,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IPostMediaRepository, PostMediaRepository>();
             services.AddScoped<IFriendShipRepository, FriendShipRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
@@ -66,6 +65,7 @@ namespace SocialNetwork.Infrastructure.Configuration
                 options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultProvider;
             });
 
+            // Set lifeTime of reset token
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             {
                 options.TokenLifespan = TimeSpan.FromMinutes(10);
@@ -83,6 +83,7 @@ namespace SocialNetwork.Infrastructure.Configuration
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
             });
 
+            // Register Authentication (JWT)
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -103,6 +104,7 @@ namespace SocialNetwork.Infrastructure.Configuration
                     };
 
 
+                    // Hanlde SignalR Event with JWT in header
                     options.Events = new JwtBearerEvents
                     {
                        

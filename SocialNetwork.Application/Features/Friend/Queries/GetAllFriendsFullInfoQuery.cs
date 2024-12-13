@@ -4,11 +4,11 @@ using SocialNetwork.Application.Contracts.Responses;
 
 namespace SocialNetwork.Application.Features.Friend.Queries
 {
-    public class GetAllFriendsQuery : IRequest<BaseResponse>
+    public class GetAllFriendsFullInfoQuery : IRequest<BaseResponse>
     {
         public string UserId { get; set; }
 
-        public GetAllFriendsQuery(string userId)
+        public GetAllFriendsFullInfoQuery(string userId)
         {
             UserId = userId;
         }

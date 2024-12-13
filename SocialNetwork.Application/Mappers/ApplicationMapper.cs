@@ -19,6 +19,15 @@ namespace SocialNetwork.Application.Mappers
             };
         } 
 
+        public static TagResponse MapToTag(Tag tag)
+        {
+            return new TagResponse
+            {
+                Id = tag.Id,
+                User = tag.User != null ? MapToFriend(tag.User) : null
+            };
+        }
+
         public static PostResponse MapToPost(Post post)
         {
             if (post == null) return null;
@@ -33,8 +42,9 @@ namespace SocialNetwork.Application.Mappers
                 PostType = post.PostType,
                 Medias = post.Medias != null ? post.Medias.Select(MapToPostMedia).ToList() : new(),
                 User = post.User != null ? MapToUser(post.User) : null,
-                Comments = post.Comments != null ?post.Comments.Count : 0,
-                Shares = post.Shares != null ?post.Shares.Count : 0,
+                Tags = post.Tags != null ? post.Tags.Select(MapToTag).ToList() : new(),
+                Comments = post.Comments != null ? post.Comments.Count : 0,
+                Shares = post.Shares != null ? post.Shares.Count : 0,
                 SharePost = MapToPost(post.SharePost),
                 OriginalPost = MapToPost(post.OriginalPost),
             };

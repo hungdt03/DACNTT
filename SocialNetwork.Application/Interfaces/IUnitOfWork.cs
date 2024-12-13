@@ -10,6 +10,7 @@ namespace SocialNetwork.Application.Interfaces
         public IPostMediaRepository PostMediaRepository { get; }
         public IFriendShipRepository FriendShipRepository { get; }
         public INotificationRepository NotificationRepository { get; }
+        public ITagRepository TagRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(CancellationToken cancellationToken = default);

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Features.Post.Commands;
 using SocialNetwork.Application.Features.Post.Queries;
@@ -44,10 +45,33 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("share/{postId}")]
+        public async Task<IActionResult> GetAllSharesByPostId([FromRoute] Guid postId, [FromQuery] int page = 1, [FromQuery] int size = 8)
+        {
+            var response = await _mediator.Send(new GetAllSharesByPostIdQuery(postId, page, size));
+            return Ok(response);
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> GetAllPosts([FromQuery] int page = 1, [FromQuery] int size = 8)
         {
             var response = await _mediator.Send(new GetAllPostQuery(page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("principal")]
+        public async Task<IActionResult> GetAllPostsByPrincipal([FromQuery] int page = 1, [FromQuery] int size = 8)
+        {
+            var userId = HttpContext.User.GetUserId();
+            var response = await _mediator.Send(new GetAllPostByUserIdQuery(userId, page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetAllPostsByPrincipal([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 8)
+        {
+            var response = await _mediator.Send(new GetAllPostByUserIdQuery(userId, page, size));
             return Ok(response);
         }
 

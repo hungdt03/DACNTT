@@ -130,7 +130,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
             </div>
             <Divider className="my-3" />
 
-            <ProfilePostList isShowPostCreator={false} />
+            <ProfilePostList user={targetUser} isShowPostCreator={false} />
         </div>
     </div>
 };

@@ -14,9 +14,9 @@ import { PostMoreAction } from "./PostMoreAction";
 import { PostReaction } from "./PostReaction";
 import { PostResource } from "../../types/post";
 import { getBtnReaction, getPrivacyPost } from "../../utils/post";
-import { formatTime } from "../../utils/date";
+import { formatTime, formatVietnamDate } from "../../utils/date";
 import { ReactionType } from "../../constants/reaction";
-import { CommentRequest, ReactionRequest, getTopReactions } from "./Post";
+import { ReactionRequest, getTopReactions } from "./Post";
 import commentService from "../../services/commentService";
 import postService from "../../services/postService";
 import { Id, toast } from "react-toastify";
@@ -26,10 +26,12 @@ import { selectAuth } from "../../features/slices/auth-slice";
 import { useSelector } from "react-redux";
 import EditSharePostModal, { EditSharePostRequest } from "../modals/EditSharePostModal";
 import { Link } from "react-router-dom";
+import ListSharePostModal from "../modals/ListSharePostModal";
+import PostOtherTags from "./PostOtherTags";
 
 type SharePostProps = {
     post: PostResource;
-    onFetch?: () => void;
+    onFetch?: (data: PostResource) => void;
 }
 
 const SharePost: FC<SharePostProps> = ({
@@ -40,6 +42,7 @@ const SharePost: FC<SharePostProps> = ({
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
     const { handleCancel: editPostCancel, isModalOpen: isEditPostOpen, handleOk: handleEditPostOk, showModal: showEditPostModal } = useModal();
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
+    const { handleCancel: cancelListShare, isModalOpen: openListShare, handleOk: okListShare, showModal: showListShare } = useModal();
 
     const [reactions, setReactions] = useState<ReactionResource[]>();
     const { user } = useSelector(selectAuth)
@@ -154,14 +157,38 @@ const SharePost: FC<SharePostProps> = ({
     return <div className="flex flex-col gap-y-3 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
-                <Avatar className="w-10 h-10" src={post.user.avatar ?? images.user} />
+                <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
                 <div className="flex flex-col gap-y-[1px]">
                     <div className="flex items-center gap-x-1">
-                        <Link to={`/profile/${post.user.id}`} className="font-semibold text-[16px] text-gray-600">{post.user.fullName}</Link>
+                        <div className="font-semibold text-[15px] text-gray-600">
+                            <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                            {post.tags.length > 0 &&
+                                (() => {
+                                    const maxDisplay = 3;
+                                    const displayedTags = post.tags.slice(0, maxDisplay);
+                                    const remainingTagsCount = post.tags.length - maxDisplay;
+                                    const remainingTags = post.tags.slice(maxDisplay)
+
+                                    return (
+                                        <>
+                                            {' cùng với '}
+                                            {displayedTags.map((tag, index) => (
+                                                <Link className="hover:underline" to={`/profile/${tag.user.id}`} key={tag.id}>
+                                                    {tag.user.fullName}
+                                                    {index < displayedTags.length - 1 ? ', ' : ''}
+                                                </Link>
+                                            ))}
+                                            <Tooltip title={<PostOtherTags tags={remainingTags} />}>
+                                                {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
+                                            </Tooltip>
+                                        </>
+                                    );
+                                })()}
+                        </div>
                         <p className="text-gray-400">đã chia sẻ bài viết</p>
                     </div>
                     <div className="flex items-center gap-x-2">
-                        <Tooltip title='Thứ bảy, 23 tháng 11, 2014 lúc 19:17'>
+                        <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
                             <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
                         {getPrivacyPost(post.privacy)}
@@ -191,7 +218,7 @@ const SharePost: FC<SharePostProps> = ({
             </button>
             <div className="flex gap-x-4 items-center">
                 <button onClick={showModal} className="hover:underline text-gray-500">{post.comments} bình luận</button>
-                <button className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>
+                <button onClick={showListShare} className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>
             </div>
         </div>
         <Divider className='my-0' />
@@ -246,13 +273,27 @@ const SharePost: FC<SharePostProps> = ({
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
             <SharePostModal
                 post={post}
-                onSuccess={msg => {
+                onSuccess={(data, msg) => {
                     okSharePost()
-                    onFetch?.()
+                    onFetch?.(data)
                     toast.success(msg)
                 }}
                 onFailed={msg => toast.error(msg)}
             />
+        </Modal>
+
+        {/*======== MODAL LIST SHARES ====== */}
+
+        <Modal
+            style={{ top: 20 }}
+            title={<p className="text-center font-semibold text-xl">Những người đã chia sẻ bài viết</p>}
+            width='500px'
+            centered
+            open={openListShare}
+            onOk={okListShare}
+            onCancel={cancelListShare}
+        >
+            <ListSharePostModal post={post} />
         </Modal>
     </div>
 };

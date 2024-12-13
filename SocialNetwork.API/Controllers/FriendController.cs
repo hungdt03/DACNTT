@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Features.Friend.Commands;
 using SocialNetwork.Application.Features.Friend.Queries;
 
@@ -30,6 +31,14 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> DeleteFriend([FromRoute] string friendId)
         {
             var response = await mediator.Send(new DeleteFriendCommand(friendId));
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllFriends()
+        {
+            var userId = HttpContext.User.GetUserId();
+            var response = await mediator.Send(new GetAllFriendsQuery(userId));
             return Ok(response);
         }
     }

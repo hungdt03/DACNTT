@@ -22,6 +22,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public IFriendShipRepository FriendShipRepository { get; }
 
         public INotificationRepository NotificationRepository { get; }
+        public ITagRepository TagRepository { get; }
 
         public UnitOfWork
         (
@@ -32,7 +33,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 IReactionRepository reactionRepository,
                 IPostMediaRepository postMediaRepository,
                 IFriendShipRepository friendShipRepository,
-                INotificationRepository notificationRepository
+                INotificationRepository notificationRepository,
+                ITagRepository tagRepository
         )
         {
             _context = context;
@@ -43,6 +45,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             PostMediaRepository = postMediaRepository;
             FriendShipRepository = friendShipRepository;
             NotificationRepository = notificationRepository;
+            TagRepository = tagRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

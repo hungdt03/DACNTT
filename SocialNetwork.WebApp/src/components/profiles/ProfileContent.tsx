@@ -1,13 +1,21 @@
 import { Upload } from "lucide-react";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { useSelector } from "react-redux";
 import images from "../../assets";
 import { Divider } from "antd";
 import ProfilePostList from "./ProfilePostList";
+import { FriendResource } from "../../types/friend";
+import { UserResource } from "../../types/user";
 
-const ProfileContent: FC = () => {
-    const { user } = useSelector(selectAuth)
+type ProfileContentProps = {
+    user: UserResource
+}
+
+const ProfileContent: FC<ProfileContentProps> = ({
+    user
+}) => {
+    const [friends, setFriends] = useState<FriendResource[]>([])
 
     return <div className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
         <div className="flex flex-col gap-y-4 overflow-y-auto shadow">
@@ -37,7 +45,7 @@ const ProfileContent: FC = () => {
             </div>
             <Divider className="my-3" />
 
-            <ProfilePostList />
+            <ProfilePostList user={user} />
         </div>
     </div>
 };

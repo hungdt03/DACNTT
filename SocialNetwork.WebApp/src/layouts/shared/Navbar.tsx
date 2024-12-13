@@ -58,7 +58,9 @@ const Navbar: FC = () => {
                         : notification
                 );
             });
-            toast.success(response.message)
+            
+        } else {
+            toast.error(response.message)
         }
     }
 

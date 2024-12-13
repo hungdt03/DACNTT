@@ -9,13 +9,17 @@ import { PostType } from "../../constants/post-type";
 import SharePost from "../posts/SharePost";
 import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";
+import { UserResource } from "../../types/user";
+import PostSkeletonList from "../skeletons/PostSkeletonList";
 
 type ProfilePostListProps = {
-    isShowPostCreator?: boolean
+    isShowPostCreator?: boolean;
+    user: UserResource;
 }
 
 const ProfilePostList: FC<ProfilePostListProps> = ({
-    isShowPostCreator = true
+    isShowPostCreator = true,
+    user
 }) => {
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
     const [loading, setLoading] = useState(false)
@@ -23,10 +27,11 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
 
     const fetchPosts = async (page: number, size: number) => {
         setLoading(true)
-        const response = await postService.getAllPosts(page, size);
+        const response = await postService.getAllPostsByUserId(user.id, page, size);
         setLoading(false)
 
         if (response.isSuccess) {
+            console.log(response)
             setPagination(response.pagination)
             setPosts(prevPosts => {
                 const existingIds = new Set(prevPosts.map(post => post.id));
@@ -69,13 +74,16 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
             onFalied={handleCreatePostFailed}
         />}
        
-        {loading ? <PostSkeleton /> : posts.map(post => {
-            if(post.postType === PostType.SHARE_POST) {
-                return <SharePost onFetch={fetchNewPosts} key={post.id} post={post} />
+       {posts.map(post => {
+            if (post.postType === PostType.SHARE_POST) {
+                return <SharePost onFetch={() => fetchPosts(1, pagination.size)} key={post.id} post={post} />;
             }
 
-            return <Post onFetch={fetchNewPosts} key={post.id} post={post} />
+            return <Post onFetch={() => fetchPosts(1, pagination.size)} key={post.id} post={post} />;
         })}
+
+        {loading && <PostSkeletonList />} 
+        {pagination.hasMore && !loading && <button onClick={fetchNewPosts} className="text-primary font-semibold text-center">Tải thêm bài viết</button>}
     </div>
 };
 

@@ -1,5 +1,6 @@
 import { MediaType } from "../constants/media";
 import { PrivacyType } from "../constants/privacy";
+import { TagResource } from "./tag";
 import { UserResource } from "./user";
 
 export type PostResource = {
@@ -16,6 +17,7 @@ export type PostResource = {
     sharePost: PostResource;
     originalPost: PostResource;
     sharePostId: string;
+    tags: TagResource[]
 }
 
 export type PostMediaResource = {

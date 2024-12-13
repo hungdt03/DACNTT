@@ -1,18 +1,19 @@
-import { Avatar, Modal, Popover, Tooltip, UploadFile } from "antd";
+import { Avatar, Popover, Tooltip, UploadFile } from "antd";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import images from "../../assets";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import { Lock, User } from "lucide-react";
 import UploadMultipleFile from "../uploads/UploadMultiFile";
-import useModal from "../../hooks/useModal";
-import TagFriendModal from "./TagFriendModal";
 import { PrivacyType } from "../../constants/privacy";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { PostResource } from "../../types/post";
+import TagFriendModal from "./TagFriendModal";
+import { FriendResource } from "../../types/friend";
+import { TagResource } from "../../types/tag";
 
 
 const renderButtonContent = (icon: JSX.Element, label: string, imageSrc?: string) => (
@@ -40,7 +41,9 @@ export type EditPostForm = {
     images: UploadFile[];
     videos: UploadFile[];
     privacy: PrivacyType;
-    removeMedias: string[]
+    removeMedias: string[];
+    tagIds: FriendResource[];
+    removeTagIds: TagResource[];
 }
 
 type EditPostModalProps = {
@@ -53,11 +56,11 @@ const EditPostModal: FC<EditPostModalProps> = ({
     post
 }) => {
     const [showUpload, setShowUpload] = useState(false);
-    const { isModalOpen: openTagFriend, handleCancel: cancelTagFriend, showModal: showTagFriend, handleOk: okTagFriend } = useModal();
     const uploadRef = useRef<{ clear: () => void }>(null);
     const { user } = useSelector(selectAuth)
     const valueUrls = useMemo(() => post.medias.map(item => item.mediaUrl), [post.medias]);
     const [isEdited, setIsEdited] = useState(false)
+    const [tags, setTags] = useState<FriendResource[]>([])
 
     const handleReset = () => {
         uploadRef.current?.clear();
@@ -68,7 +71,9 @@ const EditPostModal: FC<EditPostModalProps> = ({
         privacy: post.privacy,
         images: [],
         videos: [],
-        removeMedias: []
+        removeMedias: [],
+        tagIds: [],
+        removeTagIds: []
     })
 
     const handleUploadFiles = (files: UploadFile[]) => {
@@ -103,6 +108,14 @@ const EditPostModal: FC<EditPostModalProps> = ({
             }
         });
 
+        postRequest.tagIds.forEach(tag => {
+            formData.append('tagIds', tag.id);
+        });
+
+        postRequest.removeTagIds.forEach(tag => {
+            formData.append('removeTagIds', tag.id);
+        });
+
         postRequest.removeMedias.forEach(mediaId => {
             formData.append('removeMediaIds', mediaId);
         });
@@ -118,6 +131,8 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 images: [],
                 videos: [],
                 removeMedias: [],
+                tagIds: [],
+                removeTagIds: []
             })
 
             handleReset()
@@ -138,8 +153,12 @@ const EditPostModal: FC<EditPostModalProps> = ({
             privacy: post.privacy,
             images: [],
             videos: [],
-            removeMedias: []
+            removeMedias: [],
+            tagIds: [],
+            removeTagIds: []
         })
+
+        setTags([...post.tags.map(p => p.user)])
 
     }, [post])
 
@@ -154,11 +173,43 @@ const EditPostModal: FC<EditPostModalProps> = ({
         }
     }
 
+    const handleRemoveTag = (tag: FriendResource) => {
+        const findTag = post.tags.find(item => item.user.id === tag.id)
+
+        if(findTag && !postRequest.removeTagIds.includes(findTag)) {
+            setPostRequest({
+                ...postRequest,
+                removeTagIds: [...postRequest.removeTagIds, findTag]
+            })
+        }
+    }
+
     return <div className="flex flex-col gap-y-4">
         <div className="flex items-center gap-x-2">
             <Avatar size='large' src={images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
-                <span className="text-[16px] font-semibold">{user?.fullName}</span>
+                <div className="text-[16px] font-semibold">
+                    {user?.fullName}
+                    {tags.length > 0 &&
+                        (() => {
+                            const maxDisplay = 3;
+                            const displayedTags = tags.slice(0, maxDisplay);
+                            const remainingTagsCount = tags.length - maxDisplay;
+
+                            return (
+                                <>
+                                    {' cùng với '}
+                                    {displayedTags.map((tag, index) => (
+                                        <span key={tag.id}>
+                                            {tag.fullName}
+                                            {index < displayedTags.length - 1 ? ', ' : ''}
+                                        </span>
+                                    ))}
+                                    {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
+                                </>
+                            );
+                        })()}
+                </div>
                 <Popover trigger='click' content={<PostPrivacryOption
                     onChange={(privacy) => setPostRequest({
                         ...postRequest,
@@ -195,19 +246,25 @@ const EditPostModal: FC<EditPostModalProps> = ({
                             <img alt="Ảnh" className="w-6 h-6" src={images.photo} />
                         </button>
                     </Tooltip>
-                    <Tooltip title='Gắn thẻ người khác'>
-                        <button onClick={showTagFriend} className="p-2 rounded-full hover:bg-gray-100">
+                    <Popover trigger='click' placement="right" content={<TagFriendModal
+                        tags={post.tags}
+                        onChange={(tags) => {
+                            setPostRequest({
+                                ...postRequest,
+                                tagIds: tags
+                            })
+                            setTags(tags)
+                        }}
+                        onTagRemove={handleRemoveTag}
+                    />} title='Gắn thẻ người khác'>
+                        <button className="p-2 rounded-full hover:bg-gray-100">
                             <img alt="Tag" className="w-7 h-7" src={images.tagFriend} />
                         </button>
-                    </Tooltip>
+                    </Popover>
                 </div>
             </div>
         </div>
         <button onClick={handleEditPost} disabled={!isEdited || !postRequest.content} className="py-[5px] w-full rounded-md font-semibold text-[16px] text-white bg-sky-500">LƯU LẠI</button>
-
-        <Modal title={<p className="text-center font-semibold text-xl">Gắn thẻ người khác</p>} footer={[]} open={openTagFriend} onOk={okTagFriend} onCancel={cancelTagFriend}>
-            <TagFriendModal />
-        </Modal>
     </div>
 };
 

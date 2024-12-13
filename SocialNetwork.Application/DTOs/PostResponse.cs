@@ -13,6 +13,7 @@ namespace SocialNetwork.Application.DTOs
         public string Privacy { get; set; }
         public List<MediaResponse> Medias { get; set; }
         public UserResponse User { get; set; }
+        public List<TagResponse> Tags { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public int Comments { get; set; }
         public int Shares { get; set; }

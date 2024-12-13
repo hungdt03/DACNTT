@@ -8,7 +8,7 @@ const ProfilePage: FC = () => {
     const { user } = useSelector(selectAuth)
     return <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto w-full grid grid-cols-12 gap-4 h-full lg:h-[90vh] bg-slate-100">
         {user && <ProfileLeftSide user={user}  />}
-        <ProfileContent />
+        {user && <ProfileContent user={user} />}
     </div>
 };
 

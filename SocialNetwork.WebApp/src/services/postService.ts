@@ -19,7 +19,7 @@ class PostService {
     }
 
 
-    createPost(payload: FormData): Promise<BaseResponse> {
+    createPost(payload: FormData): Promise<DataResponse<PostResource>> {
         return axiosInterceptor.post('/api/posts', payload)
     }
 
@@ -36,11 +36,38 @@ class PostService {
         })
     }
 
+    getAllPostsByPrincipal(page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/principal', {
+            params: {
+                page: page,  
+                size: size  
+            }
+        })
+    }
+
+    getAllPostsByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/user/' + userId, {
+            params: {
+                page: page,  
+                size: size  
+            }
+        })
+    }
+
+    getAllSharesByPostId(postId: string, page: number, size: number)  : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/share/' + postId, {
+            params: {
+                page: page,  
+                size: size  
+            }
+        })
+    }
+
     getPostById(postId: string) : Promise<DataResponse<PostResource>> {
         return axiosInterceptor.get('/api/posts/' + postId)
     }
 
-    sharePost(payload: SharePostRequest) : Promise<BaseResponse> {
+    sharePost(payload: SharePostRequest) : Promise<DataResponse<PostResource>> {
         return axiosInterceptor.post('/api/posts/share', payload)
     }
 
