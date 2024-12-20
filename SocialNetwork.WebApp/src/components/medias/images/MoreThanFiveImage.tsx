@@ -33,6 +33,9 @@ const MoreThanFiveImage: FC<ImageProps> = ({ items }) => {
                             className="object-cover"
                             width='100%'
                             height='100%'
+                            style={{
+                                minHeight: '200px'
+                            }}
                             preview={{
                                 mask: 'Xem',
                             }}
@@ -56,8 +59,10 @@ const MoreThanFiveImage: FC<ImageProps> = ({ items }) => {
                                     preview={{
                                         mask: 'Xem',
                                     }}
+                                    style={{
+                                        minHeight: '200px'
+                                    }}
                                     onClick={() => {
-                                        
                                         setCurrentIndex(3)
                                     }}
                                 />
@@ -72,7 +77,8 @@ const MoreThanFiveImage: FC<ImageProps> = ({ items }) => {
                                             width='100%'
                                             height='100%'
                                             style={{
-                                                zIndex: 50 - index + 1
+                                                zIndex: 50 - index + 1,
+                                                minHeight: '200px'
                                             }}
                                             preview={{
                                                 mask: 'Xem',

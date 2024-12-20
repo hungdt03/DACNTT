@@ -20,12 +20,9 @@ export const CommentList: React.FC<CommentListProps> = ({
     pagination,
     onFetchReplies,
     updatedComments,
-    fetchNextPage
+    fetchNextPage,
 }) => {
-    const [replyToId, setReplyToId] = useState<string | null>(null);
-    const handleReply = (id: string) => {
-        setReplyToId((prev) => (prev === id ? null : id));
-    };
+   
 
     return (
         <div className="flex flex-col gap-y-3 py-4">
@@ -34,8 +31,6 @@ export const CommentList: React.FC<CommentListProps> = ({
                     parentComment={null}
                     key={comment.id}
                     comment={comment}
-                    onReply={handleReply}
-                    replyToId={replyToId}
                     level={1}
                     onFetchReplies={onFetchReplies}
                     updatedComments={updatedComments}

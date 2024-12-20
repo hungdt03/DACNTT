@@ -10,29 +10,31 @@ import { formatTime } from "../../utils/date";
 import BoxReplyComment from "./BoxReplyComment";
 import { MediaType } from "../../constants/media";
 import { BoxCommendStateType } from "../modals/PostModal";
+import { UserResource } from "../../types/user";
 
 type CommentItemProps = {
     parentComment: CommentResource | null;
     comment: CommentResource;
-    onReply: (id: string) => void;
-    replyToId: string | null;
     level: number;
+    onReply?: (comment: CommentResource) => void;
     updatePagination?: (page: number, size: number, hasMore: boolean) => void;
     onFetchReplies?: (commentId: string, page: number, size: number) => void;
     updatedComments: (commentId: string, fetchedReplies: CommentResource[]) => void;
-    replyComment: (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | null) => void
+    replyComment: (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | undefined) => void
 }
+
+
 
 export const CommentItem: React.FC<CommentItemProps> = ({
     comment,
-    onReply,
-    replyToId,
     replyComment,
     onFetchReplies,
     updatedComments,
-    level
+    level,
+    onReply
 }) => {
-    const isReplying = replyToId === comment.id;
+    const [isReplying, setIsReplying] = useState(false)
+    const [replyToUser, setReplyToUser] = useState<UserResource>(comment.user)
 
     const [commentData, setCommentData] = useState<BoxCommendStateType>({
         content: '',
@@ -54,8 +56,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
         }
     }
 
-    const handleReplyComment = (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | null) => {
-        replyComment(values, parentCommentId, replyToUserId);
+    const handleReplyComment = (values: BoxCommentType, parentCommentId: string | null) => {
+        replyComment(values, parentCommentId, replyToUser?.id);
         setCommentData({
             content: '',
             fileList: []
@@ -64,11 +66,11 @@ export const CommentItem: React.FC<CommentItemProps> = ({
 
     return (
         <div className={cn("relative flex flex-col pl-4", comment.parentCommentId !== null ? "gap-y-5" : "gap-y-3")}>
-            {comment.isHaveChildren && <div className={cn("absolute left-8 w-[2px] top-[28px] border-b-[2px] rounded-lg bg-gray-200",  (comment?.replies?.length ?? 0) === 0 ? 'bottom-6' : 'bottom-16')}></div>}
+            {comment.isHaveChildren && <div className={cn("absolute left-8 w-[2px] top-[28px] border-b-[2px] rounded-lg bg-gray-200", (comment?.replies?.length ?? 0) === 0 ? 'bottom-8' : 'bottom-16')}></div>}
             {/* Comment nội dung */}
             <div className="relative flex items-start gap-x-2">
                 {comment.parentCommentId && (
-                        <div className="absolute -left-[24px] w-7 top-[0px] h-[20px] bg-transparent border-b-[2px] rounded-lg border-gray-200"></div>
+                    <div className="absolute -left-[24px] w-7 top-[0px] h-[20px] bg-transparent border-b-[2px] border-l-[2px] rounded-bl-lg border-gray-200"></div>
                 )}
                 <Avatar className="flex-shrink-0" src={comment.user.avatar ?? images.user} />
                 <div className="flex flex-col gap-y-2">
@@ -93,11 +95,19 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                         className="w-[120px] h-[120px] object-contain bg-black"
                         controls
                     />}
+
                     <div className="flex items-center gap-x-4 px-2">
                         <span className="text-xs">{formatTime(new Date(comment.createdAt))}</span>
                         <button
                             className="text-xs hover:underline"
-                            onClick={() => onReply(comment.id)}
+                            onClick={() => {
+                                setIsReplying(true)
+                                if (level <= 2) {
+                                    setReplyToUser(comment.user)
+                                } else {
+                                    onReply?.(comment)
+                                }
+                            }}
                         >
                             Phản hồi
                         </button>
@@ -109,12 +119,13 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             </div>
 
             {comment.isHaveChildren && (comment?.replies?.length ?? 0) === 0 && <>
-                <div className="absolute left-8 bottom-5 rounded-bl-lg border-b-gray-200 border-b-[2px] w-8 h-6"></div>
+                <div className={cn("absolute left-8 border-gray-200 border-l-[2px] border-b-[2px] w-6 h-1/2", comment.parentCommentId ? "bottom-[26px] rounded-bl-lg" : "bottom-[19px] rounded-bl-xl")}></div>
                 <button onClick={() => {
-                    onReply(comment.id)
+                    setIsReplying(true)
                     handleFetchReplies(comment.id, pagination.page, pagination.size)
-                }} className="font-semibold text-left pl-12 text-xs">Xem các phản hồi</button>
+                }} className="font-semibold text-left pl-11 text-xs">Xem các phản hồi</button>
             </>}
+
             {/* Render comment con */}
             {comment.isHaveChildren && (
                 <div className="relative flex flex-col gap-y-3 pl-6">
@@ -125,15 +136,17 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                             comment={child}
                             onFetchReplies={onFetchReplies}
                             replyComment={replyComment}
-                            onReply={onReply}
                             updatedComments={updatedComments}
-                            replyToId={replyToId}
                             level={level + 1}
+                            onReply={(comment) => {
+                                if (level + 1 > 2) {
+                                    setReplyToUser(comment.user)
+                                }
+                            }}
                         />
                     ))}
 
                     {pagination.hasMore && <button onClick={() => handleFetchReplies?.(comment.id, pagination.page + 1, pagination.size)} className="font-semibold text-left pl-6 mb-2 text-xs">Xem thêm phản hồi</button>}
-
 
                     {/* Box phản hồi ở cuối nếu đang reply comment này */}
                     {isReplying && (
@@ -145,13 +158,13 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                                         ...commentData,
                                         content: newValue
                                     })}
-                                    key={'box-send-comment'}
+                                    replyToUsername={replyToUser?.fullName}
                                     files={commentData.fileList}
                                     onFileChange={(file) => setCommentData({
                                         ...commentData,
                                         fileList: [file]
                                     })}
-                                    onSubmit={(values => handleReplyComment(values, comment.id, comment.user.id))}
+                                    onSubmit={(values => handleReplyComment(values, comment.id))}
                                 />
                             </div>
                         </>
@@ -161,25 +174,22 @@ export const CommentItem: React.FC<CommentItemProps> = ({
             )}
 
             {/* Nếu không có comment con, hiển thị box reply trực tiếp dưới comment */}
-            {isReplying && !comment.isHaveChildren && (
+            {isReplying && !comment.isHaveChildren && level < 3 && (
                 <div className="relative">
-                    {level < 3 &&
-                        <div className="absolute left-4 w-[24px] -top-[25px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>
-                    }
+                    <div className="absolute left-4 w-[24px] -top-[25px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>
                     <div className={cn(level === 3 ? "pl-0" : "pl-10")}>
-                        {level >= 3 && <div className="absolute -left-6 w-[24px] -top-[28px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>}
                         <BoxReplyComment value={commentData.content}
                             onContentChange={(newValue) => setCommentData({
                                 ...commentData,
                                 content: newValue
                             })}
-                            key={'box-send-comment'}
+                            replyToUsername={replyToUser?.fullName}
                             files={commentData.fileList}
                             onFileChange={(file) => setCommentData({
                                 ...commentData,
                                 fileList: [file]
                             })}
-                            onSubmit={(values => handleReplyComment(values, comment.id, comment.user.id))}
+                            onSubmit={(values => handleReplyComment(values, comment.id))}
                         />
                     </div>
                 </div>

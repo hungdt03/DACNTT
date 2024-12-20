@@ -11,6 +11,9 @@ namespace SocialNetwork.Application.Interfaces
         public IFriendShipRepository FriendShipRepository { get; }
         public INotificationRepository NotificationRepository { get; }
         public ITagRepository TagRepository { get; }
+        public IChatRoomRepository ChatRoomRepository { get; }
+        public IChatRoomMemberRepository ChatRoomMemberRepository { get; }
+        public IMessageRepository MessageRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(CancellationToken cancellationToken = default);

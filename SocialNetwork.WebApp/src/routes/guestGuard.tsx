@@ -12,12 +12,13 @@ const GuestGuard: FC<GuestGuardProps> = ({
     element
 }) => {
     const { isAuthenticated, isInitialized } = useSelector(selectAuth)
-
-    if(!isInitialized) return <Loading />
     
     if(isAuthenticated) return <Navigate to='/' replace />
 
-    return element;
+    return <>
+        {!isInitialized && <Loading />}
+        {element}
+    </>
 };
 
 export default GuestGuard;

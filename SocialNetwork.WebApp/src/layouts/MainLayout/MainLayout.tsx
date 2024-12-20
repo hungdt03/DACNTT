@@ -4,9 +4,16 @@ import { Outlet } from "react-router-dom";
 
 import MainLeftSidebar from "./components/MainLeftSidebar";
 import MainRightSidebar from "./components/MainRightSidebar";
+import ChatPopup from "../../components/chats/ChatPopup";
+import { useDispatch, useSelector } from "react-redux";
+import { remove, selectChatPopup } from "../../features/slices/chat-popup-slice";
+import { AppDispatch } from "../../app/store";
 
 
 const MainLayout: FC = () => {
+    const dispatch = useDispatch<AppDispatch>()
+    const { chatRooms } = useSelector(selectChatPopup);
+
     return <div className="flex flex-col w-screen h-screen overflow-y-hidden">
         <Header />
         <div className="bg-slate-100 w-ful h-full">
@@ -17,6 +24,13 @@ const MainLayout: FC = () => {
                 </div>
                 <MainRightSidebar />
             </div>
+        </div>
+        
+
+        
+        <div className="absolute right-24 bottom-0 flex gap-x-4">
+            {chatRooms.map(chatRoom => <ChatPopup onClose={() => dispatch(remove(chatRoom.id))} key={chatRoom.id} room={chatRoom} />)}
+        
         </div>
     </div>
 };

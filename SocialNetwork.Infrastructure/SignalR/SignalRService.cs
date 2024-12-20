@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Interfaces.Services;
-using SocialNetwork.Domain.Entity;
 
 namespace SocialNetwork.Infrastructure.SignalR
 {
@@ -16,7 +15,12 @@ namespace SocialNetwork.Infrastructure.SignalR
             this.connectionManager = connectionManager;
         }
 
-        public async void SendNotificationToSpecificUser(string username, NotificationResponse notification)
+        public async Task SendMessageToSpecificGroup(string groupName, MessageResponse message)
+        {
+            await hubContext.Clients.Group(groupName).SendAsync("NewMessage", message);
+        }
+
+        public async Task SendNotificationToSpecificUser(string username, NotificationResponse notification)
         {
             await hubContext.Clients.User(username).SendAsync("NewNotification", notification);
         }

@@ -1,22 +1,23 @@
 import { FC } from "react";
-import MesssageOneImage from "./MesssageOneImage";
-import MessageTwoImage from "./MessageTwoImage";
-import MessageMoreThanTwoImage from "./MessageMoreThanTwoImage";
+import { MessageResource } from "../../../types/message";
+import { formatTimeMessage } from "../../../utils/date";
+import MessageMedia from "./MessageMedia";
 
-const MessageFromMe: FC = () => {
-    return <div className="flex justify-end">
-        <div className="flex items-start gap-x-2 w-[55%]">
-            <div className="flex flex-col items-start gap-y-1">
-                
-                {/* <MesssageOneImage /> */}
-                {/* <MessageTwoImage /> */}
-                <MessageMoreThanTwoImage />
-                <div className="bg-sky-500 text-white p-2 rounded-lg text-sm">
-                    <p>thì ông bảo tui làm ảo thuật cho mn xem ông đăng nhập bằng 1 ký tự mà vào được trang đăng nhập đó</p>
-                </div>
+type MessageFromMeProps = {
+    message: MessageResource
+}
 
-                <span className="text-xs text-gray-400 pl-1">Đã gửi vào lúc 12:23:32</span>
-            </div>
+const MessageFromMe: FC<MessageFromMeProps> = ({
+    message
+}) => {
+    return <div className="flex justify-end w-full">
+        <div className="flex flex-col items-end gap-y-1 max-w-[70%] w-full">
+            {message.medias && <MessageMedia medias={message.medias} />}
+            <p className="bg-sky-500 text-white p-2 rounded-lg text-sm break-words max-w-full">
+                {message.content}
+            </p>
+
+            <span className="text-xs text-gray-400 pl-1">Đã gửi vào lúc {formatTimeMessage(new Date(message.sentAt))}</span>
         </div>
     </div>
 };

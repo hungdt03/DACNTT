@@ -1,5 +1,5 @@
 import { Avatar, Image, Upload, UploadFile, UploadProps } from "antd";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons'
 import { SendHorizonal } from "lucide-react";
 import cn from "../../utils/cn";
@@ -17,6 +17,7 @@ type BoxReplyCommentProps = {
     onFileChange?: (fileList: UploadFile) => void;
     onRemoveFileUrl?: (url: string | undefined) => void;
     onContentChange?: (content: string) => void;
+    replyToUsername?: string;
     onSubmit?: (data: BoxReplyCommentType) => void;
     value?: string;
     files?: UploadFile[];
@@ -28,12 +29,14 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     onContentChange,
     onSubmit,
     value = '',
+    replyToUsername,
     files = []
 }) => {
 
     const [fileList, setFileList] = useState<UploadFile[] | any[]>(files);
     const [content, setContent] = useState<string>(value)
     const { user } = useSelector(selectAuth)
+    const contentRef = useRef<HTMLDivElement>(null)
 
     const handleRemoveFile = (file: UploadFile) => {
         const updatedFileList = [...fileList.filter(item => item.uid !== file.uid)]
@@ -68,6 +71,14 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
         onContentChange?.(messageValue)
     }
 
+    const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+        if (contentRef.current) {
+            console.log(contentRef.current.textContent)
+            handleContentChange(contentRef.current.innerText)
+        }
+    };
+
+
     useEffect(() => {
         setContent(value)
     }, [value])
@@ -80,9 +91,18 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
         <div className="flex items-center gap-x-2 w-full">
             <Avatar size='small' className="flex-shrink-0" src={user?.avatar ?? images.user} />
             <div className={cn("bg-gray-100 px-1 rounded-3xl w-full flex items-center justify-between py-[2px]")}>
+                {/* <div
+                    className="px-2 flex-1 outline-none border-none bg-gray-100"
+                    onInput={handleInput}
+                    suppressContentEditableWarning
+                    contentEditable
+                >
+                    {replyToUsername && <span className="px-[4px] font-semibold rounded-md bg-sky-50 text-primary">{replyToUsername}</span>}
+                    <span ref={contentRef} className="text-green-600">{content}</span>
+                </div> */}
                 <input onChange={e => handleContentChange(e.target.value)} value={content} className="px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập bình luận" />
                 <div className="flex items-center gap-x-2">
-                   {fileList.length === 0 &&  <button className="-mb-2">
+                    {fileList.length === 0 && <button className="-mb-2">
                         <Upload {...props}>
                             <img alt="upload" className="w-5 h-5" src={images.photo} />
                         </Upload>
@@ -95,7 +115,7 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
         </div>
 
         {fileList.length > 0 && <div className="w-full flex items-center gap-x-2 px-8 py-1">
-        {fileList.map(file => <div key={file.uid} className="relative">
+            {fileList.map(file => <div key={file.uid} className="relative">
                 {isVideo(file.name) ?
                     <video
                         src={URL.createObjectURL(file.originFileObj)}

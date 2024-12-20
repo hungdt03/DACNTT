@@ -7,7 +7,9 @@ using SocialNetwork.Application.Features.FriendShip.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Application.Utils;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity;
 
 namespace SocialNetwork.Application.Features.FriendShip.Handlers
 {
@@ -36,6 +38,39 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             friendRequest.Status = FriendShipStatus.ACCEPTED;
+
+            var memberIds = new List<string>
+            {
+                friendRequest.FriendId,
+                friendRequest.UserId
+            };
+
+            var chatRoomName = ChatUtils.GenerateChatRoomName(memberIds);
+            var firstMember = new ChatRoomMember()
+            {
+                UserId = friendRequest.FriendId,
+                IsActive = true,
+            };
+
+            var secondMember = new ChatRoomMember()
+            {
+                UserId = friendRequest.UserId,
+                IsActive = true,
+            };
+
+            var members = new List<ChatRoomMember>() { firstMember, secondMember };
+
+            var chatRoom = new Domain.Entity.ChatRoom()
+            {
+                IsPrivate = false,
+                LastMessageDate = DateTimeOffset.UtcNow,
+                UniqueName = chatRoomName,
+                Name = chatRoomName,
+                LastMessage = "Các bạn hiện đã được kết nối với nhau",
+                Members = members
+            };
+
+            await _unitOfWork.ChatRoomRepository.CreateChatRoom(chatRoom);
 
             var notification = new Domain.Entity.Notification()
             {

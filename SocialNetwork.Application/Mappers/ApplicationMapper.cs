@@ -28,6 +28,36 @@ namespace SocialNetwork.Application.Mappers
             };
         }
 
+        public static MessageResponse MapToMessage(Message message)
+        {
+            return new MessageResponse()
+            {
+                Id = message.Id,
+                ChatRoomId = message.ChatRoomId,
+                Content = message.Content,
+                Medias = message.Medias != null ? message.Medias.Select(MapToMessageMedia).ToList() : new(),
+                MessageType = message.MessageType,
+                Sender = message.Sender != null ? MapToUser(message.Sender) : null,
+                SenderId = message.SenderId,
+                SentAt = message.DateCreated,
+            };
+        }
+
+        public static ChatRoomResponse MapToChatRoom(ChatRoom chatRoom)
+        {
+            return new ChatRoomResponse
+            {
+                Id = chatRoom.Id,
+                IsPrivate = chatRoom.IsPrivate,
+                UniqueName = chatRoom.UniqueName,
+                Name = chatRoom.Name,
+                LastMessage = chatRoom.LastMessage,
+                LastMessageDate = chatRoom.LastMessageDate,
+                Members = chatRoom.Members.Any() ? chatRoom.Members.Select(member => MapToUser(member.User)).ToList() : new(),
+
+            };
+        }
+
         public static PostResponse MapToPost(Post post)
         {
             if (post == null) return null;
@@ -51,6 +81,16 @@ namespace SocialNetwork.Application.Mappers
         }
 
         public static MediaResponse MapToPostMedia(PostMedia media) {
+            return new MediaResponse
+            {
+                Id = media.Id,
+                MediaType = media.MediaType,
+                MediaUrl = media.MediaUrl,
+            };
+        }
+
+        public static MediaResponse MapToMessageMedia(MessageMedia media)
+        {
             return new MediaResponse
             {
                 Id = media.Id,

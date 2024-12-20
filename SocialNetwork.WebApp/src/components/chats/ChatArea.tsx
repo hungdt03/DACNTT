@@ -20,7 +20,7 @@ const ChatArea: FC = () => {
         </div>
 
         <div className="flex flex-col h-full gap-y-3 w-full overflow-y-auto custom-scrollbar border-[1px] border-sky-300 rounded-xl p-4">
-            <Message />
+            {/* <Message />
             <Message isMe />
             <Message />
             <Message isMe />
@@ -32,7 +32,7 @@ const ChatArea: FC = () => {
             <Message />
             <Message />
             <Message isMe />
-            <Message isMe />
+            <Message isMe /> */}
         </div>
 
         <div className="w-full px-4 py-4 border-[1px] border-sky-300 rounded-xl">

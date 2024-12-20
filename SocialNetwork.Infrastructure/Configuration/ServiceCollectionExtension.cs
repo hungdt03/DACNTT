@@ -37,6 +37,9 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IFriendShipRepository, FriendShipRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
             services.AddScoped<ITagRepository, TagRepository>();
+            services.AddScoped<IChatRoomMemberRepository, ChatRoomMemberRepository>();
+            services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 

@@ -43,4 +43,8 @@ const formatVietnamDate = (date: Date) : string => {
     return `${datePart} lúc ${timePart}`;
 }
 
-export { formatTime, formatVietnamDate };
+const formatTimeMessage = (date: Date) : string => {
+    return date.toTimeString().split(" ")[0];
+}
+
+export { formatTime, formatVietnamDate, formatTimeMessage };

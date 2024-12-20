@@ -34,7 +34,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             var comments = await query
                 .Include(c => c.User)
                 .Include(c => c.Replies)
-                .OrderByDescending(c => c.DateCreated)
+                .OrderBy(c => c.DateCreated)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

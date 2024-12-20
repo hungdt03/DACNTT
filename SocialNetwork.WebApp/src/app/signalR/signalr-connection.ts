@@ -1,6 +1,7 @@
 import * as signalR from "@microsoft/signalr";
 import { getAccessToken } from "../../utils/auth";
 import { NotificationResource } from "../../types/notification";
+import { MessageRequest } from "../../components/chats/ChatPopup";
 
 const URL = "http://localhost:5172/serverHub";
 
@@ -12,7 +13,7 @@ class SignalRConnector {
         onNotificationReceived?: (notification: NotificationResource) => void,
     ) => void;
 
-    static instance: SignalRConnector;
+    private static instance: SignalRConnector;
 
     constructor() {
         this.connection = new signalR.HubConnectionBuilder()
@@ -38,14 +39,14 @@ class SignalRConnector {
         };
     }
 
-    // public sendMessage = async (message: MessageRequest) => {
-    //     if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
-    //         await this.connection.send("SendMessage", message)
-    //     } else {
-    //         console.error("Chưa kết nối tới Server SignalR");
-    //     }
+    public sendMessage = async (message: MessageRequest) => {
+        if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
+            await this.connection.send("SendMessage", message)
+        } else {
+            console.error("Chưa kết nối tới Server SignalR");
+        }
 
-    // }
+    }
 
     public static getInstance(): SignalRConnector {
         if (!SignalRConnector.instance)
@@ -53,4 +54,5 @@ class SignalRConnector {
         return SignalRConnector.instance;
     }
 }
+
 export default SignalRConnector.getInstance;

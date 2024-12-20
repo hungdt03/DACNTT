@@ -1,5 +1,5 @@
 import { Image, Upload, UploadFile, UploadProps } from "antd";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons'
 import images from "../../assets";
 import { SendHorizonal } from "lucide-react";
@@ -14,18 +14,22 @@ type BoxSendMessageProps = {
     onFileChange?: (fileList: UploadFile[]) => void;
     onRemoveFileUrl?: (url: string | undefined) => void;
     onContentChange?: (content: string) => void;
-    onSubmit?: (data: BoxMessageType) => void;
+    onSubmit?: () => void;
+    value?: string;
+    files?: UploadFile[]
 }
 
 const BoxSendMessage: FC<BoxSendMessageProps> = ({
     onFileChange,
     onRemoveFileUrl,
     onContentChange,
-    onSubmit
+    onSubmit,
+    value = '',
+    files = []
 }) => {
 
-    const [fileList, setFileList] = useState<UploadFile[] | any[]>([]);
-    const [content, setContent] = useState<string>('')
+    const [fileList, setFileList] = useState<UploadFile[] | any[]>(files);
+    const [content, setContent] = useState<string>(value)
 
     const handleRemoveFile = (file: UploadFile) => {
         const updatedFileList = [...fileList.filter(item => item.uid !== file.uid)]
@@ -50,10 +54,7 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
     };
 
     const handleSubmit = () => {
-        onSubmit?.({
-            files: fileList,
-            content
-        } as BoxMessageType)
+        onSubmit?.()
     }
 
     const handleContentChange = (messageValue: string) => {
@@ -61,10 +62,11 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
         setContent(messageValue)
     }
 
-    return <div className="flex items-center gap-x-4">
-        <div>
+
+    return <div className="flex items-center gap-x-2">
+        <div className="flex-shrink-0">
             <Upload {...props}>
-                <img alt="upload" className="w-8 h-8" src={images.photo} />
+                <img alt="upload" className="w-6 h-6" src={images.photo} />
             </Upload>
         </div>
 
@@ -84,10 +86,10 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
                         </div>)}
                     </Image.PreviewGroup>
                 </div>}
-                <input onChange={e => handleContentChange(e.target.value)} className="px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
+                <input onChange={e => handleContentChange(e.target.value)} className="text-sm px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
             </div>
-            <button disabled={!content} onClick={handleSubmit} className="w-9 h-9 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
-                <SendHorizonal size={24} className="text-sky-600" />
+            <button disabled={!content} onClick={handleSubmit} className="w-8 h-8 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
+                <SendHorizonal size={18} className="text-sky-600" />
             </button>
         </div>
     </div>

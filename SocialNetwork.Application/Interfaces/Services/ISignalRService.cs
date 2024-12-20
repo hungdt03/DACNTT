@@ -5,6 +5,7 @@ namespace SocialNetwork.Application.Interfaces.Services
 {
     public interface ISignalRService
     {
-        void SendNotificationToSpecificUser(string username, NotificationResponse notification);
+        Task SendNotificationToSpecificUser(string username, NotificationResponse notification);
+        Task SendMessageToSpecificGroup(string groupName, MessageResponse message);
     }
 }

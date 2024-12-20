@@ -13,9 +13,10 @@ const AuthGuard: FC<AuthGuardProps> = ({
 }) => {
     const { isAuthenticated, isInitialized } = useSelector(selectAuth)
 
-    if (!isInitialized) return <Loading />
-
-    return isAuthenticated ? element : <Navigate to='/sign-in' replace />;
+    return <>
+        {!isInitialized && <Loading />}
+        {isAuthenticated ? element : <Navigate to='/sign-in' replace />}
+    </>
 };
 
 export default AuthGuard;

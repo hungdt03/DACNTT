@@ -7,7 +7,6 @@ import { ConfigProvider } from 'antd'
 import store from './app/store.ts'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { SignalRProvider } from './contexts/SignalRProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
     //<StrictMode>
