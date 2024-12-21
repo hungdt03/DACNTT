@@ -6,8 +6,9 @@ import MainLeftSidebar from "./components/MainLeftSidebar";
 import MainRightSidebar from "./components/MainRightSidebar";
 import ChatPopup from "../../components/chats/ChatPopup";
 import { useDispatch, useSelector } from "react-redux";
-import { remove, selectChatPopup } from "../../features/slices/chat-popup-slice";
+import { expand, minimize, remove, selectChatPopup } from "../../features/slices/chat-popup-slice";
 import { AppDispatch } from "../../app/store";
+import ChatMinimizePopup from "../../components/chats/ChatMinimizePopup";
 
 
 const MainLayout: FC = () => {
@@ -26,11 +27,14 @@ const MainLayout: FC = () => {
             </div>
         </div>
         
-
-        
         <div className="absolute right-24 bottom-0 flex gap-x-4">
-            {chatRooms.map(chatRoom => <ChatPopup onClose={() => dispatch(remove(chatRoom.id))} key={chatRoom.id} room={chatRoom} />)}
-        
+            {chatRooms.map(item => item.state === 'open' && <ChatPopup onMinimize={() => dispatch(minimize(item.chatRoom.id))} onClose={() => dispatch(remove(item.chatRoom.id))} key={item.chatRoom.id} room={item.chatRoom} />)}
+        </div>
+
+        <div className="absolute right-8 bottom-8 flex gap-x-4">
+            <div className="flex flex-col gap-2">
+                {chatRooms.map(item => item.state === 'minimize' && <ChatMinimizePopup key={item.chatRoom.id} onClose={() => dispatch(remove(item.chatRoom.id))} onClick={() => dispatch(expand(item.chatRoom.id))} chatRoom={item.chatRoom} />)}
+            </div>
         </div>
     </div>
 };

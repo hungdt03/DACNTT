@@ -9,7 +9,7 @@ import messageService from "../../services/messageService";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import BoxSendMessage from "./BoxSendMessage";
-import { UploadFile } from "antd";
+import { Tooltip, UploadFile } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
 
 export type MessageRequest = {
@@ -21,12 +21,14 @@ export type MessageRequest = {
 
 type ChatPopupProps = {
     room: ChatRoomResource;
-    onClose?: () => void
+    onClose?: () => void;
+    onMinimize?: () => void;
 }
 
 const ChatPopup: FC<ChatPopupProps> = ({
     room,
-    onClose
+    onClose,
+    onMinimize
 }) => {
     const { sendMessage, events } = SignalRConnector();
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -125,17 +127,17 @@ const ChatPopup: FC<ChatPopupProps> = ({
             </div>
 
             <div className="flex gap-x-1 items-center">
-                <div title="Thu nhỏ đoạn chat">
-                    <button className="p-2 bg-transparent border-none">
+                <Tooltip title="Thu nhỏ đoạn chat">
+                    <button onClick={() => onMinimize?.()} className="p-2 bg-transparent border-none">
                         <MinusOutlined />
                     </button>
-                </div>
+                </Tooltip>
 
-                <div title="Đóng đoạn chat">
+                <Tooltip title="Đóng đoạn chat">
                     <button onClick={() => onClose?.()} className="p-2 bg-transparent border-none">
                         <CloseOutlined />
                     </button>
-                </div>
+                </Tooltip>
             </div>
         </div>
 
