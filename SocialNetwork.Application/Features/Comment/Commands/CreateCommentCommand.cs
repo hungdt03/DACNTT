@@ -16,5 +16,6 @@ namespace SocialNetwork.Application.Features.Comment.Commands
         public Guid? ParentCommentId { get; set; }
         public string? ReplyToUserId { get; set; }
         public string? ReplyToUserName { get; set; }
+        public DateTimeOffset SentAt { get; set; }
     }
 }

@@ -17,5 +17,6 @@ namespace SocialNetwork.Domain.Entity
         public string UserId { get; set; } // Who create comment
         public User User { get; set; } // Who create comment
         public ICollection<Comment> Replies { get; set; }
+        public DateTimeOffset SentAt { get; set; }
     }
 }

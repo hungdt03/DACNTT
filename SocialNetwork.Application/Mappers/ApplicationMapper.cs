@@ -39,7 +39,7 @@ namespace SocialNetwork.Application.Mappers
                 MessageType = message.MessageType,
                 Sender = message.Sender != null ? MapToUser(message.Sender) : null,
                 SenderId = message.SenderId,
-                SentAt = message.DateCreated,
+                SentAt = message.SentAt,
             };
         }
 
@@ -106,6 +106,7 @@ namespace SocialNetwork.Application.Mappers
                 Id = comment.Id,
                 Content = comment.Content,
                 CreatedAt = comment.DateCreated,
+                SentAt = comment.SentAt,
                 MediaUrl = comment.MediaUrl,
                 ReplyToUserId = comment.ReplyToUserId,
                 ReplyToUserName = comment.ReplyToUserName,

@@ -14,6 +14,7 @@ namespace SocialNetwork.Application.Features.Message.Commands
         public string Content { get; set; }
         [Required(ErrorMessage = "Đoạn chat ID không được để trống")]
         public string ChatRoomName { get; set; }
+        public DateTimeOffset SentAt { get; set; }
         public List<IFormFile>? Images { get; set; }
         public List<IFormFile>? Videos { get; set; }
     }

@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Configuration;
+using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Message.Commands;
@@ -64,7 +65,8 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                 Content = request.Content,
                 SenderId = userId,
                 MessageType = MessageType.NORMAL,
-                Medias = medias
+                Medias = medias,
+                SentAt = request.SentAt,
             };
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);

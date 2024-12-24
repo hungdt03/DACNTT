@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { CommentResource } from "../../types/comment";
 import { BoxCommentType } from "./BoxSendComment";
 import { Pagination } from "../../types/response";
@@ -7,7 +6,7 @@ import { CommentItem } from "./CommentItem";
 type CommentListProps = {
     comments: CommentResource[];
     pagination: Pagination;
-    replyComment: (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | null) => void
+    replyComment: (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void
     onFetchReplies?: (commentId: string) => void;
     updatedComments: (commentId: string, fetchedReplies: CommentResource[]) => void;
     fetchNextPage: (page: number, size: number) => void;

@@ -62,6 +62,7 @@ namespace SocialNetwork.Infrastructure.SignalR
                 Sender = senderUser,
                 SenderId = userId,
                 MessageType = MessageType.NORMAL,
+                SentAt = messageRequest.SentAt,
             };
 
             await unitOfWork.BeginTransactionAsync();

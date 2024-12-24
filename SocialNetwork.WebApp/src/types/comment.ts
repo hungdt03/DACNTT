@@ -7,10 +7,13 @@ export type CommentResource = {
     parentCommentId?: string | null;
     replyToUserId?: string | null;
     replyToUserName?: string | null; 
-    mediaUrl?: string | null; 
+    mediaUrl?: string; 
     mediaType?: MediaType; 
     user: UserResource;
     createdAt: Date; 
+    sentAt: Date; 
     isHaveChildren: boolean;
-    replies: CommentResource[]
+    replies: CommentResource[];
+    status: string;
+    level: number
 };

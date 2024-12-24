@@ -266,7 +266,7 @@ const Post: FC<PostProps> = ({
         </div>
         <Divider className='mt-0 mb-2' />
 
-        <BoxSendComment
+        {/* <BoxSendComment
             value={commentData.content}
             onContentChange={(newValue) => setCommentData({
                 ...commentData,
@@ -279,7 +279,7 @@ const Post: FC<PostProps> = ({
                 ...commentData,
                 fileList: [file]
             })}
-        />
+        /> */}
 
         {/*======== MODAL COMMENTS ====== */}
 

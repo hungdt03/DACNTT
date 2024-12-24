@@ -62,6 +62,9 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
             file: fileList[0],
             content
         } as BoxCommentType)
+
+        setFileList([])
+        setContent('')
     }
 
     const handleContentChange = (messageValue: string) => {

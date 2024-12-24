@@ -44,6 +44,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 Content = request.Content,
                 UserId = currentUser.Id,
                 PostId = request.PostId,
+                SentAt = request.SentAt,
             };
 
             if(request.File != null)

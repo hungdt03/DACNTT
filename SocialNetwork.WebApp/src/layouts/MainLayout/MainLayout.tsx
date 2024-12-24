@@ -5,17 +5,14 @@ import MainLeftSidebar from "./components/MainLeftSidebar";
 import MainRightSidebar from "./components/MainRightSidebar";
 import ChatPopup from "../../components/chats/ChatPopup";
 import { useDispatch, useSelector } from "react-redux";
-import { expand, minimize, remove, selectChatPopup } from "../../features/slices/chat-popup-slice";
-import { AppDispatch } from "../../app/store";
+import { expand, remove } from "../../features/slices/chat-popup-slice";
 import ChatMinimizePopup from "../../components/chats/ChatMinimizePopup";
-import useWebRtc from "../../hooks/useWebRtc";
+import PopupWrapper from "../../components/chats/PopupWrapper";
+import MinimizePopupWrapper from "../../components/chats/MinimizePopupWrapper";
 
 
 const MainLayout: FC = () => {
-    const dispatch = useDispatch<AppDispatch>()
-    const { handleCallUser } = useWebRtc();
-    const { chatRooms } = useSelector(selectChatPopup);
-
+   
     return <div className="flex flex-col w-screen h-screen overflow-y-hidden">
         <Header />
         <div className="bg-slate-100 w-ful h-full">
@@ -29,12 +26,12 @@ const MainLayout: FC = () => {
         </div>
 
         <div className="absolute right-24 bottom-0 flex gap-x-4">
-            {chatRooms.map(item => item.state === 'open' && <ChatPopup onCalling={() => item.chatRoom.friend && handleCallUser(item.chatRoom.friend)} onMinimize={() => dispatch(minimize(item.chatRoom.id))} onClose={() => dispatch(remove(item.chatRoom.id))} key={item.chatRoom.id} room={item.chatRoom} />)}
+            <PopupWrapper />
         </div>
 
         <div className="absolute right-8 bottom-8 flex gap-x-4">
             <div className="flex flex-col gap-2">
-                {chatRooms.map(item => item.state === 'minimize' && <ChatMinimizePopup key={item.chatRoom.id} onClose={() => dispatch(remove(item.chatRoom.id))} onClick={() => dispatch(expand(item.chatRoom.id))} chatRoom={item.chatRoom} />)}
+                <MinimizePopupWrapper />
             </div>
         </div>
 

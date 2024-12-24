@@ -3,6 +3,7 @@ import { getAccessToken } from "../../utils/auth";
 import { NotificationResource } from "../../types/notification";
 import { MessageRequest } from "../../components/chats/ChatPopup";
 import { AnswerPayload, CallPayload, IncomingCallPayload } from "../../contexts/webrtc/WebrtcProvider";
+import { MessageResource } from "../../types/message";
 
 const URL = import.meta.env.VITE_SERVER_HUB_URL;
 
@@ -10,7 +11,7 @@ class SignalRConnector {
 
     private readonly connection: signalR.HubConnection;
     public events: (
-        onMessageReceived?: (message: any) => void,
+        onMessageReceived?: (message: MessageResource) => void,
         onNotificationReceived?: (notification: NotificationResource) => void,
         onIncomingCall?: (payload: IncomingCallPayload) => void,
         onCallAccepted?: (signalData: any) => void,
@@ -33,7 +34,7 @@ class SignalRConnector {
         this.connection.start().catch(err => console.log(err));
 
         this.events = (onMessageReceived, onNotificationReceived, onIncomingCall, onCallAccepted, onLeaveCall) => {
-            this.connection.on("NewMessage", (message: any) => {
+            this.connection.on("NewMessage", (message: MessageResource) => {
                 onMessageReceived?.(message);
             });
 

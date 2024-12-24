@@ -14,5 +14,6 @@ namespace SocialNetwork.Domain.Entity
         public ChatRoom ChatRoom { get; set; }
         public ICollection<MessageMedia> Medias { get; set; }
         public ICollection<MessageReadStatus> Reads { get; set; }
+        public DateTimeOffset SentAt { get; set; }
     }
 }

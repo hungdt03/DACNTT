@@ -20,7 +20,7 @@ type CommentItemProps = {
     updatePagination?: (page: number, size: number, hasMore: boolean) => void;
     onFetchReplies?: (commentId: string, page: number, size: number) => void;
     updatedComments: (commentId: string, fetchedReplies: CommentResource[]) => void;
-    replyComment: (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | undefined) => void
+    replyComment: (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void
 }
 
 
@@ -57,7 +57,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     }
 
     const handleReplyComment = (values: BoxCommentType, parentCommentId: string | null) => {
-        replyComment(values, parentCommentId, replyToUser?.id);
+        replyComment(values, parentCommentId, replyToUser?.id, level);
         setCommentData({
             content: '',
             fileList: []
@@ -97,8 +97,9 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                     />}
 
                     <div className="flex items-center gap-x-4 px-2">
-                        <span className="text-xs">{formatTime(new Date(comment.createdAt))}</span>
+                        <span className="text-xs">{comment.status === 'pending' ? 'Đang viết': formatTime(new Date(comment.sentAt))}</span>
                         <button
+                            disabled={comment.status === 'pending'}
                             className="text-xs hover:underline"
                             onClick={() => {
                                 setIsReplying(true)

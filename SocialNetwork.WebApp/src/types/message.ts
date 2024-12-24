@@ -7,7 +7,9 @@ export type MessageResource = {
     senderId: string;
     content: string;
     medias: MessageMediaResource[]
-    sentAt: Date
+    sentAt: Date;
+    chatRoomId: string;
+    status: string
 }
 
 

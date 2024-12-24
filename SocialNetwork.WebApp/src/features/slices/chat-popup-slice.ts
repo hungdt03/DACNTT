@@ -20,7 +20,8 @@ const chatPopupSlice = createSlice({
     } as ChatWindowsState,
     reducers: {
         add: (state, action: PayloadAction<ChatRoomResource>) => {
-            if (!state.chatRooms.some(s => s.chatRoom.id === action.payload.id)) {
+            const index = state.chatRooms.findIndex(s => s.chatRoom.id === action.payload.id)
+            if (index < 0) {
                 const openPopups = state.chatRooms.filter(s => s.state === 'open');
                 if (openPopups.length >= MAX_OPEN_POPUPS) {
                     const oldestOpen = openPopups[0]; 
@@ -35,6 +36,8 @@ const chatPopupSlice = createSlice({
                     chatRoom: action.payload,
                     state: 'open',
                 });
+            } else {
+                state.chatRooms[index].state = 'open'
             }
         },
         remove: (state, action: PayloadAction<string>) => {
