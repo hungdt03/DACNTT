@@ -1,6 +1,7 @@
 export interface UserResource {
     id: string;
     fullName: string;
+    email: string;
     avatar: string;
     gender: string;
     phoneNumber: string;

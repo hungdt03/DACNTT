@@ -39,6 +39,14 @@ function App() {
 
     }, []);
 
+    // useEffect(() => {
+    //     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    //         .then((stream) => {
+    //             localStream.current.srcObject = stream;
+    //         })
+    //         .catch((error) => console.error("Error accessing media devices.", error));
+    // }, []);
+
     return <RouterProvider router={appRouter} />
 }
 export default App;

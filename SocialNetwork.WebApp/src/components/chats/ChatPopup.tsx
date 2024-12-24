@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { CloseOutlined, MinusOutlined } from '@ant-design/icons'
+import { CloseOutlined, MinusOutlined, PhoneOutlined } from '@ant-design/icons'
 import images from "../../assets";
 import Message from "./messages/Message";
 import { ChatRoomResource } from "../../types/chatRoom";
@@ -23,12 +23,14 @@ type ChatPopupProps = {
     room: ChatRoomResource;
     onClose?: () => void;
     onMinimize?: () => void;
+    onCalling?: () => void;
 }
 
 const ChatPopup: FC<ChatPopupProps> = ({
     room,
     onClose,
-    onMinimize
+    onMinimize,
+    onCalling
 }) => {
     const { sendMessage, events } = SignalRConnector();
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -127,6 +129,11 @@ const ChatPopup: FC<ChatPopupProps> = ({
             </div>
 
             <div className="flex gap-x-1 items-center">
+                <Tooltip title="Gọi điện">
+                    <button onClick={() => onCalling?.()} className="p-2 bg-transparent border-none">
+                        <PhoneOutlined className="rotate-90" />
+                    </button>
+                </Tooltip>
                 <Tooltip title="Thu nhỏ đoạn chat">
                     <button onClick={() => onMinimize?.()} className="p-2 bg-transparent border-none">
                         <MinusOutlined />
@@ -157,28 +164,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 onFileChange={handleUploadFiles}
                 onSubmit={handleSendMessage}
             />
-            {/* <div className="w-full py-3 px-2"> */}
-
-            {/* <div className="flex items-center gap-x-1">
-                    {/* <div className="flex-shrink-0">
-                        <button>
-                            <img alt="Ảnh" className="w-6 h-6" src={images.photo} />
-                        </button>
-                    </div> */}
-
-            {/* <div className="bg-gray-100 px-1 py-1 rounded-3xl w-full flex justify-between">
-                        <input value={msgPayload.content} onChange={e => setMsgPayload({
-                            ...msgPayload,
-                            content: e.target.value
-                        })} className="px-2 flex-1 text-sm outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
-                        <button onClick={handleSendMessage} disabled={!msgPayload.content.trim()} className="w-8 h-8 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
-                            <SendHorizonal size={16} className="text-sky-600" />
-                        </button>
-                    </div> */}
-
-
-            {/* </div>  */}
-            {/* </div> */}
+           
         </div>
     </div >
 

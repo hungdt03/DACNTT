@@ -1,0 +1,456 @@
+  // const localStream = useRef<HTMLVideoElement | null>(null);
+    // const remoteStream = useRef<HTMLVideoElement | null>(null);
+
+    // const peerConnection = useRef<RTCPeerConnection | null>(null);
+    // const startCall = async (username: string) => {
+    //     if (!localStream.current) return;
+
+    //     peerConnection.current = new RTCPeerConnection(servers);
+
+    //     // Thêm track vào PeerConnection
+    //     const stream = localStream.current.srcObject as MediaStream;
+    //     stream.getTracks().forEach((track) => {
+    //         peerConnection.current?.addTrack(track, stream);
+    //     });
+
+    //     peerConnection.current.ontrack = (event: RTCTrackEvent) => {
+    //         if (remoteStream.current) {
+    //             console.log('INCOMING REMOTE STREAM')
+    //             console.log(event.streams[0])
+    //             const stream = new MediaStream();
+    //             event.streams[0].getTracks().forEach((track) => {
+    //                 stream.addTrack(track)
+    //             });
+    //             remoteStream.current.srcObject = stream;
+    //         }
+    //     };
+
+    //     peerConnection.current.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
+    //         if (event.candidate) {
+    //             sendIceCandidate(username, event);
+    //         }
+    //     };
+
+    //     // Tạo Offer
+    //     const offer = await peerConnection.current.createOffer();
+    //     await peerConnection.current.setLocalDescription(offer);
+
+    //     sendOffer(username, offer);
+    // };
+
+    // useEffect(() => {
+    //     console.log('Local stream: ')
+    //     // Truy cập camera và microphone
+    //     navigator.mediaDevices
+    //         .getUserMedia({ video: true, audio: true })
+    //         .then((stream) => {
+
+    //             console.log(stream)
+    //             if (localStream.current) {
+    //                 localStream.current.srcObject = stream;
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error accessing media devices.", error);
+    //         });
+    // }, []);
+
+    // useEffect(() => {
+    //     events(
+    //         undefined, undefined,
+    //         async (user, offer) => {
+    //             console.log('OFFER MAIN LAYOUT')
+    //             await peerConnection?.current?.setRemoteDescription(
+    //                 new RTCSessionDescription(offer)
+    //             );
+
+    //             const answer = await peerConnection?.current?.createAnswer();
+    //             await peerConnection?.current?.setLocalDescription(answer);
+    //             sendAnswer(user, offer)
+    //         },
+    //         async (answer) => {
+    //             console.log('ANSWER MAIN LAYOUT')
+    //             await peerConnection?.current?.setRemoteDescription(
+    //                 new RTCSessionDescription(answer)
+    //             );
+    //         },
+    //         async (candidate) => {
+    //             console.log('CANDIDATE MAIN LAYOUT')
+    //             await peerConnection?.current?.addIceCandidate(
+    //                 new RTCIceCandidate(candidate)
+    //             );
+    //         }
+    //     );
+    // }, [])
+===================================================
+
+
+import { FC, useEffect, useRef, useState } from "react";
+import Header from "../shared/Header";
+import { Outlet } from "react-router-dom";
+import MainLeftSidebar from "./components/MainLeftSidebar";
+import MainRightSidebar from "./components/MainRightSidebar";
+import ChatPopup from "../../components/chats/ChatPopup";
+import { useDispatch, useSelector } from "react-redux";
+import { expand, minimize, remove, selectChatPopup } from "../../features/slices/chat-popup-slice";
+import { AppDispatch } from "../../app/store";
+import ChatMinimizePopup from "../../components/chats/ChatMinimizePopup";
+import SignalRConnector from '../../app/signalR/signalr-connection'
+
+const servers = {
+    iceServers: [
+        {
+            urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+        },
+    ],
+    iceCandidatePoolSize: 10,
+};
+
+
+const MainLayout: FC = () => {
+    const dispatch = useDispatch<AppDispatch>()
+    const { chatRooms } = useSelector(selectChatPopup);
+    const { sendIceCandidate, sendOffer, sendAnswer, events } = SignalRConnector()
+    const [remoteStreamMedia, setRemoteStreamMedia] = useState<MediaStream>()
+
+    const localStream = useRef<HTMLVideoElement | null>(null);
+    const remoteStream = useRef<HTMLVideoElement | null>(null);
+
+    const peerConnection = useRef<RTCPeerConnection | null>(null);
+    peerConnection.current = new RTCPeerConnection(servers);
+
+    const startCall = async (username: string) => {
+        if (!peerConnection.current) return;
+        const stream = await navigator.mediaDevices
+            .getUserMedia({ video: true, audio: true })
+
+        if (localStream.current) {
+            localStream.current.srcObject = stream;
+        }
+
+        console.log('Local stream: ', stream)
+        // Thêm track vào PeerConnection
+        stream.getTracks().forEach((track) => {
+            peerConnection.current?.addTrack(track, stream);
+        });
+
+      
+        // Tạo Offer
+        const offer = await peerConnection.current.createOffer();
+        await peerConnection.current.setLocalDescription(offer);
+        sendOffer(username, offer);
+
+        peerConnection.current.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
+            if (event.candidate) {
+                sendIceCandidate(username, event);
+            } else {
+                console.log('ICE gathering complete.');
+            }
+        };
+
+        peerConnection.current.ontrack = (event: RTCTrackEvent) => {
+            console.log('Received remote track:', event);
+            if (remoteStream.current) {
+                console.log('Remote stream is available')
+                remoteStream.current.srcObject = event.streams[0];
+            } else {
+                console.error("Remote video element not initialized");
+            }
+        };
+
+        peerConnection.current.onicegatheringstatechange = () => {
+            console.log('ICE gathering state:', peerConnection.current?.iceGatheringState);
+        };
+
+    };
+
+    useEffect(() => {
+        events(
+            undefined, undefined,
+            async (user, offer) => {
+                console.log('Received offer');
+
+                if (peerConnection.current?.signalingState !== "stable") {
+                    console.error("Cannot handle offer, invalid signaling state:", peerConnection.current?.signalingState);
+                    return;
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: true,
+                });
+
+                console.log('Local stream: ', stream)
+
+                if (localStream.current) {
+                    localStream.current.srcObject = stream;
+                }
+
+                // Thêm track vào PeerConnection
+                stream.getTracks().forEach((track) => {
+                    peerConnection.current?.addTrack(track, stream);
+                });
+
+                console.log('Set remote description in Received offer')
+                await peerConnection.current.setRemoteDescription(
+                    new RTCSessionDescription(offer)
+                );
+
+                const answer = await peerConnection.current.createAnswer();
+                await peerConnection.current.setLocalDescription(answer);
+                sendAnswer(user, answer);
+
+                
+                peerConnection.current.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
+                    if (event.candidate) {
+                        sendIceCandidate(user, event);
+                    } else {
+                        console.log('ICE gathering complete.');
+                    }
+                };
+
+                peerConnection.current.ontrack = (event: RTCTrackEvent) => {
+                    setRemoteStreamMedia(event.streams[0])
+                };
+
+            },
+            async (answer) => {
+                console.log('Received answer');
+
+                if (peerConnection.current?.signalingState === "have-local-offer") {
+                    console.log('Set remote description in Received answer')
+                    await peerConnection.current.setRemoteDescription(
+                        new RTCSessionDescription(answer)
+                    );
+                } else {
+                    console.error("Invalid state for setting answer:", peerConnection.current?.signalingState);
+                }
+            },
+            async (candidate) => {
+                console.log('receive candidate: ', candidate)
+                if (peerConnection.current?.remoteDescription) {
+                    console.log('Set được mà hen')
+                    await peerConnection.current.addIceCandidate(new RTCIceCandidate(candidate));
+                } else {
+                    console.error("Remote description is not set yet, cannot add ICE candidate.");
+                }
+            }
+        );
+    }, [])
+
+    useEffect(() => {
+        if(remoteStream.current && remoteStreamMedia) {
+            console.log('remoteStreamMedia')
+            console.log(remoteStreamMedia)
+            remoteStream.current.srcObject = remoteStreamMedia
+        }
+    }, [remoteStreamMedia])
+
+    return <div className="flex flex-col w-screen h-screen overflow-y-hidden">
+        <Header />
+        <div className="bg-slate-100 w-ful h-full">
+            <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto w-full h-full grid grid-cols-12 gap-6 overflow-hidden">
+                <MainLeftSidebar />
+                <div className="h-full flex flex-col gap-6 overflow-y-auto scrollbar-hide col-span-12 lg:col-span-8 xl:col-span-6 py-6 px-4 md:px-0">
+                    <div className="w-full items-center flex gap-x-4">
+                        {localStream && <video ref={localStream} autoPlay muted style={{ width: '300px' }} />}
+                        {remoteStream && <video ref={remoteStream} autoPlay style={{ width: '300px' }} />}
+                    </div>
+                    <Outlet />
+                </div>
+                <MainRightSidebar />
+            </div>
+        </div>
+
+        <div className="absolute right-24 bottom-0 flex gap-x-4">
+            {chatRooms.map(item => item.state === 'open' && <ChatPopup onCalling={() => startCall(item.chatRoom.friend?.email ?? "")} onMinimize={() => dispatch(minimize(item.chatRoom.id))} onClose={() => dispatch(remove(item.chatRoom.id))} key={item.chatRoom.id} room={item.chatRoom} />)}
+        </div>
+
+        <div className="absolute right-8 bottom-8 flex gap-x-4">
+            <div className="flex flex-col gap-2">
+                {chatRooms.map(item => item.state === 'minimize' && <ChatMinimizePopup key={item.chatRoom.id} onClose={() => dispatch(remove(item.chatRoom.id))} onClick={() => dispatch(expand(item.chatRoom.id))} chatRoom={item.chatRoom} />)}
+            </div>
+        </div>
+
+    </div>
+};
+
+export default MainLayout;
+
+
+=======================================================
+
+import { FC, useCallback, useEffect, useRef, useState } from "react";
+import Header from "../shared/Header";
+import { Outlet } from "react-router-dom";
+import MainLeftSidebar from "./components/MainLeftSidebar";
+import MainRightSidebar from "./components/MainRightSidebar";
+import ChatPopup from "../../components/chats/ChatPopup";
+import { useDispatch, useSelector } from "react-redux";
+import { expand, minimize, remove, selectChatPopup } from "../../features/slices/chat-popup-slice";
+import { AppDispatch } from "../../app/store";
+import ChatMinimizePopup from "../../components/chats/ChatMinimizePopup";
+import SignalRConnector from '../../app/signalR/signalr-connection'
+
+const servers = {
+    iceServers: [
+        {
+            urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+        },
+    ],
+    iceCandidatePoolSize: 10,
+};
+
+
+const MainLayout: FC = () => {
+    const dispatch = useDispatch<AppDispatch>()
+    const { chatRooms } = useSelector(selectChatPopup);
+    const { sendIceCandidate, sendOffer, sendAnswer, events } = SignalRConnector()
+
+    const [myStream, setMyStream] = useState<MediaStream>()
+    const localStream = useRef<HTMLVideoElement | null>(null);
+    const remoteStream = useRef<HTMLVideoElement | null>(null);
+
+    const peerConnection = useRef<RTCPeerConnection | null>(null);
+    if (!peerConnection.current) {
+        console.log('Create peer connection')
+        peerConnection.current = new RTCPeerConnection();
+    }
+
+    const startCall = async (username: string) => {
+        if (!peerConnection.current) return;
+        const stream = await navigator.mediaDevices
+            .getUserMedia({ video: true, audio: true })
+
+        if (localStream.current) {
+            console.log('Local stream Peer A: ')
+            console.log(stream)
+            localStream.current.srcObject = stream;
+        }
+
+        // sendStreams()
+        // // Thêm track vào PeerConnection
+        stream.getTracks().forEach((track) => {
+            peerConnection.current?.addTrack(track, stream);
+        });
+
+        peerConnection.current.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
+            if (event.candidate) {
+                sendIceCandidate(username, event);
+            } else {
+                console.log('ICE gathering complete.');
+            }
+        };
+
+        peerConnection.current.onicegatheringstatechange = () => {
+            console.log('ICE gathering state:', peerConnection.current?.iceGatheringState);
+        };
+
+        // Tạo Offer
+        const offer = await peerConnection.current.createOffer();
+        await peerConnection.current.setLocalDescription(offer);
+        sendOffer(username, offer);
+    };
+
+    useEffect(() => {
+        if (peerConnection.current) {
+            peerConnection.current.ontrack = (event: RTCTrackEvent) => {
+                console.log('Received remote track:', event.streams[0]);
+                if (remoteStream.current) {
+                    remoteStream.current.srcObject = event.streams[0];
+                }
+            };
+        }
+    }, []);
+
+    useEffect(() => {
+        events(
+            undefined, undefined,
+            async (user, offer) => {
+
+                if (peerConnection.current?.signalingState !== "stable") {
+                    return;
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: true,
+                });
+
+                if (localStream.current) {
+                    console.log('Local stream Peer B: ')
+                    console.log(stream)
+                    localStream.current.srcObject = stream;
+                }
+
+                peerConnection.current.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
+                    if (event.candidate) {
+                        sendIceCandidate(user, event);
+                    } else {
+                        console.log('ICE gathering complete.');
+                    }
+                };
+
+                // Thêm track vào PeerConnection
+                stream.getTracks().forEach((track) => {
+                    peerConnection.current?.addTrack(track, stream);
+                });
+
+                await peerConnection.current.setRemoteDescription(
+                    new RTCSessionDescription(offer)
+                );
+
+                const answer = await peerConnection.current.createAnswer();
+                await peerConnection.current.setLocalDescription(answer);
+                sendAnswer(user, answer);
+
+            },
+            async (answer) => {
+                if (peerConnection.current?.signalingState === "have-local-offer") {
+                    await peerConnection.current.setRemoteDescription(
+                        new RTCSessionDescription(answer)
+                    );
+                }
+            },
+            async (user, candidate) => {
+                console.log('Receive candidate from: ', user)
+                if (peerConnection.current) {
+                    await peerConnection.current.addIceCandidate(
+                        new RTCIceCandidate(candidate)
+                    );
+                }
+            }
+        );
+    }, [])
+
+
+    return <div className="flex flex-col w-screen h-screen overflow-y-hidden">
+        <Header />
+        <div className="bg-slate-100 w-ful h-full">
+            <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto w-full h-full grid grid-cols-12 gap-6 overflow-hidden">
+                <MainLeftSidebar />
+                <div className="h-full flex flex-col gap-6 overflow-y-auto scrollbar-hide col-span-12 lg:col-span-8 xl:col-span-6 py-6 px-4 md:px-0">
+                    <div className="w-full items-center flex gap-x-4">
+                        {localStream && <video id="localStream" ref={localStream} autoPlay muted style={{ width: '300px' }} />}
+                        {remoteStream && <video id="remoteStream" ref={remoteStream} autoPlay muted style={{ width: '300px' }} />}
+                    </div>
+                    <Outlet />
+                </div>
+                <MainRightSidebar />
+            </div>
+        </div>
+
+        <div className="absolute right-24 bottom-0 flex gap-x-4">
+            {chatRooms.map(item => item.state === 'open' && <ChatPopup onCalling={() => startCall(item.chatRoom.friend?.email ?? "")} onMinimize={() => dispatch(minimize(item.chatRoom.id))} onClose={() => dispatch(remove(item.chatRoom.id))} key={item.chatRoom.id} room={item.chatRoom} />)}
+        </div>
+
+        <div className="absolute right-8 bottom-8 flex gap-x-4">
+            <div className="flex flex-col gap-2">
+                {chatRooms.map(item => item.state === 'minimize' && <ChatMinimizePopup key={item.chatRoom.id} onClose={() => dispatch(remove(item.chatRoom.id))} onClick={() => dispatch(expand(item.chatRoom.id))} chatRoom={item.chatRoom} />)}
+            </div>
+        </div>
+
+    </div>
+};
+
+export default MainLayout;

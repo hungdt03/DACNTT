@@ -9,6 +9,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity;
+using SocialNetwork.Infrastructure.SignalR.Payload;
 
 namespace SocialNetwork.Infrastructure.SignalR
 {
@@ -74,6 +75,28 @@ namespace SocialNetwork.Infrastructure.SignalR
             await Clients.Group(chatRoom.UniqueName).SendAsync("NewMessage", ApplicationMapper.MapToMessage(message));
         }
 
+
+
+        public async Task CallFriend(CallPayload payload)
+        {
+            var user = await userManager.FindByIdAsync(Context.User.GetUserId());
+            await Clients.User(payload.UserToCall).SendAsync("CallFriend", new
+            {
+                SignalData = payload.SignalData,
+                From = ApplicationMapper.MapToUser(user),
+            });
+        }
+
+        public async Task AnswerCall(AnswerPayload payload)
+        {
+            var username = Context.User.GetUserName();
+            await Clients.User(payload.UserToAnswer).SendAsync("AcceptCall", payload.SignalData);
+        }
+
+        public async Task LeaveCall(string username)
+        {
+            await Clients.User(username).SendAsync("LeaveCall");
+        }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {

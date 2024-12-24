@@ -1,7 +1,6 @@
 import { FC } from "react";
 import Header from "../shared/Header";
 import { Outlet } from "react-router-dom";
-
 import MainLeftSidebar from "./components/MainLeftSidebar";
 import MainRightSidebar from "./components/MainRightSidebar";
 import ChatPopup from "../../components/chats/ChatPopup";
@@ -9,10 +8,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { expand, minimize, remove, selectChatPopup } from "../../features/slices/chat-popup-slice";
 import { AppDispatch } from "../../app/store";
 import ChatMinimizePopup from "../../components/chats/ChatMinimizePopup";
+import useWebRtc from "../../hooks/useWebRtc";
 
 
 const MainLayout: FC = () => {
     const dispatch = useDispatch<AppDispatch>()
+    const { handleCallUser } = useWebRtc();
     const { chatRooms } = useSelector(selectChatPopup);
 
     return <div className="flex flex-col w-screen h-screen overflow-y-hidden">
@@ -26,9 +27,9 @@ const MainLayout: FC = () => {
                 <MainRightSidebar />
             </div>
         </div>
-        
+
         <div className="absolute right-24 bottom-0 flex gap-x-4">
-            {chatRooms.map(item => item.state === 'open' && <ChatPopup onMinimize={() => dispatch(minimize(item.chatRoom.id))} onClose={() => dispatch(remove(item.chatRoom.id))} key={item.chatRoom.id} room={item.chatRoom} />)}
+            {chatRooms.map(item => item.state === 'open' && <ChatPopup onCalling={() => item.chatRoom.friend && handleCallUser(item.chatRoom.friend)} onMinimize={() => dispatch(minimize(item.chatRoom.id))} onClose={() => dispatch(remove(item.chatRoom.id))} key={item.chatRoom.id} room={item.chatRoom} />)}
         </div>
 
         <div className="absolute right-8 bottom-8 flex gap-x-4">
@@ -36,6 +37,7 @@ const MainLayout: FC = () => {
                 {chatRooms.map(item => item.state === 'minimize' && <ChatMinimizePopup key={item.chatRoom.id} onClose={() => dispatch(remove(item.chatRoom.id))} onClick={() => dispatch(expand(item.chatRoom.id))} chatRoom={item.chatRoom} />)}
             </div>
         </div>
+
     </div>
 };
 
