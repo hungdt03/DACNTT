@@ -9,6 +9,7 @@ import SharePost from "../components/posts/SharePost";
 import PostSkeletonList from "../components/skeletons/PostSkeletonList";
 import { Pagination } from "../types/response";
 import { inititalValues } from "../utils/pagination";
+import StoryWrapper from "../components/story/StoryWrapper";
 
 const Feeds: FC = () => {
     const [loading, setLoading] = useState(false)
@@ -76,6 +77,8 @@ const Feeds: FC = () => {
             onSuccess={handleCreatePostSuccess}
             onFalied={handleCreatePostFailed}
         />
+
+        <StoryWrapper />
 
         {posts.map(post => {
             if (post.postType === PostType.SHARE_POST) {

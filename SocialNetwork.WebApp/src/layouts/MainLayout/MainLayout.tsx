@@ -3,10 +3,6 @@ import Header from "../shared/Header";
 import { Outlet } from "react-router-dom";
 import MainLeftSidebar from "./components/MainLeftSidebar";
 import MainRightSidebar from "./components/MainRightSidebar";
-import ChatPopup from "../../components/chats/ChatPopup";
-import { useDispatch, useSelector } from "react-redux";
-import { expand, remove } from "../../features/slices/chat-popup-slice";
-import ChatMinimizePopup from "../../components/chats/ChatMinimizePopup";
 import PopupWrapper from "../../components/chats/PopupWrapper";
 import MinimizePopupWrapper from "../../components/chats/MinimizePopupWrapper";
 

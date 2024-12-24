@@ -14,6 +14,7 @@ import NotFoundPage from "../pages/errors/NotFoundPage";
 import GuestGuard from "./guestGuard";
 import UserPage from "../pages/UserPage";
 import ErrorBoundaryPage from "../pages/errors/ErrorBoundaryPage";
+import CreateStoryPage from "../pages/CreateStoryPage";
 
 const appRouter = createBrowserRouter([
     {
@@ -24,7 +25,7 @@ const appRouter = createBrowserRouter([
             {
                 path: '',
                 element: <Feeds />
-            }
+            },
         ]
     },
     {
@@ -70,6 +71,10 @@ const appRouter = createBrowserRouter([
                 element: <ChatPage />
             }
         ]
+    },
+    {
+        path: '/story',
+        element: <CreateStoryPage />
     },
     {
         path: '*',

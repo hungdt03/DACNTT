@@ -1,5 +1,4 @@
 import React, { FC, useState } from "react";
-import { isVideo } from "../utils";
 import { MixMediaProps } from "./MixMediaProps";
 import MediaGallery from "../../MediaGallery";
 import { CloseOutlined } from '@ant-design/icons'
