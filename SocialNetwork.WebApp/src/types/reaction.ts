@@ -1,4 +1,4 @@
-import { ReactionType } from "../constants/reaction";
+import { ReactionType } from "../enums/reaction";
 import { UserResource } from "./user";
 
 export type ReactionResource = {

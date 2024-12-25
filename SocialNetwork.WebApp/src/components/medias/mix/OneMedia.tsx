@@ -4,7 +4,7 @@ import OneImage from "../images/OneImage";
 import { Modal } from "antd";
 import MediaGallery from "../../MediaGallery";
 import { CloseOutlined } from '@ant-design/icons'
-import { MediaType } from "../../../constants/media";
+import { MediaType } from "../../../enums/media";
 
 const OneMedia: FC<MixMediaProps> = ({
     items

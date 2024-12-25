@@ -5,7 +5,7 @@ import { PostResource } from "../../types/post";
 import postService from "../../services/postService";
 import { Id, toast } from "react-toastify";
 import PostSkeleton from "../skeletons/PostSkeleton";
-import { PostType } from "../../constants/post-type";
+import { PostType } from "../../enums/post-type";
 import SharePost from "../posts/SharePost";
 import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";

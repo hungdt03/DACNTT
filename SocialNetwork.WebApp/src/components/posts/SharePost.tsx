@@ -15,7 +15,7 @@ import { PostReaction } from "./PostReaction";
 import { PostResource } from "../../types/post";
 import { getBtnReaction, getPrivacyPost } from "../../utils/post";
 import { formatTime, formatVietnamDate } from "../../utils/date";
-import { ReactionType } from "../../constants/reaction";
+import { ReactionType } from "../../enums/reaction";
 import { ReactionRequest, getTopReactions } from "./Post";
 import commentService from "../../services/commentService";
 import postService from "../../services/postService";

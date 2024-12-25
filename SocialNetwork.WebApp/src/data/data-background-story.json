@@ -1,0 +1,122 @@
+[
+    {
+        "name": "Gradient 1",
+        "background": "linear-gradient(to bottom, #f97316, #ec4899)"
+    },
+    {
+        "name": "Gradient 2",
+        "background": "linear-gradient(to bottom, #3b82f6, #10b981)"
+    },
+    {
+        "name": "Gradient 3",
+        "background": "linear-gradient(to bottom, #a855f7, #6366f1)"
+    },
+    {
+        "name": "Gradient 4",
+        "background": "linear-gradient(to bottom, #f59e0b, #ef4444)"
+    },
+    {
+        "name": "Gradient 5",
+        "background": "linear-gradient(to bottom, #14b8a6, #06b6d4)"
+    },
+    {
+        "name": "Gradient 6",
+        "background": "linear-gradient(to bottom, #84cc16, #10b981)"
+    },
+    {
+        "name": "Gradient 7",
+        "background": "linear-gradient(to bottom, #ec4899, #a855f7)"
+    },
+    {
+        "name": "Gradient 8",
+        "background": "linear-gradient(to bottom, #6366f1, #3b82f6)"
+    },
+    {
+        "name": "Gradient 9",
+        "background": "linear-gradient(to bottom, #ef4444, #f97316)"
+    },
+    {
+        "name": "Gradient 10",
+        "background": "linear-gradient(to bottom, #6b7280, #71717a)"
+    },
+    {
+        "name": "Gradient 11",
+        "background": "linear-gradient(to bottom, #38bdf8, #3b82f6)"
+    },
+    {
+        "name": "Gradient 12",
+        "background": "linear-gradient(to bottom, #f43f5e, #ec4899)"
+    },
+    {
+        "name": "Gradient 13",
+        "background": "linear-gradient(to bottom, #d946ef, #a855f7)"
+    },
+    {
+        "name": "Gradient 14",
+        "background": "linear-gradient(to bottom, #f59e0b, #facc15)"
+    },
+    {
+        "name": "Gradient 15",
+        "background": "linear-gradient(to bottom, #06b6d4, #14b8a6)"
+    },
+    {
+        "name": "Gradient 16",
+        "background": "linear-gradient(to bottom, #10b981, #84cc16)"
+    },
+    {
+        "name": "Gradient 17",
+        "background": "linear-gradient(to bottom, #fbbf24, #f97316)"
+    },
+    {
+        "name": "Gradient 18",
+        "background": "linear-gradient(to bottom, #60a5fa, #06b6d4)"
+    },
+    {
+        "name": "Gradient 19",
+        "background": "linear-gradient(to bottom, #fb7185, #ef4444)"
+    },
+    {
+        "name": "Gradient 20",
+        "background": "linear-gradient(to bottom, #c084fc, #6366f1)"
+    },
+    {
+        "name": "Gradient 21",
+        "background": "linear-gradient(to bottom, #34d399, #14b8a6)"
+    },
+    {
+        "name": "Gradient 22",
+        "background": "linear-gradient(to bottom, #9ca3af, #6b7280)"
+    },
+    {
+        "name": "Gradient 23",
+        "background": "linear-gradient(to bottom, #fb7185, #f43f5e)"
+    },
+    {
+        "name": "Gradient 24",
+        "background": "linear-gradient(to bottom, #bef264, #10b981)"
+    },
+    {
+        "name": "Gradient 25",
+        "background": "linear-gradient(to bottom, #fbbf24, #f97316)"
+    },
+    {
+        "name": "Gradient 26",
+        "background": "linear-gradient(to bottom, #22d3ee, #38bdf8)"
+    },
+    {
+        "name": "Gradient 27",
+        "background": "linear-gradient(to bottom, #8b5cf6, #7c3aed)"
+    },
+    {
+        "name": "Gradient 28",
+        "background": "linear-gradient(to bottom, #14b8a6, #34d399)"
+    },
+    {
+        "name": "Gradient 29",
+        "background": "linear-gradient(to bottom, #fde047, #f59e0b)"
+    },
+    {
+        "name": "Gradient 30",
+        "background": "linear-gradient(to bottom, #fbcfe8, #d946ef)"
+    }
+]

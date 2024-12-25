@@ -2,7 +2,7 @@ import { Avatar, Popover } from "antd";
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
 import TagFriendModal from "./TagFriendModal";
-import { PrivacyType } from "../../constants/privacy";
+import { PrivacyType } from "../../enums/privacy";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";

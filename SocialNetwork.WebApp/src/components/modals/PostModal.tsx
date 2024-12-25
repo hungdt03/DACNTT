@@ -10,7 +10,7 @@ import { Id, toast } from "react-toastify";
 import { imageTypes } from "../../utils/file";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
-import { MediaType } from "../../constants/media";
+import { MediaType } from "../../enums/media";
 
 export type BoxCommendStateType = {
     fileList: UploadFile[];

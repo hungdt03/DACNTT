@@ -6,7 +6,7 @@ import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 SwiperCore.use([Navigation]);
 import 'swiper/css';
 import { PostMediaResource } from "../types/post";
-import { MediaType } from "../constants/media";
+import { MediaType } from "../enums/media";
 
 interface MediaGalleryProps {
     medias: PostMediaResource[];

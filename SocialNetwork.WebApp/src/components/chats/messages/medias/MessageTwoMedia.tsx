@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { MessageMediaResource } from "../../../../types/message";
 import MediaGallery from "../../../MediaGallery";
-import { MediaType } from "../../../../constants/media";
+import { MediaType } from "../../../../enums/media";
 import { CloseOutlined } from '@ant-design/icons'
 import { Modal } from "antd";
 

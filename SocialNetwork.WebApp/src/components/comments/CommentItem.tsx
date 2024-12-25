@@ -8,7 +8,7 @@ import { Avatar, Image } from "antd";
 import cn from "../../utils/cn";
 import { formatTime } from "../../utils/date";
 import BoxReplyComment from "./BoxReplyComment";
-import { MediaType } from "../../constants/media";
+import { MediaType } from "../../enums/media";
 import { BoxCommendStateType } from "../modals/PostModal";
 import { UserResource } from "../../types/user";
 

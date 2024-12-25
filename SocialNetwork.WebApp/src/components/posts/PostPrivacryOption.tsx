@@ -1,6 +1,6 @@
 import { Radio } from "antd";
 import images from "../../assets";
-import { PrivacyType } from "../../constants/privacy";
+import { PrivacyType } from "../../enums/privacy";
 import { FC, useState } from "react";
 import { User, Users } from "lucide-react";
 

@@ -4,7 +4,7 @@ import { isVideo } from "../utils";
 import { CloseOutlined } from '@ant-design/icons'                  
 import { Modal } from "antd";
 import MediaGallery from "../../MediaGallery";
-import { MediaType } from "../../../constants/media";
+import { MediaType } from "../../../enums/media";
 
 const FiveMedia: FC<MixMediaProps> = ({
     items

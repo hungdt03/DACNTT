@@ -3,7 +3,7 @@ import { MixMediaProps } from "./MixMediaProps";
 import { Modal } from "antd";
 import { CloseOutlined } from '@ant-design/icons'
 import MediaGallery from "../../MediaGallery";
-import { MediaType } from "../../../constants/media";
+import { MediaType } from "../../../enums/media";
 
 const FourMedia: FC<MixMediaProps> = ({
     items

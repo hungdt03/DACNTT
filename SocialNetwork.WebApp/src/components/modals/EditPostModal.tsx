@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import { Lock, User } from "lucide-react";
 import UploadMultipleFile from "../uploads/UploadMultiFile";
-import { PrivacyType } from "../../constants/privacy";
+import { PrivacyType } from "../../enums/privacy";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";

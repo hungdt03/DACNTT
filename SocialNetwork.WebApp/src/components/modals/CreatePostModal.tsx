@@ -3,7 +3,7 @@ import { FC, useRef, useState } from "react";
 import images from "../../assets";
 import UploadMultipleFile from "../uploads/UploadMultiFile";
 import TagFriendModal from "./TagFriendModal";
-import { PrivacyType } from "../../constants/privacy";
+import { PrivacyType } from "../../enums/privacy";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";

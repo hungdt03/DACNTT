@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { MessageMediaResource } from "../../../types/message";
-import { MediaType } from "../../../constants/media";
+import { MediaType } from "../../../enums/media";
 import MessageIncludeVideo from "./medias/MessageIncludeVideo";
 import MessageIncludeImage from "./images/MessageIncludeImage";
 

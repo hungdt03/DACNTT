@@ -4,17 +4,15 @@ import images from "../../assets";
 import { MoreHorizontal } from "lucide-react";
 import { ChatBubbleLeftIcon, ShareIcon } from "@heroicons/react/24/outline";
 import { ReactionSvgType, svgReaction } from "../../assets/svg";
-import PostModal, { BoxCommendStateType } from "../modals/PostModal";
+import PostModal from "../modals/PostModal";
 import useModal from "../../hooks/useModal";
 import PostReactionModal from "../modals/PostReactionModal";
 import SharePostModal from "../modals/SharePostModal";
 import PostMedia from "./PostMedia";
-import BoxSendComment, { BoxCommentType } from "../comments/BoxSendComment";
 import { PostResource } from "../../types/post";
 import { formatTime, formatVietnamDate } from "../../utils/date";
 import { PostReaction } from "./PostReaction";
-import commentService from "../../services/commentService";
-import { ReactionType } from "../../constants/reaction";
+import { ReactionType } from "../../enums/reaction";
 import reactionService from "../../services/reactionService";
 import { ReactionResource } from "../../types/reaction";
 import { useSelector } from "react-redux";
@@ -74,10 +72,7 @@ const Post: FC<PostProps> = ({
     const { user } = useSelector(selectAuth)
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
-    const [commentData, setCommentData] = useState<BoxCommendStateType>({
-        content: '',
-        fileList: []
-    })
+   
     const [post, setPost] = useState<PostResource>(postParam)
 
     const fetchReactions = async () => {
@@ -105,27 +100,6 @@ const Post: FC<PostProps> = ({
             setPost(response.data);
         } else {
             toast.error(response.message);
-        }
-    }
-
-    const handleCreateComment = async (values: BoxCommentType) => {
-        const formData = new FormData();
-        formData.append('content', values.content);
-        formData.append('postId', post.id);
-
-        if (values?.file?.originFileObj) {
-            formData.append('file', values.file.originFileObj, values.file.name);
-        }
-
-        const response = await commentService.createComment(formData);
-        if (response.isSuccess) {
-            message.success(response.message)
-            setCommentData({
-                content: '',
-                fileList: []
-            })
-        } else {
-            message.error(response.message)
         }
     }
 
@@ -265,21 +239,6 @@ const Post: FC<PostProps> = ({
             </button>
         </div>
         <Divider className='mt-0 mb-2' />
-
-        {/* <BoxSendComment
-            value={commentData.content}
-            onContentChange={(newValue) => setCommentData({
-                ...commentData,
-                content: newValue
-            })}
-            onSubmit={handleCreateComment}
-            key={'box-send-comment'}
-            files={commentData.fileList}
-            onFileChange={(file) => setCommentData({
-                ...commentData,
-                fileList: [file]
-            })}
-        /> */}
 
         {/*======== MODAL COMMENTS ====== */}
 

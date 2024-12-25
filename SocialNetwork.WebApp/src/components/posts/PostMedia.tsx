@@ -1,7 +1,7 @@
 import PostMixMedia from '../medias/mix/PosMixMedia'
 import PostImage from "../medias/images/PostImage";
 import { PostMediaResource } from "../../types/post";
-import { MediaType } from "../../constants/media";
+import { MediaType } from "../../enums/media";
 
 interface PostMediaProps {
     files: PostMediaResource[];

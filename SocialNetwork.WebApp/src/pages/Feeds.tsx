@@ -4,7 +4,7 @@ import PostCreator from "../components/posts/PostCreator";
 import { Id, toast } from "react-toastify";
 import { PostResource } from "../types/post";
 import postService from "../services/postService";
-import { PostType } from "../constants/post-type";
+import { PostType } from "../enums/post-type";
 import SharePost from "../components/posts/SharePost";
 import PostSkeletonList from "../components/skeletons/PostSkeletonList";
 import { Pagination } from "../types/response";

@@ -1,4 +1,4 @@
-import { FriendRequestStatus } from "../constants/friend-request";
+import { FriendRequestStatus } from "../enums/friend-request";
 import { UserResource } from "./user";
 
 export type FriendRequestResource = {

@@ -1,5 +1,5 @@
-import { MediaType } from "../constants/media";
-import { PrivacyType } from "../constants/privacy";
+import { MediaType } from "../enums/media";
+import { PrivacyType } from "../enums/privacy";
 import { TagResource } from "./tag";
 import { UserResource } from "./user";
 

@@ -10,7 +10,7 @@ import { UserResource } from "../../types/user";
 import friendRequestService from "../../services/friendRequestService";
 import { toast } from "react-toastify";
 import friendService from "../../services/friendService";
-import { FriendRequestStatus } from "../../constants/friend-request";
+import { FriendRequestStatus } from "../../enums/friend-request";
 
 type ProfileUserContentProps = {
     user: UserResource;

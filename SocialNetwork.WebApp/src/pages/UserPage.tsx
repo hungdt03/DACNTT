@@ -8,7 +8,7 @@ import userService from "../services/userService";
 import Loading from "../components/Loading";
 import SignalRConnector from '../app/signalR/signalr-connection'
 import { NotificationResource } from "../types/notification";
-import { NotificationType } from "../constants/notification-type";
+import { NotificationType } from "../enums/notification-type";
 import ProfileUserContent from "../components/profiles/ProfileUserContent";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../features/slices/auth-slice";

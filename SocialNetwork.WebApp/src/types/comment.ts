@@ -1,4 +1,4 @@
-import { MediaType } from "../constants/media";
+import { MediaType } from "../enums/media";
 import { UserResource } from "./user";
 
 export type CommentResource = {

@@ -13,6 +13,8 @@ import cover from './images/cover.jpg'
 import coverGroup from './images/cover-group.png'
 import follower from './images/follow.png'
 import userProfile from './images/hr-manager.png'
+import bgStoryText from './images/bg-story-text.png'
+import bgStoryImage from './images/bg-story-image.png'
 
 const images = {
     facebook,
@@ -29,7 +31,9 @@ const images = {
     tagFriend,
     coverGroup,
     follower,
-    userProfile
+    userProfile,
+    bgStoryText,
+    bgStoryImage
 }
 
 export default images

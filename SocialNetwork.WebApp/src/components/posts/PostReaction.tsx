@@ -1,6 +1,6 @@
 import { FC } from "react"
 import { svgReaction } from "../../assets/svg"
-import { ReactionType } from "../../constants/reaction"
+import { ReactionType } from "../../enums/reaction"
 
 type PostReactionProps = {
     onSelect?: (reaction: ReactionType) => void

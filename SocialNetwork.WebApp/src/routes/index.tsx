@@ -73,7 +73,7 @@ const appRouter = createBrowserRouter([
         ]
     },
     {
-        path: '/story',
+        path: '/story/create',
         element: <CreateStoryPage />
     },
     {

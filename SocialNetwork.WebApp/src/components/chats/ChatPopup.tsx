@@ -11,7 +11,7 @@ import { selectAuth } from "../../features/slices/auth-slice";
 import BoxSendMessage, { BoxMessageType } from "./BoxSendMessage";
 import { Tooltip, UploadFile } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
-import { MediaType } from "../../constants/media";
+import { MediaType } from "../../enums/media";
 
 export type MessageRequest = {
     content: string;
