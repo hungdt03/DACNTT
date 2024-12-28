@@ -24,6 +24,7 @@ namespace SocialNetwork.Domain.Entity
         public ICollection<MessageReadStatus> MessageReadStatuses { get; set; }
         public ICollection<Follow> Followers { get; set; }
         public ICollection<Follow> Followings { get; set; }
+        public ICollection<Story> Stories { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }

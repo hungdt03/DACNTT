@@ -40,6 +40,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IChatRoomMemberRepository, ChatRoomMemberRepository>();
             services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IStoryRepository, StoryRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 

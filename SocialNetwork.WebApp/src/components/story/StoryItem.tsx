@@ -1,30 +1,43 @@
 import { FC } from "react";
-import { Story } from "react-insta-stories/dist/interfaces";
+import { UserStoryResource } from "../../types/userStory";
+import images from "../../assets";
+import { StoryType } from "../../enums/story-type.";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
 
 type StoryItemProps = {
-    items: Story[];
+    story: UserStoryResource;
     onClick: () => void
 }
 
 const StoryItem: FC<StoryItemProps> = ({
-    items,
+    story,
     onClick
 }) => {
-
+    const { user } = useSelector(selectAuth)
     return (
         <div
             onClick={onClick}
-            className="rounded-xl relative"
+            className="rounded-xl relative flex items-center justify-center px-4 py-6 overflow-hidden"
             style={{
-                backgroundImage:
-                    `url(${items[0].url})`,
+                background: story.stories[0].type === StoryType.STORY_TEXT ? story.stories[0].background : `url(${story.stories[0].background})`,
+                fontFamily: story.stories[0].fontFamily,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 height: '200px',
+                backgroundRepeat: 'no-repeat',
             }}
         >
+            <div className="text-white text-center break-words break-all font-semibold text-xs">{story.stories[0].content}</div>
+
             <div className="absolute top-4 left-4">
-                <img className="rounded-full border-[3px] border-blue-500" width='40px' height='40px' src='https://scontent.fdad3-4.fna.fbcdn.net/v/t39.30808-6/415026176_367351105878728_9160707036274657793_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeGbTEdtGKlVJQfRxu_rzcKHnZQwh6N-P12dlDCHo34_Xe8cD09ZBVMoxXYcWoqKajke466jeewyz7TsDyPhYg5F&_nc_ohc=25CwFZ7wAcsQ7kNvgEwFaj7&_nc_zt=23&_nc_ht=scontent.fdad3-4.fna&_nc_gid=AF91PC9lX5tZGZXKasIQ_S1&oh=00_AYBQzyW6nUOmU6EPNtVMDd85_WX34ls1g_caPIKcCn_zOw&oe=677099E2' />
+                <img className="rounded-full border-[3px] border-blue-500" width='40px' height='40px' src={story.user.avatar ?? images.user} />
+            </div>
+
+            <div className="absolute left-0 bottom-0 right-0 py-2 px-2 bg-black bg-opacity-20 shadow z-10">
+                <span className="text-xs text-white font-bold">
+                    {user?.id === story.user.id ? 'Tin của bạn' : story.user.fullName}
+                </span>
             </div>
         </div>
     )

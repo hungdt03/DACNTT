@@ -7,16 +7,16 @@ const FiveImage: FC<ImageProps> = ({
 }) => {
     return <div className="flex flex-col gap-2">
         <div className="grid grid-cols-3 gap-2">
-            {items.slice(0, 3).map((item, index) => <Image preview={{
+            {items.slice(0, 3).map((item) => <Image preview={{
                 mask: 'Xem',
-            }} key={index} src={item.mediaUrl} className="object-cover"
+            }} key={item.id} src={item.mediaUrl} className="object-cover"
                 width='100%'
                 height='100%' />)}
         </div>
         <div className="grid grid-cols-2 gap-2">
-            {items.slice(3).map((item, index) => <Image preview={{
+            {items.slice(3).map((item) => <Image preview={{
                 mask: 'Xem',
-            }} key={index} src={item.mediaUrl}
+            }} key={item.id} src={item.mediaUrl}
                 className="object-cover"
                 width='100%'
                 height='100%' />)}

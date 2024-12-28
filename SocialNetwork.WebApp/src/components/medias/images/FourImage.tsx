@@ -6,7 +6,7 @@ const FourImage: FC<ImageProps> = ({
     items
 }) => {
     return <div className="grid grid-cols-2 gap-2">
-        {items.map((item, index) => <Image key={index} src={item.mediaUrl} className="w-full h-full object-cover" />)}
+        {items.map((item) => <Image key={item.id} src={item.mediaUrl} width='100%' height='300px' className="object-cover" />)}
     </div>
 };
 

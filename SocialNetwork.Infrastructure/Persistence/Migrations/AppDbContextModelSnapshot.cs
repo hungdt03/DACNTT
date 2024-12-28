@@ -170,11 +170,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("bit");
 
+                    b.Property<string>("LastMessage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTimeOffset?>("LastMessageDate")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("LastMessageId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -252,6 +253,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("ReplyToUserName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -359,6 +363,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("SenderId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -635,6 +642,47 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.Story", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Background")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("FontFamily")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Privacy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Stories");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Tag", b =>
                 {
                     b.Property<Guid>("Id")
@@ -746,6 +794,38 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.Viewer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Reaction")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("StoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StoryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Viewer");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1023,6 +1103,17 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.Story", b =>
+                {
+                    b.HasOne("SocialNetwork.Domain.Entity.User", "User")
+                        .WithMany("Stories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Tag", b =>
                 {
                     b.HasOne("SocialNetwork.Domain.Entity.Post", "Post")
@@ -1038,6 +1129,25 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.Viewer", b =>
+                {
+                    b.HasOne("SocialNetwork.Domain.Entity.Story", "Story")
+                        .WithMany("Viewers")
+                        .HasForeignKey("StoryId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("SocialNetwork.Domain.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Story");
 
                     b.Navigation("User");
                 });
@@ -1074,6 +1184,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Tags");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.Story", b =>
+                {
+                    b.Navigation("Viewers");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.User", b =>
                 {
                     b.Navigation("ChatRoomMembers");
@@ -1097,6 +1212,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("RequestReceives");
 
                     b.Navigation("RequestSends");
+
+                    b.Navigation("Stories");
 
                     b.Navigation("Tags");
                 });

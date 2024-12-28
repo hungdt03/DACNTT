@@ -117,6 +117,21 @@ namespace SocialNetwork.Application.Mappers
             };
         }
 
+        public static StoryResponse MapToStory(Story story)
+        {
+            return new StoryResponse
+            {
+                Id = story.Id,
+                Background = story.Background,
+                User = story.User != null ? MapToUser(story.User) : null,
+                Content = story.Content,
+                FontFamily = story.FontFamily,
+                Privacy = story.Privacy,
+                Type = story.Type,
+                CreatedDate = story.DateCreated,
+            };
+        }
+
         public static ReactionResponse MapToReaction(Reaction reaction)
         {
             return new ReactionResponse

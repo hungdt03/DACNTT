@@ -6,10 +6,9 @@ import { MoreHorizontal, ShareIcon } from "lucide-react";
 import { ReactionSvgType, svgReaction } from "../../assets/svg";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import PostReactionModal from "../modals/PostReactionModal";
-import PostModal, { BoxCommendStateType } from "../modals/PostModal";
+import PostModal from "../modals/PostModal";
 import SharePostModal from "../modals/SharePostModal";
 import PostShareInner from "./PostShareInner";
-import BoxSendComment, { BoxCommentType } from "../comments/BoxSendComment";
 import { PostMoreAction } from "./PostMoreAction";
 import { PostReaction } from "./PostReaction";
 import { PostResource } from "../../types/post";
@@ -17,7 +16,6 @@ import { getBtnReaction, getPrivacyPost } from "../../utils/post";
 import { formatTime, formatVietnamDate } from "../../utils/date";
 import { ReactionType } from "../../enums/reaction";
 import { ReactionRequest, getTopReactions } from "./Post";
-import commentService from "../../services/commentService";
 import postService from "../../services/postService";
 import { Id, toast } from "react-toastify";
 import reactionService from "../../services/reactionService";
@@ -48,10 +46,7 @@ const SharePost: FC<SharePostProps> = ({
     const { user } = useSelector(selectAuth)
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
-    const [commentData, setCommentData] = useState<BoxCommendStateType>({
-        content: '',
-        fileList: []
-    })
+  
     const [post, setPost] = useState<PostResource>(postParam)
 
     const fetchReactions = async () => {
@@ -81,25 +76,6 @@ const SharePost: FC<SharePostProps> = ({
         }
     }
 
-    const handleCreateComment = async (values: BoxCommentType) => {
-        const formData = new FormData();
-        formData.append('content', values.content);
-        formData.append('postId', post.id);
-
-        if (values?.file?.originFileObj) {
-            formData.append('file', values.file.originFileObj, values.file.name);
-        }
-        const response = await commentService.createComment(formData);
-        if (response.isSuccess) {
-            message.success(response.message)
-            setCommentData({
-                content: '',
-                fileList: []
-            })
-        } else {
-            message.error(response.message)
-        }
-    }
 
     const handleSaveReaction = async (reactionType: ReactionType) => {
         const payload: ReactionRequest = {
@@ -238,20 +214,6 @@ const SharePost: FC<SharePostProps> = ({
             </button>
         </div>
         <Divider className='mt-0 mb-2' />
-        <BoxSendComment
-            value={commentData.content}
-            onContentChange={(newValue) => setCommentData({
-                ...commentData,
-                content: newValue
-            })}
-            onSubmit={handleCreateComment}
-            key={'box-send-comment'}
-            files={commentData.fileList}
-            onFileChange={(file) => setCommentData({
-                ...commentData,
-                fileList: [file]
-            })}
-        />
 
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của Bùi Việt</p>} width='700px' footer={[
 
