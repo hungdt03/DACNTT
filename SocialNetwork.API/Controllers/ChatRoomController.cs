@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.Application.Features.ChatRoom.Commands;
 using SocialNetwork.Application.Features.ChatRoom.Queries;
 
 namespace SocialNetwork.API.Controllers
@@ -18,10 +18,24 @@ namespace SocialNetwork.API.Controllers
             this.mediator = mediator;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateChatRoom([FromBody] CreateChatRoomCommand command)
+        {
+            var response = await mediator.Send(command);
+            return Ok(response);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAllChatRooms()
         {
             var response = await mediator.Send(new GetAllChatRoomsQuery());
+            return Ok(response);
+        }
+
+        [HttpGet("{chatRoomId}")]
+        public async Task<IActionResult> GetChatRoomById([FromRoute] Guid chatRoomId)
+        {
+            var response = await mediator.Send(new GetChatRoomByIdQuery(chatRoomId));
             return Ok(response);
         }
     }

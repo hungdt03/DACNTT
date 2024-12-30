@@ -59,6 +59,13 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                 }));
             }
 
+            var readStatus = new MessageReadStatus()
+            {
+                IsRead = true,
+                UserId = userId,
+                ReadAt = DateTimeOffset.Now,
+            }; ;
+
             var message = new Domain.Entity.Message()
             {
                 ChatRoomId = chatRoom.Id,
@@ -67,6 +74,7 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                 MessageType = MessageType.NORMAL,
                 Medias = medias,
                 SentAt = request.SentAt,
+                Reads = new List<MessageReadStatus>() { readStatus },
             };
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -76,6 +84,11 @@ namespace SocialNetwork.Application.Features.Message.Handlers
             chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            if (message.SenderId == userId)
+            {
+                message.Reads = message.Reads.Where(r => r.User.Id != userId).ToList();
+            }
 
             await _signalRService.SendMessageToSpecificGroup(chatRoom.UniqueName, ApplicationMapper.MapToMessage(message));
 

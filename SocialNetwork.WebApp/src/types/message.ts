@@ -9,7 +9,14 @@ export type MessageResource = {
     medias: MessageMediaResource[]
     sentAt: Date;
     chatRoomId: string;
-    status: string
+    status: string;
+    reads?: ReadStatusResource[]
+}
+
+export type ReadStatusResource = {
+    user: UserResource;
+    readAt: Date;
+    userId: string;
 }
 
 

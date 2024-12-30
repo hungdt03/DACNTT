@@ -62,7 +62,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
 
             var chatRoom = new Domain.Entity.ChatRoom()
             {
-                IsPrivate = false,
+                IsPrivate = true,
                 LastMessageDate = DateTimeOffset.UtcNow,
                 UniqueName = chatRoomName,
                 Name = chatRoomName,

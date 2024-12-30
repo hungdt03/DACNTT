@@ -40,6 +40,12 @@ namespace SocialNetwork.Application.Mappers
                 Sender = message.Sender != null ? MapToUser(message.Sender) : null,
                 SenderId = message.SenderId,
                 SentAt = message.SentAt,
+                Reads = message.Reads != null ? message.Reads.Select(read => new ReadStatus()
+                {
+                    UserId = read.UserId,
+                    User = read.User != null ? MapToUser(read.User) : null,
+                    ReadAt = read.ReadAt
+                }).ToList() : null
             };
         }
 

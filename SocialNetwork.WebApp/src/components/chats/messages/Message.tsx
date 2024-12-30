@@ -2,17 +2,34 @@ import { FC } from "react";
 import MessageFromMe from "./MessageFromMe";
 import MessageFromOther from "./MessageFromOther";
 import { MessageResource } from "../../../types/message";
+import { Avatar, Tooltip } from "antd";
+import images from "../../../assets";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../../features/slices/auth-slice";
+import { ChatRoomResource } from "../../../types/chatRoom";
 
 type MessageProps = {
     isMe?: boolean;
+    chatRoom: ChatRoomResource
     message: MessageResource
 }
 
 const Message: FC<MessageProps> = ({
     isMe=false,
-    message
+    message,
+    chatRoom
 }) => {
-    return isMe ? <MessageFromMe message={message} /> : <MessageFromOther message={message} />
+    const { user } = useSelector(selectAuth)
+    return <div className="flex flex-col gap-y-1">
+        {isMe ? <MessageFromMe message={message} /> : <MessageFromOther chatRoom={chatRoom} message={message} />}
+        <div className="flex justify-end gap-x-1 px-2">
+            {message?.reads?.filter(read => read.userId !== user?.id).map(read => 
+                <Tooltip  key={read?.user?.id} title={read?.user?.fullName ?? 'Anonymous user'}>
+                    <Avatar className="w-4 h-4" src={read?.user?.avatar ?? images.user} />
+                </Tooltip>
+            )}
+        </div>
+    </div>
 };
 
 export default Message;

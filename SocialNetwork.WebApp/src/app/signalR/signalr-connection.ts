@@ -10,13 +10,16 @@ const URL = import.meta.env.VITE_SERVER_HUB_URL;
 class SignalRConnector {
 
     private readonly connection: signalR.HubConnection;
-    public events: (
-        onMessageReceived?: (message: MessageResource) => void,
-        onNotificationReceived?: (notification: NotificationResource) => void,
-        onIncomingCall?: (payload: IncomingCallPayload) => void,
-        onCallAccepted?: (signalData: any) => void,
-        onLeaveCall?: () => void
-    ) => void;
+
+    // Event handlers
+    public onTypingMessage?: (groupName: string, content: string) => void;
+    public onStopTypingMessage?: (groupName: string) => void;
+    public onMessageReceived?: (message: MessageResource) => void;
+    public onReadStatusReceived?: (message: MessageResource, userId: string) => void;
+    public onNotificationReceived?: (notification: NotificationResource) => void;
+    public onIncomingCall?: (payload: IncomingCallPayload) => void;
+    public onCallAccepted?: (signalData: any) => void;
+    public onLeaveCall?: () => void;
 
     private static instance: SignalRConnector;
 
@@ -32,34 +35,66 @@ class SignalRConnector {
             .build();
 
         this.connection.start().catch(err => console.log(err));
+        this.registerEvents();
 
-        this.events = (onMessageReceived, onNotificationReceived, onIncomingCall, onCallAccepted, onLeaveCall) => {
-            this.connection.on("NewMessage", (message: MessageResource) => {
-                onMessageReceived?.(message);
-            });
+    }
 
-            this.connection.on("NewNotification", (notification: NotificationResource) => {
-                onNotificationReceived?.(notification);
-            });
+    private registerEvents() {
+        this.connection.on("NewMessage", (message: MessageResource) => {
+            this.onMessageReceived?.(message);
+        });
 
-            this.connection.on("CallFriend", (payload: IncomingCallPayload) => {
-                onIncomingCall?.(payload)
-            })
+        this.connection.on("NewRead", (message: MessageResource, userId: string) => {
+            this.onReadStatusReceived?.(message, userId);
+        });
 
-            this.connection.on("AcceptCall", (signalData: any) => {
-                onCallAccepted?.(signalData)
-            })
+        this.connection.on("TypingMessage", (groupName: string, content: string) => {
+            this.onTypingMessage?.(groupName, content)
+        })
 
-            this.connection.on("LeaveCall", () => {
-                onLeaveCall?.()
-            })
+        this.connection.on("StopTypingMessage", (groupName: string) => {
+            this.onStopTypingMessage?.(groupName)
+        })
 
-        };
+
+        this.connection.on("NewNotification", (notification: NotificationResource) => {
+            this.onNotificationReceived?.(notification);
+        });
+
+        this.connection.on("CallFriend", (payload: IncomingCallPayload) => {
+            this.onIncomingCall?.(payload);
+        });
+
+        this.connection.on("AcceptCall", (signalData: any) => {
+            this.onCallAccepted?.(signalData);
+        });
+
+        this.connection.on("LeaveCall", () => {
+            this.onLeaveCall?.();
+        });
     }
 
     public sendMessage = async (message: MessageRequest) => {
         if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
             await this.connection.send("SendMessage", message)
+        } else {
+            console.error("Chưa kết nối tới Server SignalR");
+        }
+
+    }
+
+    public startTypingMessage = async (groupName: string, fullName: string) => {
+        if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
+            await this.connection.send("TypingMessage", groupName, fullName)
+        } else {
+            console.error("Chưa kết nối tới Server SignalR");
+        }
+
+    }
+
+    public stopTypingMessage = async (groupName: string) => {
+        if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
+            await this.connection.send("StopTypingMessage", groupName)
         } else {
             console.error("Chưa kết nối tới Server SignalR");
         }
@@ -97,4 +132,4 @@ class SignalRConnector {
     }
 }
 
-export default SignalRConnector.getInstance;
+export default SignalRConnector.getInstance();

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Exceptions;
@@ -9,7 +11,9 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity;
+using SocialNetwork.Infrastructure.Persistence.Repository;
 using SocialNetwork.Infrastructure.SignalR.Payload;
+using System.Text.Json;
 
 namespace SocialNetwork.Infrastructure.SignalR
 {
@@ -54,6 +58,9 @@ namespace SocialNetwork.Infrastructure.SignalR
 
             ChatRoom chatRoom = await unitOfWork.ChatRoomRepository.GetChatRoomByUniqueNameAsync(messageRequest.ChatRoomName)
                 ?? throw new AppException("Nhóm chat không tồn tại");
+            await unitOfWork.BeginTransactionAsync();
+
+            var recentReadStatus = await unitOfWork.MessageReadStatusRepository.GetMessageReadStatusByUserAndChatRoomId(userId, chatRoom.Id);
 
             var message = new Message()
             {
@@ -65,9 +72,27 @@ namespace SocialNetwork.Infrastructure.SignalR
                 SentAt = messageRequest.SentAt,
             };
 
-            await unitOfWork.BeginTransactionAsync();
-
             await unitOfWork.MessageRepository.CreateMessageAsync(message);
+
+            if (recentReadStatus == null)
+            {
+                recentReadStatus = new MessageReadStatus()
+                {
+                    UserId = userId,
+                    User = senderUser,
+                    IsRead = true,
+                    ReadAt = DateTimeOffset.UtcNow,
+                    MessageId = message.Id,
+                };
+
+                await unitOfWork.MessageReadStatusRepository.CreateMessageReadStatusAsync(recentReadStatus);
+            }
+            else 
+            {
+                recentReadStatus.MessageId = message.Id;
+                recentReadStatus.ReadAt = DateTimeOffset.UtcNow;
+            }
+
             chatRoom.LastMessage = message.Content;
             chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
 
@@ -76,7 +101,16 @@ namespace SocialNetwork.Infrastructure.SignalR
             await Clients.Group(chatRoom.UniqueName).SendAsync("NewMessage", ApplicationMapper.MapToMessage(message));
         }
 
+        public async Task TypingMessage(string groupName, string fullName)
+        {
+            var content = fullName + " đang soạn tin nhắn";
+            await Clients.OthersInGroup(groupName).SendAsync("TypingMessage", groupName, content);
+        }
 
+        public async Task StopTypingMessage(string groupName)
+        {
+            await Clients.OthersInGroup(groupName).SendAsync("StopTypingMessage", groupName);
+        }
 
         public async Task CallFriend(CallPayload payload)
         {

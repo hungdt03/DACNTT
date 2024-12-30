@@ -32,5 +32,12 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(command);
             return Ok(response);
         }
+
+        [HttpPut("read/{messageId}")]
+        public async Task<IActionResult> ReadMessage([FromRoute] Guid messageId)
+        {
+            var response = await mediator.Send(new ReadMessageCommand(messageId));
+            return Ok(response);
+        }
     }
 }

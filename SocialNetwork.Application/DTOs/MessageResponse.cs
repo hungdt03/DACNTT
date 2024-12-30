@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace SocialNetwork.Application.DTOs
 {
     public class MessageResponse
@@ -11,5 +13,13 @@ namespace SocialNetwork.Application.DTOs
         public Guid ChatRoomId { get; set; }
         public ICollection<MediaResponse> Medias { get; set; }
         public DateTimeOffset SentAt { get; set; }
+        public List<ReadStatus> Reads { get; set; }
+    }
+
+    public class ReadStatus
+    {
+        public UserResponse User { get; set; }
+        public string UserId { get; set; }
+        public DateTimeOffset? ReadAt { get; set; }
     }
 }

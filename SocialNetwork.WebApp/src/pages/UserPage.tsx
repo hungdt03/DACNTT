@@ -19,7 +19,7 @@ const UserPage: FC = () => {
     const [friendRequest, setFriendRequest] = useState<FriendRequestResource | null>(null)
     const [user, setUser] = useState<UserResource | null>(null)
     const [loading, setLoading] = useState(false)
-    const { events } = SignalRConnector()
+  
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -42,11 +42,12 @@ const UserPage: FC = () => {
     }, [id]);
 
     useEffect(() => {
-        events(undefined, (notification: NotificationResource) => {
+        SignalRConnector.onNotificationReceived = (notification: NotificationResource) => {
             if(notification.type === NotificationType.FRIEND_REQUEST_SENT || notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
                 id && fetchFriendRequestData(id)
             }
-        })
+        }
+       
     }, [])
 
     const fetchUserData = async (userId: string) => {

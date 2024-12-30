@@ -27,6 +27,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public IChatRoomMemberRepository ChatRoomMemberRepository { get; }
         public IMessageRepository MessageRepository { get; }
         public IStoryRepository StoryRepository { get; }
+        public IMessageReadStatusRepository MessageReadStatusRepository { get; }
 
         public UnitOfWork
         (
@@ -42,7 +43,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 IChatRoomRepository chatRoomRepository,
                 IChatRoomMemberRepository chatRoomMemberRepository,
                 IMessageRepository messageRepository,
-                IStoryRepository storyRepository
+                IStoryRepository storyRepository,
+                IMessageReadStatusRepository messageReadStatusRepository
         )
         {
             _context = context;
@@ -58,6 +60,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             ChatRoomMemberRepository = chatRoomMemberRepository;
             MessageRepository = messageRepository;
             StoryRepository = storyRepository;
+            MessageReadStatusRepository = messageReadStatusRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

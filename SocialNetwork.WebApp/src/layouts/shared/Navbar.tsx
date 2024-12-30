@@ -14,7 +14,6 @@ import { Pagination } from "../../types/response";
 const Navbar: FC = () => {
     const [notifications, setNotifications] = useState<NotificationResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
-    const { events } = SignalRConnector()
 
     const fetchNotifications = async (page: number) => {
         const response = await notificationService.getAllNotifications({ page, size: pagination.size });
@@ -33,10 +32,10 @@ const Navbar: FC = () => {
     useEffect(() => {
         fetchNotifications(pagination.page);
 
-        events(undefined, (notification: NotificationResource) => {
+        SignalRConnector.onNotificationReceived = (notification: NotificationResource) => {
             toast.info(notification.content);
             setNotifications(prev => [notification, ...prev])
-        })
+        }
 
     }, [])
 

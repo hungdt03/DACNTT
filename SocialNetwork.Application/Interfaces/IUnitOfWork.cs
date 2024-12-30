@@ -15,6 +15,7 @@ namespace SocialNetwork.Application.Interfaces
         public IChatRoomMemberRepository ChatRoomMemberRepository { get; }
         public IMessageRepository MessageRepository { get; }
         public IStoryRepository StoryRepository { get; }
+        public IMessageReadStatusRepository MessageReadStatusRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(CancellationToken cancellationToken = default);

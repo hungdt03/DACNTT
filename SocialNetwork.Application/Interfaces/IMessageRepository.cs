@@ -7,5 +7,6 @@ namespace SocialNetwork.Application.Interfaces
     {
         Task CreateMessageAsync(Message message);
         Task<List<Message>> GetAllMessagesByChatRoomIdAsync(Guid chatRoomId);
+        Task<Message?> GetMessageByIdAsync(Guid messageId);
     }
 }

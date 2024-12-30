@@ -36,7 +36,7 @@ type WebRtcProviderProps = {
 const WebRtcProvider: FC<WebRtcProviderProps> = ({
     children
 }) => {
-    const { events, answerCall, callFriend, leaveCall } = SignalRConnector()
+
     const { handleOk, handleCancel, isModalOpen, showModal } = useModal()
     const { handleOk: okCall, handleCancel: cancelCall, isModalOpen: openCall, showModal: showCall } = useModal()
 
@@ -52,42 +52,40 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
     const connectionRef = useRef<Peer.Instance>();
 
     useEffect(() => {
-        events(
-            undefined, undefined,
-            (payload: IncomingCallPayload) => {
-                showModal()
-                setCall({ isReceivingCall: true, from: payload.from, signalData: payload.signalData });
-            },
-            undefined,
-            () => {
-                console.log('RECEIVE SIGNAL LEAVING CALL');
-                okCall();
-                handleOk();
+        SignalRConnector.onIncomingCall = (payload: IncomingCallPayload) => {
+            showModal()
+            setCall({ isReceivingCall: true, from: payload.from, signalData: payload.signalData });
+        }
 
-                if (connectionRef.current) {
-                    connectionRef.current.destroy();
-                    connectionRef.current = undefined;
-                }
+        SignalRConnector.onLeaveCall =  () => {
+            console.log('RECEIVE SIGNAL LEAVING CALL');
+            okCall();
+            handleOk();
 
-                // Stop stream tracks and reset video elements
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                    setStream(undefined);
-                }
-
-                if (localVideo.current) {
-                    localVideo.current.srcObject = null;
-                }
-
-                if (remoteVideo.current) {
-                    remoteVideo.current.srcObject = null;
-                }
-
-                // Reset call state
-                setCall(undefined);
-                setCallAccepted(false);
+            if (connectionRef.current) {
+                connectionRef.current.destroy();
+                connectionRef.current = undefined;
             }
-        )
+
+            // Stop stream tracks and reset video elements
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                setStream(undefined);
+            }
+
+            if (localVideo.current) {
+                localVideo.current.srcObject = null;
+            }
+
+            if (remoteVideo.current) {
+                remoteVideo.current.srcObject = null;
+            }
+
+            // Reset call state
+            setCall(undefined);
+            setCallAccepted(false);
+        }
+       
     }, []);
 
     useEffect(() => {
@@ -107,7 +105,7 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
         });
 
         peer.on('signal', (data) => {
-            answerCall({
+            SignalRConnector.answerCall({
                 signalData: data,
                 userToAnswer: call?.from.email
             } as AnswerPayload)
@@ -134,7 +132,7 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
             const peer = new Peer({ initiator: true, trickle: false, stream: dataStream });
 
             peer.on('signal', (data) => {
-                callFriend({
+                SignalRConnector.callFriend({
                     userToCall: user?.email,
                     signalData: data
                 } as CallPayload)
@@ -147,10 +145,10 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
                 }
             });
     
-            events(undefined, undefined, undefined, (signal: any) => {
+            SignalRConnector.onCallAccepted = (signal: any) => {
                 setCallAccepted(true);
                 peer.signal(signal);
-            })
+            }
     
             connectionRef.current = peer;
         } catch {
@@ -174,9 +172,9 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
         }
 
         if (userToCall) {
-            leaveCall(userToCall?.email);
+            SignalRConnector.leaveCall(userToCall?.email);
         } else {
-            leaveCall(call?.from.email!);
+            SignalRConnector.leaveCall(call?.from.email!);
         }
 
         handleCancel();

@@ -12,12 +12,14 @@ export type BoxMessageType = {
 
 type BoxSendMessageProps = {
     onSubmit?: () => void;
+    onFocus?: () => void;
     onChange?: (value: BoxMessageType) => void;
     value?: string;
 }
 
 const BoxSendMessage: FC<BoxSendMessageProps> = ({
     onSubmit,
+    onFocus,
     onChange,
     value = ''
 }) => {
@@ -100,7 +102,7 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
                         </Image.PreviewGroup>
                     </div>}
                 </div>
-                <input value={state.content} onChange={e => handleContentChange(e.target.value)} className="text-sm px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
+                <input onFocus={onFocus} value={state.content} onChange={e => handleContentChange(e.target.value)} className="text-sm px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
             </div>
             <button disabled={!state.content} onClick={handleSubmit} className="w-8 h-8 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
                 <SendHorizonal size={18} className="text-sky-600" />

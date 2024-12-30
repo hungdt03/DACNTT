@@ -9,7 +9,7 @@ import messageService from "../../services/messageService";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import BoxSendMessage, { BoxMessageType } from "./BoxSendMessage";
-import { Tooltip, UploadFile } from "antd";
+import { Tooltip, UploadFile, message } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
 
@@ -34,11 +34,13 @@ const ChatPopup: FC<ChatPopupProps> = ({
     onMinimize,
     onCalling
 }) => {
-    const { sendMessage, events } = SignalRConnector();
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<MessageResource[]>([])
-    const { user } = useSelector(selectAuth)
+    const { user } = useSelector(selectAuth);
 
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [typing, setTyping] = useState<string>('');
     const [pendingMessages, setPendingMessages] = useState<MessageResource[]>([]);
     const [msgPayload, setMsgPayload] = useState<MessageRequest>({
         content: '',
@@ -54,23 +56,74 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
     useEffect(() => {
         fetchMessages()
-        events((message) => {
+
+        SignalRConnector.onTypingMessage = (groupName, content) => {
+            groupName === room.uniqueName && setTyping(content)
+        }
+
+        SignalRConnector.onStopTypingMessage = (groupName) => {
+            groupName === room.uniqueName && setTyping('')
+        }
+
+        SignalRConnector.onMessageReceived = ((message) => {
             if (message.chatRoomId === room.id) {
                 setPendingMessages((prev) =>
                     prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
                 );
-                setMessages((prev) => [...prev, message]);
+
+                setMessages((prev) => {
+                    const updatedMessages = [...prev, message];
+
+                    if (message.senderId !== user?.id) {
+                        const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === message.senderId));
+
+                        if (findIndex !== -1) {
+                            updatedMessages[findIndex].reads = [
+                                ...(updatedMessages[findIndex]?.reads?.filter(r => r.userId !== message.senderId) || [])
+                            ];
+                        }
+                    }
+
+                    return updatedMessages;
+                });
+
             }
         });
-    }, []);
+
+        SignalRConnector.onReadStatusReceived = ((message, userId) => {
+            if (message.chatRoomId === room.id) {
+                setMessages((prevMessages) => {
+                    const updatedMessages = [...prevMessages];
+
+                    if (userId !== user?.id) {
+                        const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === userId));
+
+                        if (findIndex !== -1) {
+                            updatedMessages[findIndex].reads = [
+                                ...(updatedMessages[findIndex]?.reads?.filter(r => r.userId !== userId) || [])
+                            ];
+                        }
+
+                        updatedMessages[updatedMessages.length - 1].reads = [...(message.reads ?? [])];
+                    }
+
+                    return updatedMessages;
+                });
+            }
+        });
+    }, [room]);
 
     useEffect(() => {
         if (messagesEndRef.current)
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }, [messages])
 
-
     const handleBoxChange = (value: BoxMessageType) => {
+        user && SignalRConnector.startTypingMessage(room.uniqueName, user?.fullName)
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+
         let updateState: MessageRequest = {
             ...msgPayload,
             content: value.content
@@ -89,13 +142,18 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 videos: videoFiles
             }
         }
+
         setMsgPayload(updateState);
+
+        typingTimeoutRef.current = setTimeout(() => {
+            SignalRConnector.stopTypingMessage(room.uniqueName)
+        }, 500);
 
     }
 
     const handleSendMessage = async () => {
         const tempMessage: MessageResource = {
-            id: Date.now().toString(), 
+            id: Date.now().toString(),
             content: msgPayload.content,
             senderId: user?.id!,
             chatRoomId: room.id,
@@ -104,14 +162,14 @@ const ChatPopup: FC<ChatPopupProps> = ({
             medias: [],
             sender: user!
         };
-        
+
         setPendingMessages(prev => [...prev, tempMessage]);
 
-        if ((msgPayload.images && msgPayload.images.length > 0 )|| (msgPayload.videos && msgPayload.videos.length > 0)) {
+        if ((msgPayload.images && msgPayload.images.length > 0) || (msgPayload.videos && msgPayload.videos.length > 0)) {
             const formData = new FormData();
 
             msgPayload?.images?.forEach(file => {
-               
+
                 if (file.originFileObj) {
                     formData.append('images', file.originFileObj, file.name);
 
@@ -124,9 +182,9 @@ const ChatPopup: FC<ChatPopupProps> = ({
             });
 
             msgPayload?.videos?.forEach(file => {
-               
+
                 if (file.originFileObj) {
-                    
+
                     formData.append('videos', file.originFileObj, file.name);
                     tempMessage.medias.push({
                         id: file.uid,
@@ -145,7 +203,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
             console.log(response)
         } else {
             msgPayload.sentAt = tempMessage.sentAt
-            sendMessage(msgPayload)
+            SignalRConnector.sendMessage(msgPayload)
         }
 
         setMsgPayload({
@@ -157,12 +215,24 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
     }
 
-    return <div className="w-[300px] z-[2000] h-[450px] relative bg-white rounded-t-xl overflow-hidden shadow-md">
+    const handleReadMessage = async () => {
+        const length = messages.length;
+        if (messages[length - 1] && messages[length - 1].senderId !== user?.id) {
+            const response = await messageService.readMessage(messages[length - 1].id);
+            if (!response.isSuccess) {
+                message.warning(response.message)
+            } else {
+                console.log(response)
+            }
+        }
+    }
+
+    return <div className="w-[300px] z-[100] h-[450px] relative bg-white rounded-t-xl overflow-hidden shadow-md">
         <div className="bg-sky-500 text-white absolute top-0 left-0 right-0 shadow-md flex items-center justify-between border-[1px] border-gray-200 p-[2px]">
             <div className="flex items-center gap-x-2 rounded-md p-1">
                 <div className="relative">
                     <img
-                        src={room.friend?.avatar ?? images.user}
+                        src={room.friend?.avatar ?? images.group}
                         alt="Avatar"
                         className="w-[40px] h-[40px] rounded-full"
                     />
@@ -170,7 +240,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 </div>
 
                 <div className="flex flex-col">
-                    <b className="text-sm">{room.friend?.fullName}</b>
+                    <b className="text-sm">{room.isPrivate ? room.friend?.fullName : room.name}</b>
                     <p className="text-[13px]">Đang hoạt động</p>
                 </div>
             </div>
@@ -196,16 +266,22 @@ const ChatPopup: FC<ChatPopupProps> = ({
         </div>
 
         <div className="overflow-y-auto absolute left-0 right-0 top-14 bottom-14 px-2 py-3 scrollbar-w-2 scrollbar-h-4 custom-scrollbar flex flex-col gap-y-3">
-            {[...messages, ...pendingMessages].map(message => <Message key={message.id} message={message} isMe={message.senderId === user?.id} />)}
+            {[...messages, ...pendingMessages].map(message => <Message chatRoom={room} key={message.id} message={message} isMe={message.senderId === user?.id} />)}
             <div ref={messagesEndRef}></div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-white shadow border-t-[1px] border-gray-100">
-            <BoxSendMessage
-                value={msgPayload.content}
-                onChange={handleBoxChange}
-                onSubmit={handleSendMessage}
-            />
+        <div className="absolute bottom-0 left-0 right-0">
+            {typing && <div className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
+                {typing}
+            </div>}
+            <div className="p-3 bg-white shadow border-t-[1px] border-gray-100">
+                <BoxSendMessage
+                    value={msgPayload.content}
+                    onChange={handleBoxChange}
+                    onSubmit={handleSendMessage}
+                    onFocus={() => handleReadMessage()}
+                />
+            </div>
 
         </div>
     </div >

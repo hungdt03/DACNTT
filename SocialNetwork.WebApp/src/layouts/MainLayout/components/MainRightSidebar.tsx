@@ -78,7 +78,7 @@ const MainRightSidebar: FC = () => {
                             <Avatar size='large' src={chatRoom.friend?.avatar ?? images.user} />
                             <div className="absolute right-0 bottom-0 w-3 h-3 rounded-full bg-green-500 border-[2px] border-white"></div>
                         </div>
-                        <span className="font-semibold text-sm">{chatRoom.friend?.fullName}</span>
+                        <span className="font-semibold text-sm">{chatRoom.isPrivate ? chatRoom.friend?.fullName : chatRoom.name}</span>
                     </div>
                 </div>)}
 

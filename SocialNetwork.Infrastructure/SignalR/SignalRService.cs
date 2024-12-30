@@ -20,6 +20,11 @@ namespace SocialNetwork.Infrastructure.SignalR
             await hubContext.Clients.Group(groupName).SendAsync("NewMessage", message);
         }
 
+        public async Task SendReadStatusToSpecificGroup(string groupName, MessageResponse message, string userId)
+        {
+            await hubContext.Clients.Group(groupName).SendAsync("NewRead", message, userId);
+        }
+
         public async Task SendNotificationToSpecificUser(string username, NotificationResponse notification)
         {
             await hubContext.Clients.User(username).SendAsync("NewNotification", notification);
