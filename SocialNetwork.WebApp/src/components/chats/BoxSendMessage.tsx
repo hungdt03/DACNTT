@@ -80,14 +80,14 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
     return <div className="flex items-center gap-x-2">
         <div className="flex-shrink-0">
             <Upload {...props}>
-                <img alt="upload" className="w-6 h-6" src={images.photo} />
+                <img alt="upload" className="w-5 h-5" src={images.photo} />
             </Upload>
         </div>
 
-        <div className={cn("bg-gray-100 px-1 rounded-3xl w-full flex items-center justify-between", state.files.length ? 'py-2' : 'py-[2px]')}>
-            <div className="flex flex-col gap-y-1">
-                <div className="w-full overflow-x-auto">
-                    {state.files.length > 0 && <div className="w-full flex items-center gap-x-2 px-4 py-1">
+        <div className={cn("bg-gray-100 px-1 rounded-3xl w-full overflow-hidden", state.files.length ? 'py-2' : 'py-[2px]')}>
+            <div className="flex flex-col items-start gap-y-1 overflow-x-hidden">
+                <div className="w-full overflow-x-auto custom-scrollbar">
+                    {state.files.length > 0 && <div className="flex items-center gap-x-2 px-4 py-2">
                         <Image.PreviewGroup>
                             {state.files.map(file => <div key={file.uid} className="relative">
                                 <Image preview={{
@@ -102,11 +102,14 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
                         </Image.PreviewGroup>
                     </div>}
                 </div>
-                <input onFocus={onFocus} value={state.content} onChange={e => handleContentChange(e.target.value)} className="text-sm px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
+                <div className="flex items-center justify-between w-full">
+                    <input onFocus={onFocus} value={state.content} onChange={e => handleContentChange(e.target.value)} className="text-sm px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
+                    <button disabled={!state.content} onClick={handleSubmit} className="flex-shrink-0 w-8 h-8 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
+                        <SendHorizonal size={18} className="text-sky-600" />
+                    </button>
+                </div>
             </div>
-            <button disabled={!state.content} onClick={handleSubmit} className="w-8 h-8 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
-                <SendHorizonal size={18} className="text-sky-600" />
-            </button>
+
         </div>
     </div>
 };

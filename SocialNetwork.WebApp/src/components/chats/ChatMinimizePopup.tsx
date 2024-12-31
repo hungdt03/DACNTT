@@ -2,6 +2,7 @@ import { FC } from "react";
 import { ChatRoomResource } from "../../types/chatRoom";
 import { CloseOutlined } from '@ant-design/icons';
 import { Avatar, Popover } from "antd";
+import images from "../../assets";
 
 type ChatMinimizePopupProps = {
     chatRoom: ChatRoomResource;
@@ -15,13 +16,13 @@ const ChatMinimizePopup: FC<ChatMinimizePopupProps> = ({
     onClick
 }) => {
     return <Popover  key={chatRoom.id} placement="left" content={<div className="flex flex-col p-0">
-        <p className="font-bold">{chatRoom?.friend?.fullName}</p>
+        <p className="font-bold">{chatRoom.isPrivate ? chatRoom?.friend?.fullName : chatRoom.name}</p>
         <p className="w-36 truncate text-gray-500">{chatRoom?.lastMessage}</p>
     </div>}>
         <div className="relative group">
             <Avatar
                 className="cursor-pointer shadow-xl w-12 h-12"
-                src={chatRoom.friend?.avatar}
+                src={chatRoom.isPrivate ? chatRoom.friend?.avatar : images.group}
                 onClick={() => onClick()}
             />
 

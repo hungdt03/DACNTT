@@ -1,10 +1,11 @@
-import { Avatar, Popover } from "antd";
+import { Avatar, Button, Popover } from "antd";
 import { FC, useState } from "react";
 import images from "../assets";
 import { Check, Delete, MoreHorizontal } from "lucide-react";
 import { NotificationResource } from "../types/notification";
 import { formatTime } from "../utils/date";
 import cn from "../utils/cn";
+import { NotificationType } from "../enums/notification-type";
 
 type NotificationMoreActionProps = {
     onMarkAsRead?: () => void;
@@ -44,11 +45,18 @@ const Notification: FC<NotificationProps> = ({
 
     return <div onMouseOver={() => setShowMoreAction(true)} onMouseLeave={() => setShowMoreAction(false)} className={cn("relative flex items-center gap-x-3 px-3 py-2 rounded-md hover:bg-gray-100 max-w-[400px]", !notification.isRead && 'bg-gray-50')}>
         <Avatar className="flex-shrink-0" size='large' src={notification.imageUrl ?? images.user} />
-        <div className="flex flex-col items-start">
-            <div className="flex-1 line-clamp-2">
-                {notification.content}
+        <div className="flex flex-col gap-y-3 items-start">
+            <div className="flex flex-col items-start">
+                <div className="flex-1 line-clamp-2">
+                    {notification.content}
+                </div>
+                <span className={cn("text-gray-500 text-xs font-semibold", !notification.isRead && 'text-primary')}>{formatTime(new Date(notification.dateSent))}</span>
             </div>
-            <span className={cn("text-gray-500 text-xs font-semibold px-1", !notification.isRead && 'text-primary')}>{formatTime(new Date(notification.dateSent))}</span>
+
+            {notification.type === NotificationType.FRIEND_REQUEST_SENT && <div className="flex items-center gap-x-2">
+                <Button type="primary">Xác nhận</Button>
+                <Button type="primary" danger>Xóa</Button>
+            </div>}
         </div>
 
         {showMoreAction && <Popover trigger='click' content={<NotificationMoreAction

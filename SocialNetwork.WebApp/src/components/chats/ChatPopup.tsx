@@ -57,61 +57,70 @@ const ChatPopup: FC<ChatPopupProps> = ({
     useEffect(() => {
         fetchMessages()
 
-        SignalRConnector.onTypingMessage = (groupName, content) => {
-            groupName === room.uniqueName && setTyping(content)
-        }
-
-        SignalRConnector.onStopTypingMessage = (groupName) => {
-            groupName === room.uniqueName && setTyping('')
-        }
-
-        SignalRConnector.onMessageReceived = ((message) => {
-            if (message.chatRoomId === room.id) {
-                setPendingMessages((prev) =>
-                    prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
-                );
-
-                setMessages((prev) => {
-                    const updatedMessages = [...prev, message];
-
-                    if (message.senderId !== user?.id) {
-                        const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === message.senderId));
-
-                        if (findIndex !== -1) {
-                            updatedMessages[findIndex].reads = [
-                                ...(updatedMessages[findIndex]?.reads?.filter(r => r.userId !== message.senderId) || [])
-                            ];
+        SignalRConnector.events (
+            // ON MESSAGE RECEIVE
+            (message) => {
+                if (message.chatRoomId === room.id) {
+                    setPendingMessages((prev) =>
+                        prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
+                    );
+    
+                    setMessages((prev) => {
+                        const updatedMessages = [...prev, message];
+    
+                        if (message.senderId !== user?.id) {
+                            const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === message.senderId));
+    
+                            if (findIndex !== -1) {
+                                updatedMessages[findIndex].reads = [
+                                    ...(updatedMessages[findIndex]?.reads?.filter(r => r.userId !== message.senderId) || [])
+                                ];
+                            }
                         }
-                    }
-
-                    return updatedMessages;
-                });
-
-            }
-        });
-
-        SignalRConnector.onReadStatusReceived = ((message, userId) => {
-            if (message.chatRoomId === room.id) {
-                setMessages((prevMessages) => {
-                    const updatedMessages = [...prevMessages];
-
-                    if (userId !== user?.id) {
-                        const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === userId));
-
-                        if (findIndex !== -1) {
-                            updatedMessages[findIndex].reads = [
-                                ...(updatedMessages[findIndex]?.reads?.filter(r => r.userId !== userId) || [])
-                            ];
+    
+                        return updatedMessages;
+                    });
+    
+                }
+            },
+            // ON READ STATUS RECEIVE
+            (message, userId) => {
+                if (message.chatRoomId === room.id) {
+                    setMessages((prevMessages) => {
+                        const updatedMessages = [...prevMessages];
+    
+                        if (userId !== user?.id) {
+                            const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === userId));
+    
+                            if (findIndex !== -1) {
+                                updatedMessages[findIndex].reads = [
+                                    ...(updatedMessages[findIndex]?.reads?.filter(r => r.userId !== userId) || [])
+                                ];
+                            }
+    
+                            updatedMessages[updatedMessages.length - 1].reads = [...(message.reads ?? [])];
                         }
+    
+                        return updatedMessages;
+                    });
+                }
+            },
+            // ON TYPING MESSAGE
+            (groupName, content) => {
+                groupName === room.uniqueName && setTyping(content)
+            },
 
-                        updatedMessages[updatedMessages.length - 1].reads = [...(message.reads ?? [])];
-                    }
-
-                    return updatedMessages;
-                });
-            }
-        });
-    }, [room]);
+            // ON STOP TYPING MESSAGE
+            (groupName) => {
+                groupName === room.uniqueName && setTyping('')
+            },
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+        );
+       
+    }, []);
 
     useEffect(() => {
         if (messagesEndRef.current)
@@ -119,11 +128,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
     }, [messages])
 
     const handleBoxChange = (value: BoxMessageType) => {
-        user && SignalRConnector.startTypingMessage(room.uniqueName, user?.fullName)
-        if (typingTimeoutRef.current) {
-            clearTimeout(typingTimeoutRef.current);
-        }
-
+        
         let updateState: MessageRequest = {
             ...msgPayload,
             content: value.content
@@ -144,6 +149,12 @@ const ChatPopup: FC<ChatPopupProps> = ({
         }
 
         setMsgPayload(updateState);
+
+        user && SignalRConnector.startTypingMessage(room.uniqueName, user?.fullName)
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+
 
         typingTimeoutRef.current = setTimeout(() => {
             SignalRConnector.stopTypingMessage(room.uniqueName)
@@ -203,7 +214,11 @@ const ChatPopup: FC<ChatPopupProps> = ({
             console.log(response)
         } else {
             msgPayload.sentAt = tempMessage.sentAt
-            SignalRConnector.sendMessage(msgPayload)
+            try {
+                SignalRConnector.sendMessage(msgPayload)
+            } catch(error) {
+                alert(error)
+            }
         }
 
         setMsgPayload({
@@ -271,7 +286,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
         </div>
 
         <div className="absolute bottom-0 left-0 right-0">
-            {typing && <div className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
+            {typing && <div key={room.id} className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
                 {typing}
             </div>}
             <div className="p-3 bg-white shadow border-t-[1px] border-gray-100">

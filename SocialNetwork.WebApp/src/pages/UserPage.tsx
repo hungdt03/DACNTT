@@ -42,11 +42,17 @@ const UserPage: FC = () => {
     }, [id]);
 
     useEffect(() => {
-        SignalRConnector.onNotificationReceived = (notification: NotificationResource) => {
-            if(notification.type === NotificationType.FRIEND_REQUEST_SENT || notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
-                id && fetchFriendRequestData(id)
+        SignalRConnector.events(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            (notification: NotificationResource) => {
+                if(notification.type === NotificationType.FRIEND_REQUEST_SENT || notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
+                    id && fetchFriendRequestData(id)
+                }
             }
-        }
+        )
        
     }, [])
 

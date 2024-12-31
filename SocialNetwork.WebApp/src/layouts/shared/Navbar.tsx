@@ -32,10 +32,17 @@ const Navbar: FC = () => {
     useEffect(() => {
         fetchNotifications(pagination.page);
 
-        SignalRConnector.onNotificationReceived = (notification: NotificationResource) => {
-            toast.info(notification.content);
-            setNotifications(prev => [notification, ...prev])
-        }
+        SignalRConnector.events(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            // ON NOTIFICATION RECEIVED
+            (notification: NotificationResource) => {
+                toast.info(notification.content);
+                setNotifications(prev => [notification, ...prev])
+            }
+        )
 
     }, [])
 

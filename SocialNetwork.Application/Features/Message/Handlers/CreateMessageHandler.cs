@@ -59,12 +59,9 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                 }));
             }
 
-            var readStatus = new MessageReadStatus()
-            {
-                IsRead = true,
-                UserId = userId,
-                ReadAt = DateTimeOffset.Now,
-            }; ;
+            await _unitOfWork.BeginTransactionAsync();
+
+            var recentReadStatus = await _unitOfWork.MessageReadStatusRepository.GetMessageReadStatusByUserAndChatRoomId(userId, chatRoom.Id);
 
             var message = new Domain.Entity.Message()
             {
@@ -72,23 +69,34 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                 Content = request.Content,
                 SenderId = userId,
                 MessageType = MessageType.NORMAL,
-                Medias = medias,
                 SentAt = request.SentAt,
-                Reads = new List<MessageReadStatus>() { readStatus },
+                Medias = medias
             };
 
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
             await _unitOfWork.MessageRepository.CreateMessageAsync(message);
+
+            if (recentReadStatus == null)
+            {
+                recentReadStatus = new MessageReadStatus()
+                {
+                    UserId = userId,
+                    IsRead = true,
+                    ReadAt = DateTimeOffset.UtcNow,
+                    MessageId = message.Id,
+                };
+
+                await _unitOfWork.MessageReadStatusRepository.CreateMessageReadStatusAsync(recentReadStatus);
+            }
+            else
+            {
+                recentReadStatus.MessageId = message.Id;
+                recentReadStatus.ReadAt = DateTimeOffset.UtcNow;
+            }
+
             chatRoom.LastMessage = message.Content;
             chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
 
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-            if (message.SenderId == userId)
-            {
-                message.Reads = message.Reads.Where(r => r.User.Id != userId).ToList();
-            }
+            await _unitOfWork.CommitTransactionAsync();
 
             await _signalRService.SendMessageToSpecificGroup(chatRoom.UniqueName, ApplicationMapper.MapToMessage(message));
 

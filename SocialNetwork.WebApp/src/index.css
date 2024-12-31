@@ -28,6 +28,10 @@
     width: 5px;
 }
 
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+
 .scrollbar-h-4::-webkit-scrollbar {
     height: 10px;
 }
