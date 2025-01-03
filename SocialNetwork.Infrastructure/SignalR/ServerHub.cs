@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity;
@@ -23,17 +25,26 @@ namespace SocialNetwork.Infrastructure.SignalR
         private readonly ConnectionManager connectionManager;
         private readonly UserManager<Domain.Entity.User> userManager;
         private readonly IUnitOfWork unitOfWork;
+        private readonly IUserStatusService userStatusService;
+        private readonly ILogger<ServerHub> logger;
 
-        public ServerHub(ConnectionManager connectionManager, UserManager<Domain.Entity.User> userManager, IUnitOfWork unitOfWork)
+        public ServerHub(ConnectionManager connectionManager, UserManager<Domain.Entity.User> userManager, IUnitOfWork unitOfWork, IUserStatusService userStatusService, ILogger<ServerHub> logger)
         {
             this.connectionManager = connectionManager;
             this.userManager = userManager;
             this.unitOfWork = unitOfWork;
+            this.userStatusService = userStatusService;
+            this.logger = logger;
         }
 
         public override async Task OnConnectedAsync()
         {
             var userId = Context.User.GetUserId();
+            logger.LogInformation("============NEW CONNECTED=============");
+            logger.LogInformation(userId);
+            logger.LogInformation(Context.ConnectionId);
+
+            await userStatusService.AddConnectionAsync(userId, Context.ConnectionId);
             await connectionManager.UserConnected(userId, Context.ConnectionId);
 
             var chatRooms = await unitOfWork.ChatRoomRepository.GetAllChatRoomsByUserIdAsync(userId);
@@ -136,6 +147,10 @@ namespace SocialNetwork.Infrastructure.SignalR
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var userId = Context.User.GetUserId();
+            logger.LogInformation("============DISCONNECTED=============");
+            logger.LogInformation(userId);
+            logger.LogInformation(Context.ConnectionId);
+            await userStatusService.RemoveConnectionAsync(userId, Context.ConnectionId);
             await connectionManager.UserDisconnected(userId, Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);
         }

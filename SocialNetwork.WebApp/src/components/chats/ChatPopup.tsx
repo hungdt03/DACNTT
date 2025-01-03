@@ -12,6 +12,7 @@ import BoxSendMessage, { BoxMessageType } from "./BoxSendMessage";
 import { Tooltip, UploadFile, message } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
+import { formatTime } from "../../utils/date";
 
 export type MessageRequest = {
     content: string;
@@ -251,12 +252,15 @@ const ChatPopup: FC<ChatPopupProps> = ({
                         alt="Avatar"
                         className="w-[40px] h-[40px] rounded-full"
                     />
-                    <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>
+                    {room.isOnline && <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
+                    
                 </div>
 
                 <div className="flex flex-col">
                     <b className="text-sm">{room.isPrivate ? room.friend?.fullName : room.name}</b>
-                    <p className="text-[13px]">Đang hoạt động</p>
+                    <p className="text-[12px]">
+                        {room.isOnline ? 'Đang hoạt động' : room.recentOnlineTime && `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
+                    </p>
                 </div>
             </div>
 

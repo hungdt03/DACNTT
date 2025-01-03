@@ -13,5 +13,8 @@ namespace SocialNetwork.Application.DTOs
         public DateTimeOffset? LastMessageDate { get; set; }
         public ICollection<UserResponse> Members { get; set; }
         public UserResponse Friend {  get; set; }
+        public bool IsRead { get; set; }
+        public bool IsOnline { get; set; }
+        public DateTimeOffset RecentOnlineTime { get; set; }
     }
 }

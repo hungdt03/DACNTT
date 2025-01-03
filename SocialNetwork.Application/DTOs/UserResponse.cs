@@ -13,5 +13,7 @@ namespace SocialNetwork.Application.DTOs
         public int FollowerCount { get; set; }  
         public int FollowingCount { get; set; }
         public int FriendCount { get; set; }
+        public bool IsOnline { get; set; }
+        public DateTimeOffset RecentOnlineTime { get; set; }
     }
 }

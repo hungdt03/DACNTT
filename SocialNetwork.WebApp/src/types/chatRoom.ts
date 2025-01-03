@@ -8,5 +8,8 @@ export type ChatRoomResource  = {
     lastMessage: string;
     lastMessageDate: Date;
     isPrivate: boolean;
-    friend: UserResource | null
+    friend: UserResource | null;
+    isRead: boolean;
+    isOnline: boolean;
+    recentOnlineTime: Date;
 }

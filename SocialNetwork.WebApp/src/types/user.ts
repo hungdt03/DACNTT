@@ -6,7 +6,7 @@ export interface UserResource {
     gender: string;
     phoneNumber: string;
     dateOfBirth: Date;
-
+    isOnline: boolean;
     postCount: number;
     followerCount: number;
     followingCount: number;

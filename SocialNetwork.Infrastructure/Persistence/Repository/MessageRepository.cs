@@ -32,6 +32,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return messages;
         }
 
+        public async Task<Message?> GetLastMessageByGroupIdAsync(Guid groupId)
+        {
+            return await _context.Messages
+               .Where(m => m.ChatRoom.Id == groupId)
+               .OrderByDescending(m => m.SentAt)
+               .FirstOrDefaultAsync();
+        }
+
         public async Task<Message?> GetMessageByIdAsync(Guid messageId)
         {
             return await _context.Messages

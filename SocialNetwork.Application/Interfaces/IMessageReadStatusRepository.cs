@@ -7,5 +7,6 @@ namespace SocialNetwork.Application.Interfaces
     {
         Task<MessageReadStatus?> GetMessageReadStatusByUserAndChatRoomId(string userId, Guid chatRoomId);
         Task CreateMessageReadStatusAsync(MessageReadStatus messageReadStatus);
+        Task<List<MessageReadStatus>> GetMessageReadStatusesByMessageId(Guid messageId);
     }
 }

@@ -16,6 +16,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using SocialNetwork.Infrastructure.Cloudinary;
 using SocialNetwork.Infrastructure.SignalR;
+using StackExchange.Redis;
+using SocialNetwork.Application.Interfaces.Services.Redis;
+using SocialNetwork.Infrastructure.Redis;
 
 namespace SocialNetwork.Infrastructure.Configuration
 {
@@ -44,7 +47,16 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IMessageReadStatusRepository, MessageReadStatusRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var redisOptions = new RedisOptions();
+                configuration.GetSection(nameof(RedisOptions)).Bind(redisOptions);
+                return ConnectionMultiplexer.Connect(redisOptions.ConnectionStrings);
+            });
 
+            // Dependency injection
+
+            services.AddScoped<IUserStatusService, UserStatusService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ISignalRService, SignalRService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();

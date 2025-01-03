@@ -1,4 +1,5 @@
 ﻿
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Entity;
@@ -26,5 +27,15 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(x => x.Message)
                 .SingleOrDefaultAsync(x => x.Message.ChatRoomId == chatRoomId && x.UserId == userId);
         }
+
+        public async Task<List<MessageReadStatus>> GetMessageReadStatusesByMessageId(Guid messageId)
+        {
+            var messageReadStatuses = await _context.MessageReadStatuses
+                .Where(x => x.MessageId == messageId)
+                .ToListAsync();
+
+            return messageReadStatuses;
+        }
+
     }
 }
