@@ -1,7 +1,7 @@
 import { Avatar, Modal } from "antd";
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
-import { Edit, Search } from "lucide-react";
+import { Edit, MessageCircle, Search } from "lucide-react";
 import { ChatRoomResource } from "../../types/chatRoom";
 import chatRoomService from "../../services/chatRoomService";
 import { formatTime } from "../../utils/date";
@@ -12,6 +12,7 @@ import useModal from "../../hooks/useModal";
 import CreateGroupChatModal from "../modals/CreateGroupChatModal";
 import cn from "../../utils/cn";
 import ChatUserSkeleton from "../skeletons/ChatUserSkeleton";
+import { Link } from "react-router-dom";
 
 const MessengerDialog: FC = () => {
     const dispatch = useDispatch<AppDispatch>()
@@ -39,7 +40,7 @@ const MessengerDialog: FC = () => {
         setChatRooms(prev => {
             const updateList = [...prev]
             const findIndex = updateList.findIndex(item => item.id === chatRoom.id);
-            if(findIndex !== -1) {
+            if (findIndex !== -1) {
                 updateList[findIndex] = {
                     ...updateList[findIndex],
                     isRead: true
@@ -53,9 +54,12 @@ const MessengerDialog: FC = () => {
         <div className="flex flex-col gap-y-3 w-[330px]">
             <div className="flex items-center justify-between">
                 <span className="font-semibold text-gray-500 px-1 text-lg">Đoạn chat</span>
+
+
                 <button onClick={showModal} className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100">
                     <Edit size={14} />
                 </button>
+
             </div>
             <div className="flex flex-1 items-center gap-x-2 px-3 py-2 rounded-3xl bg-gray-100">
                 <Search size={16} />
@@ -93,7 +97,11 @@ const MessengerDialog: FC = () => {
             open={isModalOpen}
             onOk={handleOk}
             onCancel={handleCancel}
-         
+            styles={{
+                footer: {
+                    display: 'none'
+                }
+            }}
         >
             <CreateGroupChatModal
                 onSuccess={handleOk}

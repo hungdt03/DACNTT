@@ -44,6 +44,12 @@ namespace SocialNetwork.Infrastructure.Redis
             return await db.SetLengthAsync($"user_connections:{userId}") > 0;
         }
 
+        public async Task<bool> IsUserActiveAsync(string userId)
+        {
+            var db = _redis.GetDatabase();
+            return await db.SetContainsAsync("active_users", userId);
+        }
+
         // Thiết lập thời gian hoạt động của người dùng khi họ online
         public async Task SetUserActiveTimeAsync(string userId)
         {

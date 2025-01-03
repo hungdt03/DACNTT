@@ -13,6 +13,8 @@ import { Tooltip, UploadFile, message } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
 import { formatTime } from "../../utils/date";
+import { MessageSquareText } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export type MessageRequest = {
     content: string;
@@ -36,9 +38,9 @@ const ChatPopup: FC<ChatPopupProps> = ({
     onCalling
 }) => {
 
+    const { user } = useSelector(selectAuth);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<MessageResource[]>([])
-    const { user } = useSelector(selectAuth);
 
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [typing, setTyping] = useState<string>('');
@@ -58,30 +60,30 @@ const ChatPopup: FC<ChatPopupProps> = ({
     useEffect(() => {
         fetchMessages()
 
-        SignalRConnector.events (
+        SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
                 if (message.chatRoomId === room.id) {
                     setPendingMessages((prev) =>
                         prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
                     );
-    
+
                     setMessages((prev) => {
                         const updatedMessages = [...prev, message];
-    
+
                         if (message.senderId !== user?.id) {
                             const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === message.senderId));
-    
+
                             if (findIndex !== -1) {
                                 updatedMessages[findIndex].reads = [
                                     ...(updatedMessages[findIndex]?.reads?.filter(r => r.userId !== message.senderId) || [])
                                 ];
                             }
                         }
-    
+
                         return updatedMessages;
                     });
-    
+
                 }
             },
             // ON READ STATUS RECEIVE
@@ -89,19 +91,19 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 if (message.chatRoomId === room.id) {
                     setMessages((prevMessages) => {
                         const updatedMessages = [...prevMessages];
-    
+
                         if (userId !== user?.id) {
                             const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === userId));
-    
+
                             if (findIndex !== -1) {
                                 updatedMessages[findIndex].reads = [
                                     ...(updatedMessages[findIndex]?.reads?.filter(r => r.userId !== userId) || [])
                                 ];
                             }
-    
+
                             updatedMessages[updatedMessages.length - 1].reads = [...(message.reads ?? [])];
                         }
-    
+
                         return updatedMessages;
                     });
                 }
@@ -120,7 +122,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
             undefined,
             undefined,
         );
-       
+
     }, []);
 
     useEffect(() => {
@@ -129,7 +131,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
     }, [messages])
 
     const handleBoxChange = (value: BoxMessageType) => {
-        
+
         let updateState: MessageRequest = {
             ...msgPayload,
             content: value.content
@@ -217,7 +219,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
             msgPayload.sentAt = tempMessage.sentAt
             try {
                 SignalRConnector.sendMessage(msgPayload)
-            } catch(error) {
+            } catch (error) {
                 alert(error)
             }
         }
@@ -253,7 +255,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                         className="w-[40px] h-[40px] rounded-full"
                     />
                     {room.isOnline && <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
-                    
+
                 </div>
 
                 <div className="flex flex-col">
@@ -275,6 +277,12 @@ const ChatPopup: FC<ChatPopupProps> = ({
                         <MinusOutlined />
                     </button>
                 </Tooltip>
+
+                {room && <Tooltip title='Mở trong messenger'>
+                    <Link to={`/chat/${room.id}`} className="p-2 bg-transparent border-none">
+                        <MessageSquareText size={14} />
+                    </Link>
+                </Tooltip>}
 
                 <Tooltip title="Đóng đoạn chat">
                     <button onClick={() => onClose?.()} className="p-2 bg-transparent border-none">

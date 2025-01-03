@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import images from "../../assets";
 import { StoryOption } from "../../pages/CreateStoryPage";
 import TextEditor from "./TextEditor";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
 
 type CreateStorySidebarProps = {
     option: StoryOption;
@@ -23,23 +25,25 @@ const CreateStorySidebar: FC<CreateStorySidebarProps> = ({
     onFontFamilySelect,
     onSubmit
 }) => {
+    const { user } = useSelector(selectAuth)
     return <div className="flex flex-col shadow h-full relative">
         <div className="flex items-center gap-x-2 p-3">
-            <Button shape="circle" icon={<CloseOutlined />}>
-            </Button>
+            <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-300">
+                <CloseOutlined />
+            </Link>
             <Link to='/'><img width='36px' height='36px' src={images.facebook} /></Link>
         </div>
         <Divider className="my-0" />
-            <div className="flex flex-col gap-y-4 py-5 px-3">
-                <div className="flex items-end justify-between">
-                    <span className="text-2xl font-bold">Tin của bạn</span>
-                    <Button shape="circle" icon={<SettingOutlined />}></Button>
-                </div>
-                <div className="flex items-center gap-x-3">
-                    <img width={45} src={images.user} />
-                    <span className="font-semibold text-lg">Đạo Thanh Hưng</span>
-                </div>
+        <div className="flex flex-col gap-y-4 py-5 px-3">
+            <div className="flex items-end justify-between">
+                <span className="text-2xl font-bold">Tin của bạn</span>
+                <Button shape="circle" icon={<SettingOutlined />}></Button>
             </div>
+            <div className="flex items-center gap-x-3">
+                <img width={45} src={user?.avatar ?? images.user} />
+                <span className="font-semibold text-lg">{user?.fullName}</span>
+            </div>
+        </div>
         <Divider />
 
         <div className="p-3">

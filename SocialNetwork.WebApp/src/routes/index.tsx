@@ -62,15 +62,9 @@ const appRouter = createBrowserRouter([
         ]
     },
     {
-        path: '/chat',
+        path: '/chat/:id',
         errorElement: <ErrorBoundaryPage />,
-        element: <AuthGuard element={<ChatLayout />} />,
-        children: [
-            {
-                path: ':id',
-                element: <ChatPage />
-            }
-        ]
+        element: <AuthGuard element={<ChatPage />} />,
     },
     {
         path: '/story/create',

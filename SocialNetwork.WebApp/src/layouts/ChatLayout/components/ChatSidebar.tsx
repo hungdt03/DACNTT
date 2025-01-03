@@ -1,6 +1,6 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import ChatUserItem from "../../../components/chats/ChatUserItem";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Edit, Search } from "lucide-react";
 import { Navigation } from "swiper/modules";
 import SwiperCore from "swiper";
@@ -9,9 +9,25 @@ import "swiper/css";
 SwiperCore.use([Navigation]);
 
 import ChatAvatarStatus from "../../../components/chats/ChatAvatarStatus";
+import { ChatRoomResource } from "../../../types/chatRoom";
+import chatRoomService from "../../../services/chatRoomService";
 
 const ChatSidebar: FC = () => {
-    return <div className="h-full bg-white col-span-3 flex flex-col gap-y-4 py-4 overflow-hidden border-[1px] border-sky-300 rounded-xl">
+    const { id } = useParams();
+    const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([])
+
+    useEffect(() => {
+        const fetchChatRooms = async () => {
+            const response = await chatRoomService.getAllChatRooms();
+            if (response.isSuccess) {
+                setChatRooms(response.data);
+            }
+        }
+
+        fetchChatRooms();
+    }, [])
+
+    return <div className="h-full bg-white col-span-3 flex flex-col gap-y-4 py-4 overflow-hidden border-r-[1px] border-gray-200">
         <div className="flex items-center justify-between px-4">
             <Link to='/' className="px-2 py-1 rounded-md bg-sky-100 text-primary text-xs">Quay lại</Link>
             <span className="text-xl font-semibold">Nhắn tin</span>
@@ -33,41 +49,12 @@ const ChatSidebar: FC = () => {
                 spaceBetween={4}
                 modules={[Navigation]}
             >
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
-                <SwiperSlide><ChatAvatarStatus /></SwiperSlide>
+                {chatRooms.filter(chatRoom => chatRoom.isOnline).map(chatRoom => <SwiperSlide key={chatRoom.id}><ChatAvatarStatus chatRoom={chatRoom} /></SwiperSlide>)}
             </Swiper>
 
         </div>
         <div className="flex flex-col gap-y-2 px-4 w-full h-full overflow-y-auto custom-scrollbar">
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
-            <ChatUserItem />
+            {chatRooms.map((chatRoom, index) => <ChatUserItem isActive={index === 0 && !id ? true : id === chatRoom.id} key={chatRoom.id} chatRoom={chatRoom} />)}
         </div>
     </div>
 };

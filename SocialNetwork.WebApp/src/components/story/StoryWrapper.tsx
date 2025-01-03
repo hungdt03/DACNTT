@@ -11,12 +11,15 @@ import useModal from "../../hooks/useModal";
 import ViewStory from "./ViewStory";
 import { UserStoryResource } from "../../types/userStory";
 import storyService from "../../services/storyService";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
 
 
 const StoryWrapper: FC = () => {
     const [showPrev, setShowPrev] = useState(false);
     const { isModalOpen, showModal, handleCancel, handleOk } = useModal();
     const [selectStory, setSelectStory] = useState<UserStoryResource>();
+    const { user } = useSelector(selectAuth)
 
     const [userStories, setUserStories] = useState<UserStoryResource[]>([])
 
@@ -56,7 +59,14 @@ const StoryWrapper: FC = () => {
                 <SwiperSlide>
                     <StoryCreator />
                 </SwiperSlide>
-                {userStories.map((story, index) => <SwiperSlide key={index}>
+                {userStories.filter(s => s.user.id === user?.id).map((story, index) => <SwiperSlide key={index}>
+                    <StoryItem onClick={() => {
+                        setCurrentIndex(index)
+                        setSelectStory(story)
+                        showModal()
+                    }} story={story} />
+                </SwiperSlide>)}
+                {userStories.filter(s => s.user.id !== user?.id).map((story, index) => <SwiperSlide key={index}>
                     <StoryItem onClick={() => {
                         setCurrentIndex(index)
                         setSelectStory(story)

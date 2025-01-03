@@ -16,7 +16,7 @@ const CreateStoryOption: FC<CreateStoryOptionProps> = ({
             backgroundImage: `url(${images.bgStoryText})`,
             backgroundPosition: '0px 0px',
             backgroundSize: 'auto'
-        }} className="px-6 flex items-center justify-center w-[220px] h-[330px] bg-no-repeat">
+        }} className="px-6 flex items-center justify-center w-[220px] h-[330px] bg-no-repeat cursor-pointer">
             <div className="flex flex-col gap-y-2 items-center">
                 <div className="p-2 rounded-full bg-white border-[1px] border-gray-100 shadow">
                     <Images />
@@ -36,7 +36,7 @@ const CreateStoryOption: FC<CreateStoryOptionProps> = ({
             backgroundImage: `url(${images.bgStoryImage})`,
             backgroundPosition: '0px -331px',
             backgroundSize: 'auto'
-        }} className="px-6 flex items-center justify-center w-[220px] h-[330px] bg-no-repeat">
+        }} className="px-6 flex items-center justify-center w-[220px] h-[330px] bg-no-repeat cursor-pointer">
             <div className="flex flex-col gap-y-2 items-center">
                 <div className="p-2 rounded-full bg-white border-[1px] border-gray-100 shadow">
                     <CaseSensitive />

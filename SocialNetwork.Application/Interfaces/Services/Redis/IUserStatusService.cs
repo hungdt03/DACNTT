@@ -12,6 +12,7 @@ namespace SocialNetwork.Application.Interfaces.Services.Redis
 
         // Kiểm tra xem người dùng có kết nối hay không
         public Task<bool> HasConnectionsAsync(string userId);
+        public Task<bool> IsUserActiveAsync(string userId);
 
         // Thiết lập thời gian hoạt động của người dùng khi họ online
         public Task SetUserActiveTimeAsync(string userId);

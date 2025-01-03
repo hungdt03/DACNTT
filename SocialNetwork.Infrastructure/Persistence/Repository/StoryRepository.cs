@@ -23,6 +23,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Stories
                 .Include(s => s.User)
+                .Where(s => s.ExpiresAt > DateTimeOffset.UtcNow)
+                .OrderByDescending(s => s.DateCreated)
                 .ToListAsync();
         }
     }
