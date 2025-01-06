@@ -29,7 +29,7 @@ namespace SocialNetwork.Application.Features.Message.Handlers
 
         public async Task<BaseResponse> Handle(ReadMessageCommand request, CancellationToken cancellationToken)
         {
-            var message = await _unitOfWork.MessageRepository.GetMessageByIdAsync(request.MessageId)
+            var message = await _unitOfWork.MessageRepository.GetLastMessageByGroupIdAsync(request.ChatRoomId)
                 ?? throw new NotFoundException("Không tìm thấy tin nhắn");
 
             var userId = _contextAccessor.HttpContext.User.GetUserId();
@@ -46,7 +46,7 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                     UserId = userId,
                     IsRead = true,
                     ReadAt = DateTimeOffset.UtcNow,
-                    MessageId = request.MessageId,
+                    MessageId = message.Id,
                 };
 
                 await _unitOfWork.MessageReadStatusRepository.CreateMessageReadStatusAsync(recentReadStatus);

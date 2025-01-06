@@ -2,7 +2,7 @@ import { Image, Upload, UploadFile, UploadProps } from "antd";
 import { FC, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons'
 import images from "../../assets";
-import { SendHorizonal } from "lucide-react";
+import { CameraIcon, SendHorizonal } from "lucide-react";
 import cn from "../../utils/cn";
 
 export type BoxMessageType = {
@@ -80,12 +80,14 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
     return <div className="flex items-center gap-x-2">
         <div className="flex-shrink-0">
             <Upload {...props}>
-                <img alt="upload" className="w-5 h-5" src={images.photo} />
+                <div className="p-1 rounded-full bg-gray-400 hover:bg-gray-500 cursor-pointer">
+                    <CameraIcon className="text-white" size={16} strokeWidth={2} />
+                </div>
             </Upload>
         </div>
 
         <div className={cn("bg-gray-100 px-1 rounded-3xl w-full overflow-hidden", state.files.length ? 'py-2' : 'py-[2px]')}>
-            <div className="flex flex-col items-start gap-y-1 overflow-x-hidden">
+            <div className={cn("flex flex-col items-start overflow-x-hidden", state.files.length > 0 && 'gap-y-1')}>
                 <div className="w-full overflow-x-auto custom-scrollbar">
                     {state.files.length > 0 && <div className="flex items-center gap-x-2 px-4 py-2">
                         <Image.PreviewGroup>
@@ -105,7 +107,7 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
                 <div className="flex items-center justify-between w-full">
                     <input onFocus={onFocus} value={state.content} onChange={e => handleContentChange(e.target.value)} className="text-sm px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
                     <button disabled={!state.content} onClick={handleSubmit} className="flex-shrink-0 w-8 h-8 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
-                        <SendHorizonal size={18} className="text-sky-600" />
+                        <SendHorizonal size={18} className="text-sky-500" />
                     </button>
                 </div>
             </div>

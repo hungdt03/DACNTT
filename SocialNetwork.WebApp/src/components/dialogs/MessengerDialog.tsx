@@ -1,18 +1,19 @@
 import { Avatar, Modal } from "antd";
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
-import { Edit, MessageCircle, Search } from "lucide-react";
+import { Edit, Search } from "lucide-react";
 import { ChatRoomResource } from "../../types/chatRoom";
 import chatRoomService from "../../services/chatRoomService";
 import { formatTime } from "../../utils/date";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
-import { add } from "../../features/slices/chat-popup-slice";
+import { add, setChatRoomRead } from "../../features/slices/chat-popup-slice";
 import useModal from "../../hooks/useModal";
 import CreateGroupChatModal from "../modals/CreateGroupChatModal";
 import cn from "../../utils/cn";
 import ChatUserSkeleton from "../skeletons/ChatUserSkeleton";
-import { Link } from "react-router-dom";
+import messageService from "../../services/messageService";
+import SignalRConnector from '../../app/signalR/signalr-connection'
 
 const MessengerDialog: FC = () => {
     const dispatch = useDispatch<AppDispatch>()
@@ -32,11 +33,42 @@ const MessengerDialog: FC = () => {
         }
 
         fetchChatRooms()
+
+        SignalRConnector.events(
+            // ON MESSAGE RECEIVE
+            (message) => {
+                console.log(message)
+                setChatRooms(prev => {
+                    const updatedChatRooms = [...prev]
+                    const findIndex = updatedChatRooms.findIndex(chatRoom => chatRoom.id === message.chatRoomId);
+                    if (findIndex !== -1) {
+                        updatedChatRooms[findIndex].lastMessage = message.content;
+                        updatedChatRooms[findIndex].lastMessageDate = message.sentAt;
+                        updatedChatRooms[findIndex].isRead = false;
+                    }
+
+                    return updatedChatRooms
+                })
+            },
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+        );
     }, []);
 
-    const handleSelectChat = (chatRoom: ChatRoomResource) => {
-        dispatch(add(chatRoom));
 
+    const readMessage = async (chatRoom: ChatRoomResource) => {
+        const response = await messageService.readMessage(chatRoom.id);
+        dispatch(add(chatRoom));
+        dispatch(setChatRoomRead(chatRoom.id));
+    }
+
+    const handleSelectChat = async (chatRoom: ChatRoomResource) => {
+        await readMessage(chatRoom)
         setChatRooms(prev => {
             const updateList = [...prev]
             const findIndex = updateList.findIndex(item => item.id === chatRoom.id);

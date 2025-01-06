@@ -71,6 +71,7 @@ namespace SocialNetwork.Application.Mappers
             {
                 Id = post.Id,
                 Content = post.Content,
+                Background = post.Background,
                 Privacy = post.Privacy,
                 SharePostId = post.SharePostId,
                 OriginalPostId = post.OriginalPostId,

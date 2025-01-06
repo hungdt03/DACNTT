@@ -11,6 +11,12 @@ export type ChatWindowsState = {
     chatRooms: ChatPopupState[];
 }
 
+export type LastMessagePayload = {
+    chatRoomId: string;
+    message: string;
+    sentAt: Date
+}
+
 const MAX_OPEN_POPUPS = 3;  
 
 const chatPopupSlice = createSlice({
@@ -60,6 +66,20 @@ const chatPopupSlice = createSlice({
                 chat.state = 'open';
             }
         },
+        setChatRoomRead: (state, action: PayloadAction<string>) => {
+            const chat = state.chatRooms.find(s => s.chatRoom.id === action.payload);
+            if (chat) {
+                chat.chatRoom.isRead = true;
+            }
+        },
+        setChatRoomMessage: (state, action: PayloadAction<LastMessagePayload>) => {
+            const chat = state.chatRooms.find(s => s.chatRoom.id === action.payload.chatRoomId);
+            if (chat) {
+                chat.chatRoom.lastMessage = action.payload.message;
+                chat.chatRoom.lastMessageDate = action.payload.sentAt;
+                chat.chatRoom.isRead = false;
+            }
+        },
         minimize:  (state, action: PayloadAction<string>) => {
             const chat = state.chatRooms.find(s => s.chatRoom.id === action.payload);
             if (chat) {
@@ -70,5 +90,5 @@ const chatPopupSlice = createSlice({
 });
 
 export const selectChatPopup = (state: RootState) => state.chatPopup;
-export const { add, remove, expand, minimize } = chatPopupSlice.actions;
+export const { add, remove, expand, minimize, setChatRoomRead, setChatRoomMessage } = chatPopupSlice.actions;
 export default chatPopupSlice.reducer;

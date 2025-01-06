@@ -43,7 +43,7 @@ const StoryTextPreview: FC<StoryTextPreviewProps> = ({
             }} className="rounded-xl h-[95%] w-[33.333333%] flex flex-col items-start justify-center px-6 overflow-hidden py-10">
                 <div
                     ref={contentRef}
-                    className={`text-white text-center break-words break-all font-semibold text-xl overflow-hidden ${isExpanded === 'expand' ? "overflow-y-scroll" : "line-clamp-7"
+                    className={`text-white w-full text-center break-words break-all font-semibold text-xl overflow-hidden ${isExpanded === 'expand' ? "overflow-y-scroll" : "line-clamp-7"
                         }`}
                     style={{
                         display: isExpanded === 'expand' ? "block" : "-webkit-box",

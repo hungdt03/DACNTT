@@ -1,4 +1,4 @@
-import { Bell, MessageSquare } from "lucide-react";
+import { Bell, ChevronDown, MessageSquare } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
 import { Badge, Popover } from "antd";
@@ -10,8 +10,12 @@ import { toast } from "react-toastify";
 import SignalRConnector from '../../app/signalR/signalr-connection'
 import { inititalValues } from "../../utils/pagination";
 import { Pagination } from "../../types/response";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
+import AccountDialog from "../../components/dialogs/AccountDialog";
 
 const Navbar: FC = () => {
+    const { user } = useSelector(selectAuth)
     const [notifications, setNotifications] = useState<NotificationResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
 
@@ -24,7 +28,7 @@ const Navbar: FC = () => {
                 );
                 return [...prev, ...newNotifications];
             });
-            
+
             setPagination(response.pagination)
         }
     }
@@ -64,20 +68,13 @@ const Navbar: FC = () => {
                         : notification
                 );
             });
-            
+
         } else {
             toast.error(response.message)
         }
     }
 
     return <div className="flex items-center gap-x-3">
-        {/* <Badge count={2}>
-            <Popover trigger='click' placement="topRight" content={<NotificationDialog />}>
-                <button className="p-3 rounded-md bg-gray-100">
-                    <Menu className="text-gray-500" size={18} />
-                </button>
-            </Popover>
-        </Badge> */}
         <Badge count={notifications.filter(n => !n.isRead).length}>
             <Popover trigger='click' placement="topRight" content={<NotificationDialog onFetchMore={(nextPage) => fetchNotifications(nextPage)} pagination={pagination} onMarkAsRead={handleMarkNotificationAsRead} onDelete={handleDeleteNotification} notifications={notifications} />}>
                 <button className="p-3 rounded-md bg-gray-100">
@@ -92,9 +89,17 @@ const Navbar: FC = () => {
                 </button>
             </Popover>
         </Badge>
-        <div>
-            <img width='36px' height='36px' src={images.user} />
-        </div>
+        <Popover trigger='click' placement="bottomRight" content={<AccountDialog />}>
+            <div className="relative">
+                <button className="border-[1px] border-gray-300 rounded-full overflow-hidden">
+                    <img width='36px' height='36px' src={user?.avatar ?? images.user} />
+                </button>
+                <button className="absolute right-0 bottom-0 p-[1px] rounded-full border-[1px] bg-gray-50 border-gray-200">
+                    <ChevronDown className="text-gray-500 font-bold" size={14} />
+                </button>
+            </div>
+        </Popover>
+
     </div>
 };
 

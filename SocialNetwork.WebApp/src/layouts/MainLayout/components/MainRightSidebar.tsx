@@ -72,7 +72,7 @@ const MainRightSidebar: FC = () => {
         <div className="p-4 rounded-md shadow bg-white flex flex-col gap-y-4">
             <span className="font-semibold text-lg text-gray-700">Người liên hệ</span>
             <div className="flex flex-col gap-y-2">
-                {chatRooms.map(chatRoom => <div key={chatRoom.id} onClick={() => dispatch(add(chatRoom))} className="flex items-center justify-between hover:bg-gray-100 px-2 py-2 rounded-md">
+                {chatRooms.filter(chatRoom => chatRoom.isOnline).map(chatRoom => <div key={chatRoom.id} onClick={() => dispatch(add(chatRoom))} className="flex items-center justify-between hover:bg-gray-100 px-2 py-2 rounded-md">
                     <div className="flex items-center gap-x-3">
                         <div className="relative">
                             <Avatar size='large' src={chatRoom.friend?.avatar ?? images.user} />

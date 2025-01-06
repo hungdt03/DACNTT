@@ -25,6 +25,7 @@ import postService from "../../services/postService";
 import { Link } from "react-router-dom";
 import ListSharePostModal from "../modals/ListSharePostModal";
 import PostOtherTags from "./PostOtherTags";
+import { LikeOutlined } from '@ant-design/icons'
 
 export type CommentRequest = {
     postId: string;
@@ -72,7 +73,7 @@ const Post: FC<PostProps> = ({
     const { user } = useSelector(selectAuth)
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
-   
+
     const [post, setPost] = useState<PostResource>(postParam)
 
     const fetchReactions = async () => {
@@ -204,10 +205,14 @@ const Post: FC<PostProps> = ({
         </div>
 
         <div className="flex flex-col gap-y-3">
-            <p className="text-sm text-gray-700 break-words">{post.content}</p>
-
+            {post.background ? <div style={{
+                background: post.background,
+                width: '100%',
+                height: 380
+            }} className="flex items-center justify-center px-6 py-8 rounded-md">
+                <p className="text-2xl font-bold text-center break-words break-all text-white">{post.content}</p>
+            </div> : <p className="text-sm text-gray-700 break-words">{post.content}</p>}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
-
         </div>
         <div className="flex items-center justify-between text-sm">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">

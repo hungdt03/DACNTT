@@ -6,11 +6,11 @@ namespace SocialNetwork.Application.Features.Message.Commands
 {
     public class ReadMessageCommand : IRequest<BaseResponse>
     {
-        public Guid MessageId { get; set; }
+        public Guid ChatRoomId { get; set; }
 
-        public ReadMessageCommand(Guid messageId)
+        public ReadMessageCommand(Guid chatRoomId)
         {
-            MessageId = messageId;
+            ChatRoomId = chatRoomId;
         }
     }
 }

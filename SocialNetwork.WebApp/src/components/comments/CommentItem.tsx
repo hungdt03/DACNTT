@@ -76,8 +76,9 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 <div className="flex flex-col gap-y-2">
                     <div className={cn("py-2 rounded-2xl flex flex-col items-start", comment.content ? 'bg-gray-100 px-4' : '-mt-1')}>
                         <span className="font-semibold">{comment?.user?.fullName}</span>
-                        <p className="text-left flex items-center gap-x-1">
+                        <p className="text-left">
                             {comment.replyToUserId && <button className="font-bold rounded-lg text-sm">{comment.replyToUserName}</button>}
+                            <span> </span>
                             {comment.content}
                         </p>
                     </div>

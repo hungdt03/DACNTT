@@ -6,15 +6,19 @@ import { ChatRoomResource } from "../../types/chatRoom";
 import SignalRConnector from '../../app/signalR/signalr-connection'
 import { MessageMediaResource, MessageResource } from "../../types/message";
 import messageService from "../../services/messageService";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import BoxSendMessage, { BoxMessageType } from "./BoxSendMessage";
-import { Tooltip, UploadFile, message } from "antd";
+import { Tooltip, UploadFile } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
 import { formatTime } from "../../utils/date";
 import { MessageSquareText } from "lucide-react";
 import { Link } from "react-router-dom";
+import cn from "../../utils/cn";
+import { add, selectChatPopup, setChatRoomRead } from "../../features/slices/chat-popup-slice";
+import { AppDispatch } from "../../app/store";
+import chatRoomService from "../../services/chatRoomService";
 
 export type MessageRequest = {
     content: string;
@@ -41,14 +45,19 @@ const ChatPopup: FC<ChatPopupProps> = ({
     const { user } = useSelector(selectAuth);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<MessageResource[]>([])
+    const [isRead, setIsRead] = useState(room.isOnline);
 
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [typing, setTyping] = useState<string>('');
     const [pendingMessages, setPendingMessages] = useState<MessageResource[]>([]);
+    const { chatRooms } = useSelector(selectChatPopup)
+
     const [msgPayload, setMsgPayload] = useState<MessageRequest>({
         content: '',
         chatRoomName: room.uniqueName
     });
+
+    const dispatch = useDispatch<AppDispatch>()
 
     const fetchMessages = async () => {
         const response = await messageService.getAllMessagesByChatRoomId(room.id);
@@ -57,12 +66,33 @@ const ChatPopup: FC<ChatPopupProps> = ({
         }
     }
 
+    
+    const getChatRoomById = async (chatRoomId: string): Promise<ChatRoomResource | undefined> => {
+        const response = await chatRoomService.getChatRoomById(chatRoomId);
+        if (response.isSuccess) {
+            return response.data;
+        }
+
+        return undefined;
+    }
+
     useEffect(() => {
         fetchMessages()
 
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
+                if (message.senderId !== user?.id) {
+                    const chatRoom = chatRooms.find(item => item.chatRoom.id === message.chatRoomId);
+                    if (!chatRoom) {
+                        console.log('Fetching new chat room');
+                        getChatRoomById(message.chatRoomId)
+                            .then(data => {
+                                if (data) dispatch(add(data));
+                            });
+                    }
+                }
+
                 if (message.chatRoomId === room.id) {
                     setPendingMessages((prev) =>
                         prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
@@ -83,6 +113,9 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
                         return updatedMessages;
                     });
+
+                    if (message.senderId !== user?.id)
+                        setIsRead(false)
 
                 }
             },
@@ -106,6 +139,8 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
                         return updatedMessages;
                     });
+
+
                 }
             },
             // ON TYPING MESSAGE
@@ -234,19 +269,13 @@ const ChatPopup: FC<ChatPopupProps> = ({
     }
 
     const handleReadMessage = async () => {
-        const length = messages.length;
-        if (messages[length - 1] && messages[length - 1].senderId !== user?.id) {
-            const response = await messageService.readMessage(messages[length - 1].id);
-            if (!response.isSuccess) {
-                message.warning(response.message)
-            } else {
-                console.log(response)
-            }
-        }
+        const response = await messageService.readMessage(room.id);
+        dispatch(setChatRoomRead(room.id));
+        setIsRead(true)
     }
 
-    return <div className="w-[300px] z-[100] h-[450px] relative bg-white rounded-t-xl overflow-hidden shadow-md">
-        <div className="bg-sky-500 text-white absolute top-0 left-0 right-0 shadow-md flex items-center justify-between border-[1px] border-gray-200 p-[2px]">
+    return <div className="w-[300px] z-[200] h-[450px] relative bg-white rounded-t-xl overflow-hidden shadow-md">
+        <div className={cn("z-[200] text-white absolute top-0 left-0 right-0 shadow-md flex items-center justify-between border-[1px] border-gray-200 p-[2px]", isRead ? ' bg-white' : 'bg-sky-500')}>
             <div className="flex items-center gap-x-2 rounded-md p-1">
                 <div className="relative">
                     <img
@@ -259,14 +288,14 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 </div>
 
                 <div className="flex flex-col">
-                    <b className="text-sm">{room.isPrivate ? room.friend?.fullName : room.name}</b>
-                    <p className="text-[12px]">
+                    <b className={cn("text-sm", isRead && 'text-black')}>{room.isPrivate ? room.friend?.fullName : room.name}</b>
+                    <p className={cn("text-[12px]", isRead && 'text-gray-400')}>
                         {room.isOnline ? 'Đang hoạt động' : room.recentOnlineTime && `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
                     </p>
                 </div>
             </div>
 
-            <div className="flex gap-x-1 items-center">
+            <div className={cn("flex gap-x-1 items-center", isRead && 'text-sky-500')}>
                 <Tooltip title="Gọi điện">
                     <button onClick={() => onCalling?.()} className="p-2 bg-transparent border-none">
                         <PhoneOutlined className="rotate-90" />

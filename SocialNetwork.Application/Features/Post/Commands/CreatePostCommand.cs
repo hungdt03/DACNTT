@@ -12,6 +12,7 @@ namespace SocialNetwork.Application.Features.Post.Commands
         [Required(ErrorMessage = "Nội dung không được để trống")]
         public string Content { get; set; }
         public string Privacy { get; set; } = PrivacyConstant.PUBLIC;
+        public string Background {  get; set; }
         public List<IFormFile>? Images { get; set; }
         public List<IFormFile>? Videos { get; set; }
         public List<string>? TagIds { get; set; }

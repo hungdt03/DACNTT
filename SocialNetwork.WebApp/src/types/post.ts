@@ -6,6 +6,7 @@ import { UserResource } from "./user";
 export type PostResource = {
     id: string;
     content: string;
+    background: string;
     privacy: PrivacyType;
     user: UserResource;
     createdAt: Date;

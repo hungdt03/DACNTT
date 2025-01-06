@@ -79,10 +79,9 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 PostType = PostType.ORIGINAL_POST,
                 Privacy = request.Privacy,
                 UserId = _contextAccessor.HttpContext.User.GetUserId(),
-                Tags = tags
+                Tags = tags,
+                Background = request.Background,
             };
-
-          
 
             var fullName = _contextAccessor.HttpContext.User.GetFullName();
             var imageUrl = _contextAccessor.HttpContext.User.GetAvatar();

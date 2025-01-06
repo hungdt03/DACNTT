@@ -33,10 +33,10 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
-        [HttpPut("read/{messageId}")]
-        public async Task<IActionResult> ReadMessage([FromRoute] Guid messageId)
+        [HttpPut("read/{chatRoomId}")]
+        public async Task<IActionResult> ReadMessage([FromRoute] Guid chatRoomId)
         {
-            var response = await mediator.Send(new ReadMessageCommand(messageId));
+            var response = await mediator.Send(new ReadMessageCommand(chatRoomId));
             return Ok(response);
         }
     }

@@ -15,6 +15,7 @@ import follower from './images/follow.png'
 import userProfile from './images/hr-manager.png'
 import bgStoryText from './images/bg-story-text.png'
 import bgStoryImage from './images/bg-story-image.png'
+import AaBackground from './images/AaBackground.png'
 
 const images = {
     facebook,
@@ -33,7 +34,8 @@ const images = {
     follower,
     userProfile,
     bgStoryText,
-    bgStoryImage
+    bgStoryImage,
+    AaBackground
 }
 
 export default images

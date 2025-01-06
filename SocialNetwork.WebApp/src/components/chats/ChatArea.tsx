@@ -8,7 +8,7 @@ import { ChatRoomResource } from "../../types/chatRoom";
 import { formatTime } from "../../utils/date";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
-import {  MinusOutlined, PhoneOutlined } from '@ant-design/icons'
+import { MinusOutlined, PhoneOutlined } from '@ant-design/icons'
 import { MessageMediaResource, MessageResource } from "../../types/message";
 import { MessageRequest } from "./ChatPopup";
 import messageService from "../../services/messageService";
@@ -219,15 +219,9 @@ const ChatArea: FC<ChatAreaProps> = ({
     }
 
     const handleReadMessage = async () => {
-        const length = messages.length;
-        if (messages[length - 1] && messages[length - 1].senderId !== user?.id) {
-            const response = await messageService.readMessage(messages[length - 1].id);
-            if (!response.isSuccess) {
-                message.warning(response.message)
-            } else {
-                console.log(response)
-            }
-        }
+        const response = await messageService.readMessage(chatRoom.id);
+        console.log(response.message)
+
     }
 
 
@@ -246,12 +240,12 @@ const ChatArea: FC<ChatAreaProps> = ({
 
             <div className="flex gap-x-1 items-center">
                 <Tooltip title="Gọi điện">
-                    <button onClick={() => {}} className="p-2 bg-transparent border-none">
+                    <button onClick={() => { }} className="p-2 bg-transparent border-none">
                         <PhoneOutlined className="rotate-90" />
                     </button>
                 </Tooltip>
                 <Tooltip title="Thông tin cuộc trò chuyện">
-                    <button onClick={() => {}} className="p-2 bg-transparent border-none">
+                    <button onClick={() => { }} className="p-2 bg-transparent border-none">
                         <MinusOutlined />
                     </button>
                 </Tooltip>

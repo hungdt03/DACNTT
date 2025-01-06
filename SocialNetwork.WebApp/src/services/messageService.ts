@@ -22,8 +22,8 @@ class MessageService {
         return axiosInterceptor.post('/api/messages', formData)
     }
 
-    readMessage(messageId: string) : Promise<BaseResponse> {
-        return axiosInterceptor.put('/api/messages/read/' + messageId)
+    readMessage(chatRoomId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/messages/read/' + chatRoomId)
     }
  
 }

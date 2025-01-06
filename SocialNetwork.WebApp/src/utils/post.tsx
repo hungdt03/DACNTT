@@ -1,12 +1,14 @@
 import { ReactNode } from "react"
 import { PrivacyType } from "../enums/privacy"
 import { Tooltip } from "antd"
-import { HeartIcon, Lock, User } from "lucide-react"
+import {  Lock, ThumbsUp, User } from "lucide-react"
+import { LikeOutlined } from '@ant-design/icons'
 import { ReactionType } from "../enums/reaction"
 import { svgReaction } from "../assets/svg"
 import images from "../assets"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons"
+import { HandThumbUpIcon } from "@heroicons/react/24/outline"
 
 export const getPrivacyPost = (privacy: PrivacyType): ReactNode => {
     switch (privacy) {
@@ -71,7 +73,7 @@ export const getBtnReaction = (reactionType: ReactionType | 'UNKNOWN', handleSav
     }
 
     return <button  onClick={() => handleSaveReaction(ReactionType.LIKE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
-        <HeartIcon className="h-5 w-5 text-gray-500" />
+        <HandThumbUpIcon width={20} />
         <span>Thích</span>
     </button>
 }

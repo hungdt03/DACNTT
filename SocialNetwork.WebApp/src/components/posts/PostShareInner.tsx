@@ -55,7 +55,13 @@ const PostShareInner: FC<PostShareInnerProps> = ({
             </div>
 
             <div className="flex flex-col gap-y-3">
-                <p className="text-sm text-gray-700">{post.content}</p>
+                {post.background ? <div style={{
+                    background: post.background,
+                    width: '100%',
+                    height: 380
+                }} className="flex items-center justify-center px-6 py-8 rounded-md">
+                    <p className="text-2xl font-bold text-center break-words break-all text-white">{post.content}</p>
+                </div> : <p className="text-sm text-gray-700 break-words">{post.content}</p>}
             </div>
         </div>
 

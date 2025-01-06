@@ -54,7 +54,6 @@ class SignalRConnector {
                 onStopTypingMessage?.(groupName)
             })
 
-
             this.connection.on("NewNotification", (notification: NotificationResource) => {
                 onNotificationReceived?.(notification);
             });
@@ -75,7 +74,16 @@ class SignalRConnector {
 
     }
 
-        
+    public unsubscribeEvents = () => {
+        this.connection.off("NewMessage");
+        this.connection.off("NewRead");
+        this.connection.off("TypingMessage");
+        this.connection.off("StopTypingMessage");
+        this.connection.off("NewNotification");
+        this.connection.off("CallFriend");
+        this.connection.off("AcceptCall");
+        this.connection.off("LeaveCall");
+    };
 
     public sendMessage = async (message: MessageRequest) => {
         if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
