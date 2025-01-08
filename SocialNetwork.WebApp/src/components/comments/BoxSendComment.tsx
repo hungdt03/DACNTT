@@ -1,5 +1,5 @@
 import { Avatar, Image, Upload, UploadFile, UploadProps } from "antd";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons'
 import { CameraIcon, SendHorizonal } from "lucide-react";
 import cn from "../../utils/cn";
@@ -8,37 +8,121 @@ import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { isVideo } from "../medias/utils";
 
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { ContentEditable } from '@lexical/react/LexicalContentEditable';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
+import { $createTextNode, $getRoot, $getSelection, $isRangeSelection, EditorState, LexicalEditor, TextNode } from 'lexical';
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { NodeContent } from "./BoxReplyComment";
+import { FriendResource } from "../../types/friend";
+import friendService from "../../services/friendService";
+
+
+
+export const loadContentEmpty = () =>
+    `{
+        "root": {
+        "children": [
+            {
+            "children": [
+                {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "", 
+                    "text": "",
+                    "type": "text",
+                    "version": 1
+                }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1
+            }
+        ],
+        "direction": "ltr",
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
+        }
+    }`;
+
+
+// Cấu hình Lexical
+const editorConfig = {
+    isEditable: true,
+    theme: {
+        paragraph: 'text-gray-800 my-2',
+    },
+    namespace: 'CommentEditor',
+    onError: (error: Error) => {
+        console.error('Lexical error:', error);
+    },
+    nodes: [TextNode],
+};
+
+function extractContentAndStyle(data: any): NodeContent[] {
+    return data.map((item: any) => {
+        if (item.style) {
+            const splitStyle = item.style.split(';');
+            const userIdPart = splitStyle[0].split(' ')[1];
+            const backgroundPart = splitStyle[1].split(' ')[1];
+
+            return {
+                id: userIdPart,
+                content: item.text,
+                style: backgroundPart
+            };
+        } else {
+            return {
+                id: '',
+                content: item.text,
+                style: ''
+            };
+        }
+    });
+}
+
 export type BoxCommentType = {
     file: UploadFile;
     content: string;
+    mentionUserIds: []
 }
 
 type BoxSendCommentProps = {
-    onFileChange?: (fileList: UploadFile) => void;
-    onRemoveFileUrl?: (url: string | undefined) => void;
-    onContentChange?: (content: string) => void;
     onSubmit?: (data: BoxCommentType) => void;
-    value?: string;
-    files?: UploadFile[]
 }
 
 const BoxSendComment: FC<BoxSendCommentProps> = ({
-    onFileChange,
-    onRemoveFileUrl,
-    onContentChange,
     onSubmit,
-    value = '',
-    files = []
 }) => {
 
-    const [fileList, setFileList] = useState<UploadFile[] | any[]>(files);
-    const [content, setContent] = useState<string>(value)
+    const [fileList, setFileList] = useState<UploadFile[] | any[]>([]);
+    const [content, setContent] = useState<string>('')
     const { user } = useSelector(selectAuth)
+
+    const [initialEditorState, setInitialEditorState] = useState<string | null>(null);
+
+    const [suggestedFriends, setSuggestedFriends] = useState<FriendResource[]>([]);
+    const [mentionFriends, setMentionFriends] = useState<FriendResource[]>([])
+    const [isMentioning, setIsMentioning] = useState(false);
+    const editorStateRef = useRef<EditorState | null>(null);
+    const editorRef = useRef<LexicalEditor | null>(null);
+
+
+    useEffect(() => {
+        const valueEditorState = loadContentEmpty();
+        setInitialEditorState(valueEditorState);
+    }, [])
 
     const handleRemoveFile = (file: UploadFile) => {
         const updatedFileList = [...fileList.filter(item => item.uid !== file.uid)]
         setFileList(updatedFileList)
-        onRemoveFileUrl?.(file.url)
     }
 
 
@@ -47,7 +131,6 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
         multiple: false,
         fileList,
         onChange(info) {
-            onFileChange?.(info.fileList[0])
             setFileList(info.fileList)
         },
         beforeUpload(_) {
@@ -58,27 +141,116 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
     };
 
     const handleSubmit = () => {
-        onSubmit?.({
-            file: fileList[0],
-            content
-        } as BoxCommentType)
+        if (editorStateRef.current && editorRef.current) {
+            const nodeContents = (editorStateRef.current?.toJSON().root.children[0] as any).children
+            const mentions = extractContentAndStyle(nodeContents);
 
-        setFileList([])
-        setContent('')
+            onSubmit?.({
+                file: fileList[0],
+                content: JSON.stringify(mentions),
+                mentionUserIds: mentions.map(item => item.id)
+            } as BoxCommentType)
+
+            editorRef.current?.update(() => {
+                const nodeRoot = $getRoot();
+                nodeRoot.clear()
+            })
+
+            setContent('')
+            setFileList([])
+        }
     }
 
-    const handleContentChange = (messageValue: string) => {
-        setContent(messageValue)
-        onContentChange?.(messageValue)
+    const fetchFriendSuggestions = async (fullName: string) => {
+        const response = await friendService.getAllFriendsByFullName(fullName);
+        if (response.isSuccess) {
+            setSuggestedFriends(response.data)
+        }
     }
 
-    useEffect(() => {
-        setContent(value)
-    }, [value])
+    const replaceHighlightUsers = (content: string, mentionFriends: FriendResource[]): string => {
+        mentionFriends.forEach(friend => {
+            content = content.replace(`@${friend.fullName}`, '');
+        });
+        return content;
+    };
 
-    useEffect(() => {
-        setFileList(files)
-    }, [files])
+    const extractLastMention = (text: string): string | null => {
+        const words = text.split(" ");
+
+        for (let i = words.length - 1; i >= 0; i--) {
+            const word = words[i];
+
+            if (word.startsWith("@") && word.length > 1 && word[1] !== " ") {
+                return word.slice(1);
+            }
+        }
+
+        return null;
+    };
+
+
+    const onChange = (editorState: EditorState, editor: LexicalEditor): void => {
+        editorStateRef.current = editorState;
+        editorRef.current = editor;
+
+        editorState.read(() => {
+            const editorRoot = $getRoot();
+            setContent(editorRoot.getTextContent());
+
+            const textBeforeCursor = replaceHighlightUsers(editorRoot.getTextContent(), mentionFriends);
+            const mentionText = extractLastMention(textBeforeCursor);
+            if (mentionText) {
+                if (mentionText.trim().includes(" ")) {
+                    setIsMentioning(false);
+                    return;
+                }
+
+                fetchFriendSuggestions(mentionText);
+                setIsMentioning(true);
+            } else {
+                setIsMentioning(false);
+            }
+        });
+    }
+
+    const handleSelectFriend = (friend: FriendResource) => {
+        if (editorRef.current) {
+            editorRef.current.update(() => {
+                const editorRoot = $getRoot();
+                const selection = $getSelection();
+
+
+                if ($isRangeSelection(selection)) {
+                    // Lấy vị trí con trỏ hiện tại
+
+                    const textBeforeSelection = '@' + extractLastMention(editorRoot.getTextContent());
+                    if (textBeforeSelection) {
+                        selection.getNodes().forEach((node) => {
+                            if (node instanceof TextNode) {
+                                const index = node.getTextContent().lastIndexOf(textBeforeSelection)
+                                const newContent = node.getTextContent().substring(0, index);
+                                node.setTextContent(newContent);
+                            }
+                        });
+
+                    }
+                    const mentionNode = $createTextNode(`${friend.fullName}`);
+                    const newStyle = `content: ${friend.id};background-color: #E0F2FE;color: #0EA5E9;`
+                    mentionNode.setStyle(newStyle);
+                    // Thêm text tại vị trí con trỏ
+
+                    selection.insertNodes([mentionNode]);
+                    const spaceNode = $createTextNode(" ");
+                    selection.insertNodes([spaceNode]);
+
+                }
+            });
+        }
+
+        setIsMentioning(false)
+    }
+
 
     return <div className="flex flex-col items-start gap-y-2">
         <div className="flex items-center gap-x-4 w-full">
@@ -86,7 +258,38 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
 
             <div className={cn("bg-gray-100 px-1 rounded-3xl w-full flex items-center justify-between py-[2px]")}>
 
-                <input value={content} onChange={e => handleContentChange(e.target.value)} className="px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập bình luận" />
+                {initialEditorState &&
+                    <LexicalComposer initialConfig={{
+                        ...editorConfig,
+                        editorState: initialEditorState
+                    }}>
+                        <div className="w-full h-[35px] relative">
+                            <RichTextPlugin
+                                contentEditable={<ContentEditable 
+                                    className="w-full h-full border-none outline-none px-4 z-0"
+                                />}
+                                placeholder={
+                                    <p className="text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
+                                        Nhập bình luận...
+                                    </p>
+                                }
+                                ErrorBoundary={LexicalErrorBoundary}
+                            />
+                            <OnChangePlugin onChange={onChange} />
+                            <HistoryPlugin />
+                        </div>
+                    </LexicalComposer>}
+
+                {isMentioning && (
+                    <div className="absolute top-full z-10 bg-white border p-2 rounded-md shadow-lg mt-1">
+                        {suggestedFriends.map((friend) => (
+                            <div onClick={() => handleSelectFriend(friend)} key={friend.id} className="flex items-center gap-2 p-1 cursor-pointer hover:bg-gray-200">
+                                <Avatar src={friend.avatar} size="small" />
+                                <span>{friend.fullName}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
                 <div className="flex items-center gap-x-2 py-1 px-1">
                     {fileList.length === 0 && <button className="-mb-2">
                         <Upload {...props}>

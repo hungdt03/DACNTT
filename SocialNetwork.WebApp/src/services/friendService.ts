@@ -25,6 +25,10 @@ class FriendService {
     deleteFriend(friendId: string) : Promise<BaseResponse> {
         return axiosInterceptor.delete('/api/friends/'+ friendId)
     }
+
+    getAllFriendsByFullName(fullName: string) : Promise<DataResponse<FriendResource[]>> {
+        return axiosInterceptor.get('/api/friends/fullName?fullName=' + encodeURIComponent(fullName))
+    }
  
 }
 

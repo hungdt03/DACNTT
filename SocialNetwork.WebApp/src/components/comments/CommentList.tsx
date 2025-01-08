@@ -1,12 +1,12 @@
 import { CommentResource } from "../../types/comment";
-import { BoxCommentType } from "./BoxSendComment";
 import { Pagination } from "../../types/response";
 import { CommentItem } from "./CommentItem";
+import { BoxReplyCommentType } from "./BoxReplyComment";
 
 type CommentListProps = {
     comments: CommentResource[];
     pagination: Pagination;
-    replyComment: (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void
+    replyComment: (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void
     onFetchReplies?: (commentId: string) => void;
     updatedComments: (commentId: string, fetchedReplies: CommentResource[]) => void;
     fetchNextPage: (page: number, size: number) => void;

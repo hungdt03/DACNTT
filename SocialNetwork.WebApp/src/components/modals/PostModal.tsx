@@ -6,11 +6,11 @@ import { PostResource } from "../../types/post";
 import BoxSendComment, { BoxCommentType } from "../comments/BoxSendComment";
 import { Pagination } from "../../types/response";
 import { CommentList } from "../comments/CommentList";
-import { Id, toast } from "react-toastify";
 import { imageTypes } from "../../utils/file";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { MediaType } from "../../enums/media";
+import { BoxReplyCommentType } from "../comments/BoxReplyComment";
 
 export type BoxCommendStateType = {
     fileList: UploadFile[];
@@ -27,10 +27,6 @@ const PostModal: FC<PostModalProps> = ({
     const { user } = useSelector(selectAuth)
     const [comments, setComments] = useState<CommentResource[]>([])
     const [pendingComments, setPendingComments] = useState<CommentResource[]>([])
-    const [commentData, setCommentData] = useState<BoxCommendStateType>({
-        content: '',
-        fileList: []
-    })
 
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
@@ -79,11 +75,6 @@ const PostModal: FC<PostModalProps> = ({
         if (response.isSuccess) {
             setPendingComments(prev => prev.filter(cmt => cmt.level === 0 && cmt.sentAt.getTime() !== new Date(response.data.sentAt).getTime()))
             setComments((prevComment) => [response.data, ...prevComment])
-            setCommentData({
-                content: '',
-                fileList: []
-            })
-
             message.success('Tải bình luận thành công')
         } else {
             message.error('Có lỗi xảy ra khi tải bình luận')
@@ -102,7 +93,7 @@ const PostModal: FC<PostModalProps> = ({
         fetchComments(pagination.page, pagination.size)
     }, [post])
 
-    const handleReplyComment = async (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => {
+    const handleReplyComment = async (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => {
         const sentAt = new Date();
 
         const tempReplyComment: CommentResource = {
@@ -125,6 +116,7 @@ const PostModal: FC<PostModalProps> = ({
         formData.append('parentCommentId', parentCommentId as string);
         formData.append('replyToUserId', replyToUserId as string);
         formData.append('sentAt', sentAt.toISOString());
+        values?.mentionUserIds?.forEach(mention => formData.append('mentionUserIds', mention))
 
         if (values?.file?.originFileObj) {
             formData.append('file', values.file.originFileObj, values.file.name);
@@ -212,18 +204,8 @@ const PostModal: FC<PostModalProps> = ({
 
         <div className="shadow p-4 absolute left-0 right-0 bottom-0 bg-white rounded-b-md">
             <BoxSendComment
-                value={commentData.content}
-                onContentChange={(newValue) => setCommentData({
-                    ...commentData,
-                    content: newValue
-                })}
                 onSubmit={handleCreateComment}
                 key={'box-send-comment'}
-                files={commentData.fileList}
-                onFileChange={(file) => setCommentData({
-                    ...commentData,
-                    fileList: [file]
-                })}
             />
         </div>
     </div>

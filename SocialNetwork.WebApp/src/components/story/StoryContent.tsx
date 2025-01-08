@@ -9,22 +9,22 @@ import { Ellipsis, Eye, Pause, Play } from "lucide-react";
 
 type StoryContentProps = {
     story: StoryResource;
-    status: 'play' | 'pause'
+    isPlay: boolean;
     onPause: () => void;
     onPlay: () => void;
 }
 
 const StoryContent: FC<StoryContentProps> = ({
     story,
-    status,
+    isPlay,
     onPause,
     onPlay
 }) => {
-    const [play, setPlay] = useState(true);
 
     useEffect(() => {
-        setPlay(status === 'play')
-    }, [status])
+        console.log('Rerender')
+    }, [])
+ 
     return <div
         className="relative w-full h-full flex items-center justify-center"
         style={{
@@ -41,8 +41,8 @@ const StoryContent: FC<StoryContentProps> = ({
                 </div>
             </div>
 
-            <div className="flex items-center gap-x-2 text-white">
-                {!play ? <Play onClick={onPlay} size={18} /> : <Pause onClick={onPause} size={18} />}
+            <div className="flex items-center gap-x-2 text-white cursor-pointer">
+                {!isPlay ? <Play onClick={onPlay} size={18} /> : <Pause onClick={onPause} size={18} />}
                 <Ellipsis size={18} />
             </div>
         </div>

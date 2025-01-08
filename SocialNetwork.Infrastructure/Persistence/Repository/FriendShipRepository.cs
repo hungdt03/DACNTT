@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity;
 using SocialNetwork.Infrastructure.DBContext;
 
@@ -23,6 +24,20 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public void DeleteFriendShip(FriendShip request)
         {
             _context.FriendShips.Remove(request);
+        }
+
+        public async Task<IEnumerable<FriendShip>> GetAllFriendsByName(string userId, string fullName)
+        {
+            var lowerKey = fullName.ToLower();
+            return await _context.FriendShips
+                .Include(s => s.Friend)
+                .Include(s => s.User)
+                .Where(s => 
+                    s.Status.Equals(FriendShipStatus.ACCEPTED) 
+                    && (s.FriendId == userId ? s.User.FullName.ToLower().Contains(lowerKey) : s.Friend.FullName.ToLower().Contains(lowerKey))
+                )
+                .Distinct()
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<FriendShip>> GetAllFriendShipsAsyncByUserId(string userId, string status = "PENDING")

@@ -12,6 +12,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity;
 
 namespace SocialNetwork.Application.Features.Comment.Handlers
 {
@@ -21,13 +22,15 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly UserManager<Domain.Entity.User> userManager;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly ISignalRService _signalRService;
 
-        public CreateCommentHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.User> userManager, ICloudinaryService cloudinaryService)
+        public CreateCommentHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.User> userManager, ICloudinaryService cloudinaryService, ISignalRService signalRService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             this.userManager = userManager;
             _cloudinaryService = cloudinaryService;
+            _signalRService = signalRService;
         }
 
         public async Task<BaseResponse> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
@@ -64,13 +67,14 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 else throw new AppException("Tập tin không được hỗ trợ");
             }
 
+            Domain.Entity.User replyUser = null;
             if (request.ReplyToUserId != userId && !string.IsNullOrEmpty(request.ReplyToUserId))
             {
-                var user = await userManager.FindByIdAsync(request.ReplyToUserId)
+                replyUser = await userManager.FindByIdAsync(request.ReplyToUserId)
                     ?? throw new AppException("Thông tin người phản hồi không tồn tại");
 
                 comment.ReplyToUserId = request.ReplyToUserId;
-                comment.ReplyToUserName = user.FullName;
+                comment.ReplyToUserName = replyUser.FullName;
 
             }
 
@@ -103,7 +107,69 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             var savedComment = await _unitOfWork.CommentRepository.CreateCommentAsync(comment);
+
+            
+            var notifications = new List<Domain.Entity.Notification>();
+            if(request.MentionUserIds != null && request.MentionUserIds.Count > 0)
+            {
+                var distinctUserIds = request.MentionUserIds.Distinct().ToList();
+
+                foreach (var username in distinctUserIds)
+                {
+                    if (username == request.ReplyToUserName) continue;
+
+                    var user = await userManager.FindByIdAsync(username);
+
+                    if (user == null)
+                        continue;
+
+                    var notification = new Domain.Entity.Notification();
+                    notification.CommentId = savedComment.Id;
+                    notification.RecipientId = user.Id;
+                    notification.Recipient = user;
+                    notification.Title = "Bình luận";
+                    notification.Content = $"{currentUser.FullName} đã nhắc tới bạn trong một bình luận";
+                    notification.IsRead = false;
+                    notification.DateSent = DateTimeOffset.UtcNow;
+                    notification.Type = NotificationType.COMMENT_MENTION;
+                    notification.ImageUrl = currentUser.Avatar;
+
+                    await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+
+                    notifications.Add(notification);
+                }
+            }
+
+            Domain.Entity.Notification notiReplyComment = null;
+            if (replyUser != null)
+            {
+                notiReplyComment = new Domain.Entity.Notification();
+                notiReplyComment.CommentId = savedComment.Id;
+                notiReplyComment.RecipientId = replyUser.Id;
+                notiReplyComment.Title = "Bình luận";
+                notiReplyComment.Content = $"{currentUser.FullName} đã phản hồi bình luận của bạn";
+                notiReplyComment.IsRead = false;
+                notiReplyComment.DateSent = DateTimeOffset.UtcNow;
+                notiReplyComment.Type = NotificationType.COMMENT_MENTION;
+                notiReplyComment.ImageUrl = currentUser.Avatar;
+
+                await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiReplyComment);
+            }
+
+
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            if(replyUser != null && notiReplyComment != null)
+            {
+                var mapNoti = ApplicationMapper.MapToNotification(notiReplyComment);
+                await _signalRService.SendNotificationToSpecificUser(replyUser.UserName, mapNoti);
+            }
+
+            foreach(var notification in notifications)
+            {
+                var mapNoti = ApplicationMapper.MapToNotification(notification);
+                await _signalRService.SendNotificationToSpecificUser(notification.Recipient.UserName, mapNoti);
+            }
 
             var response = ApplicationMapper.MapToComment(savedComment);
             return new DataResponse<CommentResponse>()

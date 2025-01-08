@@ -17,5 +17,6 @@ namespace SocialNetwork.Application.Features.Comment.Commands
         public string? ReplyToUserId { get; set; }
         public string? ReplyToUserName { get; set; }
         public DateTimeOffset SentAt { get; set; }
+        public List<string>? MentionUserIds { get; set; }
     }
 }

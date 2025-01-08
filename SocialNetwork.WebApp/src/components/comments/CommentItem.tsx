@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { CommentResource } from "../../types/comment";
-import { BoxCommentType } from "./BoxSendComment";
 import { Pagination } from "../../types/response";
 import commentService from "../../services/commentService";
 import images from "../../assets";
 import { Avatar, Image } from "antd";
 import cn from "../../utils/cn";
 import { formatTime } from "../../utils/date";
-import BoxReplyComment from "./BoxReplyComment";
+import BoxReplyComment, { BoxReplyCommentType, NodeContent } from "./BoxReplyComment";
 import { MediaType } from "../../enums/media";
-import { BoxCommendStateType } from "../modals/PostModal";
 import { UserResource } from "../../types/user";
+import { Link } from "react-router-dom";
 
 type CommentItemProps = {
     parentComment: CommentResource | null;
@@ -20,11 +19,37 @@ type CommentItemProps = {
     updatePagination?: (page: number, size: number, hasMore: boolean) => void;
     onFetchReplies?: (commentId: string, page: number, size: number) => void;
     updatedComments: (commentId: string, fetchedReplies: CommentResource[]) => void;
-    replyComment: (values: BoxCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void
+    replyComment: (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void
 }
 
+const extractContentFromJSON = (commentJSON: string): JSX.Element => {
+    try {
+        const nodeContents = JSON.parse(commentJSON) as NodeContent[];
 
-
+        return (
+            <>
+                {nodeContents.map((item, index) => {
+                    if (item.id) {
+                        return (
+                            <Link
+                                key={index + item.id} 
+                                to={`/profile/${item.id}`}
+                                style={{ fontWeight: 'bold' }}
+                                className="hover:text-black"
+                            >
+                                {item.content}
+                            </Link>
+                        );
+                    } else {
+                        return <span key={index + item.content}>{item.content || ' '}</span>;
+                    }
+                })}
+            </>
+        );
+    } catch (e) {
+        return <>{commentJSON}</>;
+    }
+};
 export const CommentItem: React.FC<CommentItemProps> = ({
     comment,
     replyComment,
@@ -35,11 +60,6 @@ export const CommentItem: React.FC<CommentItemProps> = ({
 }) => {
     const [isReplying, setIsReplying] = useState(false)
     const [replyToUser, setReplyToUser] = useState<UserResource>(comment.user)
-
-    const [commentData, setCommentData] = useState<BoxCommendStateType>({
-        content: '',
-        fileList: []
-    })
 
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
@@ -56,12 +76,9 @@ export const CommentItem: React.FC<CommentItemProps> = ({
         }
     }
 
-    const handleReplyComment = (values: BoxCommentType, parentCommentId: string | null) => {
+    const handleReplyComment = (values: BoxReplyCommentType, parentCommentId: string | null) => {
         replyComment(values, parentCommentId, replyToUser?.id, level);
-        setCommentData({
-            content: '',
-            fileList: []
-        })
+    
     }
 
     return (
@@ -77,9 +94,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                     <div className={cn("py-2 rounded-2xl flex flex-col items-start", comment.content ? 'bg-gray-100 px-4' : '-mt-1')}>
                         <span className="font-semibold">{comment?.user?.fullName}</span>
                         <p className="text-left">
-                            {comment.replyToUserId && <button className="font-bold rounded-lg text-sm">{comment.replyToUserName}</button>}
-                            <span> </span>
-                            {comment.content}
+                            {extractContentFromJSON(comment.content)}
                         </p>
                     </div>
                     {comment.mediaType === MediaType.IMAGE && comment.mediaUrl && <Image preview={{
@@ -155,17 +170,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                         <>
                             <div className="absolute left-4 w-[28px] -top-[24px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>
                             <div className={cn(level === 3 ? "pl-0" : "pl-4")}>
-                                <BoxReplyComment value={commentData.content}
-                                    onContentChange={(newValue) => setCommentData({
-                                        ...commentData,
-                                        content: newValue
-                                    })}
-                                    replyToUsername={replyToUser?.fullName}
-                                    files={commentData.fileList}
-                                    onFileChange={(file) => setCommentData({
-                                        ...commentData,
-                                        fileList: [file]
-                                    })}
+                                <BoxReplyComment
+                                    replyToUsername={replyToUser}
                                     onSubmit={(values => handleReplyComment(values, comment.id))}
                                 />
                             </div>
@@ -180,17 +186,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 <div className="relative">
                     <div className="absolute left-4 w-[24px] -top-[25px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>
                     <div className={cn(level === 3 ? "pl-0" : "pl-10")}>
-                        <BoxReplyComment value={commentData.content}
-                            onContentChange={(newValue) => setCommentData({
-                                ...commentData,
-                                content: newValue
-                            })}
-                            replyToUsername={replyToUser?.fullName}
-                            files={commentData.fileList}
-                            onFileChange={(file) => setCommentData({
-                                ...commentData,
-                                fileList: [file]
-                            })}
+                        <BoxReplyComment 
+                            replyToUsername={replyToUser}
                             onSubmit={(values => handleReplyComment(values, comment.id))}
                         />
                     </div>

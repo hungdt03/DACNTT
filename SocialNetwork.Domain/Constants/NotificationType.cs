@@ -10,5 +10,6 @@ namespace SocialNetwork.Domain.Constants
         public const string REPLIED_TO_COMMENT = "REPLIED_TO_COMMENT";
         public const string POST_REACTION = "POST_REACTION"; 
         public const string ASSIGN_POST_TAG = "ASSIGN_POST_TAG";
+        public const string COMMENT_MENTION = "COMMENT_MENTION";
     }
 }

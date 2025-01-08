@@ -41,24 +41,12 @@
     border-radius: 1000px;
 }
 
-
-/* Đặt placeholder khi nội dung trống */
-.editable-div:empty::before {
-    content: attr(aria-placeholder); /* Lấy placeholder từ thuộc tính */
-    color: rgb(244, 244, 244); /* Màu placeholder */
-    pointer-events: none; /* Không can thiệp vào sự kiện */
+.highlight {
+    background-color: green;  /* Màu nền nhẹ giống Facebook */
+    color: #1d72b8;  /* Màu chữ khi highlight (màu xanh dương như Facebook) */
+    padding: 0.2em;
+    border-radius: 0.3em;
 }
-
-/* Đảm bảo caret căn giữa */
-.editable-div {
-    display: flex;
-    align-items: center; /* Căn giữa theo chiều dọc */
-    justify-content: center; /* Căn giữa theo chiều ngang */
-    min-height: 1em; /* Tránh collapse nếu không có nội dung */
-    line-height: 1.5; /* Đồng bộ với text */
-}
-
-
 
 @tailwind base;
 @tailwind components;
