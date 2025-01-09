@@ -111,16 +111,20 @@ export type BoxReplyCommentType = {
 
 type BoxReplyCommentProps = {
     replyToUsername?: UserResource;
+    onChange?: (content: string) => void;
+    value?: string;
     onSubmit?: (data: BoxReplyCommentType) => void;
 }
 
 const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     onSubmit,
+    onChange,
+    value,
     replyToUsername,
 }) => {
 
     const [fileList, setFileList] = useState<UploadFile[] | any[]>([]);
-    const [content, setContent] = useState<string>('')
+    const [content, setContent] = useState<string>(value ?? '')
     const { user } = useSelector(selectAuth)
     const [initialEditorState, setInitialEditorState] = useState<string | null>(null);
 
@@ -128,18 +132,36 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     const [mentionFriends, setMentionFriends] = useState<FriendResource[]>([])
     const [isMentioning, setIsMentioning] = useState(false);
     const editorStateRef = useRef<EditorState | null>(null);
-    const editorRef = useRef<LexicalEditor | null>(null)
-
+    const editorRef = useRef<LexicalEditor | null>(null);
 
     useEffect(() => {
+
+        const isContentEmpty = content.trim().length === 0;
+
         if (replyToUsername && user?.id !== replyToUsername.id) {
             const valueEditorState = loadContent(replyToUsername);
-            setInitialEditorState(valueEditorState)
-        } else {
-            const valueEditorState = loadContentEmpty();
-            setInitialEditorState(valueEditorState)
+            if (editorRef.current && isContentEmpty) {
+                editorRef.current.update(() => {
+                    const selection = $getSelection();
+
+                    if ($isRangeSelection(selection)) {
+                        // Tạo mention node
+                        const mentionNode = $createTextNode(`${replyToUsername.fullName}`);
+                        const newStyle = `content: ${replyToUsername.id};background-color: #E0F2FE;color: #0EA5E9;`;
+                        mentionNode.setStyle(newStyle);
+
+                        // Chèn mention node và thêm khoảng trắng
+                        selection.insertNodes([mentionNode, $createTextNode(" ")]);
+                    }
+                });
+            } else {
+                setInitialEditorState(valueEditorState);
+            }
+        } else if(isContentEmpty) {
+            const emptyEditorState = loadContentEmpty();
+            setInitialEditorState(emptyEditorState);
         }
-    }, [replyToUsername])
+    }, [replyToUsername]);
 
     const handleRemoveFile = (file: UploadFile) => {
         const updatedFileList = [...fileList.filter(item => item.uid !== file.uid)]
@@ -211,16 +233,16 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     };
 
 
-    const onChange = (editorState: EditorState, editor: LexicalEditor): void => {
+    const handleEditorChange = (editorState: EditorState, editor: LexicalEditor): void => {
         editorStateRef.current = editorState;
         editorRef.current = editor;
 
         editorState.read(() => {
             const editorRoot = $getRoot();
             setContent(editorRoot.getTextContent());
-
-            const textBeforeCursor = replaceHighlightUsers(editorRoot.getTextContent(), mentionFriends);
-            const mentionText = extractLastMention(textBeforeCursor);
+            onChange?.(editorRoot.getTextContent())
+            // const textBeforeCursor = replaceHighlightUsers(editorRoot.getTextContent(), mentionFriends);
+            const mentionText = extractLastMention(editorRoot.getTextContent());
             if (mentionText) {
                 if (mentionText.trim().includes(" ")) {
                     setIsMentioning(false);
@@ -240,7 +262,6 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
             editorRef.current.update(() => {
                 const editorRoot = $getRoot();
                 const selection = $getSelection();
-
 
                 if ($isRangeSelection(selection)) {
                     // Lấy vị trí con trỏ hiện tại
@@ -276,28 +297,27 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
         <div className="flex items-center gap-x-2 w-full">
             <Avatar size='small' className="flex-shrink-0" src={user?.avatar ?? images.user} />
             <div className={cn("relative bg-gray-100 px-1 rounded-3xl w-full flex items-center justify-between py-[2px]")}>
-                {initialEditorState &&
-                    <LexicalComposer initialConfig={{
-                        ...editorConfig,
-                        editorState: initialEditorState
-                    }}>
-                        <div className="w-full h-[35px] relative">
-                            <RichTextPlugin
-                                contentEditable={<ContentEditable className="w-full h-full border-none outline-none px-4 z-0" />}
-                                placeholder={
-                                    <p className="text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
-                                        Nhập bình luận...
-                                    </p>
-                                }
-                                ErrorBoundary={LexicalErrorBoundary}
-                            />
-                            <OnChangePlugin onChange={onChange} />
-                            <HistoryPlugin />
-                        </div>
-                    </LexicalComposer>}
+                {initialEditorState && <LexicalComposer initialConfig={{
+                    ...editorConfig,
+                    editorState: initialEditorState
+                }}>
+                    <div className="w-full h-full min-h-[35px] relative">
+                        <RichTextPlugin
+                            contentEditable={<ContentEditable className="w-full min-h-[30px] border-none outline-none px-4 z-0" />}
+                            placeholder={
+                                <p className="text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
+                                    Nhập bình luận...
+                                </p>
+                            }
+                            ErrorBoundary={LexicalErrorBoundary}
+                        />
+                        <OnChangePlugin onChange={handleEditorChange} />
+                        <HistoryPlugin />
+                    </div>
+                </LexicalComposer>}
 
                 {isMentioning && (
-                    <div className="absolute top-full z-10 bg-white border p-2 rounded-md shadow-lg mt-1">
+                    <div className="absolute top-full z-50 bg-white border p-2 rounded-md shadow-lg mt-1">
                         {suggestedFriends.map((friend) => (
                             <div onClick={() => handleSelectFriend(friend)} key={friend.id} className="flex items-center gap-2 p-1 cursor-pointer hover:bg-gray-200">
                                 <Avatar src={friend.avatar} size="small" />

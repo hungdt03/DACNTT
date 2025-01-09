@@ -45,6 +45,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IStoryRepository, StoryRepository>();
             services.AddScoped<IMessageReadStatusRepository, MessageReadStatusRepository>();
+            services.AddScoped<IViewerRepository, ViewerRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>

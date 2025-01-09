@@ -57,6 +57,7 @@ const PostModal: FC<PostModalProps> = ({
 
         formData.append('sentAt', sentAt.toISOString())
         formData.append('postId', post.id);
+        values?.mentionUserIds?.forEach(mention => formData.append('mentionUserIds', mention))
 
         if (values?.file?.originFileObj) {
             const isImage = imageTypes.includes(values.file.type as string) || (values.file.type as string).includes("image/")

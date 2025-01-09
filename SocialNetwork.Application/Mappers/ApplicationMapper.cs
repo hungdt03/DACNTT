@@ -139,6 +139,31 @@ namespace SocialNetwork.Application.Mappers
             };
         }
 
+        public static MyStoryResponse MapToMyStory(Story story, List<ViewerResponse> viewers)
+        {
+            return new MyStoryResponse
+            {
+                Id = story.Id,
+                Background = story.Background,
+                User = story.User != null ? MapToUser(story.User) : null,
+                Content = story.Content,
+                FontFamily = story.FontFamily,
+                Privacy = story.Privacy,
+                Type = story.Type,
+                CreatedDate = story.DateCreated,
+                Viewers = viewers
+            };
+        }
+
+        public static ViewerResponse MapToViewerResponse(Viewer viewer, List<string> reactions)
+        {
+            return new ViewerResponse()
+            {
+                User = viewer.User != null ? ApplicationMapper.MapToUser(viewer.User) : null,
+                Reactions = reactions
+            };
+        }
+
         public static ReactionResponse MapToReaction(Reaction reaction)
         {
             return new ReactionResponse

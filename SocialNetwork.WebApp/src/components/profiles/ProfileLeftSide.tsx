@@ -18,7 +18,7 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
 
     const fetchFriends = async () => {
         const response = await friendService.getTopSixOfUserFriends(user.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             console.log(response)
             setFriends(response.data)
         }
@@ -65,13 +65,16 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
                 {/* <Link className="text-primary" to="/friends">Xem tất cả bạn bè</Link> */}
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
+            {friends.length === 0 ? <div className="w-full h-full flex items-center justify-center py-2">
+                <span className="italic text-sm">Chưa có bạn bè nào</span>
+            </div> : <div className="grid grid-cols-3 gap-2">
                 {friends.map(friend => <div className="flex flex-col items-start gap-1" key={friend.id}>
                     <Image preview={false} src={friend.avatar ?? images.cover} className="border-[1px] border-primary rounded-md" />
                     <Link to={`/profile/${friend.id}`} className="text-sm font-semibold line-clamp-1">{friend.fullName}</Link>
                     <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>
                 </div>)}
             </div>
+            }
 
             <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button>
         </div>

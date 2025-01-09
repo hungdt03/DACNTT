@@ -263,10 +263,10 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
                         ...editorConfig,
                         editorState: initialEditorState
                     }}>
-                        <div className="w-full h-[35px] relative">
+                        <div className="w-full relative">
                             <RichTextPlugin
                                 contentEditable={<ContentEditable 
-                                    className="w-full h-full border-none outline-none px-4 z-0"
+                                    className="w-full min-h-[30px] border-none outline-none px-4 z-0"
                                 />}
                                 placeholder={
                                     <p className="text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
@@ -280,7 +280,7 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
                         </div>
                     </LexicalComposer>}
 
-                {isMentioning && (
+                {isMentioning && suggestedFriends.length > 0 && (
                     <div className="absolute top-full z-10 bg-white border p-2 rounded-md shadow-lg mt-1">
                         {suggestedFriends.map((friend) => (
                             <div onClick={() => handleSelectFriend(friend)} key={friend.id} className="flex items-center gap-2 p-1 cursor-pointer hover:bg-gray-200">

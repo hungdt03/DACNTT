@@ -21,6 +21,8 @@ namespace SocialNetwork.Domain.Entity
         public Comment Comment { get; set; }
         public Guid? FriendRequestId { get; set; }
         public FriendShip FriendRequest { get; set; }
+        public Guid? StoryId { get; set; }
+        public Story Story { get; set; }
 
         // Thời gian gửi thông báo
         public DateTimeOffset DateSent { get; set; }

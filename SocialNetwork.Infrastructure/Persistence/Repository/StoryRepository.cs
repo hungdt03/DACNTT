@@ -27,5 +27,21 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .OrderByDescending(s => s.DateCreated)
                 .ToListAsync();
         }
+
+        public async Task<ICollection<Story>> GetAllStoriesByUserIdAsync(string userId)
+        {
+            return await _context.Stories
+                 .Include(s => s.User)
+                 .Where(s => s.ExpiresAt > DateTimeOffset.UtcNow && s.UserId == userId)
+                 .OrderByDescending(s => s.DateCreated)
+                 .ToListAsync(); ;
+        }
+
+        public async Task<Story?> GetStoryByIdAsync(Guid id)
+        {
+            return await _context.Stories
+                .Include(s => s.User)
+                .SingleOrDefaultAsync(s => s.Id == id);
+        }
     }
 }

@@ -48,6 +48,7 @@ namespace SocialNetwork.Infrastructure.DBContext
         public DbSet<MessageReadStatus> MessageReadStatuses { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Story> Stories { get; set; }
+        public DbSet<Viewer> Viewers { get; set; }
 
     }
 

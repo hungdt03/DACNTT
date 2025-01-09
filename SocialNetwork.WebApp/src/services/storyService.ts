@@ -1,9 +1,10 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { StoryRequest } from '../pages/CreateStoryPage';
+import { MyStoryUserResource } from '../types/myStory';
 import { BaseResponse, DataResponse } from '../types/response';
-import { StoryResource } from '../types/story';
 import { UserStoryResource } from '../types/userStory';
+import { ViewerResource } from '../types/viewer';
 
 
 class StoryService {
@@ -23,6 +24,18 @@ class StoryService {
 
     createStory(payload: StoryRequest) : Promise<BaseResponse> {
         return axiosInterceptor.post('/api/stories', payload)
+    }
+
+    viewStory(storyId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/stories/view/' + storyId)
+    }
+
+    reactToStory(payload: ReactStory) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/stories/react', payload);
+    }
+
+    getMyStoryViews(storyId: string) : Promise<DataResponse<ViewerResource[]>> {
+        return axiosInterceptor.get('/api/stories/viewers/' + storyId)
     }
 }
 

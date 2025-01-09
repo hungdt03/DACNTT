@@ -59,7 +59,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     onReply
 }) => {
     const [isReplying, setIsReplying] = useState(false)
-    const [replyToUser, setReplyToUser] = useState<UserResource>(comment.user)
+    const [replyToUser, setReplyToUser] = useState<UserResource>(comment.user);
+    const [content, setContent] = useState<string>('')
 
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
@@ -93,7 +94,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 <div className="flex flex-col gap-y-2">
                     <div className={cn("py-2 rounded-2xl flex flex-col items-start", comment.content ? 'bg-gray-100 px-4' : '-mt-1')}>
                         <span className="font-semibold">{comment?.user?.fullName}</span>
-                        <p className="text-left">
+                        <p className="text-left overflow-hidden break-words break-words break-all">
                             {extractContentFromJSON(comment.content)}
                         </p>
                     </div>
@@ -120,7 +121,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                             onClick={() => {
                                 setIsReplying(true)
                                 if (level <= 2) {
-                                    setReplyToUser(comment.user)
+                                    const userJson = JSON.stringify(comment.user);
+                                    setReplyToUser(JSON.parse(userJson))
                                 } else {
                                     onReply?.(comment)
                                 }
@@ -157,7 +159,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                             level={level + 1}
                             onReply={(comment) => {
                                 if (level + 1 > 2) {
-                                    setReplyToUser(comment.user)
+                                    const userJson = JSON.stringify(comment.user);
+                                    setReplyToUser(JSON.parse(userJson))
                                 }
                             }}
                         />
@@ -171,6 +174,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                             <div className="absolute left-4 w-[28px] -top-[24px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>
                             <div className={cn(level === 3 ? "pl-0" : "pl-4")}>
                                 <BoxReplyComment
+                                    value={content}
+                                    onChange={(newValue) => setContent(newValue)}
                                     replyToUsername={replyToUser}
                                     onSubmit={(values => handleReplyComment(values, comment.id))}
                                 />

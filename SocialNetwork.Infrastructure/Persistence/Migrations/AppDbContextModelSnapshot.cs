@@ -479,6 +479,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<Guid?>("StoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -496,6 +499,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("PostId");
 
                     b.HasIndex("RecipientId");
+
+                    b.HasIndex("StoryId");
 
                     b.ToTable("Notifications");
                 });
@@ -665,10 +670,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("FontFamily")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Privacy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -809,7 +817,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Reaction")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("StoryId")
@@ -825,7 +832,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Viewer");
+                    b.ToTable("Viewers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1029,6 +1036,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("SocialNetwork.Domain.Entity.Story", "Story")
+                        .WithMany()
+                        .HasForeignKey("StoryId");
+
                     b.Navigation("Comment");
 
                     b.Navigation("FriendRequest");
@@ -1036,6 +1047,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Post");
 
                     b.Navigation("Recipient");
+
+                    b.Navigation("Story");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Post", b =>

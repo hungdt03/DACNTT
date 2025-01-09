@@ -30,8 +30,7 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
 
             foreach (var friend in myFriends)
             {
-                var friendItem = friend.FriendId == userId ? friend.User : friend.Friend;
-                var resource = ApplicationMapper.MapToFriend(friendItem);
+                var resource = ApplicationMapper.MapToFriend(friend);
                 response.Add(resource);
             }
 

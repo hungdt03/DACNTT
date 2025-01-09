@@ -298,10 +298,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Background = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FontFamily = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FontFamily = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ExpiresAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Privacy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
@@ -486,27 +487,27 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Viewer",
+                name: "Viewers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Reaction = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Reaction = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Viewer", x => x.Id);
+                    table.PrimaryKey("PK_Viewers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Viewer_AspNetUsers_UserId",
+                        name: "FK_Viewers_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Viewer_Stories_StoryId",
+                        name: "FK_Viewers_Stories_StoryId",
                         column: x => x.StoryId,
                         principalTable: "Stories",
                         principalColumn: "Id");
@@ -577,6 +578,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     FriendRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DateSent = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
@@ -603,6 +605,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         name: "FK_Notifications_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Stories_StoryId",
+                        column: x => x.StoryId,
+                        principalTable: "Stories",
                         principalColumn: "Id");
                 });
 
@@ -736,6 +743,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "RecipientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notifications_StoryId",
+                table: "Notifications",
+                column: "StoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PostMedias_PostId",
                 table: "PostMedias",
                 column: "PostId");
@@ -786,13 +798,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Viewer_StoryId",
-                table: "Viewer",
+                name: "IX_Viewers_StoryId",
+                table: "Viewers",
                 column: "StoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Viewer_UserId",
-                table: "Viewer",
+                name: "IX_Viewers_UserId",
+                table: "Viewers",
                 column: "UserId");
         }
 
@@ -842,7 +854,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "Tags");
 
             migrationBuilder.DropTable(
-                name: "Viewer");
+                name: "Viewers");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
