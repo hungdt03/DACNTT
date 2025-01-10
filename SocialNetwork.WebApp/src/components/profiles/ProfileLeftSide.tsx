@@ -1,32 +1,22 @@
 import { Image } from "antd";
 import { Home, LocateIcon, School, Wifi } from "lucide-react";
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import images from "../../assets";
 import { FriendResource } from "../../types/friend";
-import friendService from "../../services/friendService";
-import { UserResource } from "../../types/user";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
 
 type ProfileLeftSideProps = {
-    user: UserResource
+    friends: FriendResource[]
 }
 
 const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
-    user
+    friends
 }) => {
-    const [friends, setFriends] = useState<FriendResource[]>([])
 
-    const fetchFriends = async () => {
-        const response = await friendService.getTopSixOfUserFriends(user.id);
-        if (response.isSuccess) {
-            console.log(response)
-            setFriends(response.data)
-        }
-    }
-
-    useEffect(() => {
-        fetchFriends()
-    }, [user])
+    const { user } = useSelector(selectAuth)
+    
     return <div className="flex flex-col h-full lg:overflow-y-auto lg:scrollbar-hide gap-y-4 py-4 col-span-12 lg:col-span-4">
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-2">
             <span className="font-bold text-lg text-gray-700">Giới thiệu</span>
@@ -62,7 +52,7 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
             <div className="flex items-center justify-between">
                 <span className="font-bold text-lg text-gray-700">Bạn bè</span>
-                {/* <Link className="text-primary" to="/friends">Xem tất cả bạn bè</Link> */}
+                <Link className="text-primary" to="/friends">Xem tất cả bạn bè</Link>
             </div>
 
             {friends.length === 0 ? <div className="w-full h-full flex items-center justify-center py-2">
@@ -71,12 +61,12 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
                 {friends.map(friend => <div className="flex flex-col items-start gap-1" key={friend.id}>
                     <Image preview={false} src={friend.avatar ?? images.cover} className="border-[1px] border-primary rounded-md" />
                     <Link to={`/profile/${friend.id}`} className="text-sm font-semibold line-clamp-1">{friend.fullName}</Link>
-                    <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>
+                    {user?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}
                 </div>)}
             </div>
             }
 
-            <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button>
+            {/* <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button> */}
         </div>
 
     </div>

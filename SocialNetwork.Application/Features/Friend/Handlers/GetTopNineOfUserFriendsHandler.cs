@@ -8,22 +8,21 @@ using SocialNetwork.Application.Features.Friend.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using System.Linq;
 
 namespace SocialNetwork.Application.Features.Friend.Handlers
 {
-    public class GetTopSixMutualFriendsHandler : IRequestHandler<GetTopSixMutualFriendsQuery, BaseResponse>
+    public class GetTopNineOfUserFriendsHandler : IRequestHandler<GetTopNineOfUserFriendsQuery, BaseResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
 
-        public GetTopSixMutualFriendsHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public GetTopNineOfUserFriendsHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
         }
 
-        public async Task<BaseResponse> Handle(GetTopSixMutualFriendsQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResponse> Handle(GetTopNineOfUserFriendsQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
             var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(request.UserId, FriendShipStatus.ACCEPTED);
@@ -36,7 +35,7 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
             {
                 var friendItem = friend.FriendId == request.UserId ? friend.User : friend.Friend;
 
-                if (friendItem.Id == userId) continue;
+                //if (friendItem.Id == userId) continue;
 
                 var friendsOfTemp = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(friendItem.Id, FriendShipStatus.ACCEPTED);
                 var mutualFriendsCount = friendsOfTemp.Count(f => myFriendsIds.Contains(f.UserId == friendItem.Id ? f.FriendId : f.UserId));
@@ -48,7 +47,7 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
 
             var topSixFriends = response
                 .OrderByDescending(r => r.MutualFriends)
-                .Take(6)
+                .Take(9)
                 .ToList();
 
             return new DataResponse<List<FriendResponse>>

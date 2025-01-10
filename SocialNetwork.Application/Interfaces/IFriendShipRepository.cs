@@ -12,6 +12,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<IEnumerable<User>> GetAllFriendsByName(string userId, string fullName);
         Task<FriendShip?> GetFriendShipByUserIdAndFriendIdAsync(string userId, string friendId, string status = "");
         Task<IEnumerable<FriendShip>> GetAllFriendShipsAsyncByUserId(string userId, string status = "");
-     
+        Task<int> CountFriendsByUserIdAsync(string userId);
     }
 }

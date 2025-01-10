@@ -1,12 +1,28 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useMemo } from "react";
 import { StoryResource } from "../../types/story";
 import { StoryType } from "../../enums/story-type.";
 import { formatTime } from "../../utils/date";
-import { Ellipsis, Eye, Pause, Play } from "lucide-react";
+import {  Ellipsis, Eye, Pause, Play } from "lucide-react";
 import images from "../../assets";
-import { Avatar, Divider } from "antd";
+import { Avatar, Badge, Divider } from "antd";
 import { CloseOutlined } from '@ant-design/icons'
 import { ViewerResource } from "../../types/viewer";
+import cn from "../../utils/cn";
+import { ReactionSvgType, svgReaction } from "../../assets/svg";
+
+export const getTopReactions = (reactions?: string[], top: number = 3) => {
+    const counts = reactions?.reduce((acc, reaction) => {
+        acc[reaction] = (acc[reaction] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    return counts
+        ? Object.entries(counts)
+            .sort(([, countA], [, countB]) => countB - countA)
+            .slice(0, top) // Lấy top N
+            .map(([reactionType, count]) => ({ reactionType, count }))
+        : [];
+};
 
 type StoryContentProps = {
     story: StoryResource;
@@ -27,10 +43,6 @@ const StoryContent: FC<StoryContentProps> = ({
     onClose,
     viewers
 }) => {
-
-    useEffect(() => {
-        console.log('Rerender')
-    }, [])
 
     return <div
         className="relative w-full h-full flex items-center justify-center"
@@ -59,7 +71,7 @@ const StoryContent: FC<StoryContentProps> = ({
             {story?.content}
         </p>
 
-        {collapse && <div className="z-[2000] absolute top-0 left-0 right-0 bottom-0">
+        <div className={cn("z-[2000] absolute left-0 right-0 bottom-0 transition-all ease-linear duration-1000", collapse ? 'top-0' : 'top-full')}>
             <div className="w-full h-[70px] bg-black bg-opacity-45">
             </div>
             <div className="w-full h-full bg-white rounded-t-xl shadow-lg p-4">
@@ -89,27 +101,38 @@ const StoryContent: FC<StoryContentProps> = ({
                         <span className="font-bold text-sm text-[16px] text-gray-600">
                             {viewers.length > 0 ? `${viewers.length} người xem` : 'Chưa có người xem'}
                         </span>
+
                     </div>
                     <p className="text-gray-500 text-sm">Thông tin chi tiết về những người xem tin của bạn sẽ hiển thị ở đây.</p>
 
-                    <div className="flex flex-col gap-y-1">
-                        {viewers.map(viewer => <div key={viewer.user.id} className="flex items-center gap-x-3">
-                            <div className="relative">
-                                <Avatar size='large' src={viewer.user.avatar ?? images.user} />
-                               {viewer.user.isOnline && <div className="absolute right-0 bottom-0 w-3 h-3 rounded-full bg-green-500 border-[2px] border-white"></div>}
+                    <div className="flex flex-col gap-y-2">
+                        {viewers.map(viewer => <div key={viewer.user.id} className="flex items-center justify-between">
+                            <div className="flex items-center gap-x-2">
+                                <div className="relative">
+                                    <Avatar size='default' src={viewer.user.avatar ?? images.user} />
+                                    {viewer.user.isOnline && <div className="absolute right-0 bottom-0 w-3 h-3 rounded-full bg-green-500 border-[2px] border-white"></div>}
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-xs">{viewer.user.fullName}</span>
+                                    <span className="text-xs text-gray-500">{
+                                        viewer.user.isOnline ? 'Đang hoạt động' : `Hoạt động mấy phút trước`
+                                    }</span>
+                                </div>
                             </div>
-                            <div className="flex flex-col">
-                                <span className="font-semibold text-sm">{viewer.user.fullName}</span>
-                                <span className="text-xs text-gray-500">{
-                                    viewer.user.isOnline ? 'Đang hoạt động' : `Hoạt động mấy phút trước`
-                                }</span>
-                            </div>
+
+                            <Avatar.Group>
+                                {getTopReactions(viewer.reactions, 3).map(reaction => 
+                                    <Badge count={reaction.count} key={reaction.reactionType}>
+                                        <img width={14} height={14} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="mx-[5px]" />
+                                    </Badge>
+                                )}
+                            </Avatar.Group>
                         </div>)}
 
                     </div>
                 </div>
             </div>
-        </div>}
+        </div>
     </div>
 };
 

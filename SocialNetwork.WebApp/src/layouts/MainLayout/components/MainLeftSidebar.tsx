@@ -12,8 +12,8 @@ const MainLeftSidebar: FC = () => {
         <div className="bg-white flex flex-col shadow rounded-md">
             <div className="flex flex-col gap-y-3 items-center">
                 <div className="w-full flex flex-col items-center">
-                    <img alt="Ảnh bìa" className="w-full h-[100px] object-cover" src={images.cover} />
-                    <img alt="Avatar" className="h-[50px] -mt-[25px] rounded-full" src={user?.avatar ?? images.user} />
+                    <img alt="Ảnh bìa" className="w-full h-[100px] object-cover" src={user?.coverImage ?? images.cover} />
+                    <img alt="Avatar" className="h-[50px] w-[50px] -mt-[25px] object-cover flex-shrink-0 rounded-full" src={user?.avatar ?? images.user} />
                 </div>
                 <div className="flex flex-col items-center">
                     <span className="font-bold text-[17px]">{user?.fullName}</span>
@@ -23,8 +23,8 @@ const MainLeftSidebar: FC = () => {
             <div className="p-4 w-full">
                 <div className="flex items-center justify-between w-full">
                     <div className="flex flex-col items-center">
-                        <span className="text-sm font-semibold">{user?.postCount}</span>
-                        <span className="text-xs text-gray-400">số bài viết</span>
+                        <span className="text-sm font-semibold">{user?.friendCount}</span>
+                        <span className="text-xs text-gray-400">bạn bè</span>
                     </div>
                     <Divider className="h-10 text-gray-500" type="vertical" />
                     <div className="flex flex-col items-center">

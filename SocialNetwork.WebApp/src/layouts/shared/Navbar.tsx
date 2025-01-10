@@ -83,7 +83,7 @@ const Navbar: FC = () => {
             </Popover>
         </Badge>
         <Badge count={3}>
-            <Popover trigger='click' content={<MessengerDialog />}>
+            <Popover trigger='click' placement="bottomRight" content={<MessengerDialog />}>
                 <button className="p-3 rounded-md bg-gray-100">
                     <MessageSquare className="text-gray-500" size={18} />
                 </button>
@@ -92,7 +92,7 @@ const Navbar: FC = () => {
         <Popover trigger='click' placement="bottomRight" content={<AccountDialog />}>
             <div className="relative">
                 <button className="border-[1px] border-gray-300 rounded-full overflow-hidden">
-                    <img width='36px' height='36px' src={user?.avatar ?? images.user} />
+                    <img className='object-cover w-[38px] h-[38px]' src={user?.avatar ?? images.user} />
                 </button>
                 <button className="absolute right-0 bottom-0 p-[1px] rounded-full border-[1px] bg-gray-50 border-gray-200">
                     <ChevronDown className="text-gray-500 font-bold" size={14} />

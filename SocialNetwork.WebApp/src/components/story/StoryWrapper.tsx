@@ -42,8 +42,26 @@ const StoryWrapper: FC = () => {
         <div className="relative w-full h-[200px]">
             <Swiper
                 modules={[Navigation]}
-                slidesPerView={4.75}
+                slidesPerView={4.75} // Mặc định cho desktop
                 spaceBetween={8}
+                breakpoints={{
+                    1024: { // Laptop
+                        slidesPerView: 4.75,
+                        spaceBetween: 8,
+                    },
+                    768: { // Tablet
+                        slidesPerView: 4.75,
+                        spaceBetween: 8,
+                    },
+                    480: { // Mobile
+                        slidesPerView: 4.75,
+                        spaceBetween: 8,
+                    },
+                    300: { // Mobile
+                        slidesPerView: 2.75,
+                        spaceBetween: 8,
+                    },
+                }}
                 onSlideChange={(swiper) => setShowPrev(swiper.isBeginning === false)}
                 navigation={{
                     nextEl: nextRef.current,

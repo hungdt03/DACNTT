@@ -34,7 +34,7 @@ namespace SocialNetwork.Application.Features.Story.Handlers
             if (story.ExpiresAt < DateTimeOffset.UtcNow)
                 throw new AppException("Tin không còn nữa");
 
-            if (ReactionType.IsValidReactionType(request.ReactionType))
+            if (!ReactionType.IsValidReactionType(request.ReactionType))
                 throw new AppException("Cảm xúc không hợp lệ");
 
             var userId = _contextAccessor.HttpContext.User.GetUserId();
@@ -63,6 +63,8 @@ namespace SocialNetwork.Application.Features.Story.Handlers
             notification.ImageUrl = avatar;
             notification.IsRead = false;
             notification.Type = NotificationType.REACT_STORY;
+
+            await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

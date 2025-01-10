@@ -36,43 +36,43 @@ export const getPrivacyPost = (privacy: PrivacyType): ReactNode => {
 
 export const getBtnReaction = (reactionType: ReactionType | 'UNKNOWN', handleSaveReaction: (reactionType: ReactionType) => void): ReactNode => {
     if (reactionType === ReactionType.LIKE) {
-        return <button onClick={() => handleSaveReaction(ReactionType.LIKE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+        return <button onClick={() => handleSaveReaction(ReactionType.LIKE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
             <img alt="like" src={svgReaction.like} className="w-4 h-4 hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
             <span className="text-primary">Thích</span>
         </button>
     } else if (reactionType === ReactionType.LOVE) {
-        return <button onClick={() => handleSaveReaction(ReactionType.LOVE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+        return <button onClick={() => handleSaveReaction(ReactionType.LOVE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
             <img alt="like" src={svgReaction.love} className="w-4 h-4 hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
             <span className="text-red-600">Yêu thích</span>
         </button>
     } else if (reactionType === ReactionType.CARE) {
-        return <button onClick={() => handleSaveReaction(ReactionType.CARE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+        return <button onClick={() => handleSaveReaction(ReactionType.CARE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
             <img alt="like" src={svgReaction.care} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
             <span className="text-yellow-500">Thương thương</span>
         </button>
     } else if (reactionType === ReactionType.SAD) {
-        return <button onClick={() => handleSaveReaction(ReactionType.SAD)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+        return <button onClick={() => handleSaveReaction(ReactionType.SAD)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
             <img alt="like" src={svgReaction.sad} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
             <span className="text-yellow-500">Buồn</span>
         </button>
     } else if (reactionType === ReactionType.HAHA) {
-        return <button onClick={() => handleSaveReaction(ReactionType.HAHA)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+        return <button onClick={() => handleSaveReaction(ReactionType.HAHA)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
             <img alt="like" src={svgReaction.haha} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
             <span className="text-yellow-500">Haha</span>
         </button>
     } else if (reactionType === ReactionType.WOW) {
-        return <button onClick={() => handleSaveReaction(ReactionType.WOW)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+        return <button onClick={() => handleSaveReaction(ReactionType.WOW)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
             <img alt="like" src={svgReaction.wow} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
             <span className="text-orange-500">Wow</span>
         </button>
     } else if (reactionType === ReactionType.ANGRY) {
-        return <button onClick={() => handleSaveReaction(ReactionType.ANGRY)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+        return <button onClick={() => handleSaveReaction(ReactionType.ANGRY)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
             <img alt="like" src={svgReaction.angry} className="w-4 h-4 object-contain hover:scale-105 hover:-translate-y-1 transition-all ease-linear duration-200 cursor-pointer" />
             <span className="text-orange-600">Phẫn nộ</span>
         </button>
     }
 
-    return <button  onClick={() => handleSaveReaction(ReactionType.LIKE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+    return <button  onClick={() => handleSaveReaction(ReactionType.LIKE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
         <HandThumbUpIcon width={20} />
         <span>Thích</span>
     </button>

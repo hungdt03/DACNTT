@@ -4,6 +4,7 @@ import images from "../../assets";
 import { StoryType } from "../../enums/story-type.";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
+import cn from "../../utils/cn";
 
 type StoryItemProps = {
     story: UserStoryResource;
@@ -42,7 +43,7 @@ const StoryItem: FC<StoryItemProps> = ({
             </div>
 
             <div className="absolute top-4 left-4 z-10">
-                <img className="rounded-full border-[3px] border-blue-500" width='40px' height='40px' src={story.user.avatar ?? images.user} />
+                <img className={cn("rounded-full border-[4px]", story.haveSeen ? 'border-white' : 'border-blue-600')} width='40px' height='40px' src={story.user.avatar ?? images.user} />
             </div>
 
             <div className="absolute left-0 bottom-0 right-0 py-2 px-2">

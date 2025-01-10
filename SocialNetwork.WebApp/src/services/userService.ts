@@ -18,6 +18,14 @@ class UserService {
     getUserById(userId: string) : Promise<DataResponse<UserResource>> {
         return axiosInterceptor.get('/api/users/' + userId)
     }
+
+    uploadAvatar(formData: FormData) : Promise<DataResponse<UserResource>> {
+        return axiosInterceptor.put('/api/users/avatar', formData);
+    }
+
+    uploadCoverImage(formData: FormData) : Promise<DataResponse<UserResource>> {
+        return axiosInterceptor.put('/api/users/coverImage', formData);
+    }
 }
 
 export default UserService.getInstance();

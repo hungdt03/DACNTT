@@ -24,7 +24,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         <span className="font-semibold text-lg">Thông báo của bạn</span>
         <div className="flex flex-col gap-y-2">
             {notifications.map(notification => <Notification onDelete={() => onDelete?.(notification.id)} onMarkAsRead={() => onMarkAsRead?.(notification.id)} key={notification.id} notification={notification} />)}
-            {pagination.hasMore && <Button onClick={() => onFetchMore(pagination.page + 1)} type="primary">Tải thêm</Button>}
+            {pagination.hasMore && <button className="w-full text-center text-primary" onClick={() => onFetchMore(pagination.page + 1)}>Tải thêm</button>}
             {notifications.length === 0 && <Empty description='Chưa có thông báo nào' />}
         </div>
     </div>

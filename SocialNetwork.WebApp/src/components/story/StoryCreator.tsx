@@ -14,7 +14,7 @@ const StoryCreator: FC = () => {
                     background: 'linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0))'
                 }}
             />
-            <img className="h-full object-cover" height='100%' src={user?.avatar} />
+            <img className="w-full h-full object-cover" height='100%' src={user?.avatar} />
         </div>
         <div className="h-[25%] bg-white relative flex items-center justify-center">
             <button className="absolute -top-1/2 left-1/2 -translate-x-1/2 bg-blue-500 text-white p-[6px] rounded-full border-[4px] border-white">

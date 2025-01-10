@@ -9,6 +9,7 @@ namespace SocialNetwork.Application.DTOs
         public string Email { get; set; }
         public string Bio {  get; set; }
         public string Avatar { get; set; }
+        public string CoverImage { get; set; }
         public int PostCount { get; set; }
         public int FollowerCount { get; set; }  
         public int FollowingCount { get; set; }

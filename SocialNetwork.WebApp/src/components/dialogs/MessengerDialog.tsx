@@ -83,7 +83,7 @@ const MessengerDialog: FC = () => {
     }
 
     return <>
-        <div className="flex flex-col gap-y-3 w-[330px]">
+        <div className="flex flex-col gap-y-3 w-[380px]">
             <div className="flex items-center justify-between">
                 <span className="font-semibold text-gray-500 px-1 text-lg">Đoạn chat</span>
 

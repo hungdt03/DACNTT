@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout/MainLayout";
-import Feeds from "../pages/Feeds";
+import HomePage from "../pages/Feeds";
 import GroupPage from "../pages/GroupPage";
 import HeaderOnlyLayout from "../layouts/HeaderOnlyLayout/HeaderOnlyLayout";
 import ProfilePage from "../pages/ProfilePage";
@@ -24,7 +24,7 @@ const appRouter = createBrowserRouter([
         children: [
             {
                 path: '',
-                element: <Feeds />
+                element: <HomePage />
             },
         ]
     },

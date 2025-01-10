@@ -43,6 +43,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.Viewers.SingleOrDefaultAsync(viewer => viewer.Id == viewerId);
         }
 
+        public async Task<bool> IsAnViewersByStoryId(Guid storyId)
+        {
+            return await _context.Viewers.AnyAsync(v => v.StoryId == storyId);
+        }
+
+        public async Task<bool> IsAnViewersByStoryIdAndUserIdAsync(Guid storyId, string userId)
+        {
+            return await _context.Viewers.AnyAsync(v => v.StoryId == storyId && v.UserId == userId);
+        }
+
         public async Task<bool> IsViewerExisted(string userId, Guid storyId)
         {
             return await _context.Viewers.AnyAsync(v => v.UserId == userId && v.StoryId == storyId);

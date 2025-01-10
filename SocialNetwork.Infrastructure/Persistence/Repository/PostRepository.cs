@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity;
 using SocialNetwork.Infrastructure.DBContext;
 
@@ -32,6 +33,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
             var posts = await query
                 //.AsNoTracking()
+                .Where(p => p.Privacy.Equals(PrivacyConstant.PUBLIC))
                 .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)

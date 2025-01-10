@@ -13,6 +13,7 @@ namespace SocialNetwork.Application.Mappers
             {
                 Id = user.Id,
                 Avatar = user.Avatar,
+                CoverImage = user.CoverImage,
                 Bio = user.Bio,
                 Email = user.Email,
                 FullName = user.FullName,
@@ -139,22 +140,6 @@ namespace SocialNetwork.Application.Mappers
             };
         }
 
-        public static MyStoryResponse MapToMyStory(Story story, List<ViewerResponse> viewers)
-        {
-            return new MyStoryResponse
-            {
-                Id = story.Id,
-                Background = story.Background,
-                User = story.User != null ? MapToUser(story.User) : null,
-                Content = story.Content,
-                FontFamily = story.FontFamily,
-                Privacy = story.Privacy,
-                Type = story.Type,
-                CreatedDate = story.DateCreated,
-                Viewers = viewers
-            };
-        }
-
         public static ViewerResponse MapToViewerResponse(Viewer viewer, List<string> reactions)
         {
             return new ViewerResponse()
@@ -210,6 +195,7 @@ namespace SocialNetwork.Application.Mappers
             {
                 Id = user.Id,
                 Avatar = user.Avatar,
+                CoverImage = user.CoverImage,
                 Bio = user.Bio,
                 Email = user.Email,
                 FullName = user.FullName,

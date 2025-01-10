@@ -14,7 +14,7 @@ const MainLayout: FC = () => {
         <div className="bg-slate-100 w-ful h-full">
             <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto w-full h-full grid grid-cols-12 gap-6 overflow-hidden">
                 <MainLeftSidebar />
-                <div className="h-full flex flex-col gap-6 overflow-y-auto scrollbar-hide col-span-12 lg:col-span-8 xl:col-span-6 py-6 px-4 md:px-0">
+                <div className="h-full flex flex-col gap-6 overflow-y-auto scrollbar-hide col-span-12 lg:col-span-8 xl:col-span-6 py-6 md:px-0">
                     <Outlet />
                 </div>
                 <MainRightSidebar />

@@ -29,6 +29,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public IStoryRepository StoryRepository { get; }
         public IMessageReadStatusRepository MessageReadStatusRepository { get; }
         public IViewerRepository ViewerRepository { get; }
+        public IFollowRepository FollowRepository { get; }
 
         public UnitOfWork
         (
@@ -46,7 +47,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 IMessageRepository messageRepository,
                 IStoryRepository storyRepository,
                 IMessageReadStatusRepository messageReadStatusRepository,
-                IViewerRepository viewerRepository
+                IViewerRepository viewerRepository,
+                IFollowRepository followRepository
         )
         {
             _context = context;
@@ -64,6 +66,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             StoryRepository = storyRepository;
             MessageReadStatusRepository = messageReadStatusRepository;
             ViewerRepository = viewerRepository;
+            FollowRepository = followRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

@@ -31,6 +31,9 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
                  ?? throw new AppException("Thông tin user không tồn tại");
 
             var response = ApplicationMapper.MapToUser(user);
+            response.FriendCount = await unitOfWork.FriendShipRepository.CountFriendsByUserIdAsync(userId);
+            response.FollowerCount = await unitOfWork.FollowRepository.CountFollowersByUserIdAsync(userId);
+            response.FollowingCount = await unitOfWork.FollowRepository.CountFolloweesByUserIdAsync(userId);
 
             return new DataResponse<UserResponse>()
             {

@@ -3,6 +3,7 @@ export interface UserResource {
     fullName: string;
     email: string;
     avatar: string;
+    coverImage: string;
     gender: string;
     phoneNumber: string;
     dateOfBirth: Date;

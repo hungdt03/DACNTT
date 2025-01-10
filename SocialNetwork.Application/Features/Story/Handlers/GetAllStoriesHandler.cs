@@ -24,15 +24,53 @@ namespace SocialNetwork.Application.Features.Story.Handlers
         {
             var stories = await _unitOfWork.StoryRepository.GetAllStoriesAsync();
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var response = stories.Select(ApplicationMapper.MapToStory).ToList()
-                 .GroupBy(x => x.User.Id)
-                 .Select(x => new UserStoryResponse()
-                 {
-                     User = x.FirstOrDefault()?.User,
-                     Stories = x.ToList()
-                 }).ToList();
 
-            return new DataResponse<List<UserStoryResponse>>()
+            var groupedStories = stories
+                .Select(ApplicationMapper.MapToStory)
+                .ToList()
+                .GroupBy(x => x.User.Id);
+
+            var response = new List<UserStoryResponse>();
+            foreach (var group in groupedStories)
+            {
+                var userStories = group.ToList();
+                if (group.Key == userId)
+                {
+                    bool haveAnyViewers = false;
+                    foreach (var story in userStories)
+                    {
+                        haveAnyViewers = await _unitOfWork.ViewerRepository.IsAnViewersByStoryId(story.Id);
+                        if (!haveAnyViewers) break;
+                    }
+
+                    response.Add(new UserStoryResponse
+                    {
+                        HaveSeen = haveAnyViewers,
+                        User = group.FirstOrDefault()?.User,
+                        Stories = userStories
+                    });
+
+                    continue;
+                }
+
+                
+                bool haveSeen = false;
+                foreach(var story in userStories)
+                {
+                    
+                    haveSeen = await _unitOfWork.ViewerRepository.IsAnViewersByStoryIdAndUserIdAsync(story.Id, userId);
+                    if (!haveSeen) break;
+                }
+
+                response.Add(new UserStoryResponse
+                {
+                    HaveSeen = haveSeen,
+                    User = group.FirstOrDefault()?.User,
+                    Stories = userStories
+                });
+            }
+
+            return new DataResponse<List<UserStoryResponse>>
             {
                 Data = response,
                 IsSuccess = true,

@@ -3,5 +3,6 @@ import { UserResource } from "./user"
 
 export type UserStoryResource = {
     user: UserResource;
-    stories: StoryResource[]
+    stories: StoryResource[];
+    haveSeen: boolean;
 }

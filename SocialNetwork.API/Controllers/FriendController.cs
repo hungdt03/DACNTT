@@ -20,11 +20,18 @@ namespace SocialNetwork.API.Controllers
             this.mediator = mediator;
         }
 
-        [HttpGet("top-six/{userId}")]
-        public async Task<IActionResult> GetTopSixOfUserFriends([FromRoute] string userId)
+        [HttpGet("top-nine-user-friend/{userId}")]
+        public async Task<IActionResult> GetTopNineOfUserFriends([FromRoute] string userId)
         {
-            var response = await mediator.Send(new GetTopSixMutualFriendsQuery(userId));
+            var response = await mediator.Send(new GetTopNineOfUserFriendsQuery(userId));
             return Ok(response);    
+        }
+
+        [HttpGet("top-nine-my-friend")]
+        public async Task<IActionResult> GetTopNineOfMyFriends()
+        {
+            var response = await mediator.Send(new GetTopNineOfMyFriendsQuery());
+            return Ok(response);
         }
 
         [HttpDelete("{friendId}")]

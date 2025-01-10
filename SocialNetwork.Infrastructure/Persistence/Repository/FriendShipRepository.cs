@@ -16,6 +16,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context = context;
         }
 
+        public async Task<int> CountFriendsByUserIdAsync(string userId)
+        {
+            return await _context.FriendShips
+                .Where(f => f.UserId == userId || f.FriendId == userId && f.Status.Equals(FriendShipStatus.ACCEPTED))
+                .CountAsync();
+        }
+
         public async Task CreateFriendShipAsync(FriendShip request)
         {
             await _context.FriendShips.AddAsync(request);

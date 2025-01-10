@@ -11,7 +11,7 @@ import { Pagination } from "../types/response";
 import { inititalValues } from "../utils/pagination";
 import StoryWrapper from "../components/story/StoryWrapper";
 
-const Feeds: FC = () => {
+const HomePage: FC = () => {
     const [loading, setLoading] = useState(false)
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
     const [posts, setPosts] = useState<PostResource[]>([]);
@@ -93,4 +93,4 @@ const Feeds: FC = () => {
     </div>
 };
 
-export default Feeds;
+export default HomePage;

@@ -7,6 +7,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.User.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Entity;
 
 namespace SocialNetwork.Application.Features.User.Handlers
 {
@@ -27,10 +28,9 @@ namespace SocialNetwork.Application.Features.User.Handlers
                 ?? throw new AppException("Thông tin user không tồn tại");
 
             var response = ApplicationMapper.MapToUser(user);
-            //response.FollowerCount = user?.Followers?.Count ?? 0;
-            //response.FollowingCount = user?.Followings?.Count ?? 0;
-            //response.PostCount = user?.Posts?.Count ?? 0;
-            //response.FriendCount = user?.Friends?.Count ?? 0;
+            response.FriendCount = await unitOfWork.FriendShipRepository.CountFriendsByUserIdAsync(request.UserId);
+            response.FollowerCount = await unitOfWork.FollowRepository.CountFollowersByUserIdAsync(request.UserId);
+            response.FollowingCount = await unitOfWork.FollowRepository.CountFolloweesByUserIdAsync(request.UserId);
 
             return new DataResponse<UserResponse>()
             {

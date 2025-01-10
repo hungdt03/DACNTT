@@ -214,7 +214,7 @@ const Post: FC<PostProps> = ({
             </div> : <p className="text-sm text-gray-700 break-words">{post.content}</p>}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
         </div>
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between md:text-sm text-[13px]">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
                 <Avatar.Group>
                     {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="w-5 h-5 mx-[5px]" />)}
@@ -229,16 +229,16 @@ const Post: FC<PostProps> = ({
 
         <Divider className='my-0' />
         <div className="flex items-center justify-between gap-x-4">
-            <Popover content={<PostReaction
+            <Popover  content={<PostReaction
                 onSelect={handleSaveReaction}
             />}>
                 {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
             </Popover>
-            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>

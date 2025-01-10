@@ -40,7 +40,7 @@ const CreateStorySidebar: FC<CreateStorySidebarProps> = ({
                 <Button shape="circle" icon={<SettingOutlined />}></Button>
             </div>
             <div className="flex items-center gap-x-3">
-                <img width={45} src={user?.avatar ?? images.user} />
+                <img className="rounded-full flex-shrink-0 w-[45px] h-[45px] object-cover" src={user?.avatar ?? images.user} />
                 <span className="font-semibold text-lg">{user?.fullName}</span>
             </div>
         </div>

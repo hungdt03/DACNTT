@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity;
 using SocialNetwork.Infrastructure.DBContext;
 
@@ -23,7 +24,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Stories
                 .Include(s => s.User)
-                .Where(s => s.ExpiresAt > DateTimeOffset.UtcNow)
+                .Where(s => s.ExpiresAt > DateTimeOffset.UtcNow && s.Privacy == PrivacyConstant.PUBLIC)
                 .OrderByDescending(s => s.DateCreated)
                 .ToListAsync();
         }

@@ -1,9 +1,9 @@
 import { Check, MessageSquareText, MoreHorizontal, Plus, User, UserCheckIcon, X } from "lucide-react";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { useSelector } from "react-redux";
 import images from "../../assets";
-import { Avatar, Button, Divider, Popover } from "antd";
+import { Avatar, Button, Divider, Popover, Tooltip, message } from "antd";
 import ProfilePostList from "./ProfilePostList";
 import { FriendRequestResource } from "../../types/friendRequest";
 import { UserResource } from "../../types/user";
@@ -11,19 +11,24 @@ import friendRequestService from "../../services/friendRequestService";
 import { toast } from "react-toastify";
 import friendService from "../../services/friendService";
 import { FriendRequestStatus } from "../../enums/friend-request";
+import followService from "../../services/followService";
+import { FriendResource } from "../../types/friend";
 
 type ProfileUserContentProps = {
     user: UserResource;
+    friends: FriendResource[]
     friendRequest: FriendRequestResource | null;
     onRefresh?: () => void
 }
 
 const ProfileUserContent: FC<ProfileUserContentProps> = ({
     user: targetUser,
+    friends,
     friendRequest,
     onRefresh
 }) => {
     const { user } = useSelector(selectAuth);
+    const [isFollow, setIsFollow] = useState(false)
 
     const handleSendFriendRequest = async () => {
         const response = await friendRequestService.createFriendRequest(targetUser.id)
@@ -68,6 +73,36 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
         }
     }
 
+    const handleFollowUser = async (followeeId: string) => {
+        const response = await followService.followUser(followeeId);
+        if (response.isSuccess) {
+            message.success(response.message)
+            setIsFollow(true)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleUnfollowUser = async (followeeId: string) => {
+        const response = await followService.unfollowUser(followeeId);
+        if (response.isSuccess) {
+            message.success(response.message)
+            setIsFollow(false)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    useEffect(() => {
+        const checkIsFollow = async () => {
+            const response = await followService.checkFollowUser(targetUser.id);
+            if (response.isSuccess) setIsFollow(true)
+            else setIsFollow(false)
+        }
+
+        checkIsFollow()
+    }, [targetUser])
+
 
     return <div className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
         <div className="flex flex-col gap-y-4 overflow-y-auto shadow">
@@ -83,22 +118,23 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                         <div className="flex items-center gap-x-3">
                             <span className="text-gray-500">{user?.friendCount} người bạn</span>
                             <div className="bg-primary w-2 h-2 rounded-full"></div>
-                            <span className="font-semibold text-gray-500">0 đang theo dõi</span>
+                            <span className="font-semibold text-gray-500">{user?.followingCount} đang theo dõi</span>
+                            <div className="bg-primary w-2 h-2 rounded-full"></div>
+                            <span className="font-semibold text-gray-500">{user?.followerCount} theo dõi</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div className="w-full flex justify-between">
                 <Avatar.Group>
-                    <Avatar />
-                    <Avatar />
-                    <Avatar />
-                    <Avatar />
+                    {friends.map(friend => <Tooltip key={friend.id} title={friend.fullName}>
+                        <Avatar src={friend.avatar} />
+                    </Tooltip>)}
                 </Avatar.Group>
                 <div className="flex items-center gap-x-2">
                     {friendRequest?.status === FriendRequestStatus.ACCEPTED &&
                         <div className="flex items-center gap-x-2">
-                            
+
                             <Popover trigger='click' placement="bottom" content={<Button onClick={handleDeleteFriend} icon={<X size={16} />} danger type='primary'>Hủy kết bạn</Button>}>
                                 <button className="bg-sky-50 text-primary px-3 py-1 rounded-md flex items-end gap-x-2">
                                     <User className="mb-1" size={16} />
@@ -112,20 +148,35 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
                     {friendRequest?.status === FriendRequestStatus.PENDING && friendRequest?.sender?.id !== user?.id && <div className="flex items-center gap-x-2">
                         <Button onClick={handleAcceptFriendRequest} icon={<Check size={16} />} type='primary'>Chấp nhận</Button>
-                        <Button onClick={handleCancelFriendRequest} icon={<X size={16} />} type='default'>Gỡ lời mời</Button>
+                        <button onClick={handleCancelFriendRequest} className="flex items-center gap-x-2 px-3 py-1 rounded-md text-gray-600 font-semibold bg-slate-200">
+                            <X size={16} />
+                            Gỡ lời mời
+                        </button>
                     </div>}
 
-                    {friendRequest?.status === FriendRequestStatus.PENDING && friendRequest?.sender?.id === user?.id && <Button onClick={handleCancelFriendRequest} icon={<X size={16} />} type='default'>Hủy lời mời</Button>}
-
-                    {friendRequest?.status !== FriendRequestStatus.ACCEPTED && <button className="bg-sky-50 text-primary px-3 py-1 rounded-md flex items-end gap-x-2">
-                        <UserCheckIcon  className="mb-1" size={16} />
-                        Theo dõi
+                    {friendRequest?.status === FriendRequestStatus.PENDING && friendRequest?.sender?.id === user?.id && <button onClick={handleCancelFriendRequest} className="flex items-center gap-x-2 px-3 py-1 rounded-md text-gray-600 font-semibold bg-slate-200">
+                        <X size={16} />
+                        Gỡ lời mời
                     </button>}
-                    <button className="bg-sky-50 text-primary px-3 py-1 rounded-md flex items-end gap-x-2">
-                        <MessageSquareText className="mb-1" size={16} />
+
+                    {friendRequest?.status !== FriendRequestStatus.ACCEPTED && !isFollow ? <Button onClick={() => handleFollowUser(targetUser.id)} type="primary" icon={<UserCheckIcon size={16} />}>
+                        Theo dõi
+                    </Button> : (friendRequest?.status !== FriendRequestStatus.ACCEPTED && isFollow) && <div className="flex items-center gap-x-2">
+                        <button className="flex items-center gap-x-2 px-3 py-1 rounded-md text-gray-600 font-semibold bg-slate-200">
+                            <UserCheckIcon size={16} />
+                            Đang theo dõi
+                        </button>
+                        <button onClick={() => handleUnfollowUser(targetUser.id)} className="flex items-center gap-x-2 px-3 py-1 rounded-md text-gray-600 font-semibold bg-slate-200">
+                            <X size={16} />
+                            Bỏ theo dõi
+                        </button>
+                    </div>
+                    }
+
+                    <Button type="primary" icon={<MessageSquareText className="mb-1" size={16} />}>
                         Nhắn tin
-                    </button>
-                    <Button icon={<MoreHorizontal size={16} />} type='primary'></Button>
+                    </Button>
+
                 </div>
             </div>
             <Divider className="my-3" />
