@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Exceptions;
@@ -13,9 +12,7 @@ using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity;
-using SocialNetwork.Infrastructure.Persistence.Repository;
 using SocialNetwork.Infrastructure.SignalR.Payload;
-using System.Text.Json;
 
 namespace SocialNetwork.Infrastructure.SignalR
 {

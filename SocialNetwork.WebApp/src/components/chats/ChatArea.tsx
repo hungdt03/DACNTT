@@ -14,6 +14,7 @@ import { MessageRequest } from "./ChatPopup";
 import messageService from "../../services/messageService";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
+import { Pagination } from "../../types/response";
 
 type ChatAreaProps = {
     chatRoom: ChatRoomResource;
@@ -24,7 +25,12 @@ const ChatArea: FC<ChatAreaProps> = ({
 }) => {
     const { user } = useSelector(selectAuth);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [messages, setMessages] = useState<MessageResource[]>([])
+    const [messages, setMessages] = useState<MessageResource[]>([]);
+    const [pagination, setPagination] = useState<Pagination>({
+        page: 1,
+        size: 10,
+        hasMore: false
+    })
 
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [typing, setTyping] = useState<string>('');
@@ -34,15 +40,16 @@ const ChatArea: FC<ChatAreaProps> = ({
         chatRoomName: chatRoom.uniqueName
     });
 
-    const fetchMessages = async () => {
-        const response = await messageService.getAllMessagesByChatRoomId(chatRoom.id);
+    const fetchMessages = async (page: number, size: number) => {
+        const response = await messageService.getAllMessagesByChatRoomId(chatRoom.id, page, size);
         if (response.isSuccess) {
-            setMessages(response.data)
+            setMessages(prevMessages => [...response.data, ...prevMessages])
+            setPagination(response.pagination)
         }
     }
 
     useEffect(() => {
-        fetchMessages()
+        fetchMessages(pagination.page, pagination?.size)
 
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
@@ -110,7 +117,6 @@ const ChatArea: FC<ChatAreaProps> = ({
     }, [chatRoom]);
 
     useEffect(() => {
-
         if (messagesEndRef.current)
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }, [messages])
@@ -253,6 +259,7 @@ const ChatArea: FC<ChatAreaProps> = ({
         </div>
 
         <div className="flex flex-col h-full gap-y-3 w-full overflow-y-auto custom-scrollbar p-4">
+        {pagination.hasMore && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-primary my-2 text-xs">Tải thêm tin nhắn</button>}
             {[...messages, ...pendingMessages].map(message => <Message chatRoom={chatRoom} key={message.id} message={message} isMe={message.senderId === user?.id} />)}
             <div ref={messagesEndRef}></div>
         </div>

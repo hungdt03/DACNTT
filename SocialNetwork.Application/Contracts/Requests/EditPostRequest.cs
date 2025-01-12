@@ -15,5 +15,6 @@ namespace SocialNetwork.Application.Contracts.Requests
         public List<IFormFile>? Images { get; set; }
         public List<IFormFile>? Videos { get; set; }
         public List<string>? TagIds { get; set; }
+        public string? Background { get; set; }
     }
 }

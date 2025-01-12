@@ -6,6 +6,10 @@ import { NotificationResource } from "../types/notification";
 import { formatTime } from "../utils/date";
 import cn from "../utils/cn";
 import { NotificationType } from "../enums/notification-type";
+import friendRequestService from "../services/friendRequestService";
+import { toast } from "react-toastify";
+import notificationService from "../services/notificationService";
+
 
 type NotificationMoreActionProps = {
     onMarkAsRead?: () => void;
@@ -34,16 +38,56 @@ type NotificationProps = {
     notification: NotificationResource;
     onDelete?: () => void;
     onMarkAsRead?: () => void;
+    onCommentNotification: () => void
 }
 
 const Notification: FC<NotificationProps> = ({
     notification,
     onDelete,
-    onMarkAsRead
+    onMarkAsRead,
+    onCommentNotification
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false);
+    const [accepted, setAccepted] = useState<'accepted' | 'cancel' | 'none'>('none');
+    
+    const handleCancelFriendRequest = async (requestId: string) => {
+        const response = await friendRequestService.cancelFriendRequest(requestId)
+        if (response.isSuccess) {
+            setAccepted('cancel')
+            toast.success(response.message)
+            handleDeleteNotification(notification.id)
+        } else {
+            toast.error(response.message);
+            onDelete?.()
+        }
+    };
 
-    return <div onMouseOver={() => setShowMoreAction(true)} onMouseLeave={() => setShowMoreAction(false)} className={cn("relative flex items-center gap-x-3 px-3 py-2 rounded-md hover:bg-gray-100 max-w-[400px]", !notification.isRead && 'bg-gray-50')}>
+    const handleAcceptFriendRequest = async (requestId: string) => {
+        const response = await friendRequestService.acceptFriendRequest(requestId)
+        if (response.isSuccess) {
+            setAccepted('accepted')
+            toast.success(response.message)
+            handleDeleteNotification(notification.id)
+        } else {
+            toast.error(response.message)
+            onDelete?.()
+        }
+
+       
+    };
+
+    const handleDeleteNotification = async (notificationId: string) => {
+        const response = await notificationService.deleteNotification(notificationId);
+    }
+
+    const handleSelectNotification = () => {
+        console.log(notification)
+        if(notification.type.includes('COMMENT')) {
+            onCommentNotification()
+        }
+    }
+
+    return <div onClick={handleSelectNotification} onMouseOver={() => setShowMoreAction(true)} onMouseLeave={() => setShowMoreAction(false)} className={cn("relative flex items-center gap-x-3 px-3 py-2 rounded-md hover:bg-gray-100 max-w-[400px]", !notification.isRead && 'bg-gray-50')}>
         <Avatar className="flex-shrink-0" size='large' src={notification.imageUrl ?? images.user} />
         <div className="flex flex-col gap-y-3 items-start">
             <div className="flex flex-col items-start">
@@ -53,10 +97,30 @@ const Notification: FC<NotificationProps> = ({
                 <span className={cn("text-gray-500 text-xs font-semibold", !notification.isRead && 'text-primary')}>{formatTime(new Date(notification.dateSent))}</span>
             </div>
 
-            {notification.type === NotificationType.FRIEND_REQUEST_SENT && <div className="flex items-center gap-x-2">
-                <Button type="primary">Xác nhận</Button>
-                <Button type="primary" danger>Xóa</Button>
-            </div>}
+            {notification.type === NotificationType.FRIEND_REQUEST_SENT && (
+                <>
+                    {accepted === 'accepted' ? (
+                        <span className="text-xs text-gray-600">Đã chấp nhận lời mời kết bạn</span>
+                    ) : accepted === 'cancel' ? (
+                        <span className="text-xs text-gray-600">Đã gỡ lời mời kết bạn</span>
+                    ) : (
+                        <div className="flex items-center gap-x-2">
+                            <button
+                                className="px-3 py-1 rounded-md bg-gray-200 text-gray-600"
+                                onClick={() => handleCancelFriendRequest(notification.friendRequestId)}
+                            >
+                                Gỡ
+                            </button>
+                            <Button
+                                type="primary"
+                                onClick={() => handleAcceptFriendRequest(notification.friendRequestId)}
+                            >
+                                Chấp nhận
+                            </Button>
+                        </div>
+                    )}
+                </>
+            )}
         </div>
 
         {showMoreAction && <Popover trigger='click' content={<NotificationMoreAction

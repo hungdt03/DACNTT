@@ -1,7 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { MessageResource } from '../types/message';
-import { BaseResponse, DataResponse } from '../types/response';
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
 class MessageService {
     private static instance: MessageService;
@@ -14,18 +14,23 @@ class MessageService {
         return MessageService.instance;
     }
 
-    getAllMessagesByChatRoomId(chatRoomId: string) : Promise<DataResponse<MessageResource[]>> {
-        return axiosInterceptor.get('/api/messages/' + chatRoomId)
+    getAllMessagesByChatRoomId(chatRoomId: string, page: number, size: number): Promise<PaginationResponse<MessageResource[]>> {
+        return axiosInterceptor.get('/api/messages/' + chatRoomId, {
+            params: {
+                page: page,
+                size: size
+            }
+        })
     }
 
-    sendMessage(formData: FormData) : Promise<BaseResponse> {
+    sendMessage(formData: FormData): Promise<BaseResponse> {
         return axiosInterceptor.post('/api/messages', formData)
     }
 
-    readMessage(chatRoomId: string) : Promise<BaseResponse> {
+    readMessage(chatRoomId: string): Promise<BaseResponse> {
         return axiosInterceptor.put('/api/messages/read/' + chatRoomId)
     }
- 
+
 }
 
 export default MessageService.getInstance();

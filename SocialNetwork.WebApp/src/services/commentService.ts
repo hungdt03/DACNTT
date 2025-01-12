@@ -37,6 +37,10 @@ class CommentService {
             }
         });
     }
+
+    getNearbyCommentsByCommentId(postId: string, commentId: string) : Promise<DataResponse<CommentResource[]>> {
+        return axiosInterceptor.get('/api/comments/nearby/' + postId + "/" + commentId)
+    }
 }
 
 export default CommentService.getInstance();

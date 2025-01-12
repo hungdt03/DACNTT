@@ -53,7 +53,7 @@ const StoryContent: FC<StoryContentProps> = ({
     >
         <div className="absolute z-[2000] left-0 top-5 right-0 flex justify-between px-3">
             <div className="flex items-center gap-x-2">
-                <img width={40} height={40} className="rounded-full" src={story.user.avatar} />
+                <img className="rounded-full w-[40px] h-[40px] object-cover" src={story.user.avatar} />
                 <div className="flex flex-col text-white">
                     <span className="text-[15px]">{story.user.fullName}</span>
                     <span className="text-[11px]">{formatTime(new Date(story.createdDate))}</span>

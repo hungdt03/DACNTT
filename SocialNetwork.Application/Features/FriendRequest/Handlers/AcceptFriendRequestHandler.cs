@@ -45,32 +45,37 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 friendRequest.UserId
             };
 
-            var chatRoomName = ChatUtils.GenerateChatRoomName(memberIds);
-            var firstMember = new ChatRoomMember()
+            var chatRoom = await _unitOfWork.ChatRoomRepository.GetPrivateChatRoomByMemberIds(memberIds);
+
+            if(chatRoom == null)
             {
-                UserId = friendRequest.FriendId,
-                IsActive = true,
-            };
+                var chatRoomName = ChatUtils.GenerateChatRoomName(memberIds);
+                var firstMember = new ChatRoomMember()
+                {
+                    UserId = friendRequest.FriendId,
+                    IsActive = true,
+                };
 
-            var secondMember = new ChatRoomMember()
-            {
-                UserId = friendRequest.UserId,
-                IsActive = true,
-            };
+                var secondMember = new ChatRoomMember()
+                {
+                    UserId = friendRequest.UserId,
+                    IsActive = true,
+                };
 
-            var members = new List<ChatRoomMember>() { firstMember, secondMember };
+                var members = new List<ChatRoomMember>() { firstMember, secondMember };
 
-            var chatRoom = new Domain.Entity.ChatRoom()
-            {
-                IsPrivate = true,
-                LastMessageDate = DateTimeOffset.UtcNow,
-                UniqueName = chatRoomName,
-                Name = chatRoomName,
-                LastMessage = "Các bạn hiện đã được kết nối với nhau",
-                Members = members
-            };
+                chatRoom = new Domain.Entity.ChatRoom()
+                {
+                    IsPrivate = true,
+                    LastMessageDate = DateTimeOffset.UtcNow,
+                    UniqueName = chatRoomName,
+                    Name = chatRoomName,
+                    LastMessage = "Các bạn hiện đã được kết nối với nhau",
+                    Members = members
+                };
 
-            await _unitOfWork.ChatRoomRepository.CreateChatRoom(chatRoom);
+                await _unitOfWork.ChatRoomRepository.CreateChatRoom(chatRoom);
+            }
 
             var notification = new Domain.Entity.Notification()
             {

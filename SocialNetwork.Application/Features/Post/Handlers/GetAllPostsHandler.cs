@@ -1,5 +1,7 @@
 ﻿
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Features.Post.Queries;
@@ -12,15 +14,18 @@ namespace SocialNetwork.Application.Features.Post.Handlers
     public class GetAllPostsHandler : IRequestHandler<GetAllPostQuery, BaseResponse>
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public GetAllPostsHandler(IUnitOfWork unitOfWork)
+        public GetAllPostsHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         {
             this.unitOfWork = unitOfWork;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BaseResponse> Handle(GetAllPostQuery request, CancellationToken cancellationToken)
         {
-            var (posts, totalCount) = await unitOfWork.PostRepository.GetAllPostsAsync(request.Page, request.Size);
+            var userId = httpContextAccessor.HttpContext.User.GetUserId();
+            var (posts, totalCount) = await unitOfWork.PostRepository.GetAllPostsAsync(request.Page, request.Size, userId);
 
             var response = new List<PostResponse>();
             foreach (var post in posts)

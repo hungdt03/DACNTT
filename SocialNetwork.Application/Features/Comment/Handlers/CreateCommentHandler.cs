@@ -126,6 +126,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                     var notification = new Domain.Entity.Notification();
                     notification.CommentId = savedComment.Id;
                     notification.RecipientId = user.Id;
+                    notification.PostId = post.Id;
                     notification.Recipient = user;
                     notification.Title = "Bình luận";
                     notification.Content = $"{currentUser.FullName} đã nhắc tới bạn trong một bình luận";
@@ -140,35 +141,54 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 }
             }
 
-            Domain.Entity.Notification notiReplyComment = null;
+            Domain.Entity.Notification notiComment = null;
             if (replyUser != null)
             {
-                notiReplyComment = new Domain.Entity.Notification();
-                notiReplyComment.CommentId = savedComment.Id;
-                notiReplyComment.RecipientId = replyUser.Id;
-                notiReplyComment.Title = "Bình luận";
-                notiReplyComment.Content = $"{currentUser.FullName} đã phản hồi bình luận của bạn";
-                notiReplyComment.IsRead = false;
-                notiReplyComment.DateSent = DateTimeOffset.UtcNow;
-                notiReplyComment.Type = NotificationType.COMMENT_MENTION;
-                notiReplyComment.ImageUrl = currentUser.Avatar;
+                notiComment = new Domain.Entity.Notification();
+                notiComment.CommentId = savedComment.Id;
+                notiComment.RecipientId = replyUser.Id;
+                notiComment.Title = "Bình luận";
+                notiComment.Content = $"{currentUser.FullName} đã phản hồi bình luận của bạn";
+                notiComment.IsRead = false;
+                notiComment.PostId = post.Id;
+                notiComment.DateSent = DateTimeOffset.UtcNow;
+                notiComment.Type = NotificationType.REPLIED_TO_COMMENT;
+                notiComment.ImageUrl = currentUser.Avatar;
 
-                await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiReplyComment);
+                await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiComment);
+            }
+            else
+            {
+                notiComment = new Domain.Entity.Notification();
+                notiComment.CommentId = savedComment.Id;
+                notiComment.RecipientId = post.UserId;
+                notiComment.Title = "Bình luận";
+                notiComment.Content = $"{currentUser.FullName} đã bình luận bài viết của bạn";
+                notiComment.IsRead = false;
+                notiComment.PostId = post.Id;
+                notiComment.DateSent = DateTimeOffset.UtcNow;
+                notiComment.Type = NotificationType.COMMENTED_ON_POST;
+                notiComment.ImageUrl = currentUser.Avatar;
+
+                await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiComment);
             }
 
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            if(replyUser != null && notiReplyComment != null)
+            var mapNoti = ApplicationMapper.MapToNotification(notiComment);
+            if (replyUser != null)
             {
-                var mapNoti = ApplicationMapper.MapToNotification(notiReplyComment);
                 await _signalRService.SendNotificationToSpecificUser(replyUser.UserName, mapNoti);
+            } else 
+            {
+                await _signalRService.SendNotificationToSpecificUser(post.User.UserName, mapNoti);
             }
 
-            foreach(var notification in notifications)
+            foreach (var notification in notifications)
             {
-                var mapNoti = ApplicationMapper.MapToNotification(notification);
-                await _signalRService.SendNotificationToSpecificUser(notification.Recipient.UserName, mapNoti);
+                var mapMentionNoti = ApplicationMapper.MapToNotification(notification);
+                await _signalRService.SendNotificationToSpecificUser(notification.Recipient.UserName, mapMentionNoti);
             }
 
             var response = ApplicationMapper.MapToComment(savedComment);

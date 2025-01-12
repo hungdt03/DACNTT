@@ -43,7 +43,7 @@ const StoryItem: FC<StoryItemProps> = ({
             </div>
 
             <div className="absolute top-4 left-4 z-10">
-                <img className={cn("rounded-full border-[4px]", story.haveSeen ? 'border-white' : 'border-blue-600')} width='40px' height='40px' src={story.user.avatar ?? images.user} />
+                <img className={cn("rounded-full w-[40px] h-[40px] object-cover border-[4px]", story.haveSeen ? 'border-white' : 'border-blue-600')}  src={story.user.avatar ?? images.user} />
             </div>
 
             <div className="absolute left-0 bottom-0 right-0 py-2 px-2">

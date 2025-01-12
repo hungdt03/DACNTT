@@ -127,7 +127,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
 
     return <div className="flex flex-col gap-y-4">
         <div className="flex items-center gap-x-2">
-            <Avatar className="flex-shrink-0" size='large' src={images.user} />
+            <Avatar className="flex-shrink-0" size='large' src={user?.avatar ?? images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
                 <div className="text-[16px] font-semibold">
                     {user?.fullName}

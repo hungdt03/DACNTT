@@ -11,6 +11,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using System.Net;
 
 namespace SocialNetwork.Application.Features.FriendShip.Handlers
 {
@@ -40,18 +41,25 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
             var existedRequest = await _unitOfWork.FriendShipRepository
                 .GetFriendShipByUserIdAndFriendIdAsync(userId, request.ReceiverId);
 
-            if (existedRequest != null) throw new AppException("Đã tồn tại lời mời kết bạn giữa hai người này");
-
-            var newRequest = new Domain.Entity.FriendShip()
-            {
-                FriendId = request.ReceiverId,
-                UserId = userId,
-                Status = FriendShipStatus.PENDING,
-            };
+            if (existedRequest != null && !existedRequest.Status.Equals(FriendShipStatus.NONE)) throw new AppException("Đã tồn tại lời mời kết bạn giữa hai người này");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            await _unitOfWork.FriendShipRepository.CreateFriendShipAsync(newRequest);
-           
+
+            if (existedRequest == null)
+            {
+                existedRequest = new Domain.Entity.FriendShip()
+                {
+                    FriendId = request.ReceiverId,
+                    UserId = userId,
+                    Status = FriendShipStatus.PENDING,
+                };
+
+                await _unitOfWork.FriendShipRepository.CreateFriendShipAsync(existedRequest);
+
+            } else
+            {
+                existedRequest.Status = FriendShipStatus.PENDING;
+            }
 
             var notification = new Domain.Entity.Notification()
             {
@@ -61,7 +69,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 DateSent = DateTimeOffset.UtcNow,
                 Title = "Lời mời kết bạn",
                 Type = NotificationType.FRIEND_REQUEST_SENT,
-                FriendRequestId = newRequest.Id,
+                FriendRequestId = existedRequest.Id,
                 IsRead = false,
             };
 

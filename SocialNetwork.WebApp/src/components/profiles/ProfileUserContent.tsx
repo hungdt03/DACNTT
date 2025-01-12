@@ -134,7 +134,6 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                 <div className="flex items-center gap-x-2">
                     {friendRequest?.status === FriendRequestStatus.ACCEPTED &&
                         <div className="flex items-center gap-x-2">
-
                             <Popover trigger='click' placement="bottom" content={<Button onClick={handleDeleteFriend} icon={<X size={16} />} danger type='primary'>Hủy kết bạn</Button>}>
                                 <button className="bg-sky-50 text-primary px-3 py-1 rounded-md flex items-end gap-x-2">
                                     <User className="mb-1" size={16} />
@@ -144,7 +143,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                         </div>
                     }
 
-                    {!friendRequest && <Button onClick={handleSendFriendRequest} icon={<Plus size={16} />} type='primary'>Thêm bạn bè</Button>}
+                    {!friendRequest || friendRequest.status === FriendRequestStatus.NONE && <Button onClick={handleSendFriendRequest} icon={<Plus size={16} />} type='primary'>Thêm bạn bè</Button>}
 
                     {friendRequest?.status === FriendRequestStatus.PENDING && friendRequest?.sender?.id !== user?.id && <div className="flex items-center gap-x-2">
                         <Button onClick={handleAcceptFriendRequest} icon={<Check size={16} />} type='primary'>Chấp nhận</Button>
@@ -161,16 +160,14 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
                     {friendRequest?.status !== FriendRequestStatus.ACCEPTED && !isFollow ? <Button onClick={() => handleFollowUser(targetUser.id)} type="primary" icon={<UserCheckIcon size={16} />}>
                         Theo dõi
-                    </Button> : (friendRequest?.status !== FriendRequestStatus.ACCEPTED && isFollow) && <div className="flex items-center gap-x-2">
+                    </Button> : (friendRequest?.status !== FriendRequestStatus.ACCEPTED && isFollow) &&
+                    <Popover content={<Button onClick={() => handleUnfollowUser(targetUser.id)} icon={<X size={16} />} danger type='primary'>Bỏ theo dõi</Button>}>
                         <button className="flex items-center gap-x-2 px-3 py-1 rounded-md text-gray-600 font-semibold bg-slate-200">
                             <UserCheckIcon size={16} />
                             Đang theo dõi
                         </button>
-                        <button onClick={() => handleUnfollowUser(targetUser.id)} className="flex items-center gap-x-2 px-3 py-1 rounded-md text-gray-600 font-semibold bg-slate-200">
-                            <X size={16} />
-                            Bỏ theo dõi
-                        </button>
-                    </div>
+                    </Popover>
+
                     }
 
                     <Button type="primary" icon={<MessageSquareText className="mb-1" size={16} />}>

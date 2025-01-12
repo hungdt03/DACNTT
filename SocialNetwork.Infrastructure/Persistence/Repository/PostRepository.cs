@@ -25,29 +25,43 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.Posts.AddAsync(post);
         }
 
-        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsAsync(int page, int size)
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsAsync(int page, int size, string userId)
         {
-            var query = _context.Posts.AsQueryable();
+            var query = _context.Posts
+                 .Include(p => p.User)
+                 .Include(p => p.Tags).ThenInclude(t => t.User)
+                 .Include(p => p.Comments)
+                 .Include(p => p.Medias)
+                 .Include(p => p.SharePost)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.User)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
+                 .AsQueryable();
 
             var totalCount = await query.CountAsync();
 
-            var posts = await query
-                //.AsNoTracking()
-                .Where(p => p.Privacy.Equals(PrivacyConstant.PUBLIC))
+            var filteredPosts = new List<Post>();
+            foreach (var post in await query.ToListAsync())
+            {
+                bool isFriend = await _context.FriendShips.AnyAsync(s =>
+                    ((s.UserId == post.UserId && s.FriendId == userId) ||
+                     (s.UserId == userId && s.FriendId == post.UserId)) &&
+                     s.Status.Equals(FriendShipStatus.ACCEPTED));
+
+                bool isMe = post.UserId == userId;
+
+                if (isMe || isFriend && post.Privacy.Equals(PrivacyConstant.PUBLIC) ||
+                    (post.Privacy.Equals(PrivacyConstant.FRIENDS)))
+                {
+                    filteredPosts.Add(post);
+                }
+            }
+
+            // Phân trang
+            var posts = filteredPosts
                 .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)
-                .Include(p => p.User)
-                .Include(p => p.Tags)
-                    .ThenInclude(p => p.User)
-                .Include(p => p.Comments)
-                .Include(p => p.Medias)
-                .Include(p => p.SharePost)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.User)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.Medias)
-                .ToListAsync();
+                .ToList();
 
             return (posts, totalCount);
         }

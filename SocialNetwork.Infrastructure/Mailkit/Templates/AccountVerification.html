@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<meta charset="UTF-8" />
+	<title>Xác thực tài khoản [Tên Ứng Dụng]</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			color: #333;
+			background-color: #fff;
+		}
+
+		.container {
+			margin: 0 auto;
+			width: 100%;
+			max-width: 600px;
+			padding: 0 0px;
+			padding-bottom: 10px;
+			border-radius: 5px;
+			line-height: 1.8;
+		}
+
+		.header {
+			border-bottom: 1px solid #eee;
+		}
+
+			.header a {
+				font-size: 1.4em;
+				color: #000;
+				text-decoration: none;
+				font-weight: 600;
+			}
+
+		.content {
+			min-width: 700px;
+			overflow: auto;
+			line-height: 2;
+		}
+
+		.otp {
+			background: linear-gradient(to right, #00bc69 0, #00bc88 50%, #00bca8 100%);
+			margin: 0 auto;
+			width: max-content;
+			padding: 0 10px;
+			color: #fff;
+			border-radius: 4px;
+		}
+
+		.footer {
+			color: #aaa;
+			font-size: 0.8em;
+			line-height: 1;
+			font-weight: 300;
+		}
+
+		.email-info {
+			color: #666666;
+			font-weight: 400;
+			font-size: 13px;
+			line-height: 18px;
+			padding-bottom: 6px;
+		}
+
+			.email-info a {
+				text-decoration: none;
+				color: #00bc69;
+			}
+	</style>
+</head>
+
+<body>
+	<!-- Subject: Xác thực tài khoản [Tên Ứng Dụng] -->
+	<div class="container">
+		<div class="header">
+			<a>Xác thực danh tính của bạn trên [Tên Ứng Dụng]</a>
+		</div>
+		<br />
+		<strong>Chào [Tên Người Dùng],</strong>
+		<p>
+			Chúng tôi đã nhận được yêu cầu đăng ký tài khoản trên [Tên Ứng Dụng]. Để bảo mật tài khoản của bạn, vui lòng xác thực danh tính bằng mã xác thực (OTP) dưới đây.
+			<br />
+			<b>Mã xác thực (OTP) của bạn là:</b>
+		</p>
+		<h2 class="otp">{Insert OTP}</h2>
+		<p style="font-size: 0.9em">
+			<strong>Mã xác thực (OTP) có hiệu lực trong 3 phút.</strong>
+			<br />
+			<br />
+			Nếu bạn không thực hiện yêu cầu đăng ký này, vui lòng bỏ qua email này. Hãy bảo mật mã OTP của bạn và không chia sẻ với ai khác.<br />
+			<strong>Không chuyển tiếp hoặc cung cấp mã này cho bất kỳ ai.</strong>
+			<br />
+			<br />
+			Cảm ơn bạn đã sử dụng [Tên Ứng Dụng].
+			<br />
+			<br />
+			Trân trọng,
+			<br />
+			<strong>[Tên Công Ty]</strong>
+		</p>
+
+		<hr style="border: none; border-top: 0.5px solid #131111" />
+		<div class="footer">
+			<p>Email này không thể trả lời.</p>
+			<p>
+				Để biết thêm thông tin về [Tên Ứng Dụng] và tài khoản của bạn, vui lòng truy cập
+				<strong>[Website Công Ty]</strong>
+			</p>
+		</div>
+	</div>
+	<div style="text-align: center">
+		<div class="email-info">
+			<span>
+				Email này đã được gửi đến
+				<a href="mailto:{Địa chỉ Email}">{Địa chỉ Email}</a>
+			</span>
+		</div>
+		<div class="email-info">
+			<a href="/">[Tên Công Ty]</a> | [Địa chỉ]
+			| [Địa chỉ] - [Mã Bưu Điện], [Tên Quốc Gia]
+		</div>
+		<div class="email-info">
+			&copy; 2023 [Tên Công Ty]. Mọi quyền được bảo lưu.
+		</div>
+	</div>
+</body>
+<!--    Template này được tạo bởi Redwan từ Ocoxe. -->
+<!-- https://www.ocoxe.com -->
+</html>

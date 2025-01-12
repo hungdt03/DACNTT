@@ -14,5 +14,6 @@ namespace SocialNetwork.Application.DTOs
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset SentAt { get; set; }
         public bool IsHaveChildren { get; set; }
+        public List<CommentResponse> Replies { get; set; }
     }
 }

@@ -101,6 +101,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             post.Privacy = request.Post.Privacy;
             post.Medias = (post.Medias ?? new List<PostMedia>()).Concat(medias).ToList();
             post.Tags = (post.Tags ?? new List<Tag>()).Concat(tags).ToList();
+            post.Background = request.Post.Background;
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

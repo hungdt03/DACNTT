@@ -40,5 +40,12 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetAllRepliesByCommentIdQuery(commentId, page, size));
             return Ok(response);
         }
+
+        [HttpGet("nearby/{postId}/{commentId}")]
+        public async Task<IActionResult> GetNearbyCommentsByCommentId([FromRoute] Guid postId, [FromRoute] Guid commentId)
+        {
+            var response = await mediator.Send(new GetNearbyCommentsByCommentIdQuery(postId, commentId));
+            return Ok(response);
+        }
     }
 }

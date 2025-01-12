@@ -32,6 +32,13 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("medias/{chatRoomId}")]
+        public async Task<IActionResult> GetAllMediasByChatRoomId([FromRoute] Guid chatRoomId, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            var response = await mediator.Send(new GetMediasByChatRoomIdQuery(chatRoomId, page, size));
+            return Ok(response);
+        }
+
         [HttpGet("{chatRoomId}")]
         public async Task<IActionResult> GetChatRoomById([FromRoute] Guid chatRoomId)
         {

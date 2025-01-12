@@ -19,6 +19,7 @@ using SocialNetwork.Infrastructure.SignalR;
 using StackExchange.Redis;
 using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Infrastructure.Redis;
+using SocialNetwork.Infrastructure.Mailkit;
 
 namespace SocialNetwork.Infrastructure.Configuration
 {
@@ -29,6 +30,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             // Registry Options Pattern
             services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
             services.Configure<CloudinaryOptions>(configuration.GetSection(nameof(CloudinaryOptions)));
+            services.Configure<EmailOptions>(configuration.GetSection(nameof(EmailOptions)));
 
             // Register repository
             services.AddScoped<ISaveChangesInterceptor, AuditEntityInterceptor>();
@@ -47,6 +49,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IMessageReadStatusRepository, MessageReadStatusRepository>();
             services.AddScoped<IViewerRepository, ViewerRepository>();
             services.AddScoped<IFollowRepository, FollowRepository>();
+            services.AddScoped<IMessageMediaRepository, MessageMediaRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -62,6 +65,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ISignalRService, SignalRService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
+            services.AddScoped<IMailkitService, MailkitService>();
 
             services.AddSingleton<ConnectionManager>();
 

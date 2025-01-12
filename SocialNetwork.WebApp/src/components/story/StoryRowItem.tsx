@@ -16,7 +16,7 @@ const StoryRowItem: FC<StoryRowItemProps> = ({
     isActive
 }) => {
     return <div onClick={onSelect} className={cn("flex items-center gap-x-2 px-1 py-2 hover:bg-gray-100 cursor-pointer rounded-xl", isActive && 'bg-sky-50')}>
-        <img className="p-[2px] rounded-full border-2 border-primary" width='50px' height='50px' src={userStory.user.avatar ?? images.user} />
+        <img className={cn("p-[2px] rounded-full w-[50px] h-[50px] object-cover border-2 flex-shrink-0", userStory.haveSeen ? 'border-white' : 'border-primary')}  src={userStory.user.avatar ?? images.user} />
 
         <div className="flex flex-col">
             <span className="font-semibold text-[15px]">{userStory.user.fullName}</span>

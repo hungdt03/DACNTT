@@ -9,6 +9,7 @@ import ChatSidebar from "../layouts/ChatLayout/components/ChatSidebar";
 const ChatPage: FC = () => {
     const { id } = useParams()
     const [currentChatRoom, setCurrentChatRoom] = useState<ChatRoomResource | null>(null);
+    
 
     const fetchChatRoom = async () => {
         if (id) {
@@ -28,8 +29,8 @@ const ChatPage: FC = () => {
         <div className="col-span-9 overflow-hidden">
             <div className="grid grid-cols-12 h-full overflow-hidden">
                 {currentChatRoom && <ChatArea chatRoom={currentChatRoom} />}
-                <div className="col-span-4">
-                    <ChatDetails />
+                <div className="col-span-4 overflow-hidden">
+                    {currentChatRoom && <ChatDetails chatRoom={currentChatRoom} />}
                 </div>
             </div>
         </div>

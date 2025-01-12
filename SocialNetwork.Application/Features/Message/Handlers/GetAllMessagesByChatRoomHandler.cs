@@ -23,7 +23,7 @@ namespace SocialNetwork.Application.Features.Message.Handlers
 
         public async Task<BaseResponse> Handle(GetAllMessagesByChatRoomQuery request, CancellationToken cancellationToken)
         {
-            var messages = await _unitOfWork.MessageRepository.GetAllMessagesByChatRoomIdAsync(request.ChatRoomId);
+            var (messages, totalCount) = await _unitOfWork.MessageRepository.GetAllMessagesByChatRoomIdAsync(request.ChatRoomId, request.Page, request.Size);
             var response = new List<MessageResponse>();
             var userId = _contextAccessor.HttpContext.User.GetUserId();
 
@@ -38,12 +38,20 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                 response.Add(item);
             }
 
-            return new DataResponse<List<MessageResponse>>
+            var hasMore = request.Page * request.Size < totalCount;
+
+            return new PaginationResponse<List<MessageResponse>>
             {
                 Data = response,
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Message = "Lấy danh sách tin nhắn thành công",
+                Pagination = new Pagination()
+                {
+                    Size = request.Size,
+                    Page = request.Page,
+                    HasMore = hasMore,
+                }
             };
         }
     }

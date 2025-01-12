@@ -10,5 +10,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<(List<Comment> Comments, int TotalCount)> GetAllRepliesByCommentIdAsync(Guid commentId, int pageNumber, int pageSize);
         Task<Comment?> GetCommentByIdAsync(Guid id);
         Task<int> CountCommentsByPostIdAsync(Guid postId);
+        Task<List<Comment>> GetNearbyCommentsByPostAsync(Guid postId, Guid commentId);
     }
 }

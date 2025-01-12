@@ -5,5 +5,6 @@ namespace SocialNetwork.Domain.Constants
     {
         public const string ACCEPTED = "ACCEPTED";
         public const string PENDING = "PENDING";
+        public const string NONE = "NONE";
     }
 }

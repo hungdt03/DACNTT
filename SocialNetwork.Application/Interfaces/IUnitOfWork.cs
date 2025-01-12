@@ -18,6 +18,7 @@ namespace SocialNetwork.Application.Interfaces
         public IMessageReadStatusRepository MessageReadStatusRepository { get; }
         public IViewerRepository ViewerRepository { get; }
         public IFollowRepository FollowRepository { get; }
+        public IMessageMediaRepository MessageMediaRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(CancellationToken cancellationToken = default);
