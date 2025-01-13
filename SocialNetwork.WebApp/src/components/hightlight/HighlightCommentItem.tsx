@@ -158,7 +158,7 @@ export const HighlightCommentItem: React.FC<HighlightCommentItemProps> = ({
             </>}
 
             {/* Render comment con */}
-            {comment.isHaveChildren && (
+            {comment.isHaveChildren && (comment?.replies?.length ?? 0) > 0 && (
                 <div className="relative flex flex-col gap-y-3 pl-6">
                     {comment?.replies?.map((child) => (
                         <HighlightCommentItem

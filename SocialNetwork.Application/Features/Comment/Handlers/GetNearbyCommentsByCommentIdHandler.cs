@@ -1,8 +1,10 @@
 ﻿
 
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
+using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Comment.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
@@ -21,38 +23,85 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
 
         public async Task<BaseResponse> Handle(GetNearbyCommentsByCommentIdQuery request, CancellationToken cancellationToken)
         {
-            var comments = await _unitOfWork.CommentRepository.GetNearbyCommentsByPostAsync(request.PostId, request.CommentId);
+
+            var comment = await _unitOfWork.CommentRepository
+                .GetCommentByIdAsync(request.CommentId)
+                    ?? throw new NotFoundException("Bình luận không tồn tại");
 
             var response = new List<CommentResponse>();
-            foreach (var comment in comments)
-            {
-                var commentItem = ApplicationMapper.MapToComment(comment);
 
-                if(comment.Replies != null && comment.Replies.Count > 0)
-                    AddReplies(commentItem, comment.Replies);
-                response.Add(commentItem);
+            // Root comment
+            var rootComments = await _unitOfWork.CommentRepository.GetAllRootCommentsByPostIdAsync(request.PostId);
+            if (comment.ParentCommentId == null)
+            {
+              
+                var index = rootComments.FindIndex(cmt => cmt.Id == request.CommentId);
+                var nearbyComments = rootComments
+                    .Skip(Math.Max(0, index - 5))
+                    .Take(11)
+                    .ToList();
+
+                response = nearbyComments.Select(ApplicationMapper.MapToComment).ToList();
+
+            } else
+            {
+                var findCommentId = comment.Id;
+                var findParentCommentId = comment.ParentCommentId;
+
+                while (comment.ParentCommentId != null)
+                {
+                    var parentComment = await _unitOfWork.CommentRepository.GetCommentByIdAsync(comment.ParentCommentId.Value); 
+                    comment = parentComment;
+                }
+
+                var indexRoot = rootComments.FindIndex(cmt => cmt.Id == comment.Id);
+                var nearbyRootComments = rootComments
+                    .Skip(Math.Max(0, indexRoot - 5))
+                    .Take(11)
+                    .ToList();
+
+                response = nearbyRootComments.Select(ApplicationMapper.MapToComment).ToList();
+
+                var currentComment = response[indexRoot];
+                var haveChildren = currentComment.IsHaveChildren;
+                while (haveChildren)
+                {
+                    var childComments = await _unitOfWork.CommentRepository.GetAllRepliesByCommentIdAsync(currentComment.Id);
+                    var indexChild = childComments.FindIndex(cmt => cmt.Id == findCommentId);
+
+                    if (indexChild != -1)
+                    {
+                        var nearbyChildComments = childComments
+                            .Skip(Math.Max(0, indexChild - 5))
+                            .Take(11)
+                            .ToList();
+
+                        currentComment.Replies ??= new List<CommentResponse>();
+                        currentComment.Replies = nearbyChildComments.Select(ApplicationMapper.MapToComment).ToList();
+                        break;
+                    } 
+
+                    var indexParentComment = childComments.FindIndex(cmt => cmt.Id == findParentCommentId);
+                    var nearbyParentComment = childComments
+                           .Skip(Math.Max(0, indexParentComment - 5))
+                           .Take(11)
+                           .ToList();
+                   
+
+                    currentComment.Replies = nearbyParentComment.Select(ApplicationMapper.MapToComment).ToList();
+                    currentComment = currentComment.Replies.Find(cmt => cmt.Id == findParentCommentId);
+                    currentComment.IsHaveChildren = haveChildren = true;
+                }
             }
 
-            return new DataResponse<List<CommentResponse>>() { 
+            return new DataResponse<List<CommentResponse>>()
+            {
                 Data = response,
                 IsSuccess = true,
                 Message = "Lấy danh sách bình luận thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
-                
             };
         }
-
-        void AddReplies(CommentResponse parentResponse, ICollection<Domain.Entity.Comment> replies)
-        {
-            parentResponse.Replies ??= new List<CommentResponse>();
-            foreach (var reply in replies)
-            {
-                var replyItem = ApplicationMapper.MapToComment(reply);
-                parentResponse.Replies.Add(replyItem);
-
-                if (reply.Replies != null && reply.Replies.Count > 0)
-                    AddReplies(replyItem, reply.Replies);
-            }
-        }
+      
     }
 }
