@@ -21,7 +21,9 @@ export interface DataResponse<T> extends BaseResponse {
 export type Pagination = {
     page: number;
     size: number;
-    hasMore: boolean
+    hasMore: boolean;
+    havePrevPage?: boolean;
+    haveNextPage?: boolean;
 }
 
 export interface PaginationResponse<T> extends BaseResponse {

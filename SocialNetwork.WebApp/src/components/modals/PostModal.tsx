@@ -40,6 +40,7 @@ const PostModal: FC<PostModalProps> = ({
         const tempComment: CommentResource = {
             id: new Date().toISOString(),
             content: values.content,
+            postId: post.id,
             sentAt: sentAt,
             user: user!,
             isHaveChildren: false,
@@ -73,6 +74,7 @@ const PostModal: FC<PostModalProps> = ({
         setPendingComments(prev => [tempComment, ...prev])
 
         const response = await commentService.createComment(formData);
+        console.log(response)
         if (response.isSuccess) {
             setPendingComments(prev => prev.filter(cmt => cmt.level === 0 && cmt.sentAt.getTime() !== new Date(response.data.sentAt).getTime()))
             setComments((prevComment) => [response.data, ...prevComment])
@@ -102,6 +104,7 @@ const PostModal: FC<PostModalProps> = ({
             content: values.content,
             sentAt: sentAt,
             user: user!,
+            postId: post.id,
             isHaveChildren: false,
             parentCommentId,
             replies: [],
@@ -131,6 +134,7 @@ const PostModal: FC<PostModalProps> = ({
 
         parentCommentId && handleUpdateCommentList(parentCommentId, [tempReplyComment])
         const response = await commentService.createComment(formData);
+      
         if (response.isSuccess) {
             
             if (response.data.parentCommentId) {

@@ -10,3 +10,10 @@ export const inititalValues = {
     size: 6,
     hasMore: false
 } as Pagination
+
+export type CommentMentionPagination = {
+    havePrevPage: boolean;
+    haveNextPage: boolean;
+    prevPage: number;
+    nextPage: number;
+}

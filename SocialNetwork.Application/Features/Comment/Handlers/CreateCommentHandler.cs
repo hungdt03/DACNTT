@@ -12,7 +12,6 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
 
 namespace SocialNetwork.Application.Features.Comment.Handlers
 {
@@ -157,7 +156,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
 
                 await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiComment);
             }
-            else
+            else if(userId != post.UserId)
             {
                 notiComment = new Domain.Entity.Notification();
                 notiComment.CommentId = savedComment.Id;
@@ -176,12 +175,14 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            var mapNoti = ApplicationMapper.MapToNotification(notiComment);
+            
             if (replyUser != null)
             {
+                var mapNoti = ApplicationMapper.MapToNotification(notiComment);
                 await _signalRService.SendNotificationToSpecificUser(replyUser.UserName, mapNoti);
-            } else 
+            } else if(userId != post.UserId)
             {
+                var mapNoti = ApplicationMapper.MapToNotification(notiComment);
                 await _signalRService.SendNotificationToSpecificUser(post.User.UserName, mapNoti);
             }
 

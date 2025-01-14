@@ -33,11 +33,11 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     }
 
     return <>
-        <div className="flex flex-col gap-y-3 p-2 max-h-[600px] min-w-[400px] overflow-y-auto custom-scrollbar">
+        <div className="flex flex-col gap-y-3 pt-2 px-2 max-h-[600px] min-w-[400px] overflow-y-auto custom-scrollbar">
             <span className="font-semibold text-lg">Thông báo của bạn</span>
             <div className="flex flex-col gap-y-2">
                 {notifications.map(notification => <Notification onCommentNotification={() => handleOpenPost(notification)} onDelete={() => onDelete?.(notification.id)} onMarkAsRead={() => onMarkAsRead?.(notification.id)} key={notification.id} notification={notification} />)}
-                {pagination.hasMore && <button className="w-full text-center text-primary" onClick={() => onFetchMore(pagination.page + 1)}>Tải thêm</button>}
+                {pagination.hasMore && <button className="w-full text-center text-sm" onClick={() => onFetchMore(pagination.page + 1)}>Tải thêm ...</button>}
                 {notifications.length === 0 && <Empty description='Chưa có thông báo nào' />}
             </div>
         </div>

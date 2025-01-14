@@ -1,6 +1,6 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
-import { CommentResource } from '../types/comment';
+import { CommentMentionPaginationResource, CommentResource } from '../types/comment';
 import { DataResponse, PaginationResponse } from '../types/response';
 
 
@@ -38,9 +38,28 @@ class CommentService {
         });
     }
 
-    getNearbyCommentsByCommentId(postId: string, commentId: string) : Promise<DataResponse<CommentResource[]>> {
+    getNearbyCommentsByCommentId(postId: string, commentId: string) : Promise<CommentMentionPaginationResource> {
         return axiosInterceptor.get('/api/comments/nearby/' + postId + "/" + commentId)
     }
+
+    getPrevComments(postId: string, parentCommentId: string | null, page: number) : Promise<CommentMentionPaginationResource> {
+        return axiosInterceptor.get('/api/comments/prev/' + postId, {
+            params: {
+                page: page,
+                parentCommentId
+            }
+        })
+    }
+
+    getNextComments(postId: string, parentCommentId: string | null, page: number) : Promise<CommentMentionPaginationResource> {
+        return axiosInterceptor.get('/api/comments/next/' + postId, {
+            params: {
+                page: page,
+                parentCommentId
+            }
+        })
+    }
+
 }
 
 export default CommentService.getInstance();

@@ -4,8 +4,6 @@ import { CommentResource } from "../../types/comment";
 import commentService from "../../services/commentService";
 import { PostResource } from "../../types/post";
 import BoxSendComment, { BoxCommentType } from "../comments/BoxSendComment";
-import { Pagination } from "../../types/response";
-import { CommentList } from "../comments/CommentList";
 import { imageTypes } from "../../utils/file";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
@@ -14,6 +12,7 @@ import { BoxReplyCommentType } from "../comments/BoxReplyComment";
 import postService from "../../services/postService";
 import HighlightPostInner from "./HighlightPostInner";
 import { HighlightCommentList } from "./HighlightCommentList";
+import { CommentMentionPagination } from "../../utils/pagination";
 
 export type BoxCommendStateType = {
     fileList: UploadFile[];
@@ -34,10 +33,11 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
     const [comments, setComments] = useState<CommentResource[]>([])
     const [pendingComments, setPendingComments] = useState<CommentResource[]>([])
 
-    const [pagination, setPagination] = useState<Pagination>({
-        page: 1,
-        size: 6,
-        hasMore: false
+    const [pagination, setPagination] = useState<CommentMentionPagination>({
+        prevPage: 1,
+        nextPage: 1,
+        haveNextPage: false,
+        havePrevPage: false
     })
 
     const handleCreateComment = async (values: BoxCommentType) => {
@@ -48,6 +48,7 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
             content: values.content,
             sentAt: sentAt,
             user: user!,
+            postId,
             isHaveChildren: false,
             replies: [],
             createdAt: sentAt,
@@ -93,13 +94,37 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
         console.log(response)
         if (response.isSuccess) {
             setComments(prev => [...prev, ...response.data])
-            // setPagination(response.pagination)
+            setPagination(response.pagination)
+        }
+    }
+
+    const fetchPrevComments = async (parentCommentId: string | null, page: number) => {
+        const response = await commentService.getPrevComments(postId, parentCommentId, page);
+        console.log(response)
+        if(response.isSuccess) {
+            setComments(prevComments => [...response.data, ...prevComments])
+            setPagination(prevPagination => ({
+                ...prevPagination,
+                prevPage: response.pagination.prevPage,
+                havePrevPage: response.pagination.havePrevPage
+            }))
+        }
+    }
+
+    const fetchNextComment = async (parentCommentId: string | null, page: number) => {
+        const response = await commentService.getNextComments(postId, parentCommentId, page);
+        if(response.isSuccess) {
+            setComments(prevComments => [...prevComments, ...response.data])
+            setPagination(prevPagination => ({
+                ...prevPagination,
+                nextPage: response.pagination.nextPage,
+                haveNextPage: response.pagination.haveNextPage
+            }))
         }
     }
 
     const fetchPost = async () => {
         const response = await postService.getPostById(postId);
-        console.log(response)
         if(response.isSuccess) {
             setPost(response.data)
         }
@@ -117,6 +142,7 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
             id: new Date().toISOString(),
             content: values.content,
             sentAt: sentAt,
+            postId: postId,
             user: user!,
             isHaveChildren: false,
             parentCommentId,
@@ -145,7 +171,7 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
             tempReplyComment.mediaUrl = URL.createObjectURL(values.file.originFileObj)
         }
 
-        parentCommentId && handleUpdateCommentList(parentCommentId, [tempReplyComment])
+        parentCommentId && handleUpdateCommentList(parentCommentId, [tempReplyComment], false)
         const response = await commentService.createComment(formData);
         if (response.isSuccess) {
             
@@ -184,21 +210,21 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
         });
     };
 
-    const updateRepliesInComments = (
+    const updateNextComments = (
         comments: CommentResource[],
         commentId: string,
-        fetchedReplies: CommentResource[]
+        replies: CommentResource[],
     ): CommentResource[] => {
         return comments.map((comment) => {
             if (comment.id === commentId) {
-                const updatedReplies = comment.replies ? [...comment.replies, ...fetchedReplies] : [...fetchedReplies];
+                const updatedReplies = comment.replies ? [...comment.replies, ...replies] : [...replies];
                 return { ...comment, isHaveChildren: true, replies: updatedReplies };
             }
 
             if (comment.replies && comment.replies.length > 0) {
                 return {
                     ...comment,
-                    replies: updateRepliesInComments(comment.replies, commentId, fetchedReplies),
+                    replies: updateNextComments(comment.replies, commentId, replies),
                 };
             }
 
@@ -206,20 +232,44 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
         });
     };
 
-    const handleUpdateCommentList = (commentId: string, replies: CommentResource[]) => {
-        setComments((prevComments) => updateRepliesInComments(prevComments, commentId, replies))
+    const updatePrevComments = (
+        comments: CommentResource[],
+        commentId: string,
+        replies: CommentResource[],
+    ): CommentResource[] => {
+        return comments.map((comment) => {
+            if (comment.id === commentId) {
+                const updatedReplies = comment.replies ? [...replies, ...comment.replies] : [...replies];
+                return { ...comment, isHaveChildren: true, replies: updatedReplies };
+            }
+
+            if (comment.replies && comment.replies.length > 0) {
+                return {
+                    ...comment,
+                    replies: updatePrevComments(comment.replies, commentId, replies),
+                };
+            }
+
+            return comment;
+        });
+    };
+
+
+    const handleUpdateCommentList = (commentId: string, replies: CommentResource[], isPrev: boolean) => {
+        setComments((prevComments) => isPrev ? updatePrevComments(prevComments, commentId, replies) : updateNextComments(prevComments, commentId, replies))
     }
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
         {post && <HighlightPostInner post={post} />}
         
         <HighlightCommentList
-            replyComment={handleReplyComment}
-            comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
-            updatedComments={handleUpdateCommentList}
-            pagination={pagination}
-            fetchNextPage={fetchComments}
             activeCommentId={commentId}
+            comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
+            pagination={pagination}
+            replyComment={handleReplyComment}
+            updatedComments={handleUpdateCommentList}
+            onFetchNextPage={fetchNextComment}
+            onFetchPrevPage={fetchPrevComments}
         />
 
         <div className="shadow p-4 absolute left-0 right-0 bottom-0 bg-white rounded-b-md">

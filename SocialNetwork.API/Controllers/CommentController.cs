@@ -47,5 +47,19 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetNearbyCommentsByCommentIdQuery(postId, commentId));
             return Ok(response);
         }
+
+        [HttpGet("prev/{postId}")]
+        public async Task<IActionResult> GetPrevComments([FromRoute] Guid postId, [FromQuery] Guid? parentCommentId, [FromQuery] int page = 1)
+        {
+            var response = await mediator.Send(new GetPrevCommentsQuery(postId, page, parentCommentId));
+            return Ok(response);
+        }
+
+        [HttpGet("next/{postId}")]
+        public async Task<IActionResult> GetNextComments([FromRoute] Guid postId, [FromQuery] Guid? parentCommentId, [FromQuery] int page = 1)
+        {
+            var response = await mediator.Send(new GetNextCommentsQuery(postId, page, parentCommentId));
+            return Ok(response);
+        }
     }
 }

@@ -120,6 +120,7 @@ namespace SocialNetwork.Application.Mappers
                 ReplyToUserName = comment.ReplyToUserName,
                 ParentCommentId = comment.ParentCommentId,
                 MediaType = comment.MediaType,
+                PostId = comment.PostId,
                 User = comment.User != null ? MapToUser(comment.User) : null,
                 IsHaveChildren = comment.Replies != null && comment.Replies.Count > 0,
             };

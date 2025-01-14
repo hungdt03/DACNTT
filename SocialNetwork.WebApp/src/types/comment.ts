@@ -1,9 +1,12 @@
 import { MediaType } from "../enums/media";
+import { CommentMentionPagination } from "../utils/pagination";
+import { BaseResponse } from "./response";
 import { UserResource } from "./user";
 
 export type CommentResource = {
     id: string; 
     content: string;
+    postId: string;
     parentCommentId?: string | null;
     replyToUserId?: string | null;
     replyToUserName?: string | null; 
@@ -15,5 +18,11 @@ export type CommentResource = {
     isHaveChildren: boolean;
     replies: CommentResource[];
     status: string;
-    level: number
+    level: number;
+    pagination?: CommentMentionPagination
 };
+
+export interface CommentMentionPaginationResource extends BaseResponse {
+    data: CommentResource[];
+    pagination: CommentMentionPagination
+}

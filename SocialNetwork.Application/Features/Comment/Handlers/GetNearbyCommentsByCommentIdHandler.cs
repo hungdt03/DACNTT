@@ -30,21 +30,31 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
 
             var response = new List<CommentResponse>();
 
+            bool isHavePrev = false;
+            bool isHaveNext = false;
+
+            var pageSize = 5;
+            var rootCurrentPage = 1;
+
             // Root comment
             var rootComments = await _unitOfWork.CommentRepository.GetAllRootCommentsByPostIdAsync(request.PostId);
             if (comment.ParentCommentId == null)
             {
-              
                 var index = rootComments.FindIndex(cmt => cmt.Id == request.CommentId);
+                rootCurrentPage = (index / pageSize) + 1;
+
                 var nearbyComments = rootComments
-                    .Skip(Math.Max(0, index - 5))
-                    .Take(11)
+                    .Skip((rootCurrentPage - 1) * pageSize)  
+                    .Take(pageSize)                    
                     .ToList();
 
                 response = nearbyComments.Select(ApplicationMapper.MapToComment).ToList();
+                isHavePrev = rootCurrentPage > 1;
+                isHaveNext = (rootCurrentPage * pageSize) < rootComments.Count;
 
             } else
             {
+                var currentPage = 1;
                 var findCommentId = comment.Id;
                 var findParentCommentId = comment.ParentCommentId;
 
@@ -55,51 +65,79 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 }
 
                 var indexRoot = rootComments.FindIndex(cmt => cmt.Id == comment.Id);
+
+                currentPage = (indexRoot / pageSize) + 1;
                 var nearbyRootComments = rootComments
-                    .Skip(Math.Max(0, indexRoot - 5))
-                    .Take(11)
+                    .Skip((currentPage - 1) * pageSize)
+                    .Take(5)
                     .ToList();
 
                 response = nearbyRootComments.Select(ApplicationMapper.MapToComment).ToList();
 
-                var currentComment = response[indexRoot];
+                bool isChildHavePrev = currentPage > 1;
+                bool isChildHaveNext = (currentPage * pageSize) < rootComments.Count;
+
+                var currentComment = response.Find(item => item.Id == rootComments[indexRoot].Id);
+              
                 var haveChildren = currentComment.IsHaveChildren;
+
                 while (haveChildren)
                 {
                     var childComments = await _unitOfWork.CommentRepository.GetAllRepliesByCommentIdAsync(currentComment.Id);
                     var indexChild = childComments.FindIndex(cmt => cmt.Id == findCommentId);
+                    currentPage = (indexChild / pageSize) + 1;
+                    isChildHavePrev = currentPage > 1;
+                    isChildHaveNext = (currentPage * pageSize) < childComments.Count;
 
                     if (indexChild != -1)
                     {
+                       
                         var nearbyChildComments = childComments
-                            .Skip(Math.Max(0, indexChild - 5))
-                            .Take(11)
-                            .ToList();
+                              .Skip((currentPage - 1) * pageSize)
+                                .Take(pageSize)
+                                .ToList();
 
+                        currentComment.Pagination ??= new CommentMentionPagination();
+                        currentComment.Pagination.HaveNextPage = isChildHaveNext;
+                        currentComment.Pagination.HavePrevPage = isChildHavePrev;
+                        currentComment.Pagination.NextPage = currentComment.Pagination.PrevPage = currentPage;
                         currentComment.Replies ??= new List<CommentResponse>();
                         currentComment.Replies = nearbyChildComments.Select(ApplicationMapper.MapToComment).ToList();
                         break;
                     } 
 
                     var indexParentComment = childComments.FindIndex(cmt => cmt.Id == findParentCommentId);
+                    currentPage = (indexParentComment / pageSize) + 1;
                     var nearbyParentComment = childComments
-                           .Skip(Math.Max(0, indexParentComment - 5))
-                           .Take(11)
-                           .ToList();
-                   
+                                .Skip((currentPage - 1) * pageSize)
+                                .Take(pageSize)
+                                .ToList();
 
+                    isChildHavePrev = currentPage > 1;
+                    isChildHaveNext = (currentPage * pageSize) < childComments.Count;
+
+                    currentComment.Pagination ??= new CommentMentionPagination();
+                    currentComment.Pagination.HaveNextPage = isChildHaveNext;
+                    currentComment.Pagination.HavePrevPage = isChildHavePrev;
+                    currentComment.Pagination.NextPage = currentComment.Pagination.PrevPage = currentPage;
                     currentComment.Replies = nearbyParentComment.Select(ApplicationMapper.MapToComment).ToList();
                     currentComment = currentComment.Replies.Find(cmt => cmt.Id == findParentCommentId);
                     currentComment.IsHaveChildren = haveChildren = true;
                 }
             }
 
-            return new DataResponse<List<CommentResponse>>()
+            return new CommentMentionPaginationResponse()
             {
                 Data = response,
                 IsSuccess = true,
                 Message = "Lấy danh sách bình luận thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
+                Pagination = new CommentMentionPagination {
+                    HaveNextPage = isHaveNext,
+                    HavePrevPage = isHavePrev,
+                    PrevPage = rootCurrentPage,
+                    NextPage = rootCurrentPage,
+                }
             };
         }
       

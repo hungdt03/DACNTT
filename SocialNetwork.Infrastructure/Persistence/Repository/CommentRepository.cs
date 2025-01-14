@@ -1,6 +1,5 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
-using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Entity;
 using SocialNetwork.Infrastructure.DBContext;
@@ -24,6 +23,15 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<Comment> CreateCommentAsync(Comment comment)
         {
             return (await _dbContext.Comments.AddAsync(comment)).Entity;
+        }
+
+        public async Task<List<Comment>> GetAllCommentsByPostIdAndParentCommentIdAsync(Guid postId, Guid? parentCommentId)
+        {
+            return await _dbContext.Comments
+                .Include(cmt => cmt.User)
+                .Include(cmt => cmt.Replies)
+                .Where(cmt => cmt.ParentCommentId == parentCommentId && cmt.PostId == postId)
+                .ToListAsync();
         }
 
         public async Task<(List<Comment> Comments, int TotalCount)> GetAllRepliesByCommentIdAsync(Guid commentId, int pageNumber, int pageSize)

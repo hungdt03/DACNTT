@@ -13,12 +13,21 @@ namespace SocialNetwork.Application.Contracts.Responses
         public int Size { get; set; }
         public int TotalPages { get; set; }
         public bool HasMore { get; set; }
+      
     }
-
-    public class CommentPaginationResponse : BaseResponse
+    
+    public class CommentMentionPaginationResponse : BaseResponse
     {
         public List<CommentResponse> Data { get; set; }
-        public CommentResponse Pagination { get; set; }
+        public CommentMentionPagination Pagination { get; set; }
+    }
+
+    public class CommentMentionPagination
+    {
+        public int PrevPage { get; set; }
+        public int NextPage { get; set; }
+        public bool HavePrevPage { get; set; }
+        public bool HaveNextPage { get; set; }
     }
 
     public class CommentPagination

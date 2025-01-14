@@ -38,7 +38,7 @@ export const CommentList: React.FC<CommentListProps> = ({
 
             ))}
 
-            {pagination.hasMore && <button onClick={() => fetchNextPage(pagination.page + 1, pagination.size)} className="text-center text-xs font-semibold mb-4">Tải thêm bình luận</button>}
+            {pagination.hasMore && <button onClick={() => fetchNextPage(pagination.page + 1, pagination.size)} className="text-center text-sm font-semibold mt-2">Tải thêm bình luận...</button>}
         </div>
     );
 };

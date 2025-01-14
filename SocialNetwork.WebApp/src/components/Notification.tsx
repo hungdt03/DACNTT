@@ -81,13 +81,12 @@ const Notification: FC<NotificationProps> = ({
     }
 
     const handleSelectNotification = () => {
-        console.log(notification)
         if(notification.type.includes('COMMENT')) {
             onCommentNotification()
         }
     }
 
-    return <div onClick={handleSelectNotification} onMouseOver={() => setShowMoreAction(true)} onMouseLeave={() => setShowMoreAction(false)} className={cn("relative flex items-center gap-x-3 px-3 py-2 rounded-md hover:bg-gray-100 max-w-[400px]", !notification.isRead && 'bg-gray-50')}>
+    return <div onClick={handleSelectNotification} onMouseOver={() => setShowMoreAction(true)} onMouseLeave={() => setShowMoreAction(false)} className={cn("relative cursor-pointer flex items-center gap-x-3 px-3 py-2 rounded-md hover:bg-gray-100 max-w-[400px]", !notification.isRead && 'bg-gray-50')}>
         <Avatar className="flex-shrink-0" size='large' src={notification.imageUrl ?? images.user} />
         <div className="flex flex-col gap-y-3 items-start">
             <div className="flex flex-col items-start">

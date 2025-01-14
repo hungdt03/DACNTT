@@ -166,7 +166,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                         />
                     ))}
 
-                    {pagination.hasMore && <button onClick={() => handleFetchReplies?.(comment.id, pagination.page + 1, pagination.size)} className="font-semibold text-left pl-6 mb-2 text-xs">Xem thêm phản hồi</button>}
+                    {pagination.hasMore && <button onClick={() => handleFetchReplies?.(comment.id, pagination.page + 1, pagination.size)} className="font-semibold text-left pl-16 my-2 text-xs">Xem thêm phản hồi...</button>}
 
                     {/* Box phản hồi ở cuối nếu đang reply comment này */}
                     {isReplying && (
