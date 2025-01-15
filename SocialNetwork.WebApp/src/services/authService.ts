@@ -29,6 +29,14 @@ class AuthService {
     getPrincipal() : Promise<DataResponse<UserResource>> {
         return axiosInterceptor.get('/api/auth/principal')
     }
+
+    forgotPassword(email: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/auth/forgot-password', { email })
+    }
+
+    resetPassword(email: string, resetPasswordToken: string, newPassword: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/auth/reset-password', { email, resetPasswordToken, newPassword })
+    }
 }
 
 export default AuthService.getInstance();

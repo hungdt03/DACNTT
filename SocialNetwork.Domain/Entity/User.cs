@@ -10,6 +10,7 @@ namespace SocialNetwork.Domain.Entity
         public string? CoverImage { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Gender { get; set; }
+        public bool IsVerification {  get; set; }
         public DateTimeOffset DateOfBirth { get; set; }    
         public DateTimeOffset DateJoined { get; set; }
 
@@ -26,6 +27,7 @@ namespace SocialNetwork.Domain.Entity
         public ICollection<Follow> Followers { get; set; }
         public ICollection<Follow> Followings { get; set; }
         public ICollection<Story> Stories { get; set; }
+        public ICollection<OTP> OTPs { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }

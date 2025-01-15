@@ -19,6 +19,7 @@ namespace SocialNetwork.Application.Interfaces
         public IViewerRepository ViewerRepository { get; }
         public IFollowRepository FollowRepository { get; }
         public IMessageMediaRepository MessageMediaRepository { get; }
+        public IOTPRepository OTPRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);
         Task CommitTransactionAsync(CancellationToken cancellationToken = default);

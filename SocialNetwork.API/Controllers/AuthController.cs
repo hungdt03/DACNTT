@@ -41,5 +41,21 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetPrincipalQuery());
             return Ok(response);
         }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
+        {
+            var response = await mediator.Send(command);
+            return Ok(response);
+        }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
+        {
+            var response = await mediator.Send(command);
+            return Ok(response);
+        }
     }
 }

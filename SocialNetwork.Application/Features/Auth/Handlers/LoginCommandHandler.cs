@@ -24,6 +24,9 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
             var user = await userManager.FindByNameAsync(request.Email)
                 ?? throw new AppException("Sai thông tin đăng nhập");
 
+            if (!user.IsVerification)
+                throw new AppException("Tài khoản chưa được xác thực");
+
             var isMatchPassword = await userManager.CheckPasswordAsync(user, request.Password);
 
             if (!isMatchPassword)

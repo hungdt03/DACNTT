@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250109142247_InitialCreate")]
+    [Migration("20250115085639_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -508,6 +508,40 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.OTP", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OTPs");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Post", b =>
                 {
                     b.Property<Guid>("Id")
@@ -741,6 +775,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CoverImage")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTimeOffset>("DateJoined")
                         .HasColumnType("datetimeoffset");
 
@@ -760,6 +797,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsVerification")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -1054,6 +1094,17 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Story");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.OTP", b =>
+                {
+                    b.HasOne("SocialNetwork.Domain.Entity.User", "User")
+                        .WithMany("OTPs")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.Post", b =>
                 {
                     b.HasOne("SocialNetwork.Domain.Entity.Post", "OriginalPost")
@@ -1218,6 +1269,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("MessageReadStatuses");
 
                     b.Navigation("Messages");
+
+                    b.Navigation("OTPs");
 
                     b.Navigation("Posts");
 

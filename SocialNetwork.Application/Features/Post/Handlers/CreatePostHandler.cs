@@ -21,15 +21,13 @@ namespace SocialNetwork.Application.Features.Post.Handlers
         private readonly ICloudinaryService cloudinaryService;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly ISignalRService _signalRService;
-        private readonly IMailkitService _mailkitService;
 
-        public CreatePostHandler(IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService, IHttpContextAccessor contextAccessor, ISignalRService signalRService, IMailkitService mailkitService)
+        public CreatePostHandler(IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService, IHttpContextAccessor contextAccessor, ISignalRService signalRService)
         {
             _unitOfWork = unitOfWork;
             this.cloudinaryService = cloudinaryService;
             _contextAccessor = contextAccessor;
             _signalRService = signalRService;
-            _mailkitService = mailkitService;
         }
 
         public async Task<BaseResponse> Handle(CreatePostCommand request, CancellationToken cancellationToken)
@@ -116,8 +114,6 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             {
                 _signalRService.SendNotificationToSpecificUser(noti.Recipient.UserName, ApplicationMapper.MapToNotification(noti));
             }
-
-            await _mailkitService.SendAsync("hungktpm1406@gmail.com", "Test");
 
             return new DataResponse<PostResponse>
             {

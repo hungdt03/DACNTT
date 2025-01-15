@@ -18,8 +18,6 @@ namespace SocialNetwork.Infrastructure.DBContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 var tableName = entityType.GetTableName();
@@ -29,6 +27,7 @@ namespace SocialNetwork.Infrastructure.DBContext
                 }
             }
 
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
             base.OnModelCreating(modelBuilder);
         }
 
@@ -49,6 +48,7 @@ namespace SocialNetwork.Infrastructure.DBContext
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Story> Stories { get; set; }
         public DbSet<Viewer> Viewers { get; set; }
+        public DbSet<OTP> OTPs { get; set; }
 
     }
 

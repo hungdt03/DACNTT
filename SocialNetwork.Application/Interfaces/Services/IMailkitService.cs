@@ -3,6 +3,7 @@ namespace SocialNetwork.Application.Interfaces.Services
 {
     public interface IMailkitService
     {
-        Task SendAsync(string to, string subject);
+        Task SendOtpAccountVerificationAsync(string to, string otp, string fullName);
+        Task SendOtpForgotPasswordAsync(string to, string otp, string fullName);
     }
 }

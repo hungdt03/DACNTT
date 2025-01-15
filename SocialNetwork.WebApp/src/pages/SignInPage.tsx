@@ -62,7 +62,10 @@ const SignInPage: FC = () => {
                         {errors.password && touched.password && <div className="text-sm pl-3 text-red-500">{errors.password}</div>}
 
                     </div>
-                    <Button htmlType="submit" loading={loading} className="w-full mt-4 px-3 rounded-3xl text-white bg-primary">Đăng nhập</Button>
+                    <div className="w-full flex justify-end">
+                        <Link to='/forgot-password' className="text-primary font-semibold text-sm">Quên mật khẩu?</Link>
+                    </div>
+                    <Button htmlType="submit" loading={loading} className="w-full mt-2 px-3 rounded-3xl text-white bg-primary">Đăng nhập</Button>
                     <div className="flex items-center gap-x-2 justify-center">
                         <span>Chưa có tài khoản?</span>
                         <Link className="text-primary" to='/sign-up'>Đăng kí</Link>

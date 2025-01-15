@@ -33,8 +33,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Avatar = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CoverImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsVerification = table.Column<bool>(type: "bit", nullable: false),
                     DateOfBirth = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateJoined = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -230,6 +232,29 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OTPs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiresAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OTPs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OTPs_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -748,6 +773,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "StoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OTPs_UserId",
+                table: "OTPs",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PostMedias_PostId",
                 table: "PostMedias",
                 column: "PostId");
@@ -840,6 +870,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "OTPs");
 
             migrationBuilder.DropTable(
                 name: "PostMedias");

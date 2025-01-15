@@ -50,6 +50,7 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IViewerRepository, ViewerRepository>();
             services.AddScoped<IFollowRepository, FollowRepository>();
             services.AddScoped<IMessageMediaRepository, MessageMediaRepository>();
+            services.AddScoped<IOTPRepository, OTPRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>

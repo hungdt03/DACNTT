@@ -15,6 +15,7 @@ import GuestGuard from "./guestGuard";
 import UserPage from "../pages/UserPage";
 import ErrorBoundaryPage from "../pages/errors/ErrorBoundaryPage";
 import CreateStoryPage from "../pages/CreateStoryPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 
 const appRouter = createBrowserRouter([
     {
@@ -39,6 +40,10 @@ const appRouter = createBrowserRouter([
             {
                 path: 'sign-up',
                 element: <SignUpPage />
+            },
+            {
+                path: 'forgot-password',
+                element: <ForgotPasswordPage />
             }
         ]
     },
