@@ -129,7 +129,7 @@ const StoryShow: FC<StoryShowProps> = ({
                     <ChevronUp size={16} strokeWidth={3} className="mb-1" color="white" />
                 </div>
                 <Avatar.Group>
-                    {viewers.map(viewer => <img className="mx-[2px] rounded-full border-[2px] border-gray-800" width={28} height={28} key={viewer.user.id} src={viewer.user.avatar} />)}
+                    {viewers.map(viewer => <img className="mx-[2px] w-[28px] h-[28px] rounded-full object-cover border-[2px] border-gray-800" key={viewer.user.id} src={viewer.user.avatar} />)}
                 </Avatar.Group>
             </div>}
             <div

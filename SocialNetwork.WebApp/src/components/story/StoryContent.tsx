@@ -82,19 +82,7 @@ const StoryContent: FC<StoryContentProps> = ({
                         <CloseOutlined />
                     </button>
                 </div>
-                <Divider className="my-3" />
-
-                <div className="flex items-center gap-x-2">
-                    <div className="w-[75px] h-[145px] bg-slate-300 rounded-md">
-                        <img className="w-full h-full object-cover" src={images.music} />
-                    </div>
-                    <div className="w-[75px] h-[145px] bg-slate-300 rounded-md">
-                        <img className="w-full h-full object-cover" src={images.music} />
-                    </div>
-                    <div className="w-[75px] h-[145px] bg-slate-300 rounded-md">
-                        <img className="w-full h-full object-cover" src={images.music} />
-                    </div>
-                </div>
+                <Divider className="mb-0 mt-2" />
                 <div className="py-4 flex flex-col gap-y-2">
                     <div className="flex items-center gap-x-1">
                         <Eye size={17} />

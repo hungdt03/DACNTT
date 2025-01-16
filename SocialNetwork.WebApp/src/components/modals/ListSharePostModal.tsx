@@ -4,6 +4,7 @@ import postService from "../../services/postService";
 import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";
 import PostShareItem from "../posts/PostShareItem";
+import { Empty } from "antd";
 
 type ListSharePostModalProps = {
     post: PostResource
@@ -28,9 +29,10 @@ const ListSharePostModal: FC<ListSharePostModalProps> = ({
     }, [post])
 
     return <div className="p-2 max-h-[500px] overflow-y-auto custom-scrollbar">
-        <div className="flex flex-col gap-y-3">
+        {sharePosts.length === 0 ? <Empty description='Chưa có lượt chia sẻ nào' />
+        : <div className="flex flex-col gap-y-3">
             {sharePosts.map(sharePost => <PostShareItem key={sharePost.id} post={sharePost} />)}
-        </div>
+        </div>}
     </div>
 };
 

@@ -13,13 +13,17 @@ import { UserStoryResource } from "../../types/userStory";
 import storyService from "../../services/storyService";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
+import StorySkeleton from "../skeletons/StorySkeleton";
 
 
 const StoryWrapper: FC = () => {
-    const [showPrev, setShowPrev] = useState(false);
-    const { isModalOpen, showModal, handleCancel, handleOk } = useModal();
-    const [selectStory, setSelectStory] = useState<UserStoryResource>();
     const { user } = useSelector(selectAuth)
+
+    const { isModalOpen, showModal, handleCancel, handleOk } = useModal();
+
+    const [loading, setLoading] = useState(false)
+    const [showPrev, setShowPrev] = useState(false);
+    const [selectStory, setSelectStory] = useState<UserStoryResource>();
 
     const [userStories, setUserStories] = useState<UserStoryResource[]>([])
 
@@ -29,7 +33,9 @@ const StoryWrapper: FC = () => {
 
     useEffect(() => {
         const fetchUserStories = async () => {
+            setLoading(true)
             const response = await storyService.getAllStories();
+            setLoading(false)
             if (response.isSuccess) {
                 setUserStories(response.data)
             }
@@ -40,6 +46,7 @@ const StoryWrapper: FC = () => {
 
     return <>
         <div className="relative w-full h-[200px]">
+
             <Swiper
                 modules={[Navigation]}
                 slidesPerView={4.75} // Mặc định cho desktop
@@ -77,20 +84,46 @@ const StoryWrapper: FC = () => {
                 <SwiperSlide>
                     <StoryCreator />
                 </SwiperSlide>
-                {userStories.filter(s => s.user.id === user?.id).map((story, index) => <SwiperSlide key={index}>
-                    <StoryItem onClick={() => {
-                        setCurrentIndex(index)
-                        setSelectStory(story)
-                        showModal()
-                    }} story={story} />
-                </SwiperSlide>)}
-                {userStories.filter(s => s.user.id !== user?.id).map((story, index) => <SwiperSlide key={index}>
-                    <StoryItem onClick={() => {
-                        setCurrentIndex(index)
-                        setSelectStory(story)
-                        showModal()
-                    }} story={story} />
-                </SwiperSlide>)}
+                {loading ? (
+                    // Hiển thị 4 StorySkeleton khi đang loading
+                    Array.from({ length: 4 }).map((_, index) => (
+                        <SwiperSlide key={`skeleton-${index}`}>
+                            <StorySkeleton />
+                        </SwiperSlide>
+                    ))
+                ) : (
+                    // Hiển thị các story khi không loading
+                    <>
+                        {userStories
+                            .filter((s) => s.user.id === user?.id)
+                            .map((story, index) => (
+                                <SwiperSlide key={`user-${index}`}>
+                                    <StoryItem
+                                        onClick={() => {
+                                            setCurrentIndex(index);
+                                            setSelectStory(story);
+                                            showModal();
+                                        }}
+                                        story={story}
+                                    />
+                                </SwiperSlide>
+                            ))}
+                        {userStories
+                            .filter((s) => s.user.id !== user?.id)
+                            .map((story, index) => (
+                                <SwiperSlide key={`other-${index}`}>
+                                    <StoryItem
+                                        onClick={() => {
+                                            setCurrentIndex(index);
+                                            setSelectStory(story);
+                                            showModal();
+                                        }}
+                                        story={story}
+                                    />
+                                </SwiperSlide>
+                            ))}
+                    </>
+                )}
 
             </Swiper>
 

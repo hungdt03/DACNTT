@@ -5,21 +5,24 @@ import {  Empty, Modal } from "antd";
 import { Pagination } from "../../types/response";
 import useModal from "../../hooks/useModal";
 import HighlightPostModal from "../hightlight/HighlightPostModal";
+import ChatUserSkeleton from "../skeletons/ChatUserSkeleton";
 
 type NotificationDialogProps = {
     notifications: NotificationResource[];
+    loading: boolean;
+    pagination: Pagination;
     onDelete?: (notificationId: string) => void;
     onMarkAsRead?: (notificationId: string) => void;
-    pagination: Pagination;
-    onFetchMore: (nextPage: number) => void
+    onFetchMore: (nextPage: number) => void;
 }
 
 const NotificationDialog: FC<NotificationDialogProps> = ({
     notifications,
+    loading,
+    pagination,
     onDelete,
     onMarkAsRead,
-    pagination,
-    onFetchMore
+    onFetchMore,
 }) => {
 
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
@@ -37,6 +40,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
             <span className="font-semibold text-lg">Thông báo của bạn</span>
             <div className="flex flex-col gap-y-2">
                 {notifications.map(notification => <Notification onCommentNotification={() => handleOpenPost(notification)} onDelete={() => onDelete?.(notification.id)} onMarkAsRead={() => onMarkAsRead?.(notification.id)} key={notification.id} notification={notification} />)}
+                {loading && <ChatUserSkeleton />}
                 {pagination.hasMore && <button className="w-full text-center text-sm" onClick={() => onFetchMore(pagination.page + 1)}>Tải thêm ...</button>}
                 {notifications.length === 0 && <Empty description='Chưa có thông báo nào' />}
             </div>

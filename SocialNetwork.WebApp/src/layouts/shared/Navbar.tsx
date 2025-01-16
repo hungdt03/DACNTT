@@ -15,12 +15,16 @@ import { selectAuth } from "../../features/slices/auth-slice";
 import AccountDialog from "../../components/dialogs/AccountDialog";
 
 const Navbar: FC = () => {
-    const { user } = useSelector(selectAuth)
+    const { user } = useSelector(selectAuth);
+
+    const [loading, setLoading] = useState(false)
     const [notifications, setNotifications] = useState<NotificationResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
 
     const fetchNotifications = async (page: number) => {
+        setLoading(true)
         const response = await notificationService.getAllNotifications({ page, size: pagination.size });
+        setLoading(false)
         if (response.isSuccess) {
             setNotifications(prev => {
                 const newNotifications = response.data.filter(
@@ -76,7 +80,7 @@ const Navbar: FC = () => {
 
     return <div className="flex items-center gap-x-3">
         <Badge count={notifications.filter(n => !n.isRead).length}>
-            <Popover trigger='click' placement="topRight" content={<NotificationDialog onFetchMore={(nextPage) => fetchNotifications(nextPage)} pagination={pagination} onMarkAsRead={handleMarkNotificationAsRead} onDelete={handleDeleteNotification} notifications={notifications} />}>
+            <Popover trigger='click' placement="topRight" content={<NotificationDialog loading={loading} onFetchMore={(nextPage) => fetchNotifications(nextPage)} pagination={pagination} onMarkAsRead={handleMarkNotificationAsRead} onDelete={handleDeleteNotification} notifications={notifications} />}>
                 <button className="p-3 rounded-md bg-gray-100">
                     <Bell className="text-gray-500" size={18} />
                 </button>

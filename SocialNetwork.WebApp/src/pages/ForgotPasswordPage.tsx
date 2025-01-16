@@ -19,8 +19,10 @@ export type ForgotPasswordFormik = {
 
 const ForgotPasswordPage: FC = () => {
     const { isModalOpen, showModal, handleCancel, handleOk } = useModal();
+
     const [mailLoading, setMailLoading] = useState(false)
     const [otpLoading, setOtpLoading] = useState(false)
+    const [resendLoading, setResendLoading] = useState(false)
 
     const [email, setEmail] = useState('')
     const [verifyOtp, setVerifyOtp] = useState(false);
@@ -59,6 +61,18 @@ const ForgotPasswordPage: FC = () => {
             toast.success(response.message)
             handleOk();
             navigate('/sign-in')
+        } else {
+            toast.error(response.message)
+        }
+    }
+
+    const handleResendOTP = async () => {
+        setResendLoading(true)
+        const response = await otpService.resendOtpVerifyForgotPassword(email);
+        setResendLoading(false)
+        if(response.isSuccess) {
+            toast.success(response.message)
+            verifyOtpRef.current?.startCountdown(5 * 60);
         } else {
             toast.error(response.message)
         }
@@ -108,7 +122,7 @@ const ForgotPasswordPage: FC = () => {
 
         <Modal
             centered
-            title={<p className="text-center font-semibold text-xl">Xác thực tài khoản</p>}
+            title={<p className="text-center font-semibold text-xl">Khôi phục mật khẩu</p>}
             width='600px'
             footer={[]}
             open={isModalOpen}
@@ -116,7 +130,7 @@ const ForgotPasswordPage: FC = () => {
             onCancel={handleCancel}
             maskClosable={false}
         >
-            {!verifyOtp ? <VerifyOTP ref={verifyOtpRef} loading={otpLoading} onSubmit={handleVerifyOTP} /> :
+            {!verifyOtp ? <VerifyOTP ref={verifyOtpRef} resendLoading={resendLoading} email={email} onResend={handleResendOTP} loading={otpLoading} onSubmit={handleVerifyOTP} /> :
                 <ResetPassword loading={false} onSubmit={handleResetPassword} />
             }
         </Modal>

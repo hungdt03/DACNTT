@@ -49,7 +49,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
                 bool isMe = post.UserId == userId;
 
-                if (isMe || isFriend && post.Privacy.Equals(PrivacyConstant.PUBLIC) ||
+                if (isMe || isFriend || post.Privacy.Equals(PrivacyConstant.PUBLIC) ||
                     (post.Privacy.Equals(PrivacyConstant.FRIENDS)))
                 {
                     filteredPosts.Add(post);

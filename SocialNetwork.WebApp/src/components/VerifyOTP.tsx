@@ -5,12 +5,18 @@ import { BaseResponse } from "../types/response";
 
 type VerifyOTPProps = {
     onSubmit: (otp: string) => Promise<BaseResponse>;
-    loading: boolean
+    loading: boolean;
+    email: string;
+    resendLoading: boolean;
+    onResend: () => void
 }
 
 const VerifyOTP = forwardRef(({
     onSubmit,
-    loading
+    loading,
+    resendLoading,
+    onResend,
+    email
 }: VerifyOTPProps, ref) => {
     const [otp, setOtp] = useState<string>('')
     const [error, setError] = useState<string>('');
@@ -40,7 +46,7 @@ const VerifyOTP = forwardRef(({
     };
 
     
-    const handleSendOtp = async () => {
+    const handleVerifyOTP = async () => {
         const response = await onSubmit(otp);
         if(!response.isSuccess) {
             setError(response.message)
@@ -51,6 +57,7 @@ const VerifyOTP = forwardRef(({
             }
         }
     }
+
 
     useImperativeHandle(ref, () => ({
         startCountdown
@@ -64,7 +71,12 @@ const VerifyOTP = forwardRef(({
         }
     }, [])
 
-    return <div className="w-full flex flex-col items-center gap-y-3 p-4">
+
+    return <div className="w-full flex flex-col items-center gap-y-2 p-4">
+          <div className="flex items-center gap-x-1">
+            <span>Vui lòng nhập mã OTP chúng tôi đã gửi tới</span>
+            <span className="font-semibold italic">{email}</span>
+        </div>
         <OTPInput
             skipDefaultStyles
             inputStyle='w-12 text-center py-2 border-[1px] border-black outline-black rounded-sm text-black text-lg'
@@ -79,18 +91,20 @@ const VerifyOTP = forwardRef(({
 
         {error && <p className="text-sm text-red-600 pl-2">{error}</p>}
 
-        <div className="flex justify-end">
-            <Button loading={loading} disabled={otp.length !== 6} onClick={handleSendOtp} type="primary" >Xác thực</Button>
+        <div className="flex justify-end my-2">
+            <Button loading={loading} disabled={otp.length !== 6} onClick={handleVerifyOTP} type="primary" >Xác thực</Button>
         </div>
 
         <div className="flex justify-between">
             <p>Thời gian còn lại: {timer}</p>
         </div>
 
-        <div className="flex items-center gap-x-1">
-            <span>Vui lòng nhập mã OTP chúng tôi đã gửi tới</span>
-            <span className="font-semibold italic">hungktpm1406@gmail.com</span>
+        <div className="flex items-center">
+            <p>Chưa nhận được mã?</p>
+            <Button loading={resendLoading} type="link" onClick={onResend}>Gửi lại</Button>
         </div>
+
+      
     </div>
 })
 

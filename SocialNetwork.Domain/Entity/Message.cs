@@ -6,7 +6,7 @@ namespace SocialNetwork.Domain.Entity
 {
     public class Message : BaseAuditableEntity
     {
-        public string Content { get; set; } 
+        public string? Content { get; set; } 
         public string MessageType { get; set; }
         public string? SenderId { get; set; } 
         public User Sender { get; set; }

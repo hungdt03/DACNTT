@@ -31,9 +31,11 @@ const ChatMinimizePopup: FC<ChatMinimizePopupProps> = ({
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
-
                 if (message.chatRoomId === chatRoom.id) {
-                    setCount(prev => prev + 1)
+                    setCount(prev => {
+                        console.log(prev)
+                        return prev + 1
+                    })
                     dispatch(setChatRoomMessage({
                         chatRoomId: message.chatRoomId,
                         message: message.content,
@@ -44,23 +46,17 @@ const ChatMinimizePopup: FC<ChatMinimizePopupProps> = ({
             undefined,
             // ON TYPING MESSAGE
             (groupName, content) => {
-                console.log('Start typing')
-                console.log(groupName)
                 groupName === chatRoom.uniqueName && setTyping(content)
             },
 
             // ON STOP TYPING MESSAGE
             (groupName) => {
-                console.log('Stop typing')
-                console.log(groupName)
                 groupName === chatRoom.uniqueName && setTyping('')
             },
             undefined,
             undefined,
             undefined,
             undefined,
-       
-       
         );
 
     }, []);

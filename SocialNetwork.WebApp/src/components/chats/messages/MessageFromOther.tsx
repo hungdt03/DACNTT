@@ -22,9 +22,9 @@ const MessageFromOther: FC<MessageFromOtherProps> = ({
                 <Avatar className="flex-shrink-0" size='small' src={message.sender.avatar ?? images.user} />
                 <div className="flex flex-col w-full items-start gap-y-1">
                     {message.medias && <MessageMedia medias={message.medias} />}
-                    <div className="bg-gray-200 text-gray-700 p-2 rounded-lg text-sm max-w-full break-words">
+                    {message.content && <div className="bg-gray-200 text-gray-700 p-2 rounded-lg text-sm max-w-full break-words">
                         {message.content}
-                    </div>
+                    </div>}
                     <span className="text-xs text-gray-400 pl-1">Đã gửi vào lúc {formatTimeMessage(new Date(message.sentAt))}</span>
                 </div>
             </div>

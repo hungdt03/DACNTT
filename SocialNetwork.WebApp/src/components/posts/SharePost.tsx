@@ -174,6 +174,7 @@ const SharePost: FC<SharePostProps> = ({
 
             <Popover content={<PostMoreAction
                 onEditPost={showEditPostModal}
+                isMine={post.user.id === user?.id}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
                     <MoreHorizontal className="text-gray-400" />
@@ -254,6 +255,9 @@ const SharePost: FC<SharePostProps> = ({
             open={openListShare}
             onOk={okListShare}
             onCancel={cancelListShare}
+            classNames={{
+                footer: 'hidden'
+            }}
         >
             <ListSharePostModal post={post} />
         </Modal>

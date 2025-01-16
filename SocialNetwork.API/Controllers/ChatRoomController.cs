@@ -32,6 +32,13 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchChatRoomsByName([FromQuery] string name = "")
+        {
+            var response = await mediator.Send(new SearchChatRoomByNameQuery(name));
+            return Ok(response);
+        }
+
         [HttpGet("medias/{chatRoomId}")]
         public async Task<IActionResult> GetAllMediasByChatRoomId([FromRoute] Guid chatRoomId, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {

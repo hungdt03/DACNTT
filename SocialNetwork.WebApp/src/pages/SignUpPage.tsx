@@ -22,8 +22,11 @@ export type SignUpRequest = {
 
 const SignUpPage: FC = () => {
     const navigate = useNavigate();
+
     const [loading, setLoading] = useState(false);
     const [otpLoading, setOtpLoading] = useState(false);
+    const [resendLoading, setResendLoading] = useState(false);
+
     const { isModalOpen, showModal, handleCancel, handleOk } = useModal();
 
     const [email, setEmail] = useState('')
@@ -54,6 +57,18 @@ const SignUpPage: FC = () => {
 
         return response;
        
+    }
+
+    const handleResendOTP = async () => {
+        setResendLoading(true)
+        const response = await otpService.resendOtpVerifyAccount(email);
+        setResendLoading(false)
+        if(response.isSuccess) {
+            toast.success(response.message)
+            verifyOtpRef.current?.startCountdown(5 * 60);
+        } else {
+            toast.error(response.message)
+        }
     }
 
     useEffect(() => {
@@ -101,7 +116,7 @@ const SignUpPage: FC = () => {
                         <label htmlFor="password" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
                             Mật khẩu
                         </label>
-                        <Field name="password" id='password' placeholder='Mật khẩu' className='border-[1px] outline-none px-6 py-2 rounded-3xl border-primary' />
+                        <Field name="password" id='password' type='password' placeholder='Mật khẩu' className='border-[1px] outline-none px-6 py-2 rounded-3xl border-primary' />
                         {errors.password && touched.password && <div className="text-sm pl-3 text-red-500">{errors.password}</div>}
 
                     </div>
@@ -109,7 +124,7 @@ const SignUpPage: FC = () => {
                         <label htmlFor="confirmPassword" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
                             Nhập lại mật khẩu
                         </label>
-                        <Field name="confirmPassword" id='confirmPassword' placeholder='Xác nhận mật khẩu' className='border-[1px] outline-none px-6 py-2 rounded-3xl border-primary' />
+                        <Field name="confirmPassword" id='confirmPassword' type='password' placeholder='Xác nhận mật khẩu' className='border-[1px] outline-none px-6 py-2 rounded-3xl border-primary' />
                         {errors.confirmPassword && touched.confirmPassword && <div className="text-sm pl-3 text-red-500">{errors.confirmPassword}</div>}
 
                     </div>
@@ -132,7 +147,15 @@ const SignUpPage: FC = () => {
             onCancel={handleCancel}
             maskClosable={false}
         >
-           <VerifyOTP ref={verifyOtpRef} loading={otpLoading} onSubmit={handleVerifyOTP} />
+           {email && <VerifyOTP 
+                ref={verifyOtpRef} 
+                loading={otpLoading} 
+                email={email} 
+                onSubmit={handleVerifyOTP}
+                resendLoading={resendLoading}
+                onResend={handleResendOTP}
+
+            />}
         </Modal>
     </div>
 };

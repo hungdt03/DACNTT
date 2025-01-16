@@ -106,7 +106,7 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
                 </div>
                 <div className="flex items-center justify-between w-full">
                     <input onFocus={onFocus} value={state.content} onChange={e => handleContentChange(e.target.value)} className="text-sm px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
-                    <button disabled={!state.content} onClick={handleSubmit} className="flex-shrink-0 w-8 h-8 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
+                    <button disabled={!state.content && state.files.length === 0} onClick={handleSubmit} className="flex-shrink-0 w-8 h-8 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
                         <SendHorizonal size={18} className="text-sky-500" />
                     </button>
                 </div>

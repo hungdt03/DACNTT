@@ -110,7 +110,7 @@ const ProfileContent: FC<ProfileContentProps> = ({
 
             <div className="flex flex-col lg:flex-row items-center lg:items-end -mt-20 gap-x-6 lg:-mt-12 px-8">
                 <div className="relative z-30 flex-shrink-0">
-                    <img alt="Ảnh đại diện" className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[1px] border-primary" src={user?.avatar} />
+                    <img alt="Ảnh đại diện" className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[1px] border-primary object-cover" src={user?.avatar} />
                     <ImgCrop modalOk="Lưu lại" modalCancel="Hủy bỏ" modalTitle="Ảnh đại diện" showGrid showReset resetText="Bắt đầu lại" rotationSlider>
                         <Upload
                             multiple={false}

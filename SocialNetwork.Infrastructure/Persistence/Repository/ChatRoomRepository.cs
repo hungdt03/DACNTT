@@ -48,6 +48,24 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .SingleOrDefaultAsync(c => c.UniqueName == uniqueName);
         }
 
+        public async Task<List<ChatRoom>> GetChatRoomsByNameAndUserIdAsync(string name, string userId)
+        {
+            var chatRooms = await _context.ChatRooms
+               .Include(c => c.Members)
+                   .ThenInclude(c => c.User)
+               .Where(c => 
+                    c.Members.Any(s => s.UserId.Equals(userId)) 
+                    && (c.IsPrivate 
+                        ? c.Members.Any(m => m.UserId != userId && m.User.FullName.ToLower().Contains(name.ToLower()))
+                        : c.Name.ToLower().Contains(name)
+                    )
+                )
+               .OrderByDescending(c => c.LastMessageDate)
+               .ToListAsync();
+
+            return chatRooms;
+        }
+
         public async Task<ChatRoom?> GetPrivateChatRoomByMemberIds(List<string> memberIds)
         {
             return await _context.ChatRooms

@@ -6,6 +6,7 @@ import images from "../../assets";
 import { FriendResource } from "../../types/friend";
 import friendService from "../../services/friendService";
 import { TagResource } from "../../types/tag";
+import useDebounce from "../../hooks/useDebounce";
 
 type TagFriendModalProps = {
     onChange?: (tags: FriendResource[]) => void;
@@ -20,6 +21,8 @@ const TagFriendModal: FC<TagFriendModalProps> = ({
     onTagRemove,
     tags
 }) => {
+    const [searchTerm, setSearchTerm] = useState("");
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const [friends, setFriends] = useState<FriendResource[]>([]);
     const [selectFriends, setSelectFriends] = useState<FriendResource[]>(tags?.map(tag => tag.user) ?? [])
 
@@ -57,12 +60,23 @@ const TagFriendModal: FC<TagFriendModalProps> = ({
         }
     }
 
+    useEffect(() => {
+        const searchFriends = async () => {
+            const response = await friendService.getAllFriendsByFullName(debouncedSearchTerm);
+            if (response.isSuccess) {
+                setFriends([...response.data.filter(friend => !selectFriends.some(s => s.id === friend.id))]);
+            }
+        };
+
+        searchFriends();
+    }, [debouncedSearchTerm]);
+
 
     return <div className="flex flex-col gap-y-3 w-[400px] p-2">
         <div className="flex items-center gap-x-4">
             <div className="flex flex-1 items-center gap-x-2 px-3 py-2 rounded-3xl bg-gray-100">
                 <Search size={16} />
-                <input className="outline-none border-none bg-gray-100 w-full" placeholder="Tìm kiếm" />
+                <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="outline-none border-none bg-gray-100 w-full" placeholder="Tìm kiếm" />
             </div>
             <button onClick={() => onFinish?.(selectFriends)} className="text-primary font-bold text-sm">Xong</button>
         </div>

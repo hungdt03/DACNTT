@@ -24,7 +24,6 @@ const StoryItem: FC<StoryItemProps> = ({
                 background: story.stories[0].type === StoryType.STORY_TEXT
                     ? story.stories[0].background
                     : `url(${story.stories[0].background})`,
-                fontFamily: story.stories[0].fontFamily,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 height: '200px',
@@ -38,7 +37,9 @@ const StoryItem: FC<StoryItemProps> = ({
                 }}
             />
 
-            <div className="text-white text-center break-words break-all font-semibold text-xs z-10">
+            <div style={{
+                fontFamily: story.stories[0].fontFamily,
+            }} className="text-white text-center break-words break-all font-semibold text-xs z-10">
                 {story.stories[0].content}
             </div>
 
@@ -47,7 +48,7 @@ const StoryItem: FC<StoryItemProps> = ({
             </div>
 
             <div className="absolute left-0 bottom-0 right-0 py-2 px-2">
-                <span className="text-xs text-white font-bold">
+                <span className="text-xs text-white font-bold line-clamp-1">
                     {user?.id === story.user.id ? 'Tin của bạn' : story.user.fullName}
                 </span>
             </div>

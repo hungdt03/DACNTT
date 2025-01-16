@@ -10,5 +10,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<ChatRoom?> GetChatRoomByUniqueNameAsync(string uniqueName);
         Task<ChatRoom?> GetChatRoomByIdAsync(Guid id);
         Task<ChatRoom?> GetPrivateChatRoomByMemberIds(List<string> memberIds);
+        Task<List<ChatRoom>> GetChatRoomsByNameAndUserIdAsync(string name, string userId);
     }
 }

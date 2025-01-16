@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Contracts.Responses;
@@ -20,14 +21,16 @@ namespace SocialNetwork.Application.Features.Message.Handlers
         private readonly ISignalRService _signalRService;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly UserManager<Domain.Entity.User> _userManager;
 
 
-        public CreateMessageHandler(IUnitOfWork unitOfWork, ISignalRService signalRService, IHttpContextAccessor contextAccessor, ICloudinaryService cloudinaryService)
+        public CreateMessageHandler(IUnitOfWork unitOfWork, ISignalRService signalRService, IHttpContextAccessor contextAccessor, ICloudinaryService cloudinaryService, UserManager<Domain.Entity.User> userManager)
         {
             _unitOfWork = unitOfWork;
             _signalRService = signalRService;
             _contextAccessor = contextAccessor;
             _cloudinaryService = cloudinaryService;
+            _userManager = userManager;
         }
 
         public async Task<BaseResponse> Handle(CreateMessageCommand request, CancellationToken cancellationToken)
@@ -93,7 +96,13 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                 recentReadStatus.ReadAt = DateTimeOffset.UtcNow;
             }
 
-            chatRoom.LastMessage = message.Content;
+            if(message.Medias.Count > 0)
+            {
+                var fullName = _contextAccessor.HttpContext.User.GetFullName();
+                chatRoom.LastMessage = $"{fullName} đã gửi {medias.Count} tập tin đính kèm";
+            } else if(string.IsNullOrEmpty(message.Content))
+                chatRoom.LastMessage = message.Content;
+
             chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
 
             await _unitOfWork.CommitTransactionAsync();

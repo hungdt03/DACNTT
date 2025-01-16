@@ -22,6 +22,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<(List<Message>, int)> GetAllMessagesByChatRoomIdAsync(Guid chatRoomId, int page, int size)
         {
             var query = _context.Messages
+                .Where(msg => msg.ChatRoomId == chatRoomId)
                .Include(m => m.Medias)
                .Include(m => m.Sender)
                .Include(m => m.Reads)

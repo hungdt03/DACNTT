@@ -11,21 +11,37 @@ SwiperCore.use([Navigation]);
 import ChatAvatarStatus from "../../../components/chats/ChatAvatarStatus";
 import { ChatRoomResource } from "../../../types/chatRoom";
 import chatRoomService from "../../../services/chatRoomService";
+import useDebounce from "../../../hooks/useDebounce";
 
 const ChatSidebar: FC = () => {
     const { id } = useParams();
-    const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([])
+    const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
+    const [onlineChatRooms, setOnlineChatRooms] = useState<ChatRoomResource[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     useEffect(() => {
         const fetchChatRooms = async () => {
             const response = await chatRoomService.getAllChatRooms();
             if (response.isSuccess) {
                 setChatRooms(response.data);
+                setOnlineChatRooms(response.data.filter(item => item.isOnline))
             }
         }
 
         fetchChatRooms();
     }, [])
+
+    useEffect(() => {
+        const searchChatRoom = async () => {
+            const response = await chatRoomService.searchChatRoomByName(debouncedSearchTerm);
+            if (response.isSuccess) {
+                setChatRooms(response.data);
+            }
+        };
+
+        searchChatRoom();
+    }, [debouncedSearchTerm]);
 
     return <div className="h-full bg-white col-span-3 flex flex-col gap-y-4 py-4 overflow-hidden border-r-[1px] border-gray-200">
         <div className="flex items-center justify-between px-4">
@@ -39,7 +55,7 @@ const ChatSidebar: FC = () => {
         <div className="px-4">
             <div className="px-3 py-[6px] text-sm rounded-3xl bg-gray-100 flex items-center gap-x-2">
                 <Search size={16} className="text-gray-400" />
-                <input className="outline-none border-none w-full bg-gray-100" placeholder="Tìm kiếm" />
+                <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="outline-none border-none w-full bg-gray-100" placeholder="Tìm kiếm" />
             </div>
         </div>
         <div className="flex items-center gap-y-2 pl-4">
@@ -49,7 +65,7 @@ const ChatSidebar: FC = () => {
                 spaceBetween={4}
                 modules={[Navigation]}
             >
-                {chatRooms.filter(chatRoom => chatRoom.isOnline).map(chatRoom => <SwiperSlide key={chatRoom.id}><ChatAvatarStatus chatRoom={chatRoom} /></SwiperSlide>)}
+                {onlineChatRooms.map(chatRoom => <SwiperSlide key={chatRoom.id}><ChatAvatarStatus chatRoom={chatRoom} /></SwiperSlide>)}
             </Swiper>
 
         </div>

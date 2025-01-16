@@ -1,7 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { MessageResource } from '../types/message';
-import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
+import { BaseResponse, PaginationResponse } from '../types/response';
 
 class MessageService {
     private static instance: MessageService;

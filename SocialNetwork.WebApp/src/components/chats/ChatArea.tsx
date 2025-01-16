@@ -1,4 +1,4 @@
-import { Avatar, Tooltip, message } from "antd";
+import { Avatar, Tooltip } from "antd";
 import { FC, useEffect, useRef, useState } from "react";
 import images from "../../assets";
 import SignalRConnector from '../../app/signalR/signalr-connection'
@@ -48,8 +48,16 @@ const ChatArea: FC<ChatAreaProps> = ({
         }
     }
 
+    const loadMessages = async (page: number, size: number, chatRoomId: string) => {
+        const response = await messageService.getAllMessagesByChatRoomId(chatRoomId, page, size);
+        if (response.isSuccess) {
+            setMessages(response.data)
+            setPagination(response.pagination)
+        }
+    }
+
     useEffect(() => {
-        fetchMessages(pagination.page, pagination?.size)
+        loadMessages(1, 10, chatRoom.id);
 
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
@@ -114,6 +122,10 @@ const ChatArea: FC<ChatAreaProps> = ({
             undefined,
         );
 
+        setMsgPayload(prev => ({
+            ...prev,
+            chatRoomName: chatRoom.uniqueName
+        }))
     }, [chatRoom]);
 
     useEffect(() => {
@@ -259,7 +271,7 @@ const ChatArea: FC<ChatAreaProps> = ({
         </div>
 
         <div className="flex flex-col h-full gap-y-3 w-full overflow-y-auto custom-scrollbar p-4">
-        {pagination.hasMore && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-primary my-2 text-xs">Tải thêm tin nhắn</button>}
+            {pagination.hasMore && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-primary my-2 text-xs">Tải thêm tin nhắn</button>}
             {[...messages, ...pendingMessages].map(message => <Message chatRoom={chatRoom} key={message.id} message={message} isMe={message.senderId === user?.id} />)}
             <div ref={messagesEndRef}></div>
         </div>

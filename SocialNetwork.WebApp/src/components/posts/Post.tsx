@@ -197,6 +197,7 @@ const Post: FC<PostProps> = ({
             </div>
             <Popover className="flex-shrink-0" content={<PostMoreAction
                 onEditPost={showEditPostModal}
+                isMine={post.user.id === user?.id}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
                     <MoreHorizontal className="text-gray-400" />
@@ -314,6 +315,9 @@ const Post: FC<PostProps> = ({
             open={openListShare}
             onOk={okListShare}
             onCancel={cancelListShare}
+            classNames={{
+                footer: 'hidden'
+            }}
         >
             <ListSharePostModal post={post} />
         </Modal>

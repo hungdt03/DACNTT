@@ -143,7 +143,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                         </div>
                     }
 
-                    {!friendRequest || friendRequest.status === FriendRequestStatus.NONE && <Button onClick={handleSendFriendRequest} icon={<Plus size={16} />} type='primary'>Thêm bạn bè</Button>}
+                    {(!friendRequest || friendRequest.status === FriendRequestStatus.NONE) && <Button onClick={handleSendFriendRequest} icon={<Plus size={16} />} type='primary'>Thêm bạn bè</Button>}
 
                     {friendRequest?.status === FriendRequestStatus.PENDING && friendRequest?.sender?.id !== user?.id && <div className="flex items-center gap-x-2">
                         <Button onClick={handleAcceptFriendRequest} icon={<Check size={16} />} type='primary'>Chấp nhận</Button>

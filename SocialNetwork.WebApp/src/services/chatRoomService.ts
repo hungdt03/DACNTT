@@ -28,6 +28,14 @@ class ChatRoomService {
         return axiosInterceptor.get('/api/chatRooms/' + chatRoomId)
     }
 
+    searchChatRoomByName(name: string) : Promise<DataResponse<ChatRoomResource[]>> {
+        return axiosInterceptor.get('/api/chatRooms/search', {
+            params: {
+                name
+            }
+        })
+    }
+
     getMediasByChatRoomId(chatRoomId: string, page: number, size: number) : Promise<PaginationResponse<MessageMediaResource[]>> {
         return axiosInterceptor.get('/api/chatRooms/medias/' + chatRoomId, {
             params: {

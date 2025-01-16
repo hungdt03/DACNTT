@@ -57,7 +57,7 @@ namespace SocialNetwork.Application.Features.Otp.Handlers
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            await _mailkitService.SendOtpForgotPasswordAsync(user.Email, otpCode, user.FullName);
+            await _mailkitService.SendOtpAccountVerificationAsync(user.Email, otpCode, user.FullName);
 
             return new BaseResponse()
             {

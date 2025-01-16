@@ -17,7 +17,7 @@ export type LastMessagePayload = {
     sentAt: Date
 }
 
-const MAX_OPEN_POPUPS = 3;  
+const MAX_OPEN_POPUPS = 3;
 
 const chatPopupSlice = createSlice({
     name: 'chatPopup',
@@ -30,7 +30,7 @@ const chatPopupSlice = createSlice({
             if (index < 0) {
                 const openPopups = state.chatRooms.filter(s => s.state === 'open');
                 if (openPopups.length >= MAX_OPEN_POPUPS) {
-                    const oldestOpen = openPopups[0]; 
+                    const oldestOpen = openPopups[0];
                     const oldestIndex = state.chatRooms.findIndex(s => s.chatRoom.id === oldestOpen.chatRoom.id);
                     if (oldestIndex !== -1) {
                         state.chatRooms[oldestIndex].state = 'minimize';
@@ -43,11 +43,21 @@ const chatPopupSlice = createSlice({
                     state: 'open',
                 });
             } else {
-                state.chatRooms[index].state = 'open'
+
+                const openPopups = state.chatRooms.filter(s => s.state === 'open');
+                if (openPopups.length >= MAX_OPEN_POPUPS && state.chatRooms[index].state !== 'open') {
+                    const oldestIndex = state.chatRooms.findIndex(s => s.chatRoom.id === openPopups[0].chatRoom.id);
+                    if (oldestIndex !== -1) {
+                        state.chatRooms[oldestIndex].state = 'minimize';
+                    }
+                }
+
+                // Đặt trạng thái của chat room thành 'open'
+                state.chatRooms[index].state = 'open';
             }
         },
         remove: (state, action: PayloadAction<string>) => {
-            if(state.chatRooms.some(s => s.chatRoom.id === action.payload)) {
+            if (state.chatRooms.some(s => s.chatRoom.id === action.payload)) {
                 state.chatRooms = state.chatRooms.filter(s => s.chatRoom.id !== action.payload)
             }
         },
@@ -56,7 +66,7 @@ const chatPopupSlice = createSlice({
             if (chat) {
                 const openPopups = state.chatRooms.filter(s => s.state === 'open');
                 if (openPopups.length >= MAX_OPEN_POPUPS) {
-                    const oldestOpen = openPopups[0]; 
+                    const oldestOpen = openPopups[0];
                     const oldestIndex = state.chatRooms.findIndex(s => s.chatRoom.id === oldestOpen.chatRoom.id);
                     if (oldestIndex !== -1) {
                         state.chatRooms[oldestIndex].state = 'minimize';
@@ -80,7 +90,7 @@ const chatPopupSlice = createSlice({
                 chat.chatRoom.isRead = false;
             }
         },
-        minimize:  (state, action: PayloadAction<string>) => {
+        minimize: (state, action: PayloadAction<string>) => {
             const chat = state.chatRooms.find(s => s.chatRoom.id === action.payload);
             if (chat) {
                 chat.state = 'minimize';

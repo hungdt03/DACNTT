@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { CloseOutlined, MinusOutlined, PhoneOutlined } from '@ant-design/icons'
+import { CloseOutlined, MinusOutlined, PhoneOutlined, DownOutlined } from '@ant-design/icons'
 import images from "../../assets";
 import Message from "./messages/Message";
 import { ChatRoomResource } from "../../types/chatRoom";
@@ -9,7 +9,7 @@ import messageService from "../../services/messageService";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import BoxSendMessage, { BoxMessageType } from "./BoxSendMessage";
-import { Tooltip, UploadFile } from "antd";
+import { Popover, Tooltip, UploadFile } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
 import { formatTime } from "../../utils/date";
@@ -128,6 +128,10 @@ const ChatPopup: FC<ChatPopupProps> = ({
             // ON READ STATUS RECEIVE
             (message, userId) => {
                 if (message.chatRoomId === room.id) {
+                    if(message.senderId !== user?.id) {
+                        setIsRead(true)
+                    }
+
                     setMessages((prevMessages) => {
                         const updatedMessages = [...prevMessages];
 
@@ -145,8 +149,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
                         return updatedMessages;
                     });
-
-
                 }
             },
             // ON TYPING MESSAGE
@@ -280,44 +282,45 @@ const ChatPopup: FC<ChatPopupProps> = ({
         setIsRead(true)
     }
 
-    return <div className="w-[300px] z-[200] h-[450px] relative bg-white rounded-t-xl overflow-hidden shadow-md">
+    return <div className="w-[320px] z-[200] h-[450px] relative bg-white rounded-t-xl overflow-hidden shadow-md">
         <div className={cn("z-[200] text-white absolute top-0 left-0 right-0 shadow-md flex items-center justify-between border-[1px] border-gray-200 p-[2px]", isRead ? ' bg-white' : 'bg-sky-500')}>
-            <div className="flex items-center gap-x-2 rounded-md p-1">
-                <div className="relative">
-                    <img
-                        src={room.friend?.avatar ?? images.group}
-                        alt="Avatar"
-                        className="w-[40px] h-[40px] rounded-full"
-                    />
-                    {room.isOnline && <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
+            <Popover trigger='click' content={<div className="flex flex-col gap-y-2">
+                {room.isPrivate && <Link to={`/profile/${room.friend?.id}`} className="px-2 py-1 rounded-md hover:bg-gray-100 w-full hover:text-black">Trang cá nhân</Link>}
+                <Link to={`/chat/${room.id}`} className="px-2 py-1 rounded-md hover:bg-gray-100 w-full hover:text-black">Mở trong messenger</Link>
+            </div>}>
+                <div className="flex items-center gap-x-2 rounded-md p-1 hover:bg-gray-100 cursor-pointer">
+                    <div className="relative flex-shrink-0">
+                        <img
+                            src={room.friend?.avatar ?? images.group}
+                            alt="Avatar"
+                            className="w-[40px] h-[40px] rounded-full object-cover"
+                        />
+                        {room.isOnline && <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
+
+                    </div>
+
+                    <div className="flex flex-col flex-shrink-0">
+                        <b className={cn("text-sm", isRead && 'text-black')}>{room.isPrivate ? room.friend?.fullName : room.name}</b>
+                        <div className={cn("text-[12px] flex items-center gap-x-2", isRead && 'text-gray-400')}>
+                            {room.isOnline ? 'Đang hoạt động' : room.recentOnlineTime && `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
+                            <span><DownOutlined className="text-gray-500" /></span>
+                        </div>
+                    </div>
 
                 </div>
-
-                <div className="flex flex-col">
-                    <b className={cn("text-sm", isRead && 'text-black')}>{room.isPrivate ? room.friend?.fullName : room.name}</b>
-                    <p className={cn("text-[12px]", isRead && 'text-gray-400')}>
-                        {room.isOnline ? 'Đang hoạt động' : room.recentOnlineTime && `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
-                    </p>
-                </div>
-            </div>
+            </Popover>
 
             <div className={cn("flex gap-x-1 items-center", isRead && 'text-sky-500')}>
-                <Tooltip title="Gọi điện">
+                {room.isPrivate && <Tooltip title="Gọi điện">
                     <button onClick={() => onCalling?.()} className="p-2 bg-transparent border-none">
                         <PhoneOutlined className="rotate-90" />
                     </button>
-                </Tooltip>
+                </Tooltip>}
                 <Tooltip title="Thu nhỏ đoạn chat">
                     <button onClick={() => onMinimize?.()} className="p-2 bg-transparent border-none">
                         <MinusOutlined />
                     </button>
                 </Tooltip>
-
-                {room && <Tooltip title='Mở trong messenger'>
-                    <Link to={`/chat/${room.id}`} className="p-2 bg-transparent border-none">
-                        <MessageSquareText size={14} />
-                    </Link>
-                </Tooltip>}
 
                 <Tooltip title="Đóng đoạn chat">
                     <button onClick={() => onClose?.()} className="p-2 bg-transparent border-none">

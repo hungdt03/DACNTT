@@ -52,39 +52,47 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
     const connectionRef = useRef<Peer.Instance>();
 
     useEffect(() => {
-        SignalRConnector.onIncomingCall = (payload: IncomingCallPayload) => {
-            showModal()
-            setCall({ isReceivingCall: true, from: payload.from, signalData: payload.signalData });
-        }
-
-        SignalRConnector.onLeaveCall =  () => {
-            console.log('RECEIVE SIGNAL LEAVING CALL');
-            okCall();
-            handleOk();
-
-            if (connectionRef.current) {
-                connectionRef.current.destroy();
-                connectionRef.current = undefined;
+        SignalRConnector.events(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            (payload: IncomingCallPayload) => {
+                showModal()
+                setCall({ isReceivingCall: true, from: payload.from, signalData: payload.signalData });
+            },
+            undefined,
+            () => {
+                console.log('RECEIVE SIGNAL LEAVING CALL');
+                okCall();
+                handleOk();
+    
+                if (connectionRef.current) {
+                    connectionRef.current.destroy();
+                    connectionRef.current = undefined;
+                }
+    
+                // Stop stream tracks and reset video elements
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    setStream(undefined);
+                }
+    
+                if (localVideo.current) {
+                    localVideo.current.srcObject = null;
+                }
+    
+                if (remoteVideo.current) {
+                    remoteVideo.current.srcObject = null;
+                }
+    
+                // Reset call state
+                setCall(undefined);
+                setCallAccepted(false);
             }
+        )
 
-            // Stop stream tracks and reset video elements
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                setStream(undefined);
-            }
-
-            if (localVideo.current) {
-                localVideo.current.srcObject = null;
-            }
-
-            if (remoteVideo.current) {
-                remoteVideo.current.srcObject = null;
-            }
-
-            // Reset call state
-            setCall(undefined);
-            setCallAccepted(false);
-        }
        
     }, []);
 
@@ -105,6 +113,8 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
         });
 
         peer.on('signal', (data) => {
+            console.log('SEND ANSWER CALL')
+            console.log(call?.from.email)
             SignalRConnector.answerCall({
                 signalData: data,
                 userToAnswer: call?.from.email
@@ -113,8 +123,12 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
         });
 
         peer.on('stream', (currentStream) => {
-            if (remoteVideo.current)
+            if (remoteVideo.current) {
+                console.log('Receive remote stream')
+                console.log(currentStream)
                 remoteVideo.current.srcObject = currentStream;
+            }
+                
         });
 
         peer.signal(call?.signalData);
@@ -132,6 +146,7 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
             const peer = new Peer({ initiator: true, trickle: false, stream: dataStream });
 
             peer.on('signal', (data) => {
+                console.log('signal')
                 SignalRConnector.callFriend({
                     userToCall: user?.email,
                     signalData: data
@@ -140,16 +155,28 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
             });
     
             peer.on('stream', (currentStream) => {
+                
                 if (remoteVideo.current) {
+                    console.log('Receive stream')
+                    console.log(currentStream)
+                    console.log(remoteVideo.current)
                     remoteVideo.current.srcObject = currentStream;
                 }
             });
-    
-            SignalRConnector.onCallAccepted = (signal: any) => {
-                setCallAccepted(true);
-                peer.signal(signal);
-            }
-    
+
+            SignalRConnector.events(
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                (signal: any) => {
+                    setCallAccepted(true);
+                    peer.signal(signal);
+                },
+                undefined
+            );
+
             connectionRef.current = peer;
         } catch {
             alert('Cannot access camera')
@@ -158,7 +185,7 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
     };
 
     const handleLeaveCall = () => {
-        console.log('SEND LEAVE CALL SIGNAL')
+       
         setCallEnded(true);
 
         if (stream) {
@@ -203,15 +230,18 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
                 width='700px'
                 onOk={okCall}
                 onClose={() => handleLeaveCall()}
-                footer={[]}
                 onCancel={cancelCall}
+                maskClosable={false}
+                classNames={{
+                    footer: 'hidden'
+                }}
             >
 
                 <div className="w-full relative">
                     {stream && <video className="absolute top-4 right-4 border-2 border-primary" width='160px' ref={localVideo} autoPlay />}
                     {(callAccepted && !callEnded) ? <video className="w-full h-full" ref={remoteVideo} autoPlay muted /> : <div className="flex items-center justify-center">
                         <div className="flex flex-col items-center gap-y-1 py-20">
-                            <img width='100' height='100' src={userToCall?.avatar ?? images.user} />
+                            <img className="w-[100px] h-[100px] object-cover" src={userToCall?.avatar ?? images.user} />
                             <span className="text-xl font-semibold">{userToCall?.fullName}</span>
                             <p>Đang gọi...</p>
                         </div>
@@ -240,7 +270,7 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
                 <div className="px-4 py-2">
                     {(call?.isReceivingCall && !callAccepted) ? <div className="flex flex-col gap-y-4 items-center">
                         <div className="flex flex-col items-center gap-y-1">
-                            <img width='70' height='70' src={call.from.avatar ?? images.user} />
+                            <img className="w-[70px] h-[70px] object-cover" src={call.from.avatar ?? images.user} />
                             <span className="text-xl font-semibold text-center">{call.from.fullName} đang gọi cho bạn</span>
                         </div>
 
