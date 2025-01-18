@@ -1,18 +1,18 @@
 import { forwardRef, useEffect, useState } from "react";
-import { CommentResource } from "../../types/comment";
-import commentService from "../../services/commentService";
-import images from "../../assets";
+import { CommentResource } from "../../../types/comment";
+import commentService from "../../../services/commentService";
+import images from "../../../assets";
 import { Avatar, Image } from "antd";
-import cn from "../../utils/cn";
-import { formatTime } from "../../utils/date";
-import { MediaType } from "../../enums/media";
-import { UserResource } from "../../types/user";
+import cn from "../../../utils/cn";
+import { formatTime } from "../../../utils/date";
+import { MediaType } from "../../../enums/media";
+import { UserResource } from "../../../types/user";
 import { Link } from "react-router-dom";
-import BoxReplyComment, { BoxReplyCommentType, NodeContent } from "../comments/BoxReplyComment";
-import { CommentMentionPagination } from "../../utils/pagination";
-import { Pagination } from "../../types/response";
+import BoxReplyComment, { BoxReplyCommentType, NodeContent } from "../../comments/BoxReplyComment";
+import { CommentMentionPagination } from "../../../utils/pagination";
+import { Pagination } from "../../../types/response";
 
-type HighlightCommentItemProps = {
+type MentionCommentItemProps = {
     activeCommentId: string;
     parentComment: CommentResource | null;
     comment: CommentResource;
@@ -54,9 +54,7 @@ const extractContentFromJSON = (commentJSON: string): JSX.Element => {
     }
 };
 
-
-
-export const HighlightCommentItem = forwardRef<HTMLDivElement, HighlightCommentItemProps>(
+export const MentionCommentItem = forwardRef<HTMLDivElement, MentionCommentItemProps>(
     (
         {
             activeCommentId,
@@ -90,7 +88,6 @@ export const HighlightCommentItem = forwardRef<HTMLDivElement, HighlightCommentI
 
         const handleFetchReplies = async (commentId: string, page: number, size: number) => {
             const response = await commentService.getAllRepliesByCommentId(commentId, page, size);
-            console.log(response)
             if (response.isSuccess) {
                 const fetchedReplies = response.data;
                 setReplyPagination(response.pagination)
@@ -100,7 +97,6 @@ export const HighlightCommentItem = forwardRef<HTMLDivElement, HighlightCommentI
 
         const fetchPrevComments = async (parentCommentId: string, page: number) => {
             const response = await commentService.getPrevComments(comment.postId, parentCommentId, page);
-            console.log(response)
             if (response.isSuccess) {
                 setPagination(prevPagination => ({
                     ...prevPagination,
@@ -112,7 +108,7 @@ export const HighlightCommentItem = forwardRef<HTMLDivElement, HighlightCommentI
             }
         }
 
-        const fetchNextComment = async (parentCommentId: string, page: number) => {
+        const fetchNextComments = async (parentCommentId: string, page: number) => {
             const response = await commentService.getNextComments(comment.postId, parentCommentId, page);
             if (response.isSuccess) {
                 setPagination(prevPagination => ({
@@ -139,7 +135,7 @@ export const HighlightCommentItem = forwardRef<HTMLDivElement, HighlightCommentI
 
         return (
             <div className={cn("relative flex flex-col pl-4", comment.parentCommentId !== null ? "gap-y-5" : "gap-y-3")}>
-                {comment.isHaveChildren && <div className={cn("absolute left-8 w-[2px] top-[28px] border-b-[3px] rounded-lg bg-gray-200", (comment?.replies?.length ?? 0) === 0 ? 'bottom-8' : expandLine ? 'bottom-36' : 'bottom-20')}></div>}
+                {comment.isHaveChildren && <div className={cn("absolute left-8 w-[2px] top-[28px] rounded-lg bg-gray-200", (comment?.replies?.length ?? 0) === 0 ? 'bottom-8' : 'bottom-20')}></div>}
                 {/* Comment nội dung */}
                 <div ref={activeCommentId === comment.id ? ref : null} className="relative flex items-start gap-x-2">
                     {comment.parentCommentId && (
@@ -183,9 +179,9 @@ export const HighlightCommentItem = forwardRef<HTMLDivElement, HighlightCommentI
                                 disabled={comment.status === 'pending'}
                                 className="text-xs hover:underline"
                                 onClick={() => {
-                                    setIsReplying(true)
                                     onExpandLine?.(comment)
                                     if (level <= 2) {
+                                        setIsReplying(true)
                                         const userJson = JSON.stringify(comment.user);
                                         setReplyToUser(JSON.parse(userJson))
                                     } else {
@@ -216,7 +212,7 @@ export const HighlightCommentItem = forwardRef<HTMLDivElement, HighlightCommentI
                         {pagination?.havePrevPage && <button onClick={() => fetchPrevComments(comment.id, pagination.prevPage - 1)} className="font-semibold text-left pl-16 mt-2 mb-2 text-xs">Xem các phản hồi trước đó ...</button>}
 
                         {comment?.replies?.map((child) => (
-                            <HighlightCommentItem
+                            <MentionCommentItem
                                 ref={activeCommentId === child.id ? ref : null}
                                 activeCommentId={activeCommentId}
                                 parentComment={comment}
@@ -228,6 +224,7 @@ export const HighlightCommentItem = forwardRef<HTMLDivElement, HighlightCommentI
                                 level={level + 1}
                                 onReply={(comment) => {
                                     if (level + 1 > 2) {
+                                        setIsReplying(true)
                                         const userJson = JSON.stringify(comment.user);
                                         setReplyToUser(JSON.parse(userJson))
                                     }
@@ -241,7 +238,7 @@ export const HighlightCommentItem = forwardRef<HTMLDivElement, HighlightCommentI
                             />
                         ))}
 
-                        {pagination?.haveNextPage && <button onClick={() => fetchNextComment(comment.id, pagination.nextPage + 1)} className="font-semibold text-left pl-16 mt-2 mb-2 text-xs">Xem thêm các phản hồi khác ...</button>}
+                        {pagination?.haveNextPage && <button onClick={() => fetchNextComments(comment.id, pagination.nextPage + 1)} className="font-semibold text-left pl-16 mt-2 mb-2 text-xs">Xem thêm các phản hồi khác ...</button>}
                         {replyPagination?.hasMore && <button onClick={() => handleFetchReplies(comment.id, replyPagination.page + 1, replyPagination.size)} className="font-semibold text-left pl-16 mt-2 mb-2 text-xs">Xem thêm các phản hồi khác ...</button>}
 
                         {/* Box phản hồi ở cuối nếu đang reply comment này */}

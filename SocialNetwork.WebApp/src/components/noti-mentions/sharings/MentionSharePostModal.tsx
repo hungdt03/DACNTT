@@ -1,32 +1,30 @@
 import { FC, useEffect, useState } from "react";
-import { UploadFile, message } from "antd";
-import { CommentResource } from "../../types/comment";
-import commentService from "../../services/commentService";
-import { PostResource } from "../../types/post";
-import BoxSendComment, { BoxCommentType } from "../comments/BoxSendComment";
-import { Pagination } from "../../types/response";
-import { CommentList } from "../comments/CommentList";
-import { imageTypes } from "../../utils/file";
+import { CommentResource } from "../../../types/comment";
+import { Pagination } from "../../../types/response";
+import BoxSendComment, { BoxCommentType } from "../../comments/BoxSendComment";
 import { useSelector } from "react-redux";
-import { selectAuth } from "../../features/slices/auth-slice";
-import { MediaType } from "../../enums/media";
-import { BoxReplyCommentType } from "../comments/BoxReplyComment";
+import { selectAuth } from "../../../features/slices/auth-slice";
+import { MediaType } from "../../../enums/media";
+import { imageTypes } from "../../../utils/file";
+import commentService from "../../../services/commentService";
+import { message } from "antd";
+import { BoxReplyCommentType } from "../../comments/BoxReplyComment";
+import { CommentList } from "../../comments/CommentList";
+import { PostResource } from "../../../types/post";
+import postService from "../../../services/postService";
+import MentionSharePostInnner from "./MentionSharePostInner";
 
-export type BoxCommendStateType = {
-    fileList: UploadFile[];
-    content: string;
+type MentionSharePostModalProps = {
+    postId: string;
 }
 
-type PostModalProps = {
-    post: PostResource;
-}
-
-const PostModal: FC<PostModalProps> = ({
-    post
+const MentionSharePostModal: FC<MentionSharePostModalProps> = ({
+    postId
 }) => {
     const { user } = useSelector(selectAuth)
     const [comments, setComments] = useState<CommentResource[]>([])
-    const [pendingComments, setPendingComments] = useState<CommentResource[]>([])
+    const [pendingComments, setPendingComments] = useState<CommentResource[]>([]);
+    const [post, setPost] = useState<PostResource | null>(null);
 
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
@@ -34,13 +32,21 @@ const PostModal: FC<PostModalProps> = ({
         hasMore: false
     })
 
+    const fetchPost = async () => {
+        const response = await postService.getPostById(postId);
+        if(response.isSuccess) {
+            setPost(response.data)
+        }
+    }
+
+
     const handleCreateComment = async (values: BoxCommentType) => {
         const sentAt = new Date()
 
         const tempComment: CommentResource = {
             id: new Date().toISOString(),
             content: values.content,
-            postId: post.id,
+            postId: postId,
             sentAt: sentAt,
             user: user!,
             isHaveChildren: false,
@@ -57,7 +63,7 @@ const PostModal: FC<PostModalProps> = ({
 
 
         formData.append('sentAt', sentAt.toISOString())
-        formData.append('postId', post.id);
+        formData.append('postId', postId);
         values?.mentionUserIds?.forEach(mention => formData.append('mentionUserIds', mention))
 
         if (values?.file?.originFileObj) {
@@ -84,7 +90,7 @@ const PostModal: FC<PostModalProps> = ({
     }
 
     const fetchComments = async (page: number, size: number) => {
-        const response = await commentService.getAllRootCommentsByPostId(post.id, page, size);
+        const response = await commentService.getAllRootCommentsByPostId(postId, page, size);
         if (response.isSuccess) {
             setComments(prev => [...prev, ...response.data])
             setPagination(response.pagination)
@@ -92,8 +98,9 @@ const PostModal: FC<PostModalProps> = ({
     }
 
     useEffect(() => {
+        fetchPost()
         fetchComments(pagination.page, pagination.size)
-    }, [post])
+    }, [postId])
 
     const handleReplyComment = async (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => {
         const sentAt = new Date();
@@ -103,7 +110,7 @@ const PostModal: FC<PostModalProps> = ({
             content: values.content,
             sentAt: sentAt,
             user: user!,
-            postId: post.id,
+            postId: postId,
             isHaveChildren: false,
             parentCommentId,
             replies: [],
@@ -115,7 +122,7 @@ const PostModal: FC<PostModalProps> = ({
        
         const formData = new FormData();
         formData.append('content', values.content);
-        formData.append('postId', post.id);
+        formData.append('postId', postId);
         formData.append('parentCommentId', parentCommentId as string);
         formData.append('replyToUserId', replyToUserId as string);
         formData.append('sentAt', sentAt.toISOString());
@@ -198,6 +205,8 @@ const PostModal: FC<PostModalProps> = ({
     }
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
+        {post && <MentionSharePostInnner post={post} />}
+
         <CommentList
             replyComment={handleReplyComment}
             comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
@@ -215,5 +224,4 @@ const PostModal: FC<PostModalProps> = ({
     </div>
 };
 
-export default PostModal;
-
+export default MentionSharePostModal;

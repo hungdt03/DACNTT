@@ -1,30 +1,30 @@
 import { FC, useEffect, useState } from "react";
 import { UploadFile, message } from "antd";
-import { CommentResource } from "../../types/comment";
-import commentService from "../../services/commentService";
-import { PostResource } from "../../types/post";
-import BoxSendComment, { BoxCommentType } from "../comments/BoxSendComment";
-import { imageTypes } from "../../utils/file";
+import { CommentResource } from "../../../types/comment";
+import commentService from "../../../services/commentService";
+import { PostResource } from "../../../types/post";
+import BoxSendComment, { BoxCommentType } from "../../comments/BoxSendComment";
+import { imageTypes } from "../../../utils/file";
 import { useSelector } from "react-redux";
-import { selectAuth } from "../../features/slices/auth-slice";
-import { MediaType } from "../../enums/media";
-import { BoxReplyCommentType } from "../comments/BoxReplyComment";
-import postService from "../../services/postService";
-import HighlightPostInner from "./HighlightPostInner";
-import { HighlightCommentList } from "./HighlightCommentList";
-import { CommentMentionPagination } from "../../utils/pagination";
+import { selectAuth } from "../../../features/slices/auth-slice";
+import { MediaType } from "../../../enums/media";
+import { BoxReplyCommentType } from "../../comments/BoxReplyComment";
+import postService from "../../../services/postService";
+import MentionPostInner from "./MentionPostInner";
+import { MentionCommentList } from "./MentionCommentList";
+import { CommentMentionPagination } from "../../../utils/pagination";
 
 export type BoxCommendStateType = {
     fileList: UploadFile[];
     content: string;
 }
 
-type HighlightPostModalProps = {
+type MentionPostModalProps = {
     postId: string;
     commentId: string
 }
 
-const HighlightPostModal: FC<HighlightPostModalProps> = ({
+const MentionPostModal: FC<MentionPostModalProps> = ({
     postId,
     commentId
 }) => {
@@ -91,7 +91,6 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
 
     const fetchComments = async () => {
         const response = await commentService.getNearbyCommentsByCommentId(postId, commentId);
-        console.log(response)
         if (response.isSuccess) {
             setComments(prev => [...prev, ...response.data])
             setPagination(response.pagination)
@@ -260,9 +259,9 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
     }
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
-        {post && <HighlightPostInner post={post} />}
+        {post && <MentionPostInner post={post} />}
         
-        <HighlightCommentList
+        <MentionCommentList
             activeCommentId={commentId}
             comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
             pagination={pagination}
@@ -281,5 +280,5 @@ const HighlightPostModal: FC<HighlightPostModalProps> = ({
     </div>
 };
 
-export default HighlightPostModal;
+export default MentionPostModal;
 

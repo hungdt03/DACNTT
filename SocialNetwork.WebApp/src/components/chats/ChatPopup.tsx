@@ -288,7 +288,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 {room.isPrivate && <Link to={`/profile/${room.friend?.id}`} className="px-2 py-1 rounded-md hover:bg-gray-100 w-full hover:text-black">Trang cá nhân</Link>}
                 <Link to={`/chat/${room.id}`} className="px-2 py-1 rounded-md hover:bg-gray-100 w-full hover:text-black">Mở trong messenger</Link>
             </div>}>
-                <div className="flex items-center gap-x-2 rounded-md p-1 hover:bg-gray-100 cursor-pointer">
+                <div className={cn("flex items-center gap-x-2 rounded-md p-1 cursor-pointer", !isRead ? 'hover:bg-sky-600 bg-opacity-10' : 'hover:bg-gray-100')}>
                     <div className="relative flex-shrink-0">
                         <img
                             src={room.friend?.avatar ?? images.group}
@@ -296,7 +296,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
                             className="w-[40px] h-[40px] rounded-full object-cover"
                         />
                         {room.isOnline && <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
-
                     </div>
 
                     <div className="flex flex-col flex-shrink-0">

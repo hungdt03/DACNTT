@@ -38,14 +38,16 @@ type NotificationProps = {
     notification: NotificationResource;
     onDelete?: () => void;
     onMarkAsRead?: () => void;
-    onCommentNotification: () => void
+    onCommentNotification: () => void;
+    onShareNotification: () => void;
 }
 
 const Notification: FC<NotificationProps> = ({
     notification,
     onDelete,
     onMarkAsRead,
-    onCommentNotification
+    onCommentNotification,
+    onShareNotification,
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false);
     const [accepted, setAccepted] = useState<'accepted' | 'cancel' | 'none'>('none');
@@ -83,10 +85,12 @@ const Notification: FC<NotificationProps> = ({
     const handleSelectNotification = () => {
         if(notification.type.includes('COMMENT')) {
             onCommentNotification()
+        } else if(notification.type === NotificationType.POST_SHARED) {
+            onShareNotification()
         }
     }
 
-    return <div onClick={handleSelectNotification} onMouseOver={() => setShowMoreAction(true)} onMouseLeave={() => setShowMoreAction(false)} className={cn("relative cursor-pointer flex items-center gap-x-3 px-3 py-2 rounded-md hover:bg-gray-100 max-w-[400px]", !notification.isRead && 'bg-gray-50')}>
+    return <div onClick={handleSelectNotification} onMouseOver={() => setShowMoreAction(true)} onMouseLeave={() => setShowMoreAction(false)} className={cn("relative z-[100] cursor-pointer flex items-center gap-x-3 px-3 py-2 rounded-md hover:bg-gray-100 max-w-[400px]")}>
         <Avatar className="flex-shrink-0" size='large' src={notification.imageUrl ?? images.user} />
         <div className="flex flex-col gap-y-3 items-start">
             <div className="flex flex-col items-start">
@@ -122,12 +126,15 @@ const Notification: FC<NotificationProps> = ({
             )}
         </div>
 
+        {!notification.isRead && <div className="absolute top-1/2 -translate-y-1/2 right-0 w-3 h-3 rounded-full bg-primary">
+        </div>}
+
         {showMoreAction && <Popover trigger='click' content={<NotificationMoreAction
             isRead={notification.isRead}
             onDelete={onDelete}
             onMarkAsRead={onMarkAsRead}
         />}>
-            <button className="absolute top-1/2 -translate-y-1/2 right-4 bg-white shadow transition-all ease-linear duration-100 border-[1px] border-gray-200 w-6 h-6 flex items-center justify-center rounded-full">
+            <button className="absolute top-1/2 -translate-y-1/2 right-6 !z-[2000] bg-white shadow transition-all ease-linear duration-100 border-[1px] border-gray-200 w-6 h-6 flex items-center justify-center rounded-full">
                 <MoreHorizontal className="text-gray-400" size={16} />
             </button>
         </Popover>}

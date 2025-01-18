@@ -1,8 +1,8 @@
 import { createContext } from "react";
-import { UserResource } from "../../types/user";
+import { ChatRoomResource } from "../../types/chatRoom";
 
 type WebRtcContextType = {
-    handleCallUser: (user: UserResource) => void
+    handleCall: (chatRoom: ChatRoomResource) => void
 }
 
 const NotificationContext = createContext<WebRtcContextType | undefined>(undefined);

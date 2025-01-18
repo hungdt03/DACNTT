@@ -18,6 +18,7 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { $createTextNode, $getRoot, $getSelection, $isRangeSelection, EditorState, LexicalEditor, TextNode } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { loadContentEmpty } from "./BoxSendComment";
 
 
@@ -116,6 +117,7 @@ type BoxReplyCommentProps = {
     onSubmit?: (data: BoxReplyCommentType) => void;
 }
 
+
 const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     onSubmit,
     onChange,
@@ -133,31 +135,36 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     const [isMentioning, setIsMentioning] = useState(false);
     const editorStateRef = useRef<EditorState | null>(null);
     const editorRef = useRef<LexicalEditor | null>(null);
+ 
 
     useEffect(() => {
-
-        const isContentEmpty = content.trim().length === 0;
-
+        console.log('Reply to: ' + replyToUsername?.fullName)
         if (replyToUsername && user?.id !== replyToUsername.id) {
             const valueEditorState = loadContent(replyToUsername);
-            if (editorRef.current && isContentEmpty) {
+            if (editorRef.current) {
+                editorRef.current.focus();
+
                 editorRef.current.update(() => {
-                    const selection = $getSelection();
+                    const rootNode = $getRoot();
+                    const firstNode = rootNode.getAllTextNodes()[0];
 
-                    if ($isRangeSelection(selection)) {
-                        // Tạo mention node
-                        const mentionNode = $createTextNode(`${replyToUsername.fullName}`);
-                        const newStyle = `content: ${replyToUsername.id};background-color: #E0F2FE;color: #0EA5E9;`;
-                        mentionNode.setStyle(newStyle);
+                    const mentionNode = $createTextNode(`${replyToUsername.fullName}`);
+                    const newStyle = `content: ${replyToUsername.id};background-color: #E0F2FE;color: #0EA5E9;`;
+                    mentionNode.setStyle(newStyle);
 
-                        // Chèn mention node và thêm khoảng trắng
-                        selection.insertNodes([mentionNode, $createTextNode(" ")]);
+                    if(firstNode) {
+                        firstNode.replace(mentionNode)
+                    } else {
+                        const selection = $getSelection();
+                        if($isRangeSelection(selection)) {
+                            selection.insertNodes([mentionNode])
+                        }
                     }
                 });
             } else {
                 setInitialEditorState(valueEditorState);
             }
-        } else if(isContentEmpty) {
+        } else {
             const emptyEditorState = loadContentEmpty();
             setInitialEditorState(emptyEditorState);
         }
@@ -257,6 +264,16 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
         });
     }
 
+    function InitEditorPlugin() {
+        const [editor] = useLexicalComposerContext();
+
+        useEffect(() => {
+            editorRef.current = editor;
+        }, [editor]);
+
+        return null;
+    }
+
     const handleSelectFriend = (friend: FriendResource) => {
         if (editorRef.current) {
             editorRef.current.update(() => {
@@ -311,7 +328,9 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
                             }
                             ErrorBoundary={LexicalErrorBoundary}
                         />
+                        <InitEditorPlugin />
                         <OnChangePlugin onChange={handleEditorChange} />
+                        {/* <MyOnChangePlugin onChange={handleChange} /> */}
                         <HistoryPlugin />
                     </div>
                 </LexicalComposer>}

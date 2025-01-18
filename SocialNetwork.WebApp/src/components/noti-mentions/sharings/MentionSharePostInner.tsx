@@ -1,44 +1,31 @@
-import { Avatar, Divider, Modal, Popover, Tooltip, message } from "antd";
 import { FC, useEffect, useState } from "react";
-import images from "../../assets";
-import { MoreHorizontal } from "lucide-react";
-import { ChatBubbleLeftIcon, ShareIcon } from "@heroicons/react/24/outline";
-import { ReactionSvgType, svgReaction } from "../../assets/svg";
-import PostModal from "../modals/PostModal";
-import useModal from "../../hooks/useModal";
-import PostReactionModal from "../modals/PostReactionModal";
-import SharePostModal from "../modals/SharePostModal";
-import PostMedia from "./PostMedia";
-import { PostResource } from "../../types/post";
-import { formatTime, formatVietnamDate } from "../../utils/date";
-import { PostReaction } from "./PostReaction";
-import { ReactionType } from "../../enums/reaction";
-import reactionService from "../../services/reactionService";
-import { ReactionResource } from "../../types/reaction";
+import { PostResource } from "../../../types/post";
+import { ReactionResource } from "../../../types/reaction";
 import { useSelector } from "react-redux";
-import { selectAuth } from "../../features/slices/auth-slice";
-import { getBtnReaction, getPrivacyPost } from "../../utils/post";
-import { PostMoreAction } from "./PostMoreAction";
-import EditPostModal from "../modals/EditPostModal";
+import { selectAuth } from "../../../features/slices/auth-slice";
+import reactionService from "../../../services/reactionService";
+import postService from "../../../services/postService";
 import { Id, toast } from "react-toastify";
-import postService from "../../services/postService";
+import { ReactionType } from "../../../enums/reaction";
+import { ReactionRequest } from "../comments/MentionPostInner";
+import { Avatar, Divider, Modal, Popover, Tooltip, message } from "antd";
+import useModal from "../../../hooks/useModal";
+import images from "../../../assets";
 import { Link } from "react-router-dom";
-import ListSharePostModal from "../modals/ListSharePostModal";
-import PostOtherTags from "./PostOtherTags";
-import { LikeOutlined } from '@ant-design/icons'
-import { PrivacyType } from "../../enums/privacy";
-
-export type CommentRequest = {
-    postId: string;
-    content: string;
-    parentCommentId: string | null;
-    replyToUserId: string | null;
-}
-
-export type ReactionRequest = {
-    postId: string;
-    reactionType: ReactionType;
-}
+import PostOtherTags from "../../posts/PostOtherTags";
+import { formatTime, formatVietnamDate } from "../../../utils/date";
+import { getBtnReaction, getPrivacyPost } from "../../../utils/post";
+import { PostMoreAction } from "../../posts/PostMoreAction";
+import { MoreHorizontal, ShareIcon } from "lucide-react";
+import PostMedia from "../../posts/PostMedia";
+import { PostReaction } from "../../posts/PostReaction";
+import { ReactionSvgType, svgReaction } from "../../../assets/svg";
+import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
+import PostReactionModal from "../../modals/PostReactionModal";
+import EditPostModal from "../../modals/EditPostModal";
+import SharePostModal from "../../modals/SharePostModal";
+import ListSharePostModal from "../../modals/ListSharePostModal";
+import PostShareInner from "../../posts/PostShareInner";
 
 export const getTopReactions = (reactions?: ReactionResource[], top: number = 3) => {
     const counts = reactions?.reduce((acc, reaction) => {
@@ -54,17 +41,16 @@ export const getTopReactions = (reactions?: ReactionResource[], top: number = 3)
         : [];
 };
 
-type PostProps = {
+type MentionSharePostInnnerProps = {
     post: PostResource;
     onFetch?: (data: PostResource) => void;
 }
 
 
-const Post: FC<PostProps> = ({
+const MentionSharePostInnner: FC<MentionSharePostInnnerProps> = ({
     post: postParam,
     onFetch
 }) => {
-    const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const { handleCancel: editPostCancel, isModalOpen: isEditPostOpen, handleOk: handleEditPostOk, showModal: showEditPostModal } = useModal();
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
@@ -158,7 +144,7 @@ const Post: FC<PostProps> = ({
         }
     }
 
-    return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
+    return <div className="flex flex-col gap-y-2 bg-white rounded-md">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
                 <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
@@ -197,8 +183,8 @@ const Post: FC<PostProps> = ({
                 </div>
             </div>
             <Popover className="flex-shrink-0" content={<PostMoreAction
+                isMine={user?.id === post.user.id}
                 onEditPost={showEditPostModal}
-                isMine={post.user.id === user?.id}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
                     <MoreHorizontal className="text-gray-400" />
@@ -215,6 +201,7 @@ const Post: FC<PostProps> = ({
                 <p className="text-2xl font-bold text-center break-words break-all text-white">{post.content}</p>
             </div> : <p className="text-sm text-gray-700 break-words">{post.content}</p>}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
+            <PostShareInner post={post.originalPost} />
         </div>
         <div className="flex items-center justify-between md:text-sm text-[13px]">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
@@ -224,59 +211,28 @@ const Post: FC<PostProps> = ({
                 <span className="hover:underline">{reactions?.length === 0 ? '' : reactions?.length}</span>
             </button>
             <div className="flex gap-x-4 items-center">
-                <button onClick={showModal} className="hover:underline text-gray-500">{post.comments} bình luận</button>
-                {post.privacy === PrivacyType.PUBLIC && <button onClick={showListShare} className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>}
+                <button className="hover:underline text-gray-500">{post.comments} bình luận</button>
+                <button onClick={showListShare} className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>
             </div>
         </div>
 
         <Divider className='my-0' />
         <div className="flex items-center justify-between gap-x-4">
-            <Popover  content={<PostReaction
+            <Popover content={<PostReaction
                 onSelect={handleSaveReaction}
             />}>
                 {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
             </Popover>
-            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
+            <button className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            {post.privacy === PrivacyType.PUBLIC && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
+            <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
-            </button>}
+            </button>
         </div>
         <Divider className='mt-0 mb-2' />
-
-        {/*======== MODAL COMMENTS ====== */}
-
-        <Modal
-            style={{ top: 20 }}
-            title={<p className="text-center font-semibold text-xl">Bình luận về bài viết của {post.user.fullName}</p>}
-            width='700px'
-            footer={[
-            ]}
-            open={isModalOpen}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            classNames={{
-                footer: 'hidden',
-            }}
-            styles={{
-                body: {
-                    padding: '0px',
-                    paddingBottom: 20,
-
-                },
-                content: {
-                    position: 'relative'
-                },
-                footer: {
-                    display: 'none'
-                },
-            }}
-        >
-            {isModalOpen && <PostModal post={post} />}
-        </Modal>
 
         {/*======== MODAL REACTION ====== */}
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
@@ -325,4 +281,4 @@ const Post: FC<PostProps> = ({
     </div>
 };
 
-export default Post;
+export default MentionSharePostInnner;

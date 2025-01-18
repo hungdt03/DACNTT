@@ -123,22 +123,26 @@ namespace SocialNetwork.Infrastructure.SignalR
         public async Task CallFriend(CallPayload payload)
         {
             var user = await userManager.FindByIdAsync(Context.User.GetUserId());
-            await Clients.User(payload.UserToCall).SendAsync("CallFriend", new
+            await Clients.OthersInGroup(payload.ChatRoomName).SendAsync("CallFriend", new
             {
                 SignalData = payload.SignalData,
+                ChatRoomName = payload.ChatRoomName,
                 From = ApplicationMapper.MapToUser(user),
             });
         }
 
         public async Task AnswerCall(AnswerPayload payload)
         {
-            var username = Context.User.GetUserName();
-            await Clients.User(payload.UserToAnswer).SendAsync("AcceptCall", payload.SignalData);
+            var user = await userManager.FindByIdAsync(Context.User.GetUserId());
+            await Clients.OthersInGroup(payload.ChatRoomName).SendAsync("AcceptCall", new {
+                SignalData = payload.SignalData,
+                From = ApplicationMapper.MapToUser(user),
+            });
         }
 
-        public async Task LeaveCall(string username)
+        public async Task LeaveCall(string chatRoomName)
         {
-            await Clients.User(username).SendAsync("LeaveCall");
+            await Clients.Group(chatRoomName).SendAsync("LeaveCall");
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)

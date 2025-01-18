@@ -4,8 +4,10 @@ import { NotificationResource } from "../../types/notification";
 import {  Empty, Modal } from "antd";
 import { Pagination } from "../../types/response";
 import useModal from "../../hooks/useModal";
-import HighlightPostModal from "../hightlight/HighlightPostModal";
+import MentionPostModal from "../noti-mentions/comments/MentionPostModal";
 import ChatUserSkeleton from "../skeletons/ChatUserSkeleton";
+import { NotificationType } from "../../enums/notification-type";
+import MentionSharePostModal from "../noti-mentions/sharings/MentionSharePostModal";
 
 type NotificationDialogProps = {
     notifications: NotificationResource[];
@@ -26,12 +28,15 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
 }) => {
 
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
-    const [postId, setPostId] = useState<string>();
-    const [commentId, setCommentId] = useState<string>();
+    const [notification, setNotification] = useState<NotificationResource>()
 
-    const handleOpenPost = (notification: NotificationResource) => {
-        setPostId(notification.postId)
-        setCommentId(notification.commentId)
+    const handleOpenMentionComment = (notification: NotificationResource) => {
+        setNotification(notification)
+        showModal()
+    }
+
+    const handleOpenMentionShare = (notification: NotificationResource) => {
+        setNotification(notification)
         showModal()
     }
 
@@ -39,7 +44,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         <div className="flex flex-col gap-y-3 pt-2 px-2 max-h-[600px] min-w-[400px] overflow-y-auto custom-scrollbar">
             <span className="font-semibold text-lg">Thông báo của bạn</span>
             <div className="flex flex-col gap-y-2">
-                {notifications.map(notification => <Notification onCommentNotification={() => handleOpenPost(notification)} onDelete={() => onDelete?.(notification.id)} onMarkAsRead={() => onMarkAsRead?.(notification.id)} key={notification.id} notification={notification} />)}
+                {notifications.map(notification => <Notification onShareNotification={() => handleOpenMentionShare(notification)} onCommentNotification={() => handleOpenMentionComment(notification)} onDelete={() => onDelete?.(notification.id)} onMarkAsRead={() => onMarkAsRead?.(notification.id)} key={notification.id} notification={notification} />)}
                 {loading && <ChatUserSkeleton />}
                 {pagination.hasMore && <button className="w-full text-center text-sm" onClick={() => onFetchMore(pagination.page + 1)}>Tải thêm ...</button>}
                 {notifications.length === 0 && <Empty description='Chưa có thông báo nào' />}
@@ -72,7 +77,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                 },
             }}
         >
-            {postId && commentId && <HighlightPostModal postId={postId} commentId={commentId} />}
+            {notification?.type.includes('COMMENT') && notification.postId && notification.commentId &&  <MentionPostModal postId={notification.postId} commentId={notification.commentId} />}
+            {notification?.type === NotificationType.POST_SHARED && notification.postId && <MentionSharePostModal postId={notification.postId} />}
         </Modal>
     </>
 };

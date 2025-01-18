@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
-import { CommentResource } from "../../types/comment";
-import { CommentMentionPagination } from "../../utils/pagination";
-import { BoxReplyCommentType } from "../comments/BoxReplyComment";
-import { HighlightCommentItem } from "./HighlightCommentItem";
+import { CommentResource } from "../../../types/comment";
+import { CommentMentionPagination } from "../../../utils/pagination";
+import { BoxReplyCommentType } from "../../comments/BoxReplyComment";
+import { MentionCommentItem } from "./MentionCommentItem";
 
-type HighlightCommentListProps = {
+type MentionCommentListProps = {
     comments: CommentResource[];
     pagination: CommentMentionPagination;
     activeCommentId: string;
@@ -15,7 +15,7 @@ type HighlightCommentListProps = {
     onFetchPrevPage: (parentCommentId: null | string, page: number) => void
 }
 
-export const HighlightCommentList: React.FC<HighlightCommentListProps> = ({
+export const MentionCommentList: React.FC<MentionCommentListProps> = ({
     comments,
     activeCommentId,
     replyComment,
@@ -29,19 +29,18 @@ export const HighlightCommentList: React.FC<HighlightCommentListProps> = ({
     const mentionCommentRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        console.log('Change kakakak')
         if (mentionCommentRef.current) {
             mentionCommentRef.current.scrollIntoView({ behavior: 'smooth' });
         }
             
-    }, [comments, activeCommentId])
+    }, [activeCommentId])
 
     return (
         <div className="flex flex-col gap-y-3 py-4">
             {pagination.havePrevPage && <button onClick={() => onFetchPrevPage(null, pagination.prevPage - 1)} className="text-xs font-semibold text-center pl-6 mb-2">Xem các bình luận trước đó...</button>}
             
             {comments.map((comment) => (
-                <HighlightCommentItem
+                <MentionCommentItem
                     ref={mentionCommentRef}
                     parentComment={null}
                     key={comment.id}

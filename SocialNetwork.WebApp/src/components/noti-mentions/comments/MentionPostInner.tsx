@@ -1,29 +1,29 @@
 import { Avatar, Divider, Modal, Popover, Tooltip, message } from "antd";
 import { FC, useEffect, useState } from "react";
-import images from "../../assets";
+import images from "../../../assets";
 import { MoreHorizontal } from "lucide-react";
 import { ChatBubbleLeftIcon, ShareIcon } from "@heroicons/react/24/outline";
-import { ReactionSvgType, svgReaction } from "../../assets/svg";
-import useModal from "../../hooks/useModal";
-import PostReactionModal from "../modals/PostReactionModal";
-import SharePostModal from "../modals/SharePostModal";
-import { PostResource } from "../../types/post";
-import { formatTime, formatVietnamDate } from "../../utils/date";
-import { ReactionType } from "../../enums/reaction";
-import reactionService from "../../services/reactionService";
-import { ReactionResource } from "../../types/reaction";
+import { ReactionSvgType, svgReaction } from "../../../assets/svg";
+import useModal from "../../../hooks/useModal";
+import PostReactionModal from "../../modals/PostReactionModal";
+import SharePostModal from "../../modals/SharePostModal";
+import { PostResource } from "../../../types/post";
+import { formatTime, formatVietnamDate } from "../../../utils/date";
+import { ReactionType } from "../../../enums/reaction";
+import reactionService from "../../../services/reactionService";
+import { ReactionResource } from "../../../types/reaction";
 import { useSelector } from "react-redux";
-import { selectAuth } from "../../features/slices/auth-slice";
-import { getBtnReaction, getPrivacyPost } from "../../utils/post";
-import EditPostModal from "../modals/EditPostModal";
+import { selectAuth } from "../../../features/slices/auth-slice";
+import { getBtnReaction, getPrivacyPost } from "../../../utils/post";
+import EditPostModal from "../../modals/EditPostModal";
 import { Id, toast } from "react-toastify";
-import postService from "../../services/postService";
+import postService from "../../../services/postService";
 import { Link } from "react-router-dom";
-import ListSharePostModal from "../modals/ListSharePostModal";
-import PostOtherTags from "../posts/PostOtherTags";
-import { PostReaction } from "../posts/PostReaction";
-import { PostMoreAction } from "../posts/PostMoreAction";
-import PostMedia from "../posts/PostMedia";
+import ListSharePostModal from "../../modals/ListSharePostModal";
+import PostOtherTags from "../../posts/PostOtherTags";
+import { PostReaction } from "../../posts/PostReaction";
+import { PostMoreAction } from "../../posts/PostMoreAction";
+import PostMedia from "../../posts/PostMedia";
 
 export type CommentRequest = {
     postId: string;
@@ -51,13 +51,13 @@ export const getTopReactions = (reactions?: ReactionResource[], top: number = 3)
         : [];
 };
 
-type HighlightPostInnerProps = {
+type MentionPostInnerProps = {
     post: PostResource;
     onFetch?: (data: PostResource) => void;
 }
 
 
-const HighlightPostInner: FC<HighlightPostInnerProps> = ({
+const MentionPostInner: FC<MentionPostInnerProps> = ({
     post: postParam,
     onFetch
 }) => {
@@ -193,6 +193,7 @@ const HighlightPostInner: FC<HighlightPostInnerProps> = ({
                 </div>
             </div>
             <Popover className="flex-shrink-0" content={<PostMoreAction
+                isMine={user?.id === post.user.id}
                 onEditPost={showEditPostModal}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
@@ -286,4 +287,4 @@ const HighlightPostInner: FC<HighlightPostInnerProps> = ({
     </div>
 };
 
-export default HighlightPostInner;
+export default MentionPostInner;

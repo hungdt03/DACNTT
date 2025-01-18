@@ -7,25 +7,33 @@ import { Button, Modal } from "antd";
 import { PhoneOutlined, CloseOutlined, CameraOutlined } from '@ant-design/icons'
 import images from "../../assets";
 import { UserResource } from "../../types/user";
+import { ChatRoomResource } from "../../types/chatRoom";
 
 export type CallPayload = {
-    userToCall: string;
+    chatRoomName: string;
     signalData: any
 }
 
 export type IncomingCallPayload = {
     from: UserResource;
+    chatRoomName: string;
     signalData: any
 }
 
 export type AnswerPayload = {
-    userToAnswer: string;
+    chatRoomName: string;
+    signalData: any
+}
+
+export type CallAcceptedPayload = {
+    from: UserResource;
     signalData: any
 }
 
 export type CallInfo = {
     isReceivingCall: boolean;
     from: UserResource;
+    chatRoomName: string;
     signalData: any
 }
 
@@ -39,8 +47,7 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
 
     const { handleOk, handleCancel, isModalOpen, showModal } = useModal()
     const { handleOk: okCall, handleCancel: cancelCall, isModalOpen: openCall, showModal: showCall } = useModal()
-
-    const [userToCall, setUserToCall] = useState<UserResource>()
+    const [chatRoom, setChatRoom] = useState<ChatRoomResource>();
 
     const [callAccepted, setCallAccepted] = useState(false);
     const [callEnded, setCallEnded] = useState(false);
@@ -60,41 +67,23 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
             undefined,
             (payload: IncomingCallPayload) => {
                 showModal()
-                setCall({ isReceivingCall: true, from: payload.from, signalData: payload.signalData });
+                setCall({ isReceivingCall: true, from: payload.from, signalData: payload.signalData, chatRoomName: payload.chatRoomName });
             },
             undefined,
             () => {
-                console.log('RECEIVE SIGNAL LEAVING CALL');
-                okCall();
-                handleOk();
-    
+                setCallEnded(true)
+                stream?.getTracks().forEach(track => track.stop())
                 if (connectionRef.current) {
-                    connectionRef.current.destroy();
-                    connectionRef.current = undefined;
+                    connectionRef.current.destroy()
                 }
-    
-                // Stop stream tracks and reset video elements
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                    setStream(undefined);
-                }
-    
-                if (localVideo.current) {
-                    localVideo.current.srcObject = null;
-                }
-    
-                if (remoteVideo.current) {
-                    remoteVideo.current.srcObject = null;
-                }
-    
                 // Reset call state
-                setCall(undefined);
                 setCallAccepted(false);
+                handleOk()
+                okCall()
+                window.location.reload()
             }
         )
-
-       
-    }, []);
+    }, [stream]);
 
     useEffect(() => {
         if (localVideo.current && stream) {
@@ -113,32 +102,27 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
         });
 
         peer.on('signal', (data) => {
-            console.log('SEND ANSWER CALL')
-            console.log(call?.from.email)
             SignalRConnector.answerCall({
                 signalData: data,
-                userToAnswer: call?.from.email
+                chatRoomName: call?.chatRoomName
             } as AnswerPayload)
 
         });
 
         peer.on('stream', (currentStream) => {
             if (remoteVideo.current) {
-                console.log('Receive remote stream')
-                console.log(currentStream)
                 remoteVideo.current.srcObject = currentStream;
             }
-                
         });
 
         peer.signal(call?.signalData);
-
         connectionRef.current = peer;
     };
 
-    const handleCallUser = async (user: UserResource) => {
-        setUserToCall(user)
+    const handleCall = async (callChatRoom: ChatRoomResource) => {
+        setChatRoom(callChatRoom)
         showCall()
+
         try {
             const dataStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
             setStream(dataStream)
@@ -146,20 +130,14 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
             const peer = new Peer({ initiator: true, trickle: false, stream: dataStream });
 
             peer.on('signal', (data) => {
-                console.log('signal')
                 SignalRConnector.callFriend({
-                    userToCall: user?.email,
+                    chatRoomName: callChatRoom.uniqueName,
                     signalData: data
                 } as CallPayload)
-    
             });
-    
+
             peer.on('stream', (currentStream) => {
-                
                 if (remoteVideo.current) {
-                    console.log('Receive stream')
-                    console.log(currentStream)
-                    console.log(remoteVideo.current)
                     remoteVideo.current.srcObject = currentStream;
                 }
             });
@@ -170,9 +148,10 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
                 undefined,
                 undefined,
                 undefined,
-                (signal: any) => {
+                undefined,
+                (acceptedPayload: CallAcceptedPayload) => {
                     setCallAccepted(true);
-                    peer.signal(signal);
+                    peer.signal(acceptedPayload.signalData);
                 },
                 undefined
             );
@@ -181,42 +160,37 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
         } catch {
             alert('Cannot access camera')
         }
-       
+
     };
 
+    useEffect(() => {
+        if (openCall && !callAccepted) {
+            const timer = setTimeout(() => {
+                if (!callAccepted) {
+                    handleLeaveCall();
+                }
+            }, 60000); // 1 phút
+
+            return () => clearTimeout(timer);
+        }
+    }, [openCall, callAccepted]);
+
     const handleLeaveCall = () => {
-       
-        setCallEnded(true);
-
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            setStream(undefined);
+        if (chatRoom) {
+            setChatRoom(undefined);
+            SignalRConnector.leaveCall(chatRoom.uniqueName);
+        } else if (call?.from) {
+            setCall(undefined);
+            SignalRConnector.leaveCall(call.chatRoomName);
         }
 
-        if (connectionRef.current) {
-            connectionRef.current.destroy();
-            connectionRef.current = undefined;
-        }
-
-        if (userToCall) {
-            SignalRConnector.leaveCall(userToCall?.email);
-        } else {
-            SignalRConnector.leaveCall(call?.from.email!);
-        }
-
-        handleCancel();
-        cancelCall();
-
-        setCall(undefined);
-        setCallAccepted(false);
-        setUserToCall(undefined);
     };
 
     const contextValue = useMemo(
         () => ({
-            handleCallUser,
+            handleCall,
         }),
-        [handleCallUser]
+        [handleCall]
     );
 
     return (
@@ -225,7 +199,7 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
             <Modal
                 style={{ top: 20 }}
                 centered
-                title='Gọi điện thoại'
+                title={<p className="text-center">Cuộc gọi đi</p>}
                 open={openCall}
                 width='700px'
                 onOk={okCall}
@@ -241,8 +215,8 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
                     {stream && <video className="absolute top-4 right-4 border-2 border-primary" width='160px' ref={localVideo} autoPlay />}
                     {(callAccepted && !callEnded) ? <video className="w-full h-full" ref={remoteVideo} autoPlay muted /> : <div className="flex items-center justify-center">
                         <div className="flex flex-col items-center gap-y-1 py-20">
-                            <img className="w-[100px] h-[100px] object-cover" src={userToCall?.avatar ?? images.user} />
-                            <span className="text-xl font-semibold">{userToCall?.fullName}</span>
+                            <img className="w-[100px] h-[100px] object-cover rounded-full" src={chatRoom?.isPrivate ? chatRoom.friend?.avatar : images.group} />
+                            <span className="text-xl font-semibold">{chatRoom?.isPrivate ? chatRoom.friend?.fullName : chatRoom?.name}</span>
                             <p>Đang gọi...</p>
                         </div>
                     </div>}
@@ -251,7 +225,7 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
                         <Button onClick={() => {
                             handleLeaveCall()
                             okCall()
-                        }} danger type="primary" icon={<PhoneOutlined />} shape="round"></Button>
+                        }} danger type="primary" icon={<PhoneOutlined />} shape="circle"></Button>
                     </div>
                 </div>
             </Modal>
@@ -262,37 +236,40 @@ const WebRtcProvider: FC<WebRtcProviderProps> = ({
                 title={<p className="text-center">Cuộc gọi đến</p>}
                 open={isModalOpen}
                 width={callAccepted ? '700px' : '350px'}
-                footer={[]}
+                classNames={{
+                    footer: 'hidden'
+                }}
                 onClose={() => handleLeaveCall()}
                 onOk={handleOk}
+                maskClosable={false}
                 onCancel={handleCancel}
             >
                 <div className="px-4 py-2">
                     {(call?.isReceivingCall && !callAccepted) ? <div className="flex flex-col gap-y-4 items-center">
                         <div className="flex flex-col items-center gap-y-1">
-                            <img className="w-[70px] h-[70px] object-cover" src={call.from.avatar ?? images.user} />
-                            <span className="text-xl font-semibold text-center">{call.from.fullName} đang gọi cho bạn</span>
+                            <img className="w-[70px] h-[70px] object-cover rounded-full" src={call.from.avatar ?? images.user} />
+                            <span className="text-lg font-semibold text-center">{call.from.fullName} đang gọi cho bạn</span>
                         </div>
 
-                        <div className="flex items-center justify-center gap-x-8 w-full">
-                            <div className="flex flex-col gap-y-1">
-                                <Button danger type="primary" icon={<CloseOutlined />} shape="round"></Button>
+                        <div className="flex items-center justify-center gap-x-4 w-full">
+                            <div className="flex flex-col items-center gap-y-1">
+                                <Button danger type="primary" icon={<CloseOutlined />} shape="circle"></Button>
                                 <span>Từ chối</span>
                             </div>
-                            <div onClick={handleAnswerCall} className="flex flex-col gap-y-1">
-                                <Button className="bg-green-500" type="primary" icon={<CameraOutlined />} shape="round"></Button>
+                            <div onClick={handleAnswerCall} className="flex flex-col items-center gap-y-1">
+                                <Button className="bg-green-500" type="primary" icon={<CameraOutlined />} shape="circle"></Button>
                                 <span>Chấp nhận</span>
                             </div>
                         </div>
                     </div> : <div className="w-full relative">
-                        {stream && <video className="absolute top-4 right-4 border-2 border-primary" width='120px' ref={localVideo} autoPlay muted />}
+                        {stream && <video className="absolute top-4 right-4 border-2 border-primary" width='160px' ref={localVideo} autoPlay muted />}
                         {callAccepted && !callEnded && <video className="w-full h-full" ref={remoteVideo} autoPlay muted />}
 
                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-x-3">
                             <Button onClick={() => {
                                 handleLeaveCall()
                                 handleOk()
-                            }} danger type="primary" icon={<PhoneOutlined />} shape="round"></Button>
+                            }} danger type="primary" icon={<PhoneOutlined />} shape="circle"></Button>
                         </div>
                     </div>}
                 </div>

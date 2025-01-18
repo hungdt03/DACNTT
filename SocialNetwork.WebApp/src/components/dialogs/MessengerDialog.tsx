@@ -68,7 +68,6 @@ const MessengerDialog: FC = () => {
         const searchChatRoom = async () => {
             setLoading(true)
             const response = await chatRoomService.searchChatRoomByName(debouncedSearchTerm);
-            console.log(response)
             setLoading(false)
             if (response.isSuccess) {
                 setChatRooms(response.data);
