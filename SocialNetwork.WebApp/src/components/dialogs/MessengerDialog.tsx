@@ -17,7 +17,13 @@ import SignalRConnector from '../../app/signalR/signalr-connection'
 import useDebounce from "../../hooks/useDebounce";
 import { selectAuth } from "../../features/slices/auth-slice";
 
-const MessengerDialog: FC = () => {
+type MessengerDialogProps = {
+    onCountChatRoom: (count: number) => void
+}
+
+const MessengerDialog: FC<MessengerDialogProps> = ({
+    onCountChatRoom
+}) => {
     const dispatch = useDispatch<AppDispatch>()
     const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
     const [loading, setLoading] = useState(false);
@@ -32,6 +38,7 @@ const MessengerDialog: FC = () => {
             setLoading(true)
             const response = await chatRoomService.getAllChatRooms();
             setLoading(false)
+            onCountChatRoom(response.data.filter(chatRoom => !chatRoom.isRead).length)
             if (response.isSuccess) {
                 setChatRooms(response.data)
             }

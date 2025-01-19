@@ -138,11 +138,9 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
  
 
     useEffect(() => {
-        console.log('Reply to: ' + replyToUsername?.fullName)
         if (replyToUsername && user?.id !== replyToUsername.id) {
             const valueEditorState = loadContent(replyToUsername);
             if (editorRef.current) {
-                editorRef.current.focus();
 
                 editorRef.current.update(() => {
                     const rootNode = $getRoot();
@@ -161,6 +159,8 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
                         }
                     }
                 });
+
+                editorRef.current.focus()
             } else {
                 setInitialEditorState(valueEditorState);
             }
@@ -202,8 +202,15 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
 
             editorRef.current?.update(() => {
                 const nodeRoot = $getRoot();
-                nodeRoot.clear()
+                nodeRoot.clear();
+                
+                const selection = $getSelection();
+                if($isRangeSelection(selection)) {
+                    selection.insertNodes([$createTextNode('')])
+                }
             })
+
+            editorRef.current.focus()
 
             setContent('')
             setFileList([])

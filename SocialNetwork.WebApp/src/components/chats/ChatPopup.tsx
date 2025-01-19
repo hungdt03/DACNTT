@@ -83,7 +83,8 @@ const ChatPopup: FC<ChatPopupProps> = ({
     }
 
     useEffect(() => {
-        fetchMessages(pagination.page, pagination.size)
+        fetchMessages(pagination.page, pagination.size);
+        
 
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
@@ -91,7 +92,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 if (message.senderId !== user?.id) {
                     const chatRoom = chatRooms.find(item => item.chatRoom.id === message.chatRoomId);
                     if (!chatRoom) {
-                        console.log('Fetching new chat room');
                         getChatRoomById(message.chatRoomId)
                             .then(data => {
                                 if (data) dispatch(add(data));
@@ -168,8 +168,9 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
     }, []);
 
+
     useEffect(() => {
-        if (messagesEndRef.current)
+        if (messagesEndRef.current && pagination.page === 1)
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }, [messages])
 

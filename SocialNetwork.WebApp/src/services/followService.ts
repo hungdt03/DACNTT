@@ -1,7 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
-import { FriendRequestResource } from '../types/friendRequest';
 import { BaseResponse, DataResponse } from '../types/response';
+import { UserResource } from '../types/user';
 
 
 class FollowService {
@@ -13,6 +13,14 @@ class FollowService {
         if (!FollowService.instance)
             FollowService.instance = new FollowService();
         return FollowService.instance;
+    }
+
+    getAllFollowersByUserId(userId: string) : Promise<DataResponse<UserResource[]>> {
+        return axiosInterceptor.get('/api/follows/followers/' + userId)
+    }
+
+    getAllFolloweesByUserId(userId: string) : Promise<DataResponse<UserResource[]>> {
+        return axiosInterceptor.get('/api/follows/followees/' + userId)
     }
 
 

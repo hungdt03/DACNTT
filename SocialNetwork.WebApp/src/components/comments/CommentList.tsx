@@ -2,8 +2,10 @@ import { CommentResource } from "../../types/comment";
 import { Pagination } from "../../types/response";
 import { CommentItem } from "./CommentItem";
 import { BoxReplyCommentType } from "./BoxReplyComment";
+import CommentSkeleton from "../skeletons/CommentSkeleton";
 
 type CommentListProps = {
+    loading: boolean;
     comments: CommentResource[];
     pagination: Pagination;
     replyComment: (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void
@@ -14,6 +16,7 @@ type CommentListProps = {
 
 
 export const CommentList: React.FC<CommentListProps> = ({
+    loading,
     comments,
     replyComment,
     pagination,
@@ -38,7 +41,9 @@ export const CommentList: React.FC<CommentListProps> = ({
 
             ))}
 
-            {pagination.hasMore && <button onClick={() => fetchNextPage(pagination.page + 1, pagination.size)} className="text-center text-sm font-semibold mt-2">Tải thêm bình luận...</button>}
+            {loading && <CommentSkeleton />}
+
+            {!loading && pagination.hasMore && <button onClick={() => fetchNextPage(pagination.page + 1, pagination.size)} className="text-center text-xs font-semibold mt-2">Tải thêm bình luận...</button>}
         </div>
     );
 };

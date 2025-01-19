@@ -19,7 +19,9 @@ const Navbar: FC = () => {
 
     const [loading, setLoading] = useState(false)
     const [notifications, setNotifications] = useState<NotificationResource[]>([]);
-    const [pagination, setPagination] = useState<Pagination>(inititalValues)
+    const [pagination, setPagination] = useState<Pagination>(inititalValues);
+
+    const [countUnreadChatRoom, setCountUnreadChatRoom] = useState<number>(0)
 
     const fetchNotifications = async (page: number) => {
         setLoading(true)
@@ -86,8 +88,8 @@ const Navbar: FC = () => {
                 </button>
             </Popover>
         </Badge>
-        <Badge count={3}>
-            <Popover trigger='click' placement="bottomRight" content={<MessengerDialog />}>
+        <Badge count={countUnreadChatRoom}>
+            <Popover trigger='click' placement="bottomRight" content={<MessengerDialog onCountChatRoom={count => setCountUnreadChatRoom(count)} />}>
                 <button className="p-3 rounded-md bg-gray-100">
                     <MessageSquare className="text-gray-500" size={18} />
                 </button>

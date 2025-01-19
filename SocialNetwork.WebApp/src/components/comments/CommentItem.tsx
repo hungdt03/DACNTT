@@ -10,6 +10,7 @@ import BoxReplyComment, { BoxReplyCommentType, NodeContent } from "./BoxReplyCom
 import { MediaType } from "../../enums/media";
 import { UserResource } from "../../types/user";
 import { Link } from "react-router-dom";
+import CommentSkeleton from "../skeletons/CommentSkeleton";
 
 type CommentItemProps = {
     parentComment: CommentResource | null;
@@ -60,7 +61,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
 }) => {
     const [isReplying, setIsReplying] = useState(false)
     const [replyToUser, setReplyToUser] = useState<UserResource>(comment.user);
-    const [content, setContent] = useState<string>('')
+    const [content, setContent] = useState<string>('');
+    const [loading, setLoading] = useState(false)
 
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
@@ -69,7 +71,9 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     })
 
     const handleFetchReplies = async (commentId: string, page: number, size: number) => {
+        setLoading(true)
         const response = await commentService.getAllRepliesByCommentId(commentId, page, size);
+        setLoading(false)
         if (response.isSuccess) {
             const fetchedReplies = response.data;
             setPagination(response.pagination)
@@ -166,10 +170,12 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                         />
                     ))}
 
-                    {pagination.hasMore && <button onClick={() => handleFetchReplies?.(comment.id, pagination.page + 1, pagination.size)} className="font-semibold text-left pl-16 my-2 text-xs">Xem thêm phản hồi...</button>}
+                    {loading && <CommentSkeleton />}
+
+                    {!loading && pagination.hasMore && <button onClick={() => handleFetchReplies?.(comment.id, pagination.page + 1, pagination.size)} className="font-semibold text-left pl-16 my-2 text-xs">Xem thêm phản hồi...</button>}
 
                     {/* Box phản hồi ở cuối nếu đang reply comment này */}
-                    {isReplying && (
+                    {!loading && isReplying && (
                         <>
                             <div className="absolute left-4 w-[28px] -top-[24px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>
                             <div className={cn(level === 3 ? "pl-0" : "pl-4")}>

@@ -54,7 +54,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
 
             } else
             {
-                var currentPage = 1;
+               
                 var findCommentId = comment.Id;
                 var findParentCommentId = comment.ParentCommentId;
 
@@ -66,28 +66,28 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
 
                 var indexRoot = rootComments.FindIndex(cmt => cmt.Id == comment.Id);
 
-                currentPage = (indexRoot / pageSize) + 1;
+                rootCurrentPage = (indexRoot / pageSize) + 1;
                 var nearbyRootComments = rootComments
-                    .Skip((currentPage - 1) * pageSize)
+                    .Skip((rootCurrentPage - 1) * pageSize)
                     .Take(5)
                     .ToList();
 
                 response = nearbyRootComments.Select(ApplicationMapper.MapToComment).ToList();
 
-                bool isChildHavePrev = currentPage > 1;
-                bool isChildHaveNext = (currentPage * pageSize) < rootComments.Count;
+                isHavePrev = rootCurrentPage > 1;
+                isHaveNext = (rootCurrentPage * pageSize) < rootComments.Count;
 
                 var currentComment = response.Find(item => item.Id == rootComments[indexRoot].Id);
               
                 var haveChildren = currentComment.IsHaveChildren;
-
+                var currentPage = 1;
                 while (haveChildren)
                 {
                     var childComments = await _unitOfWork.CommentRepository.GetAllRepliesByCommentIdAsync(currentComment.Id);
                     var indexChild = childComments.FindIndex(cmt => cmt.Id == findCommentId);
                     currentPage = (indexChild / pageSize) + 1;
-                    isChildHavePrev = currentPage > 1;
-                    isChildHaveNext = (currentPage * pageSize) < childComments.Count;
+                    bool isChildHavePrev = currentPage > 1;
+                    bool isChildHaveNext = (currentPage * pageSize) < childComments.Count;
 
                     if (indexChild != -1)
                     {

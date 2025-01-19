@@ -135,7 +135,7 @@ export const MentionCommentItem = forwardRef<HTMLDivElement, MentionCommentItemP
 
         return (
             <div className={cn("relative flex flex-col pl-4", comment.parentCommentId !== null ? "gap-y-5" : "gap-y-3")}>
-                {comment.isHaveChildren && <div className={cn("absolute left-8 w-[2px] top-[28px] rounded-lg bg-gray-200", (comment?.replies?.length ?? 0) === 0 ? 'bottom-8' : 'bottom-20')}></div>}
+                {comment.isHaveChildren && <div className={cn("absolute left-8 w-[2px] top-[28px] rounded-lg bg-gray-200", (comment?.replies?.length ?? 0) === 0 ? 'bottom-8' : expandLine ? 'bottom-36' : 'bottom-20')}></div>}
                 {/* Comment nội dung */}
                 <div ref={activeCommentId === comment.id ? ref : null} className="relative flex items-start gap-x-2">
                     {comment.parentCommentId && (
@@ -230,6 +230,7 @@ export const MentionCommentItem = forwardRef<HTMLDivElement, MentionCommentItemP
                                     }
                                 }}
                                 onExpandLine={(expandComment) => {
+                                    console.log(expandComment)
                                     const commentIndex = comment.replies.findIndex(cmt => cmt.id === expandComment.id);
                                     if (commentIndex === comment.replies.length - 1) {
                                         setExpandLine(true)

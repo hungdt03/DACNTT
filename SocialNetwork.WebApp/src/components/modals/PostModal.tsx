@@ -25,8 +25,10 @@ const PostModal: FC<PostModalProps> = ({
     post
 }) => {
     const { user } = useSelector(selectAuth)
-    const [comments, setComments] = useState<CommentResource[]>([])
-    const [pendingComments, setPendingComments] = useState<CommentResource[]>([])
+    const [comments, setComments] = useState<CommentResource[]>([]);
+    const [pendingComments, setPendingComments] = useState<CommentResource[]>([]);
+
+    const [loading, setLoading] = useState(false)
 
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
@@ -84,7 +86,9 @@ const PostModal: FC<PostModalProps> = ({
     }
 
     const fetchComments = async (page: number, size: number) => {
+        setLoading(true)
         const response = await commentService.getAllRootCommentsByPostId(post.id, page, size);
+        setLoading(false)
         if (response.isSuccess) {
             setComments(prev => [...prev, ...response.data])
             setPagination(response.pagination)
@@ -112,7 +116,7 @@ const PostModal: FC<PostModalProps> = ({
             mediaType: MediaType.IMAGE,
             level
         };
-       
+
         const formData = new FormData();
         formData.append('content', values.content);
         formData.append('postId', post.id);
@@ -133,9 +137,9 @@ const PostModal: FC<PostModalProps> = ({
 
         parentCommentId && handleUpdateCommentList(parentCommentId, [tempReplyComment])
         const response = await commentService.createComment(formData);
-      
+
         if (response.isSuccess) {
-            
+
             if (response.data.parentCommentId) {
                 replaceTempCommentWithResponse(response.data)
             }
@@ -155,18 +159,18 @@ const PostModal: FC<PostModalProps> = ({
                     if (comment.parentCommentId && comment.status === 'pending' && comment.sentAt.getTime() === new Date(updatedComment.sentAt).getTime()) {
                         return { ...updatedComment };
                     }
-    
+
                     if (comment.replies && comment.replies.length > 0) {
                         return {
                             ...comment,
                             replies: updateComments(comment.replies),
                         };
                     }
-    
+
                     return comment;
                 });
             };
-    
+
             return updateComments(prevComments);
         });
     };
@@ -199,6 +203,7 @@ const PostModal: FC<PostModalProps> = ({
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
         <CommentList
+            loading={loading}
             replyComment={handleReplyComment}
             comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
             updatedComments={handleUpdateCommentList}

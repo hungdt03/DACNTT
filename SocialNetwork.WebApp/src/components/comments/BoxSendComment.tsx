@@ -154,6 +154,11 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
             editorRef.current?.update(() => {
                 const nodeRoot = $getRoot();
                 nodeRoot.clear()
+
+                const selection = $getSelection();
+                if($isRangeSelection(selection)) {
+                    selection.insertNodes([$createTextNode('')])
+                }
             })
 
             setContent('')
@@ -265,7 +270,7 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
                     }}>
                         <div className="w-full relative">
                             <RichTextPlugin
-                                contentEditable={<ContentEditable 
+                                contentEditable={<ContentEditable
                                     className="w-full min-h-[30px] border-none outline-none px-4 z-0"
                                 />}
                                 placeholder={

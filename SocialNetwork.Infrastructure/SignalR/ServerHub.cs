@@ -19,15 +19,13 @@ namespace SocialNetwork.Infrastructure.SignalR
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ServerHub : Hub
     {
-        private readonly ConnectionManager connectionManager;
         private readonly UserManager<Domain.Entity.User> userManager;
         private readonly IUnitOfWork unitOfWork;
         private readonly IUserStatusService userStatusService;
         private readonly ILogger<ServerHub> logger;
 
-        public ServerHub(ConnectionManager connectionManager, UserManager<Domain.Entity.User> userManager, IUnitOfWork unitOfWork, IUserStatusService userStatusService, ILogger<ServerHub> logger)
+        public ServerHub(UserManager<Domain.Entity.User> userManager, IUnitOfWork unitOfWork, IUserStatusService userStatusService, ILogger<ServerHub> logger)
         {
-            this.connectionManager = connectionManager;
             this.userManager = userManager;
             this.unitOfWork = unitOfWork;
             this.userStatusService = userStatusService;
@@ -42,7 +40,6 @@ namespace SocialNetwork.Infrastructure.SignalR
             logger.LogInformation(Context.ConnectionId);
 
             await userStatusService.AddConnectionAsync(userId, Context.ConnectionId);
-            await connectionManager.UserConnected(userId, Context.ConnectionId);
 
             var chatRooms = await unitOfWork.ChatRoomRepository.GetAllChatRoomsByUserIdAsync(userId);
             await JoinChatRooms(chatRooms);
@@ -152,7 +149,6 @@ namespace SocialNetwork.Infrastructure.SignalR
             logger.LogInformation(userId);
             logger.LogInformation(Context.ConnectionId);
             await userStatusService.RemoveConnectionAsync(userId, Context.ConnectionId);
-            await connectionManager.UserDisconnected(userId, Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);
         }
     }

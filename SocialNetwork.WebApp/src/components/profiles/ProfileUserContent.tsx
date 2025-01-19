@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from "react";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { useSelector } from "react-redux";
 import images from "../../assets";
-import { Avatar, Button, Divider, Popover, Tooltip, message } from "antd";
+import { Avatar, Button, Divider, Popover, Tabs, TabsProps, Tooltip, message } from "antd";
 import ProfilePostList from "./ProfilePostList";
 import { FriendRequestResource } from "../../types/friendRequest";
 import { UserResource } from "../../types/user";
@@ -13,6 +13,9 @@ import friendService from "../../services/friendService";
 import { FriendRequestStatus } from "../../enums/friend-request";
 import followService from "../../services/followService";
 import { FriendResource } from "../../types/friend";
+import ProfileFriendList from "./ProfileFriendList";
+import ProfileFollowerList from "./ProfileFollowerList";
+import ProfileFolloweeList from "./ProfileFolloweesList";
 
 type ProfileUserContentProps = {
     user: UserResource;
@@ -103,6 +106,39 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
         checkIsFollow()
     }, [targetUser])
 
+    const items: TabsProps['items'] = [
+        {
+            key: '1',
+            label: 'Bài viết',
+            children: <ProfilePostList user={targetUser} isShowPostCreator={false} />,
+        },
+        {
+            key: '2',
+            label: 'Giới thiệu',
+            children: 'Content of Tab Pane 2',
+        },
+        {
+            key: '3',
+            label: 'Bạn bè',
+            children: <ProfileFriendList userId={targetUser.id} />,
+        },
+        {
+            key: '4',
+            label: 'Người theo dõi',
+            children: <ProfileFollowerList userId={targetUser.id} />,
+        },
+        {
+            key: '5',
+            label: 'Đang theo dõi',
+            children: <ProfileFolloweeList userId={targetUser.id} />,
+        },
+        {
+            key: '6',
+            label: 'Bài viết đã lưu',
+            children: 'Content of Tab Pane 3',
+        },
+    ];
+
 
     return <div className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
         <div className="flex flex-col gap-y-4 overflow-y-auto shadow">
@@ -116,11 +152,11 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                     <div className="flex flex-col items-center lg:items-start gap-y-1">
                         <span className="font-bold text-2xl">{targetUser?.fullName}</span>
                         <div className="flex items-center gap-x-3">
-                            <span className="text-gray-500">{user?.friendCount} người bạn</span>
+                            <span className="text-gray-500">{targetUser?.friendCount} người bạn</span>
                             <div className="bg-primary w-2 h-2 rounded-full"></div>
-                            <span className="font-semibold text-gray-500">{user?.followingCount} đang theo dõi</span>
+                            <span className="font-semibold text-gray-500">{targetUser?.followingCount} đang theo dõi</span>
                             <div className="bg-primary w-2 h-2 rounded-full"></div>
-                            <span className="font-semibold text-gray-500">{user?.followerCount} theo dõi</span>
+                            <span className="font-semibold text-gray-500">{targetUser?.followerCount} theo dõi</span>
                         </div>
                     </div>
                 </div>
@@ -177,8 +213,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                 </div>
             </div>
             <Divider className="my-3" />
-
-            <ProfilePostList user={targetUser} isShowPostCreator={false} />
+            <Tabs defaultActiveKey="1" className="bg-white p-4 rounded-lg" items={items} />
         </div>
     </div>
 };

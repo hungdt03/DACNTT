@@ -281,6 +281,9 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
             open={openListShare}
             onOk={okListShare}
             onCancel={cancelListShare}
+            classNames={{
+                footer: 'hidden'
+            }}
         >
             <ListSharePostModal post={post} />
         </Modal>

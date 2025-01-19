@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import Notification from "../Notification";
 import { NotificationResource } from "../../types/notification";
-import {  Empty, Modal } from "antd";
+import { Empty, Modal } from "antd";
 import { Pagination } from "../../types/response";
 import useModal from "../../hooks/useModal";
 import MentionPostModal from "../noti-mentions/comments/MentionPostModal";
@@ -51,7 +51,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
             </div>
         </div>
 
-        <Modal
+        {isModalOpen && <Modal
             style={{ top: 20 }}
             title={<p className="text-center font-semibold text-xl">Bài viết của kkk</p>}
             width='700px'
@@ -77,9 +77,9 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                 },
             }}
         >
-            {notification?.type.includes('COMMENT') && notification.postId && notification.commentId &&  <MentionPostModal postId={notification.postId} commentId={notification.commentId} />}
+            {notification?.type.includes('COMMENT') && notification.postId && notification.commentId && <MentionPostModal postId={notification.postId} commentId={notification.commentId} />}
             {notification?.type === NotificationType.POST_SHARED && notification.postId && <MentionSharePostModal postId={notification.postId} />}
-        </Modal>
+        </Modal>}
     </>
 };
 

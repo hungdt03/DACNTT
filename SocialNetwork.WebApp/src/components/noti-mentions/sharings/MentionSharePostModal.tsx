@@ -208,6 +208,7 @@ const MentionSharePostModal: FC<MentionSharePostModalProps> = ({
         {post && <MentionSharePostInnner post={post} />}
 
         <CommentList
+            loading={false}
             replyComment={handleReplyComment}
             comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
             updatedComments={handleUpdateCommentList}

@@ -91,6 +91,7 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
 
     const fetchComments = async () => {
         const response = await commentService.getNearbyCommentsByCommentId(postId, commentId);
+        console.log(response)
         if (response.isSuccess) {
             setComments(prev => [...prev, ...response.data])
             setPagination(response.pagination)

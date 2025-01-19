@@ -7,12 +7,10 @@ namespace SocialNetwork.Infrastructure.SignalR
     public class SignalRService : ISignalRService
     {
         private readonly IHubContext<ServerHub> hubContext;
-        private readonly ConnectionManager connectionManager;
 
-        public SignalRService(IHubContext<ServerHub> hubContext, ConnectionManager connectionManager)
+        public SignalRService(IHubContext<ServerHub> hubContext)
         {
             this.hubContext = hubContext;
-            this.connectionManager = connectionManager;
         }
 
         public async Task SendMessageToSpecificGroup(string groupName, MessageResponse message)

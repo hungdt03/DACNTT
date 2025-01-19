@@ -27,7 +27,7 @@ const TagFriendModal: FC<TagFriendModalProps> = ({
     const [selectFriends, setSelectFriends] = useState<FriendResource[]>(tags?.map(tag => tag.user) ?? [])
 
     const fetchFriends = async () => {
-        const repsonse = await friendService.getAllFriends();
+        const repsonse = await friendService.getAllMyFriends();
         if (repsonse.isSuccess) {
             if(tags && tags.length > 0) {
                 setFriends([...repsonse.data.filter(item => !tags?.some(tag => tag.user.id === item.id))])

@@ -19,6 +19,20 @@ namespace SocialNetwork.API.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet("followers/{userId}")]
+        public async Task<IActionResult> GetAllFollowersByUserId([FromRoute] string userId)
+        {
+            var response = await _mediator.Send(new GetAllFollowerByUserIdQuery(userId));
+            return Ok(response);
+        }
+
+        [HttpGet("followees/{userId}")]
+        public async Task<IActionResult> GetAllFolloweesByUserId([FromRoute] string userId)
+        {
+            var response = await _mediator.Send(new GetAllFolloweesByUserIdQuery(userId));
+            return Ok(response);
+        }
+
         [HttpPost]
         public async Task<IActionResult> FollowUser([FromBody] CreateFollowCommand command)
         {

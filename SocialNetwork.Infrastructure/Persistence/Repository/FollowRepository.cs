@@ -43,12 +43,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<IEnumerable<Follow>> GetAllFolloweesByUserIdAsync(string userId)
         {
-            return await _context.Follows.Where(s => s.FollowerId == userId).ToListAsync();
+            return await _context.Follows
+                  .Include(f => f.Followee)
+                .Where(s => s.FollowerId == userId).ToListAsync();
         }
 
         public async Task<IEnumerable<Follow>> GetAllFollowersByUserIdAsync(string userId)
         {
-            return await _context.Follows.Where(s => s.FolloweeId == userId).ToListAsync();
+            return await _context.Follows
+                .Include(f => f.Follower)
+                .Where(s => s.FolloweeId == userId).ToListAsync();
         }
 
         public async Task<Follow?> GetFollowByFollowerIdAndFolloweeIdAsync(string followerId, string followeeId)

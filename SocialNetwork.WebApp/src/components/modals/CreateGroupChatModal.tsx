@@ -24,7 +24,7 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
     const [groupName, setGroupName] = useState<string>('')
 
     const fetchFriends = async () => {
-        const response = await friendService.getAllFriends();
+        const response = await friendService.getAllMyFriends();
         if (response.isSuccess) {
             setFriends(response.data)
         }
