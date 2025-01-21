@@ -9,7 +9,6 @@ import ChatSidebar from "../layouts/ChatLayout/components/ChatSidebar";
 const ChatPage: FC = () => {
     const { id } = useParams()
     const [currentChatRoom, setCurrentChatRoom] = useState<ChatRoomResource | null>(null);
-    
 
     const fetchChatRoom = async () => {
         if (id) {

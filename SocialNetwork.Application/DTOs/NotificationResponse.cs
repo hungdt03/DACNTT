@@ -14,6 +14,7 @@ namespace SocialNetwork.Application.DTOs
         public bool IsRead { get; set; }
 
         public Guid? PostId { get; set; }
+        public Guid? StoryId { get; set; }
         public Guid? CommentId { get; set; }
         public Guid? FriendRequestId { get; set; }
 

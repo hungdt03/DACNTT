@@ -20,6 +20,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.Stories.AddAsync(story);
         }
 
+        public void DeleteStory(Story story)
+        {
+            _context.Stories.Remove(story);
+        }
+
         public async Task<ICollection<Story>> GetAllStoriesAsync()
         {
             return await _context.Stories

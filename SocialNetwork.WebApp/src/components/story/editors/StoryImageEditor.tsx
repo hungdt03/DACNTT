@@ -28,7 +28,7 @@ import {
     markup_editor_defaults,
     markup_editor_locale_en_gb,
 } from "@pqina/pintura";
-import { uploadImage } from "../../services/cloudinary";
+import { uploadImage } from "../../../services/cloudinary";
 
 setPlugins(plugin_crop, plugin_finetune, plugin_filter, plugin_annotate);
 

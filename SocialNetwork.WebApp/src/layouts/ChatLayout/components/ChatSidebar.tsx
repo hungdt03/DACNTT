@@ -5,6 +5,7 @@ import { Edit, Search } from "lucide-react";
 import { Navigation } from "swiper/modules";
 import SwiperCore from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
+import SignalRConnector from '../../../app/signalR/signalr-connection'
 import "swiper/css";
 SwiperCore.use([Navigation]);
 
@@ -12,17 +13,75 @@ import ChatAvatarStatus from "../../../components/chats/ChatAvatarStatus";
 import { ChatRoomResource } from "../../../types/chatRoom";
 import chatRoomService from "../../../services/chatRoomService";
 import useDebounce from "../../../hooks/useDebounce";
+import ChatUserSkeleton from "../../../components/skeletons/ChatUserSkeleton";
+import ChatSwiperSkeleton from "../../../components/skeletons/ChatSwiperSkeleton";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../../features/slices/auth-slice";
 
 const ChatSidebar: FC = () => {
     const { id } = useParams();
+    const [loading, setLoading] = useState(false)
     const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
     const [onlineChatRooms, setOnlineChatRooms] = useState<ChatRoomResource[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
+    const { user } = useSelector(selectAuth)
+
+    useEffect(() => {
+        SignalRConnector.events(
+            // ON MESSAGE RECEIVE
+            (message) => {
+                console.log('New message: ')
+                console.log(message)
+                setChatRooms(prev => {
+                    const updatedList = [...prev];
+
+                    const findChatRoomIndex = updatedList.findIndex(chatRoom => chatRoom.id === message.chatRoomId);
+
+                    if (findChatRoomIndex !== -1) {
+                        if (user?.id !== message.senderId) {
+                            updatedList[findChatRoomIndex].isRead = false;
+                        }
+
+                        updatedList[findChatRoomIndex].lastMessageDate = message.sentAt
+
+                        if (message.medias.length > 0) {
+                            updatedList[findChatRoomIndex].lastMessage = `${message.sender.fullName} đã gửi ${message.medias.length} file`
+                        } else
+                            updatedList[findChatRoomIndex].lastMessage = message.content
+                    }
+
+                    return updatedList;
+                })
+
+            },
+            (message) => {
+                setChatRooms(prev => {
+                    const updatedList = [...prev];
+
+                    const findChatRoomIndex = updatedList.findIndex(chatRoom => chatRoom.id === message.chatRoomId);
+
+                    if (findChatRoomIndex !== -1 && user?.id !== message.senderId) {
+                        updatedList[findChatRoomIndex].isRead = true;
+                    }
+                    return updatedList;
+                })
+            },
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+        );
+
+    }, []);
 
     useEffect(() => {
         const fetchChatRooms = async () => {
+            setLoading(true)
             const response = await chatRoomService.getAllChatRooms();
+            setLoading(false)
             if (response.isSuccess) {
                 setChatRooms(response.data);
                 setOnlineChatRooms(response.data.filter(item => item.isOnline))
@@ -65,13 +124,13 @@ const ChatSidebar: FC = () => {
                 spaceBetween={4}
                 modules={[Navigation]}
             >
-                {onlineChatRooms.map(chatRoom => <SwiperSlide key={chatRoom.id}><ChatAvatarStatus chatRoom={chatRoom} /></SwiperSlide>)}
+                {loading ? <ChatSwiperSkeleton /> : onlineChatRooms.map(chatRoom => <SwiperSlide key={chatRoom.id}><ChatAvatarStatus chatRoom={chatRoom} /></SwiperSlide>)}
             </Swiper>
 
         </div>
-        <div className="flex flex-col gap-y-2 px-4 w-full h-full overflow-y-auto custom-scrollbar">
+        {loading ? <ChatUserSkeleton /> : <div className="flex flex-col gap-y-2 px-4 w-full h-full overflow-y-auto custom-scrollbar">
             {chatRooms.map((chatRoom, index) => <ChatUserItem isActive={index === 0 && !id ? true : id === chatRoom.id} key={chatRoom.id} chatRoom={chatRoom} />)}
-        </div>
+        </div>}
     </div>
 };
 

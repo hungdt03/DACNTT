@@ -2,15 +2,12 @@
 
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Story.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
-using SocialNetwork.Application.Mappers;
-using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.Story.Handlers
 {
@@ -51,27 +48,7 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             await _unitOfWork.ViewerRepository.CreateViewerAsync(viewer);
-
-            var fullName = _contextAccessor.HttpContext.User.GetFullName();
-            var avatar = _contextAccessor.HttpContext.User.GetAvatar();
-
-            var notification = new Domain.Entity.Notification();
-            notification.StoryId = request.StoryId;
-            notification.RecipientId = story.UserId;
-            notification.DateSent = DateTimeOffset.UtcNow;
-            notification.Title = "Xem tin";
-            notification.Content = $"{fullName} đã xem tin của bạn";
-            notification.ImageUrl = avatar;
-            notification.IsRead = false;
-            notification.Type = NotificationType.VIEW_STORY;
-
-            await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
-
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-            var mapNoti = ApplicationMapper.MapToNotification(notification);
-
-            await _signalRService.SendNotificationToSpecificUser(story.User.UserName, mapNoti);
 
             return new BaseResponse()
             {

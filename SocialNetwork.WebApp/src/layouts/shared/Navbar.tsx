@@ -17,72 +17,14 @@ import AccountDialog from "../../components/dialogs/AccountDialog";
 const Navbar: FC = () => {
     const { user } = useSelector(selectAuth);
 
-    const [loading, setLoading] = useState(false)
-    const [notifications, setNotifications] = useState<NotificationResource[]>([]);
-    const [pagination, setPagination] = useState<Pagination>(inititalValues);
-
     const [countUnreadChatRoom, setCountUnreadChatRoom] = useState<number>(0)
-
-    const fetchNotifications = async (page: number) => {
-        setLoading(true)
-        const response = await notificationService.getAllNotifications({ page, size: pagination.size });
-        setLoading(false)
-        if (response.isSuccess) {
-            setNotifications(prev => {
-                const newNotifications = response.data.filter(
-                    notification => !prev.some(n => n.id === notification.id)
-                );
-                return [...prev, ...newNotifications];
-            });
-
-            setPagination(response.pagination)
-        }
-    }
-
-    useEffect(() => {
-        fetchNotifications(pagination.page);
-
-        SignalRConnector.events(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            // ON NOTIFICATION RECEIVED
-            (notification: NotificationResource) => {
-                toast.info(notification.content);
-                setNotifications(prev => [notification, ...prev])
-            }
-        )
-
-    }, [])
-
-    const handleDeleteNotification = async (notificationId: string) => {
-        const response = await notificationService.deleteNotification(notificationId);
-        if (response.isSuccess) {
-            setNotifications(prev => [...prev.filter(n => n.id !== notificationId)]);
-            toast.success(response.message)
-        }
-    }
-
-    const handleMarkNotificationAsRead = async (notificationId: string) => {
-        const response = await notificationService.markNotificationAsRead(notificationId);
-        if (response.isSuccess) {
-            setNotifications(prev => {
-                return prev.map(notification =>
-                    notification.id === notificationId
-                        ? { ...notification, isRead: true }
-                        : notification
-                );
-            });
-
-        } else {
-            toast.error(response.message)
-        }
-    }
+    const [countUnreadNotification, setCountUnreadNotification] = useState<number>(0)
 
     return <div className="flex items-center gap-x-3">
-        <Badge count={notifications.filter(n => !n.isRead).length}>
-            <Popover trigger='click' placement="topRight" content={<NotificationDialog loading={loading} onFetchMore={(nextPage) => fetchNotifications(nextPage)} pagination={pagination} onMarkAsRead={handleMarkNotificationAsRead} onDelete={handleDeleteNotification} notifications={notifications} />}>
+        <Badge count={countUnreadNotification}>
+            <Popover trigger='click' placement="topRight" content={<NotificationDialog
+                onCountNotification={(count) => setCountUnreadNotification(count)}
+             />}>
                 <button className="p-3 rounded-md bg-gray-100">
                     <Bell className="text-gray-500" size={18} />
                 </button>

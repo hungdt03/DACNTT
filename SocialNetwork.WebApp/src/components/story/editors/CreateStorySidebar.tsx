@@ -2,11 +2,11 @@ import { Button, Divider } from "antd";
 import { FC } from "react";
 import { CloseOutlined, SettingOutlined } from '@ant-design/icons'
 import { Link } from "react-router-dom";
-import images from "../../assets";
-import { StoryOption } from "../../pages/CreateStoryPage";
+import images from "../../../assets";
+import { StoryOption } from "../../../pages/CreateStoryPage";
 import TextEditor from "./TextEditor";
 import { useSelector } from "react-redux";
-import { selectAuth } from "../../features/slices/auth-slice";
+import { selectAuth } from "../../../features/slices/auth-slice";
 
 type CreateStorySidebarProps = {
     option: StoryOption;
@@ -51,8 +51,8 @@ const CreateStorySidebar: FC<CreateStorySidebarProps> = ({
         </div>
 
         {option === 'text' && <div className="absolute flex items-center justify-center gap-x-3 left-0 right-0 bottom-0 py-4 border-t-[1px] border-gray-100">
-            <button className="bg-gray-100 border-[1px] py-1 rounded-md text-gray-400 px-4">Bỏ</button>
-            <button onClick={() => onSubmit()} className="bg-sky-300 text-white py-1 px-4 rounded-md">Chia sẻ lên tin</button>
+            <button className="bg-gray-100 border-[1px] py-1 rounded-md text-gray-400 hover:bg-gray-200 px-4">Bỏ</button>
+            <button onClick={() => onSubmit()} className="bg-sky-400 hover:bg-primary text-white py-1 px-4 rounded-md">Chia sẻ lên tin</button>
         </div>}
     </div>
 };

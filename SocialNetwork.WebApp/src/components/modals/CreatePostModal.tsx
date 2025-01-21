@@ -38,7 +38,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
     const [isUseBackground, setIsUseBackground] = useState(false)
     const { user } = useSelector(selectAuth);
     const contentRef = useRef<HTMLDivElement>(null)
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [finishTag, setFinishTag] = useState(false)
 
 
     const handleReset = () => {
@@ -222,13 +223,14 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                             <img alt="Ảnh" className="w-6 h-6" src={images.photo} />
                         </button>
                     </Tooltip>
-                    <Popover trigger='click' placement="right" content={<TagFriendModal
+                    <Popover trigger='click' placement="right" open={finishTag} content={<TagFriendModal
+                        onFinish={() => setFinishTag(false)}
                         onChange={(tags) => setPostRequest({
                             ...postRequest,
                             tagIds: tags
                         })}
                     />} title='Gắn thẻ người khác'>
-                        <button className="p-2 rounded-full hover:bg-gray-100">
+                        <button onClick={() => setFinishTag(!finishTag)} className="p-2 rounded-full hover:bg-gray-100">
                             <img alt="Tag" className="w-7 h-7" src={images.tagFriend} />
                         </button>
                     </Popover>

@@ -131,7 +131,6 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     const [initialEditorState, setInitialEditorState] = useState<string | null>(null);
 
     const [suggestedFriends, setSuggestedFriends] = useState<FriendResource[]>([]);
-    const [mentionFriends, setMentionFriends] = useState<FriendResource[]>([])
     const [isMentioning, setIsMentioning] = useState(false);
     const editorStateRef = useRef<EditorState | null>(null);
     const editorRef = useRef<LexicalEditor | null>(null);
@@ -224,14 +223,6 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
         }
     }
 
-    const replaceHighlightUsers = (content: string, mentionFriends: FriendResource[]): string => {
-        content = content.replace(`${replyToUsername?.fullName}`, '')
-        mentionFriends.forEach(friend => {
-            content = content.replace(`@${friend.fullName}`, '');
-        });
-        return content;
-    };
-
     const extractLastMention = (text: string): string | null => {
         const words = text.split(" ");
 
@@ -253,10 +244,10 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
 
         editorState.read(() => {
             const editorRoot = $getRoot();
-            setContent(editorRoot.getTextContent());
-            onChange?.(editorRoot.getTextContent())
-            // const textBeforeCursor = replaceHighlightUsers(editorRoot.getTextContent(), mentionFriends);
-            const mentionText = extractLastMention(editorRoot.getTextContent());
+            const rootContent = editorRoot.getTextContent()
+            setContent(rootContent);
+            onChange?.(rootContent)
+            const mentionText = extractLastMention(rootContent);
             if (mentionText) {
                 if (mentionText.trim().includes(" ")) {
                     setIsMentioning(false);
@@ -337,12 +328,11 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
                         />
                         <InitEditorPlugin />
                         <OnChangePlugin onChange={handleEditorChange} />
-                        {/* <MyOnChangePlugin onChange={handleChange} /> */}
                         <HistoryPlugin />
                     </div>
                 </LexicalComposer>}
 
-                {isMentioning && (
+                {isMentioning && suggestedFriends.length > 0 && (
                     <div className="absolute top-full z-50 bg-white border p-2 rounded-md shadow-lg mt-1">
                         {suggestedFriends.map((friend) => (
                             <div onClick={() => handleSelectFriend(friend)} key={friend.id} className="flex items-center gap-2 p-1 cursor-pointer hover:bg-gray-200">

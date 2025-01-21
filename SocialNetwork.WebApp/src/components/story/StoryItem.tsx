@@ -5,20 +5,19 @@ import { StoryType } from "../../enums/story-type.";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import cn from "../../utils/cn";
+import { Link } from "react-router-dom";
 
 type StoryItemProps = {
     story: UserStoryResource;
-    onClick: () => void
 }
 
 const StoryItem: FC<StoryItemProps> = ({
     story,
-    onClick
 }) => {
     const { user } = useSelector(selectAuth);
     return (
-        <div
-            onClick={onClick}
+        <Link
+            to={`/stories/${story.user.id}`}
             className="rounded-xl relative flex items-center justify-center px-4 py-6 overflow-hidden cursor-pointer"
             style={{
                 background: story.stories[0].type === StoryType.STORY_TEXT
@@ -52,7 +51,7 @@ const StoryItem: FC<StoryItemProps> = ({
                     {user?.id === story.user.id ? 'Tin của bạn' : story.user.fullName}
                 </span>
             </div>
-        </div>
+        </Link>
     );
 };
 

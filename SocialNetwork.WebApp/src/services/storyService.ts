@@ -3,6 +3,7 @@ import { ReactStory } from '../components/story/StoryShow';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { StoryRequest } from '../pages/CreateStoryPage';
 import { BaseResponse, DataResponse } from '../types/response';
+import { StoryResource } from '../types/story';
 import { UserStoryResource } from '../types/userStory';
 import { ViewerResource } from '../types/viewer';
 
@@ -36,6 +37,14 @@ class StoryService {
 
     getMyStoryViews(storyId: string) : Promise<DataResponse<ViewerResource[]>> {
         return axiosInterceptor.get('/api/stories/viewers/' + storyId)
+    }
+
+    getUserStoryByUserId(userId: string) : Promise<DataResponse<UserStoryResource>> {
+        return axiosInterceptor.get('/api/stories/' + userId)
+    }
+
+    deleteStoryById(storyId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.delete('/api/stories/' + storyId)
     }
 }
 

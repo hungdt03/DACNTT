@@ -35,6 +35,15 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetStoriesByUserId([FromRoute] string userId)
+        {
+            var response = await _mediator.Send(new GetStoriesByUserIdQuery(userId));
+            return Ok(response);
+        }
+     
+
         [HttpPut("view/{storyId}")]
         public async Task<IActionResult> ViewStory([FromRoute] Guid storyId)
         {
@@ -53,6 +62,13 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> GetMyStoryViewers([FromRoute] Guid storyId)
         {
             var response = await _mediator.Send(new GetMyStoryViewerQuery(storyId));
+            return Ok(response);
+        }
+
+        [HttpDelete("{storyId}")]
+        public async Task<IActionResult> DeleteStory([FromRoute] Guid storyId)
+        {
+            var response = await _mediator.Send(new DeleteStoryByIdCommand(storyId));
             return Ok(response);
         }
     }

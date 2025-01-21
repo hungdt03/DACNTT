@@ -6,7 +6,7 @@ import { selectAuth } from "../../features/slices/auth-slice";
 
 const StoryCreator: FC = () => {
     const { user } = useSelector(selectAuth)
-    return <Link to='/story/create' className="flex flex-col h-[200px] rounded-xl overflow-hidden">
+    return <Link to='/stories/create' className="flex flex-col h-[200px] rounded-xl overflow-hidden">
         <div className="h-[75%] relative">
             <div
                 className="absolute inset-0 z-0"

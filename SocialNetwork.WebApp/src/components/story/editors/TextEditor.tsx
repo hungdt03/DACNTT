@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dropdown } from "antd";
 import { CaseSensitive } from "lucide-react";
 import { FC, useState } from "react";
-import dataBackgroundStory from '../../data/data-background-story.json'
-import cn from "../../utils/cn";
+import dataBackgroundStory from '../../../data/data-background-story.json'
+import cn from "../../../utils/cn";
 
 const fontStyles = [
     { key: '1', label: 'Dancing Script', fontFamily: "'Dancing Script', cursive" },

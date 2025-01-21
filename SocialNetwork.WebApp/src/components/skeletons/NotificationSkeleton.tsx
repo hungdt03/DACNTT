@@ -1,8 +1,8 @@
 import { Skeleton } from "antd";
 import { FC } from "react";
 
-const ChatUserSkeleton: FC = () => {
-    const skeletonItems = Array.from({ length: 8 }, (_, i) => (
+const NotificationSkeleton: FC = () => {
+    const skeletonItems = Array.from({ length: 3 }, (_, i) => (
         <div className="flex items-center gap-x-4 w-full" key={i}>
             <Skeleton.Avatar active={true} size="small" shape="circle" />
             <div className="flex-1 flex flex-col gap-y-2">
@@ -32,4 +32,4 @@ const ChatUserSkeleton: FC = () => {
     return <div className="flex flex-col gap-y-7 w-full px-4">{skeletonItems}</div>;
 };
 
-export default ChatUserSkeleton;
+export default NotificationSkeleton;

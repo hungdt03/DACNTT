@@ -184,6 +184,7 @@ namespace SocialNetwork.Application.Mappers
                 ImageUrl = notification.ImageUrl,
                 IsRead = notification.IsRead,
                 PostId = notification.PostId,
+                StoryId = notification.StoryId,
                 Recipient = notification.Recipient != null ? MapToUser(notification.Recipient) : null,
                 Title = notification.Title,
                 Type = notification.Type,

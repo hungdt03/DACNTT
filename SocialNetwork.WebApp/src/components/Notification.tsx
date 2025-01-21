@@ -40,6 +40,7 @@ type NotificationProps = {
     onMarkAsRead?: () => void;
     onCommentNotification: () => void;
     onShareNotification: () => void;
+    onStoryReactionNotification: () => void;
 }
 
 const Notification: FC<NotificationProps> = ({
@@ -48,6 +49,7 @@ const Notification: FC<NotificationProps> = ({
     onMarkAsRead,
     onCommentNotification,
     onShareNotification,
+    onStoryReactionNotification
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false);
     const [accepted, setAccepted] = useState<'accepted' | 'cancel' | 'none'>('none');
@@ -87,6 +89,8 @@ const Notification: FC<NotificationProps> = ({
             onCommentNotification()
         } else if(notification.type === NotificationType.POST_SHARED) {
             onShareNotification()
+        } else if(notification.type === NotificationType.REACT_STORY) {
+            onStoryReactionNotification()
         }
     }
 

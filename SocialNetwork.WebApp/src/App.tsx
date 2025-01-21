@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import { getAccessToken } from "./utils/auth";
 import { initialize } from "./features/slices/auth-slice";
 import authService from "./services/authService";
-import SignalRConnector from './app/signalR/signalr-connection'
 
 function App() {
     
@@ -20,6 +19,7 @@ function App() {
                     isAuthenticated: false, user: undefined
                 }));
             }
+            
             try {
                 const response = await authService.getPrincipal();
                 if (response.isSuccess) {

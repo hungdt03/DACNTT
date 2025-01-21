@@ -59,7 +59,10 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
                 <span className="italic text-sm">Chưa có bạn bè nào</span>
             </div> : <div className="grid grid-cols-3 gap-2">
                 {friends.map(friend => <div className="flex flex-col items-start gap-1" key={friend.id}>
-                    <Image preview={false} src={friend.avatar ?? images.cover} className="border-[1px] border-primary rounded-md" />
+                    <Image preview={false} src={friend.avatar ?? images.cover} style={{
+                        height: '100%',
+                        width: '100%'
+                    }} className="border-[1px] object-cover border-primary rounded-md" />
                     <Link to={`/profile/${friend.id}`} className="text-sm font-semibold line-clamp-1">{friend.fullName}</Link>
                     {user?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}
                 </div>)}

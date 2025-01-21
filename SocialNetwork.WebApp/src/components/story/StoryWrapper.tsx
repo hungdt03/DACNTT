@@ -6,9 +6,6 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Modal } from "antd";
-import useModal from "../../hooks/useModal";
-import ViewStory from "./ViewStory";
 import { UserStoryResource } from "../../types/userStory";
 import storyService from "../../services/storyService";
 import { useSelector } from "react-redux";
@@ -18,16 +15,10 @@ import StorySkeleton from "../skeletons/StorySkeleton";
 
 const StoryWrapper: FC = () => {
     const { user } = useSelector(selectAuth)
-
-    const { isModalOpen, showModal, handleCancel, handleOk } = useModal();
-
     const [loading, setLoading] = useState(false)
     const [showPrev, setShowPrev] = useState(false);
-    const [selectStory, setSelectStory] = useState<UserStoryResource>();
-
     const [userStories, setUserStories] = useState<UserStoryResource[]>([])
 
-    const [currentIndex, setCurrentIndex] = useState<number>(0);
     const prevRef = useRef<HTMLButtonElement | null>(null);
     const nextRef = useRef<HTMLButtonElement | null>(null);
 
@@ -44,9 +35,7 @@ const StoryWrapper: FC = () => {
         fetchUserStories()
     }, [])
 
-    return <>
-        <div className="relative w-full h-[200px]">
-
+    return <div className="relative w-full h-[200px]">
             <Swiper
                 modules={[Navigation]}
                 slidesPerView={4.75} // Mặc định cho desktop
@@ -99,11 +88,6 @@ const StoryWrapper: FC = () => {
                             .map((story, index) => (
                                 <SwiperSlide key={`user-${index}`}>
                                     <StoryItem
-                                        onClick={() => {
-                                            setCurrentIndex(index);
-                                            setSelectStory(story);
-                                            showModal();
-                                        }}
                                         story={story}
                                     />
                                 </SwiperSlide>
@@ -113,11 +97,7 @@ const StoryWrapper: FC = () => {
                             .map((story, index) => (
                                 <SwiperSlide key={`other-${index}`}>
                                     <StoryItem
-                                        onClick={() => {
-                                            setCurrentIndex(index);
-                                            setSelectStory(story);
-                                            showModal();
-                                        }}
+                                       
                                         story={story}
                                     />
                                 </SwiperSlide>
@@ -142,32 +122,6 @@ const StoryWrapper: FC = () => {
             </button>
         </div>
 
-        <Modal
-            width='1200px'
-            centered
-            open={isModalOpen}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            className="custom-modal"
-            styles={{
-                mask: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                },
-                wrapper: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.0)',
-                },
-                content: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.0)',
-                    boxShadow: 'none'
-                },
-                footer: {
-                    display: 'none'
-                }
-            }}
-        >
-            {selectStory && <ViewStory story={selectStory} />}
-        </Modal>
-    </>
 };
 
 export default StoryWrapper;

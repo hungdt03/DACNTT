@@ -1,5 +1,5 @@
 import { FC } from "react";
-import images from "../../assets";
+import images from "../../../assets";
 import { CaseSensitive, Images } from "lucide-react";
 
 type CreateStoryOptionProps = {

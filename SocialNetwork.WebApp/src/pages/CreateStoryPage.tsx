@@ -1,9 +1,9 @@
 import { FC, useState } from "react";
-import CreateStorySidebar from "../components/story/CreateStorySidebar";
-import CreateStoryOption from "../components/story/CreateStoryOption";
-import StoryTextPreview from "../components/story/StoryTextPreview";
+import CreateStorySidebar from "../components/story/editors/CreateStorySidebar";
+import CreateStoryOption from "../components/story/editors/CreateStoryOption";
+import StoryTextPreview from "../components/story/editors/StoryTextPreview";
 import dataBackgroundStory from '../data/data-background-story.json'
-import StoryImageEditor from "../components/story/StoryImageEditor";
+import StoryImageEditor from "../components/story/editors/StoryImageEditor";
 import { StoryType } from "../enums/story-type.";
 import { PrivacyType } from "../enums/privacy";
 import storyService from "../services/storyService";
@@ -72,7 +72,14 @@ const CreateStoryPage: FC = () => {
     return <div className="h-screen w-screen grid grid-cols-12 gap-4">
         {loading && <Loading />}
         <div className="col-span-3">
-            <CreateStorySidebar onSubmit={() => handleCreateStory()} onFontFamilySelect={(fontFamily) => setFontFamily(fontFamily)} onSelectBackground={(background: string) => setBackground(background)} content={content} onChange={(value) => setContent(value)} option={option} />
+            <CreateStorySidebar 
+                onSubmit={() => handleCreateStory()} 
+                onFontFamilySelect={(fontFamily) => setFontFamily(fontFamily)} 
+                onSelectBackground={(background: string) => setBackground(background)} 
+                content={content} 
+                onChange={(value) => setContent(value)} 
+                option={option}
+            />
         </div>
         <div className="col-span-9 flex items-center justify-center">
             {!option && <CreateStoryOption

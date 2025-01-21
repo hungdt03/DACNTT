@@ -40,11 +40,22 @@ const ChatArea: FC<ChatAreaProps> = ({
         chatRoomName: chatRoom.uniqueName
     });
 
+    const [loading, setLoading] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null);
+    const observerRef = useRef<IntersectionObserver | null>(null);
+
     const fetchMessages = async (page: number, size: number) => {
+        setLoading(true)
         const response = await messageService.getAllMessagesByChatRoomId(chatRoom.id, page, size);
+        setTimeout(() =>  setLoading(false), 1000)
         if (response.isSuccess) {
             setMessages(prevMessages => [...response.data, ...prevMessages])
             setPagination(response.pagination)
+
+                    
+            if (containerRef.current) {
+                containerRef.current.scrollBy({ top: 50, behavior: 'instant' }); 
+            }
         }
     }
 
@@ -83,6 +94,8 @@ const ChatArea: FC<ChatAreaProps> = ({
                         return updatedMessages;
                     });
 
+                    if (messagesEndRef.current)
+                        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
                 }
             },
             // ON READ STATUS RECEIVE
@@ -126,12 +139,11 @@ const ChatArea: FC<ChatAreaProps> = ({
             ...prev,
             chatRoomName: chatRoom.uniqueName
         }))
-    }, [chatRoom]);
 
-    useEffect(() => {
-        if (messagesEndRef.current)
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }, [messages])
+        return () => {
+            SignalRConnector.unsubscribeEvents()
+        }
+    }, [chatRoom]);
 
     const handleBoxChange = (value: BoxMessageType) => {
 
@@ -239,8 +251,33 @@ const ChatArea: FC<ChatAreaProps> = ({
     const handleReadMessage = async () => {
         const response = await messageService.readMessage(chatRoom.id);
         console.log(response.message)
-
     }
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            entries => {
+                if (entries[0].isIntersecting) {
+                    pagination.hasMore && !loading && fetchMessages(pagination.page + 1, pagination.size)
+               
+                }
+            },
+            { root: containerRef.current, rootMargin: '0px' }
+        );
+
+        observerRef.current = observer;
+
+        const triggerElement = document.getElementById('messenger-scroll-trigger');
+        if (triggerElement) {
+            observer.observe(triggerElement);
+        }
+
+        return () => {
+            if (observerRef.current && triggerElement) {
+                observer.unobserve(triggerElement);
+            }
+        };
+    }, [pagination, loading]);
+
 
 
     return <div className="col-span-8 flex flex-col h-full overflow-hidden">
@@ -270,8 +307,13 @@ const ChatArea: FC<ChatAreaProps> = ({
             </div>
         </div>
 
-        <div className="flex flex-col h-full gap-y-3 w-full overflow-y-auto custom-scrollbar p-4">
-            {pagination.hasMore && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-primary my-2 text-xs">Tải thêm tin nhắn</button>}
+        <div ref={containerRef} className="flex flex-col h-full gap-y-3 w-full overflow-y-auto custom-scrollbar p-4">
+            {!pagination.hasMore && !loading && (
+                <p className="text-center text-gray-500 text-sm">Không còn tin nhắn nào để tải.</p>
+            )}
+            {loading && <p className="text-center text-gray-500 text-sm">Đang tải tin nhắn ...</p>}
+            <div id="messenger-scroll-trigger" className="w-full h-1" />
+
             {[...messages, ...pendingMessages].map(message => <Message chatRoom={chatRoom} key={message.id} message={message} isMe={message.senderId === user?.id} />)}
             <div ref={messagesEndRef}></div>
         </div>

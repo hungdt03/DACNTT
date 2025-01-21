@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout/MainLayout";
-import HomePage from "../pages/Feeds";
+import HomePage from "../pages/HomePage";
 import GroupPage from "../pages/GroupPage";
 import HeaderOnlyLayout from "../layouts/HeaderOnlyLayout/HeaderOnlyLayout";
 import ProfilePage from "../pages/ProfilePage";
@@ -16,6 +16,7 @@ import UserPage from "../pages/UserPage";
 import ErrorBoundaryPage from "../pages/errors/ErrorBoundaryPage";
 import CreateStoryPage from "../pages/CreateStoryPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ViewStoryPage from "../pages/ViewStoryPage";
 
 const appRouter = createBrowserRouter([
     {
@@ -72,8 +73,12 @@ const appRouter = createBrowserRouter([
         element: <AuthGuard element={<ChatPage />} />,
     },
     {
-        path: '/story/create',
+        path: '/stories/create',
         element: <CreateStoryPage />
+    },
+    {
+        path: '/stories/:userId',
+        element: <ViewStoryPage />
     },
     {
         path: '*',
