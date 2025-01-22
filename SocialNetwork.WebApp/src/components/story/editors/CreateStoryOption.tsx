@@ -11,17 +11,17 @@ const CreateStoryOption: FC<CreateStoryOptionProps> = ({
     onText,
     onImage
 }) => {
-    return <div className="flex items-center gap-x-6">
+    return <div className="flex items-center sm:gap-x-6 gap-x-3">
         <label htmlFor="fileStory" style={{
             backgroundImage: `url(${images.bgStoryText})`,
             backgroundPosition: '0px 0px',
             backgroundSize: 'auto'
-        }} className="px-6 flex items-center justify-center w-[220px] h-[330px] bg-no-repeat cursor-pointer">
+        }} className="px-6 flex items-center rounded-lg justify-center sm:w-[220px] sm:h-[330px] w-[150px] h-[225px] bg-no-repeat cursor-pointer">
             <div className="flex flex-col gap-y-2 items-center">
                 <div className="p-2 rounded-full bg-white border-[1px] border-gray-100 shadow">
                     <Images />
                 </div>
-                <span className="font-semibold text-white">Tạo tin dạng ảnh</span>
+                <span className="font-semibold text-white w-full text-center">Tạo tin dạng ảnh</span>
             </div>
         </label>
         <input accept="image/*" 
@@ -36,12 +36,12 @@ const CreateStoryOption: FC<CreateStoryOptionProps> = ({
             backgroundImage: `url(${images.bgStoryImage})`,
             backgroundPosition: '0px -331px',
             backgroundSize: 'auto'
-        }} className="px-6 flex items-center justify-center w-[220px] h-[330px] bg-no-repeat cursor-pointer">
+        }} className="px-6 flex items-center justify-center rounded-lg sm:w-[220px] sm:h-[330px] w-[150px] h-[225px] bg-no-repeat cursor-pointer">
             <div className="flex flex-col gap-y-2 items-center">
                 <div className="p-2 rounded-full bg-white border-[1px] border-gray-100 shadow">
                     <CaseSensitive />
                 </div>
-                <span className="font-semibold text-white">Tạo tin dạng văn bản</span>
+                <span className="font-semibold text-white w-full text-center">Tạo tin dạng văn bản</span>
             </div>
         </div>
     </div>

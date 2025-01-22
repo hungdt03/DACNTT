@@ -95,7 +95,7 @@ const ProfileContent: FC<ProfileContentProps> = ({
                         className="cursor-pointer w-full"
                         disabled={loading}
                     >
-                        <div className="shadow bg-sky-50 text-primary flex items-center gap-x-2 px-3 py-2 rounded-md cursor-pointer">
+                        <div className="shadow bg-white text-primary flex items-center gap-x-2 px-3 py-2 rounded-md cursor-pointer">
                             <LucideUpload size={18} />
                             <span className="text-sm font-semibold">
                                 {tempCoverImage ? 'Chọn ảnh khác' : 'Thêm ảnh bìa'}
@@ -118,7 +118,7 @@ const ProfileContent: FC<ProfileContentProps> = ({
                             beforeUpload={() => false}
                             showUploadList={false}
                             onChange={onAvatarChange}
-                            className="cursor-pointer absolute bottom-0 right-0 p-1 bg-sky-50 border-primary border-[1px] w-8 h-8 flex items-center justify-center rounded-full"
+                            className="cursor-pointer absolute bottom-0 right-0 p-1 bg-white border-primary border-[1px] w-8 h-8 flex items-center justify-center rounded-full"
                         >
                             <Camera className="text-primary" size={18} />
                         </Upload>

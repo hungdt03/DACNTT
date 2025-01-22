@@ -15,13 +15,18 @@ import messageService from "../../services/messageService";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
 import { Pagination } from "../../types/response";
+import cn from "../../utils/cn";
 
 type ChatAreaProps = {
     chatRoom: ChatRoomResource;
+    onToggleChatDetails: () => void;
+    showChatDetails: boolean;
 }
 
 const ChatArea: FC<ChatAreaProps> = ({
-    chatRoom
+    chatRoom,
+    showChatDetails,
+    onToggleChatDetails
 }) => {
     const { user } = useSelector(selectAuth);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -73,6 +78,7 @@ const ChatArea: FC<ChatAreaProps> = ({
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
+                console.log('Receive message in chat area')
                 if (message.chatRoomId === chatRoom.id) {
                     setPendingMessages((prev) =>
                         prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
@@ -278,9 +284,7 @@ const ChatArea: FC<ChatAreaProps> = ({
         };
     }, [pagination, loading]);
 
-
-
-    return <div className="col-span-8 flex flex-col h-full overflow-hidden">
+    return <div className={cn("flex flex-col h-full overflow-hidden col-span-12", !showChatDetails ? 'md:col-span-12' : 'md:col-span-8')}>
         <div className="flex items-center justify-between p-4 shadow">
             <div className="flex justify-center items-center gap-x-3">
                 <div className="relative">
@@ -299,8 +303,8 @@ const ChatArea: FC<ChatAreaProps> = ({
                         <PhoneOutlined className="rotate-90" />
                     </button>
                 </Tooltip>
-                <Tooltip title="Thông tin cuộc trò chuyện">
-                    <button onClick={() => { }} className="p-2 bg-transparent border-none">
+                <Tooltip placement="left" title="Thông tin cuộc trò chuyện">
+                    <button onClick={() => onToggleChatDetails()} className="p-2 bg-transparent border-none">
                         <MinusOutlined />
                     </button>
                 </Tooltip>

@@ -61,10 +61,10 @@ const ViewStoryPage: FC = () => {
     }
 
     return <div className="grid grid-cols-12 h-screen">
-        <div className="col-span-3 bg-white h-full overflow-y-auto">
+        <div className="lg:col-span-4 xl:col-span-3 lg:block hidden bg-white h-full overflow-y-auto">
             {userStory && <StorySidebar selectStory={userStory} onRefresh={fetchUserStories} userStories={userStories} />}
         </div>
-        <div className="col-span-9 h-full bg-black flex justify-center items-center">
+        <div className="lg:col-span-8 xl:col-span-9 col-span-12 h-full bg-black flex justify-center items-center">
             {userStory && <StoryShow onDelete={handleDeleteStory} onEnd={handleNextStory} story={userStory} />}
         </div>
     </div>

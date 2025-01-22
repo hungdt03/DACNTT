@@ -46,17 +46,22 @@ const StoryWrapper: FC = () => {
                         spaceBetween: 8,
                     },
                     768: { // Tablet
-                        slidesPerView: 4.75,
+                        slidesPerView: 5,
                         spaceBetween: 8,
                     },
-                    480: { // Mobile
-                        slidesPerView: 4.75,
+                    540: { // Tablet
+                        slidesPerView: 4.75, 
                         spaceBetween: 8,
                     },
-                    300: { // Mobile
-                        slidesPerView: 2.75,
+                    380: { // Mobile 
+                        slidesPerView: 3.75, 
                         spaceBetween: 8,
                     },
+                    300: { // Mobile 
+                        slidesPerView: 2.75, 
+                        spaceBetween: 8,
+                    },
+                    
                 }}
                 onSlideChange={(swiper) => setShowPrev(swiper.isBeginning === false)}
                 navigation={{

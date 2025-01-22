@@ -63,6 +63,7 @@ namespace SocialNetwork.Infrastructure.SignalR
 
             ChatRoom chatRoom = await unitOfWork.ChatRoomRepository.GetChatRoomByUniqueNameAsync(messageRequest.ChatRoomName)
                 ?? throw new AppException("Nhóm chat không tồn tại");
+
             await unitOfWork.BeginTransactionAsync();
 
             var recentReadStatus = await unitOfWork.MessageReadStatusRepository.GetMessageReadStatusByUserAndChatRoomId(userId, chatRoom.Id);

@@ -27,7 +27,17 @@ const CreateStoryPage: FC = () => {
     const [fontFamily, setFontFamily] = useState<string>('');
     const [content, setContent] = useState<string>('');
     const [image, setImage] = useState<File>();
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+
+    const [openTool, setOpenTool] = useState(false);
+
+    const showDrawer = () => {
+        setOpenTool(true);
+    };
+
+    const closeDrawer = () => {
+        setOpenTool(false);
+    };
 
     const navigate = useNavigate()
 
@@ -71,7 +81,7 @@ const CreateStoryPage: FC = () => {
 
     return <div className="h-screen w-screen grid grid-cols-12 gap-4">
         {loading && <Loading />}
-        <div className="col-span-3">
+        <div className="lg:col-span-4 xl:col-span-3 lg:block hidden">
             <CreateStorySidebar 
                 onSubmit={() => handleCreateStory()} 
                 onFontFamilySelect={(fontFamily) => setFontFamily(fontFamily)} 
@@ -79,9 +89,11 @@ const CreateStoryPage: FC = () => {
                 content={content} 
                 onChange={(value) => setContent(value)} 
                 option={option}
+                isOpenTool={openTool}
+                onCloseTool={closeDrawer}
             />
         </div>
-        <div className="col-span-9 flex items-center justify-center">
+        <div className="lg:col-span-8 xl:col-span-9 col-span-12 flex items-center justify-center">
             {!option && <CreateStoryOption
                 onImage={(fileImage) => {
                     setOption('image')
@@ -90,11 +102,13 @@ const CreateStoryPage: FC = () => {
                 onText={() => setOption('text')}
             />}
 
-            {option === 'text' && <StoryTextPreview fontFamily={fontFamily} background={background} content={content} />}
+            {option === 'text' && <StoryTextPreview onOpenTool={showDrawer} fontFamily={fontFamily} background={background} content={content} />}
             {option === 'image' && image && <StoryImageEditor onFinish={handleCreateStoryImage} fileImage={URL.createObjectURL(image)} />}
         </div>
 
     </div>
+
+    
 };
 
 export default CreateStoryPage;

@@ -7,7 +7,6 @@ import ProfilePage from "../pages/ProfilePage";
 import AuthLayout from "../layouts/AuthLayout/AuthLayout";
 import SignInPage from "../pages/SignInPage";
 import SignUpPage from "../pages/SignUpPage";
-import ChatLayout from "../layouts/ChatLayout/ChatLayout";
 import ChatPage from "../pages/ChatPage";
 import AuthGuard from "./authGuard";
 import NotFoundPage from "../pages/errors/NotFoundPage";

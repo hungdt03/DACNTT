@@ -1,38 +1,42 @@
 import { FC, useEffect, useState } from "react";
-import ChatUserItem from "../../../components/chats/ChatUserItem";
-import { Link, useParams } from "react-router-dom";
+import ChatUserItem from "./ChatUserItem";
+import { Link } from "react-router-dom";
 import { Edit, Search } from "lucide-react";
 import { Navigation } from "swiper/modules";
 import SwiperCore from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
-import SignalRConnector from '../../../app/signalR/signalr-connection'
+import SignalRConnector from '../../app/signalR/signalr-connection'
 import "swiper/css";
 SwiperCore.use([Navigation]);
 
-import ChatAvatarStatus from "../../../components/chats/ChatAvatarStatus";
-import { ChatRoomResource } from "../../../types/chatRoom";
-import chatRoomService from "../../../services/chatRoomService";
-import useDebounce from "../../../hooks/useDebounce";
-import ChatUserSkeleton from "../../../components/skeletons/ChatUserSkeleton";
-import ChatSwiperSkeleton from "../../../components/skeletons/ChatSwiperSkeleton";
+import ChatAvatarStatus from "./ChatAvatarStatus";
+import { ChatRoomResource } from "../../types/chatRoom";
+import chatRoomService from "../../services/chatRoomService";
+import useDebounce from "../../hooks/useDebounce";
+import ChatUserSkeleton from "../skeletons/ChatUserSkeleton";
+import ChatSwiperSkeleton from "../skeletons/ChatSwiperSkeleton";
 import { useSelector } from "react-redux";
-import { selectAuth } from "../../../features/slices/auth-slice";
+import { selectAuth } from "../../features/slices/auth-slice";
 
-const ChatSidebar: FC = () => {
-    const { id } = useParams();
+type ChatSidebarProps = {
+    chatRoom: ChatRoomResource
+}
+
+const ChatSidebar: FC<ChatSidebarProps> = ({
+    chatRoom
+}) => {
     const [loading, setLoading] = useState(false)
     const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
     const [onlineChatRooms, setOnlineChatRooms] = useState<ChatRoomResource[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
-    const { user } = useSelector(selectAuth)
+    const { user } = useSelector(selectAuth);
 
     useEffect(() => {
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
-                console.log('New message: ')
-                console.log(message)
+                console.log('Receive message in chat sidebar')
                 setChatRooms(prev => {
                     const updatedList = [...prev];
 
@@ -75,7 +79,7 @@ const ChatSidebar: FC = () => {
             undefined,
         );
 
-    }, []);
+    }, [chatRoom]);
 
     useEffect(() => {
         const fetchChatRooms = async () => {
@@ -102,7 +106,7 @@ const ChatSidebar: FC = () => {
         searchChatRoom();
     }, [debouncedSearchTerm]);
 
-    return <div className="h-full bg-white col-span-3 flex flex-col gap-y-4 py-4 overflow-hidden border-r-[1px] border-gray-200">
+    return <div className="hidden lg:flex h-full bg-white lg:col-span-4 xl:col-span-3 flex-col gap-y-4 py-4 overflow-hidden border-r-[1px] border-gray-200">
         <div className="flex items-center justify-between px-4">
             <Link to='/' className="px-2 py-1 rounded-md bg-sky-100 text-primary text-xs">Quay lại</Link>
             <span className="text-xl font-semibold">Nhắn tin</span>
@@ -123,13 +127,22 @@ const ChatSidebar: FC = () => {
                 slidesPerView={5.5}
                 spaceBetween={4}
                 modules={[Navigation]}
+                breakpoints={{
+                    1280: { // XL (>= 1280px)
+                        slidesPerView: 5.5, // Hiển thị 5 item
+                    },
+                    1024: { // LG (>= 1024px)
+                        slidesPerView: 4.5, // Hiển thị 4 item
+                    },
+                  
+                }}
             >
                 {loading ? <ChatSwiperSkeleton /> : onlineChatRooms.map(chatRoom => <SwiperSlide key={chatRoom.id}><ChatAvatarStatus chatRoom={chatRoom} /></SwiperSlide>)}
             </Swiper>
 
         </div>
         {loading ? <ChatUserSkeleton /> : <div className="flex flex-col gap-y-2 px-4 w-full h-full overflow-y-auto custom-scrollbar">
-            {chatRooms.map((chatRoom, index) => <ChatUserItem isActive={index === 0 && !id ? true : id === chatRoom.id} key={chatRoom.id} chatRoom={chatRoom} />)}
+            {chatRooms.map((item) => <ChatUserItem isActive={item.id === chatRoom.id} key={item.id} chatRoom={item} />)}
         </div>}
     </div>
 };

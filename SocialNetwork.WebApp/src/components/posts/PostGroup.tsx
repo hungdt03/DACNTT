@@ -2,7 +2,6 @@ import { FC } from "react";
 import useModal from "../../hooks/useModal";
 import { Avatar, Divider, Image, Modal, Popover, Tooltip } from "antd";
 import images from "../../assets";
-import { PostMoreAction, PostReaction } from "./Post";
 import { HeartIcon, MoreHorizontal, SendHorizonal, ShareIcon } from "lucide-react";
 import { svgReaction } from "../../assets/svg";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
@@ -13,6 +12,7 @@ import { Link } from "react-router-dom";
 import videos from "../../assets/video";
 import PostMedia from "./PostMedia";
 import BoxSendComment from "../comments/BoxSendComment";
+import { PostMoreAction } from "./PostMoreAction";
 
 const PostGroup: FC = () => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
@@ -60,11 +60,11 @@ const PostGroup: FC = () => {
                     </div>
                 </div>
             </div>
-            <Popover content={<PostMoreAction />}>
+            {/* <Popover content={<PostMoreAction />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
                     <MoreHorizontal className="text-gray-400" />
                 </button>
-            </Popover>
+            </Popover> */}
         </div>
 
         <div className="flex flex-col gap-y-3">
@@ -88,12 +88,12 @@ const PostGroup: FC = () => {
         </div>
         <Divider className='my-0' />
         <div className="flex items-center justify-between gap-x-4">
-            <Popover content={<PostReaction />}>
+            {/* <Popover content={<PostReaction />}>
                 <button className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                     <HeartIcon className="h-5 w-5 text-gray-500" />
                     <span>Thích</span>
                 </button>
-            </Popover>
+            </Popover> */}
             <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
@@ -109,7 +109,7 @@ const PostGroup: FC = () => {
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của Bùi Việt</p>} width='700px' footer={[
             <BoxSendComment />
         ]} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            <PostModal />
+            {/* <PostModal /> */}
         </Modal>
 
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
@@ -118,7 +118,7 @@ const PostGroup: FC = () => {
 
 
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
-            <SharePostModal />
+            {/* <SharePostModal /> */}
         </Modal>
     </div>
 };

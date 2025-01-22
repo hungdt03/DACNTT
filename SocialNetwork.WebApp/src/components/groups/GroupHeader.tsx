@@ -1,9 +1,13 @@
 import { FC } from "react";
 import images from "../../assets";
-import { Avatar, Button, Divider } from "antd";
+import { Avatar, Button, Divider, Modal } from "antd";
 import { Plus } from "lucide-react";
+import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
+import useModal from "../../hooks/useModal";
 
 const GroupHeader: FC = () => {
+    const { handleCancel, handleOk, showModal, isModalOpen } = useModal()
+
     return <div className="bg-white w-full shadow">
         <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto overflow-hidden">
             <img className="w-full object-cover max-h-[40vh] rounded-b-xl" src={images.coverGroup} />
@@ -61,7 +65,7 @@ const GroupHeader: FC = () => {
                     </Avatar.Group>
 
                     <div className="flex items-center gap-x-2">
-                        <Button icon={<Plus size={16} />} type='primary'>Mời</Button>
+                        <Button onClick={showModal} icon={<Plus size={16} />} type='primary'>Mời</Button>
                         <button className="bg-sky-50 text-primary px-3 py-1 rounded-md">Đã tham gia</button>
                     </div>
                 </div>
@@ -69,6 +73,19 @@ const GroupHeader: FC = () => {
                 <Divider className="my-3" />
             </div>
         </div>
+
+        <Modal
+            centered
+            title={<p className="text-center font-semibold text-xl">Mời bạn bè tham gia nhóm</p>}
+            width='800px'
+            open={isModalOpen}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            cancelText='Hủy'
+            okText='Gửi lời mời'
+        >
+            <InviteFriendsJoinGroup />
+        </Modal>
     </div>
 };
 
