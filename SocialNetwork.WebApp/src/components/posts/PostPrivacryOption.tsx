@@ -27,7 +27,7 @@ export const PostPrivacryOption: FC<PostPrivacryOptionProps> = ({
                         <img className="w-4 h-4" src={images.earth} />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-semibold text-[15px]">Công khai</span>
+                        <span className="font-semibold text-[14px]">Công khai</span>
                         <p className="text-gray-500">Bất kì ai ở trên hoặc ngoài Facebook</p>
                     </div>
                 </div>
@@ -39,7 +39,7 @@ export const PostPrivacryOption: FC<PostPrivacryOptionProps> = ({
                         <Users size={14} />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-semibold text-[15px]">Bạn bè</span>
+                        <span className="font-semibold text-[14px]">Bạn bè</span>
                         <p className="text-gray-500">Bạn bè của bạn, bất kì ai được gắn thẻ và bạn bè của họ</p>
                     </div>
                 </div>
@@ -51,7 +51,7 @@ export const PostPrivacryOption: FC<PostPrivacryOptionProps> = ({
                         <User size={14} />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-semibold text-[15px]">Chỉ mình tôi</span>
+                        <span className="font-semibold text-[14px]">Chỉ mình tôi</span>
                         <p className="text-gray-500">Chỉ mình bạn mới thấy bài viết này</p>
                     </div>
                 </div>

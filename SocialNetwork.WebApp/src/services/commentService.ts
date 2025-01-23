@@ -1,8 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { CommentMentionPaginationResource, CommentResource } from '../types/comment';
-import { DataResponse, PaginationResponse } from '../types/response';
-
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
 class CommentService {
     private static instance: CommentService;
@@ -60,6 +59,9 @@ class CommentService {
         })
     }
 
+    deleteCommentById(commentId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.delete('/api/comments/' + commentId)
+    }
 }
 
 export default CommentService.getInstance();

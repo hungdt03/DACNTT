@@ -75,6 +75,10 @@ class PostService {
         return axiosInterceptor.put('/api/posts/share/' + postId, payload)
     }
 
+    deletePost(postId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.delete('/api/posts/' + postId)
+    }
+
  
 }
 

@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250115085639_InitialCreate")]
+    [Migration("20250122160857_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -351,7 +351,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("DateCreated")
@@ -953,7 +952,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasOne("SocialNetwork.Domain.Entity.Comment", "ParentComment")
                         .WithMany("Replies")
                         .HasForeignKey("ParentCommentId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SocialNetwork.Domain.Entity.Post", "Post")
                         .WithMany("Comments")
@@ -1063,15 +1062,18 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("SocialNetwork.Domain.Entity.Comment", "Comment")
                         .WithMany()
-                        .HasForeignKey("CommentId");
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialNetwork.Domain.Entity.FriendShip", "FriendRequest")
                         .WithMany()
-                        .HasForeignKey("FriendRequestId");
+                        .HasForeignKey("FriendRequestId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialNetwork.Domain.Entity.Post", "Post")
                         .WithMany()
-                        .HasForeignKey("PostId");
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialNetwork.Domain.Entity.User", "Recipient")
                         .WithMany()
@@ -1081,7 +1083,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
                     b.HasOne("SocialNetwork.Domain.Entity.Story", "Story")
                         .WithMany()
-                        .HasForeignKey("StoryId");
+                        .HasForeignKey("StoryId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Comment");
 

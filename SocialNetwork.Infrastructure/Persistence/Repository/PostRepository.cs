@@ -25,6 +25,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.Posts.AddAsync(post);
         }
 
+        public void DeletePost(Post post)
+        {
+            _context.Posts.Remove(post);
+        }
+
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsAsync(int page, int size, string userId)
         {
             var query = _context.Posts
@@ -91,6 +96,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .ToListAsync();
 
             return (posts, totalCount);
+        }
+
+        public async Task<List<Post>> GetAllSharePostsByOriginalPostId(Guid postId)
+        {
+            return await _context.Posts.Where(p => p.SharePostId == postId || p.OriginalPostId == postId).ToListAsync();   
         }
 
         public async Task<(List<Post> Posts, int TotalCount)> GetAllSharesByPostIdAsync(Guid postId, int page, int size)

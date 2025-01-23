@@ -5,7 +5,6 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Entity;
 using SocialNetwork.Infrastructure.DBContext;
 
-
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
     public class NotificationRepository : INotificationRepository
@@ -47,6 +46,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .ToListAsync();
 
             return (notifications, totalCount);
+        }
+
+        public async Task<List<Notification>> GetAllNotificationsByPostIdAsync(Guid postId)
+        {
+            return await _context.Notifications.Where(n => n.PostId == postId).ToListAsync();
         }
     }
 }

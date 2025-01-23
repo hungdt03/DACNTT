@@ -26,15 +26,18 @@ import EditSharePostModal, { EditSharePostRequest } from "../modals/EditSharePos
 import { Link } from "react-router-dom";
 import ListSharePostModal from "../modals/ListSharePostModal";
 import PostOtherTags from "./PostOtherTags";
+import PostNotFound from "./PostNotFound";
 
 type SharePostProps = {
     post: PostResource;
     onFetch?: (data: PostResource) => void;
+    onRemovePost?: (postId: string) => void
 }
 
 const SharePost: FC<SharePostProps> = ({
     post: postParam,
-    onFetch
+    onFetch,
+    onRemovePost
 }) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
@@ -76,6 +79,15 @@ const SharePost: FC<SharePostProps> = ({
         }
     }
 
+    const handleDeletePost = async () => {
+        const response = await postService.deletePost(post.id);
+        if(response.isSuccess) {
+            onRemovePost?.(post.id)
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
 
     const handleSaveReaction = async (reactionType: ReactionType) => {
         const payload: ReactionRequest = {
@@ -174,6 +186,7 @@ const SharePost: FC<SharePostProps> = ({
 
             <Popover content={<PostMoreAction
                 onEditPost={showEditPostModal}
+                onDeletePost={handleDeletePost}
                 isMine={post.user.id === user?.id}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
@@ -184,7 +197,7 @@ const SharePost: FC<SharePostProps> = ({
 
         <div className="flex flex-col gap-y-3">
             <p className="text-sm text-gray-700">{post.content}</p>
-            <PostShareInner post={post.originalPost} />
+            {post.originalPostId ? <PostShareInner post={post.originalPost} /> : <PostNotFound />}
         </div>
         <div className="flex items-center justify-between text-sm">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
@@ -209,10 +222,10 @@ const SharePost: FC<SharePostProps> = ({
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+           {post.originalPostId &&  <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
-            </button>
+            </button>}
         </div>
         <Divider className='mt-0 mb-2' />
 

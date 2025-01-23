@@ -15,6 +15,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Configurations
             builder.HasOne(p => p.SharePost)
               .WithMany(p => p.Shares) 
               .HasForeignKey(p => p.SharePostId).OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasMany(p => p.Comments).WithOne(c => c.Post).HasForeignKey(c => c.PostId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasMany(p => p.Reactions).WithOne(c => c.Post).HasForeignKey(c => c.PostId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

@@ -99,6 +99,16 @@ const PostModal: FC<PostModalProps> = ({
         fetchComments(pagination.page, pagination.size)
     }, [post])
 
+    const handleDeleteComment = async (commentId: string) => {
+        const response = await commentService.deleteCommentById(commentId);
+        if (response.isSuccess) {
+            removeComment(commentId)
+            message.success(response.message);
+        } else {
+            message.error(response.message)
+        }
+    }
+
     const handleReplyComment = async (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => {
         const sentAt = new Date();
 
@@ -201,6 +211,34 @@ const PostModal: FC<PostModalProps> = ({
         setComments((prevComments) => updateRepliesInComments(prevComments, commentId, replies))
     }
 
+    const removeComment = (commentId: string) => {
+        setComments((prevComments) => {
+            const updateComments = (comments: CommentResource[]): CommentResource[] => {
+                return comments.flatMap((comment) => {
+                    if (comment.id === commentId) {
+                        // Khi tìm thấy comment cần xóa, trả về các replies để duy trì cấu trúc cây.
+                        return comment.replies || [];
+                    }
+    
+                    if (comment.replies && comment.replies.length > 0) {
+                        const updatedReplies = updateComments(comment.replies);
+                        const isHaveChildren = updatedReplies.length > 0;
+
+                        return {
+                            ...comment,
+                            replies: updatedReplies,
+                            isHaveChildren: isHaveChildren,
+                        };
+                    }
+    
+                    return comment;
+                });
+            };
+    
+            return updateComments(prevComments);
+        });
+    };
+
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
         <CommentList
             loading={loading}
@@ -209,6 +247,7 @@ const PostModal: FC<PostModalProps> = ({
             updatedComments={handleUpdateCommentList}
             pagination={pagination}
             fetchNextPage={fetchComments}
+            onDeleteComment={handleDeleteComment}
         />
 
         <div className="shadow p-4 absolute left-0 right-0 bottom-0 bg-white rounded-b-md">

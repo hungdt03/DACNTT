@@ -8,18 +8,20 @@ import { Divider, Tooltip } from "antd";
 import { CloseOutlined } from '@ant-design/icons'
 import { Link } from "react-router-dom";
 import images from "../../assets";
+import cn from "../../utils/cn";
+import { formatTime } from "../../utils/date";
 
 type StorySidebarProps = {
-    // onSelect: (userStory: UserStoryResource) => void
     onRefresh: () => void;
-    selectStory: UserStoryResource;
+    selectStory?: UserStoryResource;
     userStories: UserStoryResource[];
+    myStory?: UserStoryResource;
 }
 
 const StorySidebar: FC<StorySidebarProps> = ({
-    // onSelect,
     onRefresh,
     selectStory,
+    myStory,
     userStories
 }) => {
     const { user } = useSelector(selectAuth)
@@ -40,16 +42,33 @@ const StorySidebar: FC<StorySidebarProps> = ({
                     </button>
                 </Tooltip>
             </div>
-            <div className="flex items-center justify-between hover:bg-gray-100 pr-2 rounded-md">
-                {userStories.map(story => story.user.id === user?.id && <StoryRowItem isActive={story.user.id === selectStory.user.id} key={story.user.id} userStory={story} />)}
+            {myStory && myStory.stories.length > 0 ? <div className={cn("flex items-center justify-between hover:bg-gray-100 pr-2 rounded-md", myStory.user.id === selectStory?.user.id && 'bg-sky-50')}>
+                <Link to={`/stories/${myStory.user.id}`} className={cn("flex items-center gap-x-2 px-1 py-2")}>
+                    <img className={cn("p-[2px] rounded-full w-[50px] h-[50px] object-cover border-2 flex-shrink-0", myStory.haveSeen ? 'border-white' : 'border-primary')} src={myStory.user.avatar ?? images.user} />
+                    <div className="flex flex-col">
+                        <span className="font-semibold text-[15px]">{myStory.user.fullName}</span>
+                        <div className="flex items-center gap-x-2">
+                            <span className="text-primary text-sm">{myStory.stories.length} thẻ</span>
+                            <span className="text-gray-500 text-xs">{formatTime(new Date(myStory?.stories[0]?.createdDate))}</span>
+                        </div>
+                    </div>
+                </Link>
                 <Link to='/stories/create' className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center">
                     <Plus className="text-primary" />
                 </Link>
-            </div>
+            </div> : <Link to='/stories/create' className="flex items-center gap-x-2 px-2 py-2">
+                <button className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center">
+                    <Plus className="text-primary" />
+                </button>
+                <div className="flex flex-col gap-y-[2px] items-start">
+                    <span className="font-semibold text-sm">Tạo tin</span>
+                    <p className="text-gray-500 text-xs">Bạn có thể chia sẻ ảnh hoặc viết gì đó</p>
+                </div>
+            </Link>}
         </div>
         <div className="flex flex-col gap-y-1">
             <span className="font-semibold text-lg">Tất cả tin</span>
-            {userStories.map(story => story.user.id !== user?.id && <StoryRowItem isActive={story.user.id === selectStory.user.id} key={story.user.id} userStory={story} />)}
+            {userStories.map(story => story.user.id !== user?.id && <StoryRowItem isActive={story.user.id === selectStory?.user.id} key={story.user.id} userStory={story} />)}
         </div>
     </div>
 };

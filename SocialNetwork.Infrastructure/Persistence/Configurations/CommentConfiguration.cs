@@ -22,10 +22,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Configurations
                    .HasForeignKey(c => c.PostId)
                    .OnDelete(DeleteBehavior.NoAction);  
 
-            builder.HasOne(c => c.ParentComment)
-                   .WithMany(c => c.Replies)
+            builder.HasMany(c => c.Replies)
+                .WithOne(c => c.ParentComment)
                    .HasForeignKey(c => c.ParentCommentId)
-                   .OnDelete(DeleteBehavior.NoAction); 
+                   .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 }

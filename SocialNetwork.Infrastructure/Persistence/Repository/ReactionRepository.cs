@@ -34,6 +34,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .SingleOrDefaultAsync(s => s.UserId == userId && s.PostId == postId);
         }
 
+        public void RemoveRange(IEnumerable<Reaction> reactions)
+        {
+            appDbContext.Reactions.RemoveRange(reactions);
+        }
+
         public void RemoveReaction(Reaction reaction)
         {
             appDbContext.Reactions.Remove(reaction);

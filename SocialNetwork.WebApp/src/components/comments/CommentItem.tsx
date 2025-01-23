@@ -3,7 +3,7 @@ import { CommentResource } from "../../types/comment";
 import { Pagination } from "../../types/response";
 import commentService from "../../services/commentService";
 import images from "../../assets";
-import { Avatar, Image } from "antd";
+import { Avatar, Image, Popover } from "antd";
 import cn from "../../utils/cn";
 import { formatTime } from "../../utils/date";
 import BoxReplyComment, { BoxReplyCommentType, NodeContent } from "./BoxReplyComment";
@@ -11,6 +11,7 @@ import { MediaType } from "../../enums/media";
 import { UserResource } from "../../types/user";
 import { Link } from "react-router-dom";
 import CommentSkeleton from "../skeletons/CommentSkeleton";
+import { MoreHorizontal } from "lucide-react";
 
 type CommentItemProps = {
     parentComment: CommentResource | null;
@@ -20,7 +21,8 @@ type CommentItemProps = {
     updatePagination?: (page: number, size: number, hasMore: boolean) => void;
     onFetchReplies?: (commentId: string, page: number, size: number) => void;
     updatedComments: (commentId: string, fetchedReplies: CommentResource[]) => void;
-    replyComment: (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void
+    replyComment: (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void;
+    onDeleteComment: (commentId: string) => void
 }
 
 const extractContentFromJSON = (commentJSON: string): JSX.Element => {
@@ -33,7 +35,7 @@ const extractContentFromJSON = (commentJSON: string): JSX.Element => {
                     if (item.id) {
                         return (
                             <Link
-                                key={index + item.id} 
+                                key={index + item.id}
                                 to={`/profile/${item.id}`}
                                 style={{ fontWeight: 'bold' }}
                                 className="hover:text-black"
@@ -57,7 +59,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     onFetchReplies,
     updatedComments,
     level,
-    onReply
+    onReply,
+    onDeleteComment
 }) => {
     const [isReplying, setIsReplying] = useState(false)
     const [replyToUser, setReplyToUser] = useState<UserResource>(comment.user);
@@ -83,7 +86,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
 
     const handleReplyComment = (values: BoxReplyCommentType, parentCommentId: string | null) => {
         replyComment(values, parentCommentId, replyToUser?.id, level);
-    
+
     }
 
     return (
@@ -96,11 +99,21 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 )}
                 <Avatar className="flex-shrink-0" src={comment.user.avatar ?? images.user} />
                 <div className="flex flex-col gap-y-2">
-                    <div className={cn("py-2 rounded-2xl flex flex-col items-start", comment.content ? 'bg-gray-100 px-4' : '-mt-1')}>
-                        <span className="font-semibold">{comment?.user?.fullName}</span>
-                        <p className="text-left overflow-hidden break-words break-words break-all">
-                            {extractContentFromJSON(comment.content)}
-                        </p>
+                    <div className="flex items-center gap-x-2 group">
+                        <div className={cn("py-2 rounded-2xl flex flex-col items-start", comment.content ? 'bg-gray-100 px-4' : '-mt-1')}>
+                            <span className="font-semibold">{comment?.user?.fullName}</span>
+                            <p className="text-left overflow-hidden break-words break-all">
+                                {extractContentFromJSON(comment.content)}
+                            </p>
+                        </div>
+
+                        <Popover content={<div className="flex flex-col gap-y-2">
+                            <button onClick={() => onDeleteComment(comment.id)} className="w-full px-2 py-2 rounded-md hover:bg-gray-100">Xóa bình luận</button>
+                        </div>}>
+                            <button className="hidden group-hover:flex w-7 h-7 items-center justify-center rounded-full hover:bg-gray-100">
+                                <MoreHorizontal size={16} />
+                            </button>
+                        </Popover>
                     </div>
                     {comment.mediaType === MediaType.IMAGE && comment.mediaUrl && <Image preview={{
                         mask: 'Xem'
@@ -118,7 +131,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                     />}
 
                     <div className="flex items-center gap-x-4 px-2">
-                        <span className="text-xs">{comment.status === 'pending' ? 'Đang viết': formatTime(new Date(comment.sentAt))}</span>
+                        <span className="text-xs">{comment.status === 'pending' ? 'Đang viết' : formatTime(new Date(comment.sentAt))}</span>
                         <button
                             disabled={comment.status === 'pending'}
                             className="text-xs hover:underline"
@@ -160,6 +173,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                             onFetchReplies={onFetchReplies}
                             replyComment={replyComment}
                             updatedComments={updatedComments}
+                            onDeleteComment={onDeleteComment}
                             level={level + 1}
                             onReply={(comment) => {
                                 if (level + 1 > 2) {
@@ -197,7 +211,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 <div className="relative">
                     <div className="absolute left-4 w-[24px] -top-[25px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div>
                     <div className={cn(level === 3 ? "pl-0" : "pl-10")}>
-                        <BoxReplyComment 
+                        <BoxReplyComment
                             replyToUsername={replyToUser}
                             onSubmit={(values => handleReplyComment(values, comment.id))}
                         />

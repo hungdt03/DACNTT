@@ -89,5 +89,12 @@ namespace SocialNetwork.API.Controllers
             var response = await _mediator.Send(new EditPostCommand(postId, post));
             return Ok(response);
         }
+
+        [HttpDelete("{postId}")]
+        public async Task<IActionResult> DeletePost([FromRoute] Guid postId)
+        {
+            var response = await _mediator.Send(new DeletePostCommand(postId));
+            return Ok(response);
+        }
     }
 }

@@ -13,5 +13,8 @@ namespace SocialNetwork.Application.Interfaces
         Task<List<Comment>> GetAllRootCommentsByPostIdAsync(Guid postId);
         Task<List<Comment>> GetAllCommentsByPostIdAndParentCommentIdAsync(Guid postId, Guid? parentCommentId);
         Task<List<Comment>> GetAllRepliesByCommentIdAsync(Guid commentId);
+        Task<List<Comment>> GetAllCommentsByPostIdAsync(Guid postId);
+        void DeleteComment(Comment comment);
+        void RemoveRange(IEnumerable<Comment> comments);
     }
 }

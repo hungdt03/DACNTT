@@ -10,7 +10,7 @@ namespace SocialNetwork.Domain.Entity
 
         public Guid ChatRoomId { get; set; }
         public ChatRoom ChatRoom { get; set; }
-
+        public bool IsAccepted { get; set; }
         public bool IsActive { get; set; } 
     }
 }

@@ -57,5 +57,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Viewers.AnyAsync(v => v.UserId == userId && v.StoryId == storyId);
         }
+
+        public void RemoveRange(IEnumerable<Viewer> viewers)
+        {
+            _context.Viewers.RemoveRange(viewers);
+        }
     }
 }

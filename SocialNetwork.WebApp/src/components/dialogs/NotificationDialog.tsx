@@ -166,7 +166,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                     <p className="text-center text-gray-500">Không còn thông báo nào để tải.</p>
                 )}
 
-                {!isInitialLoadComplete && !loading && (
+                {!isInitialLoadComplete && !loading && pagination.hasMore && (
                     <button
                         className="w-full text-center text-sm"
                         onClick={() => {

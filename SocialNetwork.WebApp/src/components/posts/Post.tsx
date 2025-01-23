@@ -25,7 +25,6 @@ import postService from "../../services/postService";
 import { Link } from "react-router-dom";
 import ListSharePostModal from "../modals/ListSharePostModal";
 import PostOtherTags from "./PostOtherTags";
-import { LikeOutlined } from '@ant-design/icons'
 import { PrivacyType } from "../../enums/privacy";
 
 export type CommentRequest = {
@@ -57,12 +56,14 @@ export const getTopReactions = (reactions?: ReactionResource[], top: number = 3)
 type PostProps = {
     post: PostResource;
     onFetch?: (data: PostResource) => void;
+    onRemovePost?: (postId: string) => void
 }
 
 
 const Post: FC<PostProps> = ({
     post: postParam,
-    onFetch
+    onFetch,
+    onRemovePost
 }) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const { handleCancel: editPostCancel, isModalOpen: isEditPostOpen, handleOk: handleEditPostOk, showModal: showEditPostModal } = useModal();
@@ -158,6 +159,16 @@ const Post: FC<PostProps> = ({
         }
     }
 
+    const handleDeletePost = async () => {
+        const response = await postService.deletePost(post.id);
+        if(response.isSuccess) {
+            onRemovePost?.(post.id)
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -198,6 +209,7 @@ const Post: FC<PostProps> = ({
             </div>
             <Popover className="flex-shrink-0" content={<PostMoreAction
                 onEditPost={showEditPostModal}
+                onDeletePost={handleDeletePost}
                 isMine={post.user.id === user?.id}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
@@ -231,7 +243,7 @@ const Post: FC<PostProps> = ({
 
         <Divider className='my-0' />
         <div className="flex items-center justify-between gap-x-4">
-            <Popover  content={<PostReaction
+            <Popover content={<PostReaction
                 onSelect={handleSaveReaction}
             />}>
                 {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}

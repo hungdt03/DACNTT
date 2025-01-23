@@ -13,7 +13,7 @@ import { StoryResource } from "../../types/story";
 import StoryViewers from "./StoryViewers";
 import StoryReplyBox from "./StoryReplyBox";
 import StoryCollapsed from "./StoryCollapsed";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 export type ReactStory = {
     storyId: string;
@@ -43,6 +43,8 @@ const StoryShow: FC<StoryShowProps> = ({
     const { user } = useSelector(selectAuth);
 
     useEffect(() => {
+        console.log('vô đây')
+        console.log(story)
         if (story.user.id !== user?.id) {
             setViewers([])
             setIsFetch(false)
@@ -82,7 +84,7 @@ const StoryShow: FC<StoryShowProps> = ({
         const response = await storyService.deleteStoryById(storyId);
         if(response.isSuccess) {
             onDelete(storyId);
-            message.success(response.message)
+            message.success(response.message);
         } else {
             message.error(response.message)
         }

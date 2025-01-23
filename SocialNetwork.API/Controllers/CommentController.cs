@@ -61,5 +61,12 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetNextCommentsQuery(postId, page, parentCommentId));
             return Ok(response);
         }
+        [HttpDelete("{commentId}")]
+        public async Task<IActionResult> DeleteComment([FromRoute] Guid commentId)
+        {
+            var response = await mediator.Send(new DeleteCommentCommand(commentId));
+            return Ok(response);
+        }
+        
     }
 }

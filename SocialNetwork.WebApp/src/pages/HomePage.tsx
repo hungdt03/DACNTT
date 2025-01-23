@@ -38,6 +38,10 @@ const HomePage: FC = () => {
         fetchPosts(pagination.page, pagination.size);
     }, []);
 
+    const handleRemovePost = (postId: string) => {
+        setPosts(prevPosts => [...prevPosts.filter(p => p.id !== postId)])
+    }
+
     const fetchNewPosts = async () => {
         if (!pagination.hasMore || loading) return;
         fetchPosts(pagination.page + 1, pagination.size);
@@ -106,10 +110,10 @@ const HomePage: FC = () => {
 
             {posts.map(post => {
                 if (post.postType === PostType.SHARE_POST) {
-                    return <SharePost onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
+                    return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
                 }
 
-                return <Post onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
+                return <Post onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
             })}
 
             {loading && <PostSkeletonList />}

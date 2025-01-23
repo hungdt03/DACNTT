@@ -21,9 +21,9 @@ const ProfilePage: FC = () => {
         fetchFriends()
     }, [])
     
-    return <div className="xl:max-w-screen-lg lg:max-w-screen-lg md:px-0 md:max-w-screen-md max-w-screen-sm px-4 mx-auto w-full grid grid-cols-12 gap-4 h-full lg:h-[90vh] bg-slate-100">
-        {user && <ProfileLeftSide friends={friends}  />}
+    return <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:px-0 md:max-w-screen-md max-w-screen-sm px-4 mx-auto w-full grid grid-cols-12 gap-4 h-full lg:h-[90vh] bg-slate-100">
         {user && <ProfileContent friends={friends} user={user} />}
+        {user && <ProfileLeftSide friends={friends}  />}
     </div>
 };
 

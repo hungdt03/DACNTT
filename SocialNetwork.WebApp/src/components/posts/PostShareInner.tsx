@@ -64,7 +64,6 @@ const PostShareInner: FC<PostShareInnerProps> = ({
                 </div> : <p className="text-sm text-gray-700 break-words">{post.content}</p>}
             </div>
         </div>
-
     </div>
 };
 

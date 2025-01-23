@@ -23,7 +23,7 @@ const StoryRowItem: FC<StoryRowItemProps> = ({
             <span className="font-semibold text-[15px]">{userStory.user.fullName}</span>
             <div className="flex items-center gap-x-2">
                 <span className="text-primary text-sm">{userStory.stories.length} thẻ</span>
-                <span className="text-gray-500 text-xs">{formatTime(new Date(userStory.stories[0].createdDate))}</span>
+                <span className="text-gray-500 text-xs">{formatTime(new Date(userStory?.stories[0]?.createdDate))}</span>
             </div>
         </div>
     </Link>

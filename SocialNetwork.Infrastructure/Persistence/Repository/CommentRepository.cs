@@ -25,6 +25,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return (await _dbContext.Comments.AddAsync(comment)).Entity;
         }
 
+        public void DeleteComment(Comment comment)
+        {
+           _dbContext.Comments.Remove(comment);
+        }
+
         public async Task<List<Comment>> GetAllCommentsByPostIdAndParentCommentIdAsync(Guid postId, Guid? parentCommentId)
         {
             return await _dbContext.Comments
@@ -32,6 +37,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(cmt => cmt.Replies)
                 .Where(cmt => cmt.ParentCommentId == parentCommentId && cmt.PostId == postId)
                 .ToListAsync();
+        }
+
+        public async Task<List<Comment>> GetAllCommentsByPostIdAsync(Guid postId)
+        {
+            return await _dbContext.Comments.Where(c => c.PostId == postId).ToListAsync();
         }
 
         public async Task<(List<Comment> Comments, int TotalCount)> GetAllRepliesByCommentIdAsync(Guid commentId, int pageNumber, int pageSize)
@@ -92,5 +102,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .SingleOrDefaultAsync(c => c.Id == id);
         }
 
+        public void RemoveRange(IEnumerable<Comment> comments)
+        {
+            _dbContext.Comments.RemoveRange(comments);
+        }
     }
 }

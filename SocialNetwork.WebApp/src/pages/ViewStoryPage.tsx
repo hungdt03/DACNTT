@@ -5,20 +5,23 @@ import { selectAuth } from "../features/slices/auth-slice";
 import storyService from "../services/storyService";
 import StorySidebar from "../components/story/StorySidebar";
 import StoryShow from "../components/story/StoryShow";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Plus } from "lucide-react";
 
 const ViewStoryPage: FC = () => {
     const { userId } = useParams();
-    
+
     const [userStory, setUserStory] = useState<UserStoryResource>();
     const [userStories, setUserStories] = useState<UserStoryResource[]>([]);
+    const [myStory, setMyStory] = useState<UserStoryResource>()
+
     const { user } = useSelector(selectAuth);
     const navigate = useNavigate()
 
     const fetchStories = async () => {
-        if(!userId) return;
+        if (!userId) return;
         const response = await storyService.getUserStoryByUserId(userId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setUserStory(response.data)
         }
     }
@@ -26,46 +29,75 @@ const ViewStoryPage: FC = () => {
     const fetchUserStories = async () => {
         const response = await storyService.getAllStories();
         if (response.isSuccess) {
-            setUserStories(response.data)
+            setUserStories(response.data);
+            const findMyStory = response.data.find(s => s.user.id === user?.id)
+            setMyStory(findMyStory)
         }
     }
 
     useEffect(() => {
+        console.log('Vô dây không kakakakaak')
         fetchStories()
         fetchUserStories()
-    }, [userId])
+    }, [userId, user])
 
     const handleDeleteStory = (storyId: string) => {
+        let isLast = false;
+        let isUnique = false;
+
         setUserStories(prev => {
             const updateList = [...prev]
             const myStoryIdx = updateList.findIndex(item => item.user.id === user?.id);
 
-            if(myStoryIdx !== -1) {
+            if (myStoryIdx !== -1) {
+                const indexDeleteStory = updateList[myStoryIdx].stories.findIndex(s => s.id === storyId)
+                if (updateList[myStoryIdx].stories.length - 1 === indexDeleteStory) isLast = true;
                 updateList[myStoryIdx].stories = [...updateList[myStoryIdx].stories.filter(s => s.id !== storyId)]
+                setUserStory(updateList[myStoryIdx])
             }
+
+            if (updateList.length === 1)
+                isUnique = true;
 
             return updateList;
         })
+
+        if (isLast && isUnique) {
+            setUserStory(undefined)
+        }
+
+        if (!isUnique && isLast) {
+            setUserStory(undefined)
+            handleNextStory()
+        }
     }
 
     const handleNextStory = () => {
         const excludeMe = userStories.filter(item => item.user.id !== user?.id)
-        if(userStory?.user.id !== user?.id) {
+        if (userStory?.user.id !== user?.id) {
             const findIndex = excludeMe.findIndex(u => u.user.id === userStory?.user.id);
-            if(findIndex !== -1 && findIndex < excludeMe.length - 1) {
+            if (findIndex !== -1 && findIndex < excludeMe.length - 1) {
                 navigate(`/stories/${excludeMe[findIndex + 1].user.id}`)
             }
-        } else if(excludeMe.length > 0) {
+        } else if (excludeMe.length > 0) {
             navigate(`/stories/${excludeMe[0].user.id}`)
         }
     }
 
     return <div className="grid grid-cols-12 h-screen">
         <div className="lg:col-span-4 xl:col-span-3 lg:block hidden bg-white h-full overflow-y-auto">
-            {userStory && <StorySidebar selectStory={userStory} onRefresh={fetchUserStories} userStories={userStories} />}
+            <StorySidebar myStory={myStory} selectStory={userStory} onRefresh={fetchUserStories} userStories={userStories} />
         </div>
         <div className="lg:col-span-8 xl:col-span-9 col-span-12 h-full bg-black flex justify-center items-center">
-            {userStory && <StoryShow onDelete={handleDeleteStory} onEnd={handleNextStory} story={userStory} />}
+            {userStory && userStory.stories.length > 0 
+                ? <StoryShow onDelete={handleDeleteStory} onEnd={handleNextStory} story={userStory} />
+                : <Link to='/stories/create' className="flex flex-col gap-y-2 items-center">
+                    <button className="bg-sky-100 w-10 h-10 rounded-full text-primary flex items-center justify-center">
+                        <Plus strokeWidth={3} size={16} />
+                    </button>
+                    <span className="text-[16px] font-bold text-white">Tạo tin mới</span>
+                </Link>
+            }
         </div>
     </div>
 };

@@ -12,6 +12,7 @@ type CommentListProps = {
     onFetchReplies?: (commentId: string) => void;
     updatedComments: (commentId: string, fetchedReplies: CommentResource[]) => void;
     fetchNextPage: (page: number, size: number) => void;
+    onDeleteComment: (commentId: string) => void
 }
 
 
@@ -23,8 +24,8 @@ export const CommentList: React.FC<CommentListProps> = ({
     onFetchReplies,
     updatedComments,
     fetchNextPage,
+    onDeleteComment
 }) => {
-   
 
     return (
         <div className="flex flex-col gap-y-3 py-4">
@@ -37,6 +38,7 @@ export const CommentList: React.FC<CommentListProps> = ({
                     onFetchReplies={onFetchReplies}
                     updatedComments={updatedComments}
                     replyComment={replyComment}
+                    onDeleteComment={onDeleteComment}
                 />
 
             ))}
