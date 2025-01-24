@@ -1,5 +1,4 @@
-﻿
-using SocialNetwork.Domain.Entity;
+﻿using SocialNetwork.Domain.Entity.ChatRoomInfo;
 
 namespace SocialNetwork.Application.Interfaces
 {

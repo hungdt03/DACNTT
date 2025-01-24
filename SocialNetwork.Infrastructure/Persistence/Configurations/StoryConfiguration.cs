@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.StoryInfo;
 
 namespace SocialNetwork.Infrastructure.Persistence.Configurations
 {
@@ -12,6 +12,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Configurations
         {
             builder.HasKey(t => t.Id);
             builder.HasOne(t => t.User).WithMany(u => u.Stories).HasForeignKey(t => t.UserId);
+            builder.HasMany(t => t.ReplyMessages).WithOne(u => u.Story).HasForeignKey(t => t.StoryId);
             builder.HasMany(t => t.Viewers).WithOne(u => u.Story).HasForeignKey(t => t.StoryId).OnDelete(DeleteBehavior.NoAction);
         }
     }

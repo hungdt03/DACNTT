@@ -7,7 +7,7 @@ using SocialNetwork.Application.Features.Post.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.Post.Handlers
 {

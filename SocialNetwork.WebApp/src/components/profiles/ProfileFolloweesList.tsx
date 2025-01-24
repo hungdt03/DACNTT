@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from "react";
 import images from "../../assets";
 import { UserResource } from "../../types/user";
 import followService from "../../services/followService";
+import { Empty } from "antd";
 
 type ProfileFolloweeListProps = {
     userId: string
@@ -10,12 +11,12 @@ type ProfileFolloweeListProps = {
 const ProfileFolloweeList: FC<ProfileFolloweeListProps> = ({
     userId
 }) => {
-    const [followers, setFollowers] = useState<UserResource[]>([]);
+    const [followees, setFollowees] = useState<UserResource[]>([]);
 
     const fetchFollowers = async () => {
         const response = await followService.getAllFolloweesByUserId(userId);
         if (response.isSuccess) {
-            setFollowers(response.data)
+            setFollowees(response.data)
         }
     }
 
@@ -24,11 +25,11 @@ const ProfileFolloweeList: FC<ProfileFolloweeListProps> = ({
     }, [])
 
     return <div className="grid grid-cols-2 gap-4">
-        {followers.map(follower => <div key={follower.id} className="flex items-center justify-between p-4 rounded-md border-[1px] border-gray-100">
+        {followees.map(followee => <div key={followee.id} className="flex items-center justify-between p-4 rounded-md border-[1px] border-gray-100">
             <div className="flex items-center gap-x-3">
-                <img className="w-[50px] h-[50px] rounded-md border-[1px] border-gray-50" src={follower.avatar ?? images.photo} />
+                <img className="w-[50px] h-[50px] rounded-md border-[1px] border-gray-50" src={followee.avatar ?? images.photo} />
                 <div className="flex flex-col">
-                    <span className="font-semibold">{follower.fullName}</span>
+                    <span className="font-semibold">{followee.fullName}</span>
                 </div>
             </div>
 
@@ -36,6 +37,8 @@ const ProfileFolloweeList: FC<ProfileFolloweeListProps> = ({
                 Theo dõi
             </button>
         </div>)}
+
+        {followees.length === 0 && <Empty className="col-span-2" description='Bạn chưa theo dõi ai cả' />}
     </div>
 };
 

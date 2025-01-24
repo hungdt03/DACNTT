@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Interfaces.Services;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.DBContext;
 using SocialNetwork.Infrastructure.Options;
 using System.IdentityModel.Tokens.Jwt;

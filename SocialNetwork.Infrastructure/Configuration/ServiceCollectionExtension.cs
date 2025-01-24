@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
-using SocialNetwork.Domain.Entity;
 using SocialNetwork.Infrastructure.DBContext;
 using SocialNetwork.Infrastructure.Options;
 using SocialNetwork.Infrastructure.Persistence.Interceptors;
@@ -20,6 +19,7 @@ using StackExchange.Redis;
 using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Infrastructure.Redis;
 using SocialNetwork.Infrastructure.Mailkit;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Infrastructure.Configuration
 {
@@ -51,6 +51,8 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IFollowRepository, FollowRepository>();
             services.AddScoped<IMessageMediaRepository, MessageMediaRepository>();
             services.AddScoped<IOTPRepository, OTPRepository>();
+            services.AddScoped<ISchoolRepository, SchoolRepository>();
+            services.AddScoped<IUserSchoolRepository, UserSchoolRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -67,9 +69,6 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<ISignalRService, SignalRService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<IMailkitService, MailkitService>();
-
-            services.AddSingleton<ConnectionManager>();
-
 
             // Register DbContext 
             services.AddDbContext<AppDbContext>((serviceProvider, options) =>

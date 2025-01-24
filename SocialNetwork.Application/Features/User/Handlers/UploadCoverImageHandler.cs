@@ -16,10 +16,10 @@ namespace SocialNetwork.Application.Features.User.Handlers
     public class UploadCoverImageHandler : IRequestHandler<UploadCoverImageCommand, BaseResponse>
     {
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly UserManager<Domain.Entity.User> _userManager;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
         private readonly ICloudinaryService _cloudinaryService;
 
-        public UploadCoverImageHandler(IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.User> userManager, ICloudinaryService cloudinaryService)
+        public UploadCoverImageHandler(IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager, ICloudinaryService cloudinaryService)
         {
             _contextAccessor = contextAccessor;
             _userManager = userManager;

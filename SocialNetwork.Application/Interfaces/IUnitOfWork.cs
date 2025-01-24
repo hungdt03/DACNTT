@@ -18,6 +18,8 @@ namespace SocialNetwork.Application.Interfaces
         public IMessageReadStatusRepository MessageReadStatusRepository { get; }
         public IViewerRepository ViewerRepository { get; }
         public IFollowRepository FollowRepository { get; }
+        public ISchoolRepository SchoolRepository { get; }
+        public IUserSchoolRepository UserSchoolRepository { get; }
         public IMessageMediaRepository MessageMediaRepository { get; }
         public IOTPRepository OTPRepository { get; }
 

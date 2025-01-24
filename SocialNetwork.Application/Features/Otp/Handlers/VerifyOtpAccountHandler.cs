@@ -14,9 +14,9 @@ namespace SocialNetwork.Application.Features.Otp.Handlers
     public class VerifyOtpAccountHandler : IRequestHandler<VerifyOtpAccountCommand, BaseResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<Domain.Entity.User> _userManager;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
 
-        public VerifyOtpAccountHandler(IUnitOfWork unitOfWork, UserManager<Domain.Entity.User> userManager)
+        public VerifyOtpAccountHandler(IUnitOfWork unitOfWork, UserManager<Domain.Entity.System.User> userManager)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;

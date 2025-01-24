@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.DBContext;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository

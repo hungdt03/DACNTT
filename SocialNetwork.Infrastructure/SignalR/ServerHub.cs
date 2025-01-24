@@ -11,7 +11,8 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.ChatRoomInfo;
+using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.SignalR.Payload;
 
 namespace SocialNetwork.Infrastructure.SignalR
@@ -19,12 +20,12 @@ namespace SocialNetwork.Infrastructure.SignalR
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ServerHub : Hub
     {
-        private readonly UserManager<Domain.Entity.User> userManager;
+        private readonly UserManager<User> userManager;
         private readonly IUnitOfWork unitOfWork;
         private readonly IUserStatusService userStatusService;
         private readonly ILogger<ServerHub> logger;
 
-        public ServerHub(UserManager<Domain.Entity.User> userManager, IUnitOfWork unitOfWork, IUserStatusService userStatusService, ILogger<ServerHub> logger)
+        public ServerHub(UserManager<User> userManager, IUnitOfWork unitOfWork, IUserStatusService userStatusService, ILogger<ServerHub> logger)
         {
             this.userManager = userManager;
             this.unitOfWork = unitOfWork;
@@ -68,7 +69,7 @@ namespace SocialNetwork.Infrastructure.SignalR
 
             var recentReadStatus = await unitOfWork.MessageReadStatusRepository.GetMessageReadStatusByUserAndChatRoomId(userId, chatRoom.Id);
 
-            var message = new Message()
+            var message = new Domain.Entity.MessageInfo.Message()
             {
                 ChatRoomId = chatRoom.Id,
                 Content = messageRequest.Content,
@@ -82,7 +83,7 @@ namespace SocialNetwork.Infrastructure.SignalR
 
             if (recentReadStatus == null)
             {
-                recentReadStatus = new MessageReadStatus()
+                recentReadStatus = new Domain.Entity.MessageInfo.MessageReadStatus()
                 {
                     UserId = userId,
                     User = senderUser,

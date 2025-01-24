@@ -7,16 +7,15 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.User.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
-using SocialNetwork.Domain.Entity;
 
 namespace SocialNetwork.Application.Features.User.Handlers
 {
     public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, BaseResponse>
     {
-        private readonly UserManager<Domain.Entity.User> userManager;
+        private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly IUnitOfWork unitOfWork;
 
-        public GetUserByIdHandler(UserManager<Domain.Entity.User> userManager, IUnitOfWork unitOfWork)
+        public GetUserByIdHandler(UserManager<Domain.Entity.System.User> userManager, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
             this.unitOfWork = unitOfWork;

@@ -19,11 +19,11 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly UserManager<Domain.Entity.User> userManager;
+        private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly ISignalRService _signalRService;
 
-        public CreateCommentHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.User> userManager, ICloudinaryService cloudinaryService, ISignalRService signalRService)
+        public CreateCommentHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager, ICloudinaryService cloudinaryService, ISignalRService signalRService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
@@ -41,7 +41,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
 
             var currentUser = await userManager.FindByIdAsync(userId);
 
-            var comment = new Domain.Entity.Comment()
+            var comment = new Domain.Entity.PostInfo.Comment()
             {
                 Content = request.Content,
                 UserId = currentUser.Id,
@@ -66,7 +66,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 else throw new AppException("Tập tin không được hỗ trợ");
             }
 
-            Domain.Entity.User replyUser = null;
+            Domain.Entity.System.User replyUser = null;
             if (request.ReplyToUserId != userId && !string.IsNullOrEmpty(request.ReplyToUserId))
             {
                 replyUser = await userManager.FindByIdAsync(request.ReplyToUserId)
@@ -108,7 +108,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
             var savedComment = await _unitOfWork.CommentRepository.CreateCommentAsync(comment);
 
             
-            var notifications = new List<Domain.Entity.Notification>();
+            var notifications = new List<Domain.Entity.System.Notification>();
             if(request.MentionUserIds != null && request.MentionUserIds.Count > 0)
             {
                 var distinctUserIds = request.MentionUserIds.Distinct().ToList();
@@ -122,7 +122,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                     if (user == null)
                         continue;
 
-                    var notification = new Domain.Entity.Notification();
+                    var notification = new Domain.Entity.System.Notification();
                     notification.CommentId = savedComment.Id;
                     notification.RecipientId = user.Id;
                     notification.PostId = post.Id;
@@ -140,10 +140,10 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 }
             }
 
-            Domain.Entity.Notification notiComment = null;
+            Domain.Entity.System.Notification notiComment = null;
             if (replyUser != null)
             {
-                notiComment = new Domain.Entity.Notification();
+                notiComment = new Domain.Entity.System.Notification();
                 notiComment.CommentId = savedComment.Id;
                 notiComment.RecipientId = replyUser.Id;
                 notiComment.Title = "Bình luận";
@@ -158,7 +158,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
             }
             else if(userId != post.UserId)
             {
-                notiComment = new Domain.Entity.Notification();
+                notiComment = new Domain.Entity.System.Notification();
                 notiComment.CommentId = savedComment.Id;
                 notiComment.RecipientId = post.UserId;
                 notiComment.Title = "Bình luận";

@@ -1,6 +1,7 @@
 ﻿
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.System;
+using SocialNetwork.Domain.Entity.UserInfo;
 
 namespace SocialNetwork.Application.Interfaces
 {

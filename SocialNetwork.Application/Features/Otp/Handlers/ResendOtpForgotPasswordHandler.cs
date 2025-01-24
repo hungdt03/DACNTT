@@ -18,10 +18,10 @@ namespace SocialNetwork.Application.Features.Otp.Handlers
     public class ResendOtpForgotPasswordHandler : IRequestHandler<ResendOtpForrgotPasswordCommand, BaseResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<Domain.Entity.User> _userManager;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
         private readonly IMailkitService _mailkitService;
 
-        public ResendOtpForgotPasswordHandler(IUnitOfWork unitOfWork, UserManager<Domain.Entity.User> userManager, IMailkitService mailkitService)
+        public ResendOtpForgotPasswordHandler(IUnitOfWork unitOfWork, UserManager<Domain.Entity.System.User> userManager, IMailkitService mailkitService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -42,7 +42,7 @@ namespace SocialNetwork.Application.Features.Otp.Handlers
                 isExisted = await _unitOfWork.OTPRepository.IsExistOtpAsync(user.Id, otpCode, OTPType.FORGOT_PASSWORD);
             } while (isExisted);
 
-            var otp = new Domain.Entity.OTP()
+            var otp = new Domain.Entity.System.OTP()
             {
                 Code = otpCode,
                 ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(5),

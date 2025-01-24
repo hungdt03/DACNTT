@@ -41,7 +41,7 @@ namespace SocialNetwork.Application.Features.Story.Handlers
             if (userId == story.UserId) throw new AppException("Không thể cảm xúc story của chính mình");
 
 
-            var reactViewer = new Domain.Entity.Viewer()
+            var reactViewer = new Domain.Entity.StoryInfo.Viewer()
             {
                 Reaction = request.ReactionType,
                 StoryId = request.StoryId,
@@ -54,7 +54,7 @@ namespace SocialNetwork.Application.Features.Story.Handlers
             var fullName = _contextAccessor.HttpContext.User.GetFullName();
             var avatar = _contextAccessor.HttpContext.User.GetAvatar();
 
-            var notification = new Domain.Entity.Notification();
+            var notification = new Domain.Entity.System.Notification();
             notification.StoryId = request.StoryId;
             notification.RecipientId = story.UserId;
             notification.DateSent = DateTimeOffset.UtcNow;

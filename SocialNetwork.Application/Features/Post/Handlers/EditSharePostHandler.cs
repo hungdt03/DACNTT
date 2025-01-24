@@ -6,7 +6,7 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Post.Commands;
 using SocialNetwork.Application.Interfaces;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.Post.Handlers
 {

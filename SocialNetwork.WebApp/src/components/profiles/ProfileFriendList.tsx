@@ -3,6 +3,7 @@ import images from "../../assets";
 import { MoreHorizontal } from "lucide-react";
 import { FriendResource } from "../../types/friend";
 import friendService from "../../services/friendService";
+import { Empty } from "antd";
 
 type ProfileFriendListProps = {
     userId: string
@@ -38,6 +39,8 @@ const ProfileFriendList: FC<ProfileFriendListProps> = ({
                 <MoreHorizontal />
             </button>
         </div>)}
+
+        {friends.length === 0 && <Empty className="col-span-2" description='Chưa có bạn bè nào' />}
     </div>
 };
 

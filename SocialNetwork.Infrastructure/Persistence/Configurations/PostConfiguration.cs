@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.PostInfo;
 
 
 namespace SocialNetwork.Infrastructure.Persistence.Configurations

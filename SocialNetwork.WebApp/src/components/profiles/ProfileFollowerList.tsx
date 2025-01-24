@@ -3,6 +3,7 @@ import images from "../../assets";
 import { MoreHorizontal } from "lucide-react";
 import { UserResource } from "../../types/user";
 import followService from "../../services/followService";
+import { Empty } from "antd";
 
 type ProfileFollowerListProps = {
     userId: string
@@ -37,6 +38,8 @@ const ProfileFollowerList: FC<ProfileFollowerListProps> = ({
                 Theo dõi
             </button>
         </div>)}
+
+        {followers.length === 0 && <Empty className="col-span-2" description='Chưa có người nào theo dõi bạn' />}
     </div>
 };
 

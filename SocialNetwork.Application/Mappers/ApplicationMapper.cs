@@ -1,6 +1,11 @@
 ﻿
 using SocialNetwork.Application.DTOs;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.ChatRoomInfo;
+using SocialNetwork.Domain.Entity.MessageInfo;
+using SocialNetwork.Domain.Entity.PostInfo;
+using SocialNetwork.Domain.Entity.StoryInfo;
+using SocialNetwork.Domain.Entity.System;
+using SocialNetwork.Domain.Entity.UserInfo;
 using System.Linq.Expressions;
 
 namespace SocialNetwork.Application.Mappers

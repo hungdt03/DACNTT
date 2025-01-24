@@ -40,7 +40,7 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
             if (isExistedViewer) throw new AppException("Tin này đã được xem trước đó");
 
-            var viewer = new Domain.Entity.Viewer()
+            var viewer = new Domain.Entity.StoryInfo.Viewer()
             {
                 StoryId = request.StoryId,
                 UserId = userId,

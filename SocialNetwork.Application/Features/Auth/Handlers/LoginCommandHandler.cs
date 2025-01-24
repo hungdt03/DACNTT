@@ -10,10 +10,10 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
 {
     public class LoginCommandHandler : IRequestHandler<LoginCommand, BaseResponse>
     {
-        private readonly UserManager<SocialNetwork.Domain.Entity.User> userManager;
+        private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly ITokenService tokenService;
 
-        public LoginCommandHandler(UserManager<Domain.Entity.User> userManager, ITokenService tokenService)
+        public LoginCommandHandler(UserManager<Domain.Entity.System.User> userManager, ITokenService tokenService)
         {
             this.userManager = userManager;
             this.tokenService = tokenService;

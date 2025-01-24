@@ -13,11 +13,11 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
 {
     public class GetPrincipalHandler : IRequestHandler<GetPrincipalQuery, BaseResponse>
     {
-        private readonly UserManager<Domain.Entity.User> userManager;
+        private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly IUnitOfWork unitOfWork;
         private readonly IHttpContextAccessor contextAccessor;
 
-        public GetPrincipalHandler(UserManager<Domain.Entity.User> userManager, IHttpContextAccessor contextAccessor, IUnitOfWork unitOfWork)
+        public GetPrincipalHandler(UserManager<Domain.Entity.System.User> userManager, IHttpContextAccessor contextAccessor, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
             this.contextAccessor = contextAccessor;

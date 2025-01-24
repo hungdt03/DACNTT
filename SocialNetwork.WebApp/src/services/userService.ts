@@ -1,7 +1,9 @@
 
+import { EducationFormRequest } from '../components/modals/ModifyUserEducation';
 import axiosInterceptor from '../configurations/axiosInterceptor'
-import { DataResponse } from '../types/response';
+import { BaseResponse, DataResponse } from '../types/response';
 import { UserResource } from '../types/user';
+import { UserSchoolResource } from '../types/userSchool';
 
 
 class UserService {
@@ -25,6 +27,18 @@ class UserService {
 
     uploadCoverImage(formData: FormData) : Promise<DataResponse<UserResource>> {
         return axiosInterceptor.put('/api/users/coverImage', formData);
+    }
+
+    modifyBio(bio: string) : Promise<DataResponse<string>> {
+        return axiosInterceptor.post('/api/users/modify-bio', { bio })
+    }
+
+    modifyUserEducation(payload: EducationFormRequest) : Promise<DataResponse<string>> {
+        return axiosInterceptor.post('/api/users/modify-education', payload)
+    }
+
+    getUserEducation() : Promise<DataResponse<UserSchoolResource[]>> {
+        return axiosInterceptor.get('/api/users/education')
     }
 }
 

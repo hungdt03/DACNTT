@@ -41,7 +41,7 @@ namespace SocialNetwork.Application.Features.Reaction.Handlers
                 }
             } else
             {
-                var reaction = new Domain.Entity.Reaction()
+                var reaction = new Domain.Entity.PostInfo.Reaction()
                 {
                     PostId = request.PostId,
                     Type = request.ReactionType,

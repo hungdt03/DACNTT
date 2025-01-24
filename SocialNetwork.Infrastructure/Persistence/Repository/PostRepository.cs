@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Infrastructure.DBContext;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository

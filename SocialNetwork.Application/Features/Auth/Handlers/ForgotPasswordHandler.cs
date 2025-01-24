@@ -18,9 +18,9 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMailkitService _mailkitService;
-        private readonly UserManager<Domain.Entity.User> _userManager;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
 
-        public ForgotPasswordHandler(IUnitOfWork unitOfWork, IMailkitService mailkitService, UserManager<Domain.Entity.User> userManager)
+        public ForgotPasswordHandler(IUnitOfWork unitOfWork, IMailkitService mailkitService, UserManager<Domain.Entity.System.User> userManager)
         {
             _unitOfWork = unitOfWork;
             _mailkitService = mailkitService;
@@ -41,7 +41,7 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
                 isExisted = await _unitOfWork.OTPRepository.IsExistOtpAsync(user.Id, otpCode, OTPType.FORGOT_PASSWORD);
             } while (isExisted);
 
-            var otp = new Domain.Entity.OTP()
+            var otp = new Domain.Entity.System.OTP()
             {
                 Code = otpCode,
                 ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(5),

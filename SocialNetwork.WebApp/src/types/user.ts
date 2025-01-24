@@ -2,6 +2,7 @@ export interface UserResource {
     id: string;
     fullName: string;
     email: string;
+    bio: string;
     avatar: string;
     coverImage: string;
     gender: string;

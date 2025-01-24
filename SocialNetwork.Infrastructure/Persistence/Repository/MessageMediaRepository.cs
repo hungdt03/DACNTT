@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.MessageInfo;
 using SocialNetwork.Infrastructure.DBContext;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 

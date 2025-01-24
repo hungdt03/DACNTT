@@ -2,7 +2,7 @@ import { Camera, CheckIcon, Upload as LucideUpload, Plus } from "lucide-react";
 import { FC, useState } from "react";
 import ImgCrop from 'antd-img-crop';
 import images from "../../assets";
-import { Avatar, Button, Divider, Tooltip, Upload, UploadFile, UploadProps } from "antd";
+import { Avatar, Button, Divider, Tabs, TabsProps, Tooltip, Upload, UploadFile, UploadProps } from "antd";
 import ProfilePostList from "./ProfilePostList";
 import { FriendResource } from "../../types/friend";
 import { UserResource } from "../../types/user";
@@ -15,6 +15,9 @@ import { setUserDetails } from "../../features/slices/auth-slice";
 import Loading from "../Loading";
 import { RcFile } from "antd/es/upload";
 import { Link } from "react-router-dom";
+import ProfileFriendList from "./ProfileFriendList";
+import ProfileFollowerList from "./ProfileFollowerList";
+import ProfileFolloweeList from "./ProfileFolloweesList";
 
 type ProfileContentProps = {
     user: UserResource;
@@ -80,6 +83,39 @@ const ProfileContent: FC<ProfileContentProps> = ({
         }
 
     }
+
+    const items: TabsProps['items'] = [
+        {
+            key: '1',
+            label: 'Bài viết',
+            children: <ProfilePostList user={user} isShowPostCreator={true} />,
+        },
+        {
+            key: '2',
+            label: 'Giới thiệu',
+            children: 'Content of Tab Pane 2',
+        },
+        {
+            key: '3',
+            label: 'Bạn bè',
+            children: <ProfileFriendList userId={user.id} />,
+        },
+        {
+            key: '4',
+            label: 'Người theo dõi',
+            children: <ProfileFollowerList userId={user.id} />,
+        },
+        {
+            key: '5',
+            label: 'Đang theo dõi',
+            children: <ProfileFolloweeList userId={user.id} />,
+        },
+        {
+            key: '6',
+            label: 'Bài viết đã lưu',
+            children: 'Content of Tab Pane 3',
+        },
+    ];
 
 
     return <div className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
@@ -151,8 +187,10 @@ const ProfileContent: FC<ProfileContentProps> = ({
                 </div>
             </div>
             <Divider className="my-3" />
-            <ProfilePostList user={user} />
+            <Tabs defaultActiveKey="1" className="bg-white p-4 rounded-lg" items={items} />
+            {/* <ProfilePostList user={user} /> */}
             {loading && <Loading />}
+
         </div>
     </div>
 };

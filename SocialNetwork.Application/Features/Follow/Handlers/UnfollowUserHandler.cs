@@ -14,9 +14,9 @@ namespace SocialNetwork.Application.Features.Follow.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly UserManager<Domain.Entity.User> _userManager;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
 
-        public UnfollowUserHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.User> userManager)
+        public UnfollowUserHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;

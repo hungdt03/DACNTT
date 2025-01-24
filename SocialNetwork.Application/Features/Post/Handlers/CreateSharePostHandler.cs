@@ -11,7 +11,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.Post.Handlers
 {
@@ -40,7 +40,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 ?? throw new AppException("Không tìm thấy bài viết chia sẻ");
             }
 
-            var tags = new List<Domain.Entity.Tag>();
+            var tags = new List<Tag>();
             if (request.TagIds != null && request.TagIds.Count > 0)
             {
                 foreach (var tag in request.TagIds)
@@ -57,7 +57,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
             }
 
-            var sharePost = new SocialNetwork.Domain.Entity.Post
+            var sharePost = new Domain.Entity.PostInfo.Post
             {
                 Content = request.Content,
                 PostType = PostType.SHARE_POST,
@@ -77,7 +77,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             await _unitOfWork.PostRepository.CreatePostAsync(sharePost);
 
-            var notifications = tags.Select(tag => new Domain.Entity.Notification
+            var notifications = tags.Select(tag => new Domain.Entity.System.Notification
             {
                 PostId = sharePost.Id,
                 Content = $"{fullName} đã gắn thẻ bạn trong một bài viết",
@@ -95,7 +95,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             }
 
-            var sharePostNotification = new Domain.Entity.Notification()
+            var sharePostNotification = new Domain.Entity.System.Notification()
             {
                 ImageUrl = imageUrl,
                 Content = $"{fullName} đã chia sẻ bài viết của bạn",
@@ -119,14 +119,14 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
             if (post.UserId != userId)
             {
-                _signalRService.SendNotificationToSpecificUser(post.User.UserName, ApplicationMapper.MapToNotification(sharePostNotification));
+                await _signalRService.SendNotificationToSpecificUser(post.User.UserName, ApplicationMapper.MapToNotification(sharePostNotification));
             }
 
             // SEND NOTIFICATION FOR ALL TAG USERS (TYPE: ASSIGN TAGS)
 
             foreach (var noti in notifications)
             {
-                _signalRService.SendNotificationToSpecificUser(noti.Recipient.UserName, ApplicationMapper.MapToNotification(noti));
+                await _signalRService.SendNotificationToSpecificUser(noti.Recipient.UserName, ApplicationMapper.MapToNotification(noti));
             }
 
             return new DataResponse<PostResponse>

@@ -22,7 +22,7 @@ namespace SocialNetwork.Application.Features.Story.Handlers
         }
         public async Task<BaseResponse> Handle(CreateStoryCommand request, CancellationToken cancellationToken)
         {
-            var story = new Domain.Entity.Story()
+            var story = new Domain.Entity.StoryInfo.Story()
             {
                 Background = request.Background,
                 Content = request.Content,

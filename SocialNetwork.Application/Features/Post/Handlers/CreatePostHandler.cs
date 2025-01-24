@@ -10,8 +10,8 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
-using static System.Net.Mime.MediaTypeNames;
+using SocialNetwork.Domain.Entity.PostInfo;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.Post.Handlers
 {
@@ -54,7 +54,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 }));
             }
 
-            var tags = new List<Domain.Entity.Tag>();
+            var tags = new List<Tag>();
             if (request.TagIds != null && request.TagIds.Count > 0)
             {
                 foreach(var tag in request.TagIds)
@@ -72,7 +72,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 
             }
 
-            var post = new SocialNetwork.Domain.Entity.Post
+            var post = new Domain.Entity.PostInfo.Post
             {
                 Content = request.Content,
                 Medias = medias,
@@ -90,7 +90,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             await _unitOfWork.PostRepository.CreatePostAsync(post);
 
-            var notifications = tags.Select(tag => new Domain.Entity.Notification
+            var notifications = tags.Select(tag => new Domain.Entity.System.Notification
             {
                 PostId = post.Id,
                 Content = $"{fullName} đã gắn thẻ bạn trong một bài viết",
@@ -112,7 +112,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
             foreach(var noti in notifications)
             {
-                _signalRService.SendNotificationToSpecificUser(noti.Recipient.UserName, ApplicationMapper.MapToNotification(noti));
+                await _signalRService.SendNotificationToSpecificUser(noti.Recipient.UserName, ApplicationMapper.MapToNotification(noti));
             }
 
             return new DataResponse<PostResponse>

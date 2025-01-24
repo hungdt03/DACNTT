@@ -9,7 +9,7 @@ using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Application.Utils;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.ChatRoomInfo;
 
 namespace SocialNetwork.Application.Features.FriendShip.Handlers
 {
@@ -53,18 +53,16 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 var firstMember = new ChatRoomMember()
                 {
                     UserId = friendRequest.FriendId,
-                    IsActive = true,
                 };
 
                 var secondMember = new ChatRoomMember()
                 {
                     UserId = friendRequest.UserId,
-                    IsActive = true,
                 };
 
                 var members = new List<ChatRoomMember>() { firstMember, secondMember };
 
-                chatRoom = new Domain.Entity.ChatRoom()
+                chatRoom = new Domain.Entity.ChatRoomInfo.ChatRoom()
                 {
                     IsPrivate = true,
                     LastMessageDate = DateTimeOffset.UtcNow,
@@ -77,7 +75,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 await _unitOfWork.ChatRoomRepository.CreateChatRoom(chatRoom);
             }
 
-            var notification = new Domain.Entity.Notification()
+            var notification = new Domain.Entity.System.Notification()
             {
                 Content = $"{friendRequest.Friend.FullName} đã chấp nhận lời mời kết bạn của bạn",
                 ImageUrl = friendRequest.Friend.Avatar,
@@ -92,7 +90,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
             await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            _signalRService.SendNotificationToSpecificUser(friendRequest.User.UserName, ApplicationMapper.MapToNotification(notification));
+            await _signalRService.SendNotificationToSpecificUser(friendRequest.User.UserName, ApplicationMapper.MapToNotification(notification));
 
             return new BaseResponse()
             {

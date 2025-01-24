@@ -19,10 +19,10 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly UserManager<Domain.Entity.User> _userManager;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
         private readonly ISignalRService _signalRService;
 
-        public CreateFriendRequestHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.User> userManager, ISignalRService signalRService)
+        public CreateFriendRequestHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager, ISignalRService signalRService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
@@ -47,7 +47,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
 
             if (existedRequest == null)
             {
-                existedRequest = new Domain.Entity.FriendShip()
+                existedRequest = new Domain.Entity.UserInfo.FriendShip()
                 {
                     FriendId = request.ReceiverId,
                     UserId = userId,
@@ -61,7 +61,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 existedRequest.Status = FriendShipStatus.PENDING;
             }
 
-            var notification = new Domain.Entity.Notification()
+            var notification = new Domain.Entity.System.Notification()
             {
                 Content = $"{user.FullName} đã gửi cho bạn lời mời kết bạn",
                 ImageUrl = user.Avatar,
@@ -76,7 +76,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
             await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            _signalRService.SendNotificationToSpecificUser(receiver.UserName, ApplicationMapper.MapToNotification(notification));
+            await _signalRService.SendNotificationToSpecificUser(receiver.UserName, ApplicationMapper.MapToNotification(notification));
 
             return new BaseResponse()
             {

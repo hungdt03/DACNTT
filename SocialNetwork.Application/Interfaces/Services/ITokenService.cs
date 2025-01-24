@@ -1,5 +1,5 @@
 ﻿using SocialNetwork.Application.Contracts.Responses;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.System;
 using System.Security.Claims;
 
 namespace SocialNetwork.Application.Interfaces.Services

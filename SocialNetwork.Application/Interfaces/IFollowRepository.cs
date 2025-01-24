@@ -1,5 +1,4 @@
-﻿
-using SocialNetwork.Domain.Entity;
+﻿using SocialNetwork.Domain.Entity.UserInfo;
 
 namespace SocialNetwork.Application.Interfaces
 {

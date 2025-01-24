@@ -1,7 +1,6 @@
 import { Image, Upload, UploadFile, UploadProps } from "antd";
 import { FC, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons'
-import images from "../../assets";
 import { CameraIcon, SendHorizonal } from "lucide-react";
 import cn from "../../utils/cn";
 

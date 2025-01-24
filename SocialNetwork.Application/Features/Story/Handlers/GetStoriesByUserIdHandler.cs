@@ -13,9 +13,9 @@ namespace SocialNetwork.Application.Features.Story.Handlers
     public class GetStoriesByUserIdHandler : IRequestHandler<GetStoriesByUserIdQuery, BaseResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<Domain.Entity.User> _userManager;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
 
-        public GetStoriesByUserIdHandler(IUnitOfWork unitOfWork, UserManager<Domain.Entity.User> userManager)
+        public GetStoriesByUserIdHandler(IUnitOfWork unitOfWork, UserManager<Domain.Entity.System.User> userManager)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;

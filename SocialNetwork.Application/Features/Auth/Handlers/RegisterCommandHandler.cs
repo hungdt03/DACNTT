@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using SocialNetwork.Application.Common.Helpers;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
@@ -12,16 +13,21 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
 {
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BaseResponse>
     {
-        public const string AVATAR_URL = "https://www.murrayglass.com/wp-content/uploads/2020/10/avatar-1024x1024.jpeg";
-        private readonly UserManager<Domain.Entity.User> userManager;
+        private const string PREFIX_FILE_API = "/api/files/images/";
+        private const string AVATAR_FILENAME = "user.png";
+        private const string COVER_FILENAME = "image.png";
+
+        private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly IUnitOfWork unitOfWork;
         private readonly IMailkitService mailkitService;
+        private readonly IConfiguration configuration;
 
-        public RegisterCommandHandler(UserManager<Domain.Entity.User> userManager, IUnitOfWork unitOfWork, IMailkitService mailkitService)
+        public RegisterCommandHandler(UserManager<Domain.Entity.System.User> userManager, IUnitOfWork unitOfWork, IMailkitService mailkitService, IConfiguration configuration)
         {
             this.userManager = userManager;
             this.unitOfWork = unitOfWork;
             this.mailkitService = mailkitService;
+            this.configuration = configuration;
         }
 
         public async Task<BaseResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -38,11 +44,12 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
             }
                 
 
-            var user = new Domain.Entity.User();
+            var user = new Domain.Entity.System.User();
             user.FullName = request.FullName;
             user.Email = request.Email;
             user.UserName = request.Email;
-            user.Avatar = AVATAR_URL;
+            user.Avatar = configuration["ServerHost"] + PREFIX_FILE_API + AVATAR_FILENAME;
+            user.CoverImage = configuration["ServerHost"] + PREFIX_FILE_API + COVER_FILENAME;
             user.IsVerification = false;
 
             var result = await userManager.CreateAsync(user, request.Password);
@@ -59,7 +66,7 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
                 isExisted = await unitOfWork.OTPRepository.IsExistOtpAsync(user.Id, otpCode, OTPType.ACCOUNT_VERIFICATION);
             } while (isExisted);
 
-            var otp = new Domain.Entity.OTP
+            var otp = new Domain.Entity.System.OTP
             {
                 Code = otpCode,
                 ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(5),

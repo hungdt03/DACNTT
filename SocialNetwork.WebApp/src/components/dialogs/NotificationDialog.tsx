@@ -158,11 +158,11 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
 
                 {loading && <NotificationSkeleton />}
                 <div id="noti-scroll-trigger" className="w-full h-1" />
-                {notifications.length === 0 && (
+                {notifications.length === 0 && !loading && (
                     <Empty description="Chưa có thông báo nào" />
                 )}
 
-                {!pagination.hasMore && !loading && (
+                {!pagination.hasMore && !loading && notifications.length > 0 && (
                     <p className="text-center text-gray-500">Không còn thông báo nào để tải.</p>
                 )}
 

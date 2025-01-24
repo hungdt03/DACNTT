@@ -15,9 +15,9 @@ namespace SocialNetwork.Application.Features.Follow.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly UserManager<Domain.Entity.User> _userManager;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
 
-        public CreateFollowHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.User> userManager)
+        public CreateFollowHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
@@ -32,11 +32,11 @@ namespace SocialNetwork.Application.Features.Follow.Handlers
 
             var followerId = _contextAccessor.HttpContext.User.GetUserId();
 
-            Domain.Entity.Follow follow = await _unitOfWork.FollowRepository.GetFollowByFollowerIdAndFolloweeIdAsync(followerId, request.FolloweeId);
+            Domain.Entity.UserInfo.Follow follow = await _unitOfWork.FollowRepository.GetFollowByFollowerIdAndFolloweeIdAsync(followerId, request.FolloweeId);
             if (follow != null) throw new AppException("Bạn đã theo dõi người này");
                
 
-            follow = new Domain.Entity.Follow()
+            follow = new Domain.Entity.UserInfo.Follow()
             {
                 FolloweeId = request.FolloweeId,
                 FollowerId = followerId,

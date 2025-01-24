@@ -1,4 +1,4 @@
-import { Avatar, Modal } from "antd";
+import { Avatar, Empty, Modal } from "antd";
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
 import { Edit, Search } from "lucide-react";
@@ -138,6 +138,10 @@ const MessengerDialog: FC<MessengerDialogProps> = ({
 
                         {!chatRoom.isRead && <div className="bg-primary w-2 h-2 rounded-full absolute top-1/2 -translate-y-1/2 right-2"></div>}
                     </div>)}
+
+                {chatRooms.length === 0 && !loading && (
+                    <Empty description="Chưa có đoạn chat nào" />
+                )}
             </div>
         </div>
 

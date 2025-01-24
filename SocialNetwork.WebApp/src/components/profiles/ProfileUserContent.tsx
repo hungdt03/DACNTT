@@ -31,7 +31,8 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
     onRefresh
 }) => {
     const { user } = useSelector(selectAuth);
-    const [isFollow, setIsFollow] = useState(false)
+    const [isFollow, setIsFollow] = useState(false);
+    const [activeKey, setActiveKey] = useState<string>('1');
 
     const handleSendFriendRequest = async () => {
         const response = await friendRequestService.createFriendRequest(targetUser.id)
@@ -114,26 +115,21 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
         },
         {
             key: '2',
-            label: 'Giới thiệu',
-            children: 'Content of Tab Pane 2',
-        },
-        {
-            key: '3',
             label: 'Bạn bè',
             children: <ProfileFriendList userId={targetUser.id} />,
         },
         {
-            key: '4',
+            key: '3',
             label: 'Người theo dõi',
             children: <ProfileFollowerList userId={targetUser.id} />,
         },
         {
-            key: '5',
+            key: '4',
             label: 'Đang theo dõi',
             children: <ProfileFolloweeList userId={targetUser.id} />,
         },
         {
-            key: '6',
+            key: '5',
             label: 'Bài viết đã lưu',
             children: 'Content of Tab Pane 3',
         },
@@ -213,7 +209,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                 </div>
             </div>
             <Divider className="my-3" />
-            <Tabs defaultActiveKey="1" className="bg-white p-4 rounded-lg" items={items} />
+            <Tabs onChange={(key) => setActiveKey(key)} activeKey={activeKey} className="bg-white p-4 rounded-lg" items={items} />
         </div>
     </div>
 };

@@ -7,7 +7,7 @@ using SocialNetwork.Application.Features.ChatRoom.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Utils;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.ChatRoomInfo;
 
 namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 {
@@ -31,7 +31,6 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             members.Add(new ChatRoomMember()
             {
                 UserId = userId,
-                IsActive = true,
             });
             foreach (var friendId in request.MemberIds)
             {
@@ -39,12 +38,11 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 members.Add(new ChatRoomMember()
                 {
                     UserId = friendId,
-                    IsActive = true,
                 });
             }
 
             var chatRoomName = ChatUtils.GenerateChatRoomName(request.MemberIds);
-            var chatRoom = new Domain.Entity.ChatRoom()
+            var chatRoom = new Domain.Entity.ChatRoomInfo.ChatRoom()
             {
                 IsPrivate = false,
                 LastMessageDate = DateTimeOffset.UtcNow,

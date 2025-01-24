@@ -32,6 +32,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public IFollowRepository FollowRepository { get; }
         public IMessageMediaRepository MessageMediaRepository { get; }
         public IOTPRepository OTPRepository { get; }
+        public ISchoolRepository SchoolRepository { get; }
+        public IUserSchoolRepository UserSchoolRepository { get; }
 
         public UnitOfWork
         (
@@ -52,7 +54,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 IViewerRepository viewerRepository,
                 IFollowRepository followRepository,
                 IMessageMediaRepository messageMediaRepository,
-                IOTPRepository oTPRepository
+                IOTPRepository oTPRepository,
+                ISchoolRepository schoolRepository,
+                IUserSchoolRepository userSchoolRepository
         )
         {
             _context = context;
@@ -73,6 +77,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             FollowRepository = followRepository;
             MessageMediaRepository = messageMediaRepository;
             OTPRepository = oTPRepository;
+            SchoolRepository = schoolRepository;
+            UserSchoolRepository = userSchoolRepository;    
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

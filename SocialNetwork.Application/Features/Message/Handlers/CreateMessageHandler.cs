@@ -11,7 +11,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.MessageInfo;
 
 namespace SocialNetwork.Application.Features.Message.Handlers
 {
@@ -21,10 +21,10 @@ namespace SocialNetwork.Application.Features.Message.Handlers
         private readonly ISignalRService _signalRService;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly ICloudinaryService _cloudinaryService;
-        private readonly UserManager<Domain.Entity.User> _userManager;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
 
 
-        public CreateMessageHandler(IUnitOfWork unitOfWork, ISignalRService signalRService, IHttpContextAccessor contextAccessor, ICloudinaryService cloudinaryService, UserManager<Domain.Entity.User> userManager)
+        public CreateMessageHandler(IUnitOfWork unitOfWork, ISignalRService signalRService, IHttpContextAccessor contextAccessor, ICloudinaryService cloudinaryService, UserManager<Domain.Entity.System.User> userManager)
         {
             _unitOfWork = unitOfWork;
             _signalRService = signalRService;
@@ -35,7 +35,7 @@ namespace SocialNetwork.Application.Features.Message.Handlers
 
         public async Task<BaseResponse> Handle(CreateMessageCommand request, CancellationToken cancellationToken)
         {
-            Domain.Entity.ChatRoom chatRoom = await _unitOfWork.ChatRoomRepository.GetChatRoomByUniqueNameAsync(request.ChatRoomName)
+            Domain.Entity.ChatRoomInfo.ChatRoom chatRoom = await _unitOfWork.ChatRoomRepository.GetChatRoomByUniqueNameAsync(request.ChatRoomName)
                 ?? throw new AppException("Nhóm chat không tồn tại");
 
             var userId = _contextAccessor.HttpContext.User.GetUserId();
@@ -66,7 +66,7 @@ namespace SocialNetwork.Application.Features.Message.Handlers
 
             var recentReadStatus = await _unitOfWork.MessageReadStatusRepository.GetMessageReadStatusByUserAndChatRoomId(userId, chatRoom.Id);
 
-            var message = new Domain.Entity.Message()
+            var message = new Domain.Entity.MessageInfo.Message()
             {
                 ChatRoomId = chatRoom.Id,
                 Content = request.Content,

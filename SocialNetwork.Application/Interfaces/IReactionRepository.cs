@@ -1,6 +1,4 @@
-﻿
-
-using SocialNetwork.Domain.Entity;
+﻿using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Interfaces
 {
