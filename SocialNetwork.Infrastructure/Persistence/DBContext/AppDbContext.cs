@@ -19,18 +19,7 @@ namespace SocialNetwork.Infrastructure.DBContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-            {
-                var tableName = entityType.GetTableName();
-                if (tableName!.StartsWith("AspNet"))
-                {
-                    entityType.SetTableName(tableName.Substring(6));
-                }
-            }
-
             base.OnModelCreating(modelBuilder);
         }
 
@@ -77,6 +66,8 @@ namespace SocialNetwork.Infrastructure.DBContext
         public DbSet<School> Schools { get; set; }
         public DbSet<Position> Positions { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<Profession> Professions { get; set; }
+        public DbSet<Major> Majors { get; set; }
 
     }
 

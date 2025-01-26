@@ -1,8 +1,10 @@
+import { MajorResource } from "./major";
 import { SchoolResource } from "./school";
 
 export type UserSchoolResource = {
     id: string;
     school: SchoolResource;
-    startDate: Date;
+    major: MajorResource;
+    startYear: number;
     status: string;
 }

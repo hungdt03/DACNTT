@@ -34,6 +34,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public IOTPRepository OTPRepository { get; }
         public ISchoolRepository SchoolRepository { get; }
         public IUserSchoolRepository UserSchoolRepository { get; }
+        public IProfessionRepository ProfessionRepository { get; }
+        public IMajorRepository MajorRepository { get; }
+        public ICompanyRepository CompanyRepository { get; }
+        public IPositionRepository PositionRepository { get; }
+        public IUserWorkPlaceRepository UserWorkPlaceRepository { get; }
+        public ILocationRepository LocationRepository { get; }
 
         public UnitOfWork
         (
@@ -56,7 +62,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 IMessageMediaRepository messageMediaRepository,
                 IOTPRepository oTPRepository,
                 ISchoolRepository schoolRepository,
-                IUserSchoolRepository userSchoolRepository
+                IUserSchoolRepository userSchoolRepository,
+                IProfessionRepository professionRepository,
+                IMajorRepository majorRepository,
+                ICompanyRepository companyRepository,
+                IPositionRepository positionRepository,
+                IUserWorkPlaceRepository userWorkPlaceRepository,
+                ILocationRepository locationRepository  
         )
         {
             _context = context;
@@ -79,6 +91,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             OTPRepository = oTPRepository;
             SchoolRepository = schoolRepository;
             UserSchoolRepository = userSchoolRepository;    
+            ProfessionRepository = professionRepository;
+            MajorRepository = majorRepository;
+            LocationRepository = locationRepository;
+            UserWorkPlaceRepository = userWorkPlaceRepository;
+            PositionRepository = positionRepository;
+            CompanyRepository = companyRepository;
+            UserWorkPlaceRepository = userWorkPlaceRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

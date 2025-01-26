@@ -53,6 +53,12 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IOTPRepository, OTPRepository>();
             services.AddScoped<ISchoolRepository, SchoolRepository>();
             services.AddScoped<IUserSchoolRepository, UserSchoolRepository>();
+            services.AddScoped<IProfessionRepository, ProfessionRepository>();
+            services.AddScoped<IMajorRepository, MajorRepository>();
+            services.AddScoped<ICompanyRepository, CompanyRepostiory>();
+            services.AddScoped<IPositionRepository, PositionRepository>();
+            services.AddScoped<IUserWorkPlaceRepository, UserWorkPlaceRepository>();
+            services.AddScoped<ILocationRepository, LocationRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>

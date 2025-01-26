@@ -68,10 +68,7 @@ const ProfileLeftSide: FC<ProfileLeftSideProps> = ({
         </div>
 
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
-            <div className="flex items-center justify-between">
-                <span className="font-bold text-lg text-gray-700">Bạn bè</span>
-                {/* {friends.length > 9 && <Link className="text-primary" to="/friends">Xem tất cả bạn bè</Link>} */}
-            </div>
+            <span className="font-bold text-lg text-gray-700">Bạn bè</span>
 
             {friends.length === 0 ? <div className="w-full h-full flex items-center justify-center py-2">
                 <Empty description='Chua có bạn bè nào' />

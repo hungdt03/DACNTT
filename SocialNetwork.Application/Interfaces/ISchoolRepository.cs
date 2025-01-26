@@ -10,5 +10,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<IEnumerable<School>> GetAllSchoolsAsync();
         Task<IEnumerable<School>> GetSchoolsContainsNameAsync(string name);
         Task<School?> GetSchoolByNameAsync(string name);    
+        Task<School?> GetSchoolByIdAsync(Guid schoolId);
     }
 }

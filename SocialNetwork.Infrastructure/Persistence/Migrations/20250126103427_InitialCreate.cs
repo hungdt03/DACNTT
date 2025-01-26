@@ -91,6 +91,20 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Majors",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Majors", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Positions",
                 columns: table => new
                 {
@@ -102,6 +116,20 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Positions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Professions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Professions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -559,8 +587,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MajorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     SchoolId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StartDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    StartYear = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
@@ -574,6 +603,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserSchools_Majors_MajorId",
+                        column: x => x.MajorId,
+                        principalTable: "Majors",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserSchools_Schools_SchoolId",
                         column: x => x.SchoolId,
@@ -613,6 +647,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     PositionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsCurrent = table.Column<bool>(type: "bit", nullable: false),
+                    StartYear = table.Column<int>(type: "int", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
@@ -1111,6 +1146,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Majors_Name",
+                table: "Majors",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MessageMedias_MessageId",
                 table: "MessageMedias",
                 column: "MessageId");
@@ -1212,6 +1253,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Professions_Name",
+                table: "Professions",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reactions_PostId",
                 table: "Reactions",
                 column: "PostId");
@@ -1266,6 +1313,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "IX_Tags_UserId",
                 table: "Tags",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSchools_MajorId",
+                table: "UserSchools",
+                column: "MajorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserSchools_SchoolId",
@@ -1357,6 +1409,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "PostMedias");
 
             migrationBuilder.DropTable(
+                name: "Professions");
+
+            migrationBuilder.DropTable(
                 name: "Reactions");
 
             migrationBuilder.DropTable(
@@ -1391,6 +1446,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "Majors");
 
             migrationBuilder.DropTable(
                 name: "Schools");

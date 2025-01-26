@@ -14,5 +14,6 @@ namespace SocialNetwork.Domain.Entity.UserInfo
         public Guid CompanyId { get; set; }
         public Company Company { get; set; }
         public bool IsCurrent { get; set; }
+        public int StartYear { get; set; }
     }
 }

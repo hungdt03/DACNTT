@@ -7,5 +7,7 @@ namespace SocialNetwork.Application.Interfaces
     {
         Task CreateUserSchoolAsync(UserSchool userSchool);
         Task<List<UserSchool>> GetAllUserSchoolsAsync(string userId);
+        Task<UserSchool?> GetUserSchoolsByIdAsync(Guid userSchoolId);
+        void DeleteUserSchool(UserSchool userSchool);
     }
 }

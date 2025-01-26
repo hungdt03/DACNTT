@@ -1,60 +1,74 @@
-import { Checkbox, DatePicker, Divider, Form, FormProps, Input, message } from "antd";
+import { Button, Checkbox, DatePicker, Form, FormProps, Input, message } from "antd";
 import { useForm } from "antd/es/form/Form";
-import React, { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import schoolService from "../../services/schoolService";
 import { SchoolResource } from "../../types/school";
 import InputSearchDropdown from "../InputSearchDropdown";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import userService from "../../services/userService";
 import { UserSchoolResource } from "../../types/userSchool";
-import { Edit3, School } from "lucide-react";
 import { EducationStatus } from "../../enums/education-status";
+import { MajorResource } from "../../types/major";
+import majorService from "../../services/majorService";
 
-export type ModifyEducation = {
+export type ModifyEducationRequest = {
     school: string;
+    major: string;
+    startYear?: number;
+    isGraduated: boolean;
+    schoolId: string | null;
+    majorId: string | null;
+}
+
+export type ModifyEducationForm = {
+    school: string;
+    major: string;
     startYear?: Dayjs;
     isGraduated: boolean;
-    schoolId?: string;
-
-    expand: boolean;
-    showYear: boolean;
-    searchValue: string;
-}
-
-export type EducationFormRequest = {
-    educations: ModifyEducation[]
-}
-
-export type EducationExpandForm = {
-    item: UserSchoolResource;
-    expand: boolean;
-    showYear: boolean;
-    searchValue: string;
+    schoolId: string | null;
+    majorId: string | null;
 }
 
 type ModifyUserEducationProps = {
-    userSchools: UserSchoolResource[]
+    userSchool: UserSchoolResource | undefined;
+    onFetch?: () => void
 }
 
 const ModifyUserEducation: FC<ModifyUserEducationProps> = ({
-    userSchools
+    userSchool,
+    onFetch
 }) => {
-    const [form] = useForm<EducationFormRequest>();
-    const [schools, setSchools] = useState<SchoolResource[]>([]);
+    const [form] = useForm<ModifyEducationForm>();
     const [searchValue, setSearchValue] = useState<string>('');
+    const [searchMajor, setSearchMajor] = useState<string>('');
 
-    const [forms, setForms] = useState<EducationExpandForm[]>([...userSchools.map(item => ({
-        item,
-        expand: false,
-        showYear: item.status !== EducationStatus.GRADUATED,
-        searchValue: item.school.name
-    } as EducationExpandForm))])
+    const [schools, setSchools] = useState<SchoolResource[]>([])
+    const [majors, setMajors] = useState<MajorResource[]>([])
 
-    const onFinish: FormProps<EducationFormRequest>['onFinish'] = async (values) => {
-        console.log('Success:', values);
-        const response = await userService.modifyUserEducation(values);
+    const [showYear, setShowYear] = useState(userSchool ? userSchool.status !== EducationStatus.GRADUATED : false);
+    const [disabled, setDisabled] = useState(true)
+
+    const onFinish: FormProps<ModifyEducationForm>['onFinish'] = async (values) => {
+        const payload: ModifyEducationRequest = {
+            isGraduated: values.isGraduated,
+            school: values.school,
+            major: values.major,
+            schoolId: values.schoolId ? values.schoolId : null,
+            majorId: values.majorId ? values.majorId : null,
+            startYear: values.startYear?.year() ?? 2025
+        }
+
+        let response;
+        if (userSchool) {
+            response = await userService.updateUserEducation(userSchool.id, payload);
+        } else {
+            response = await userService.addUserEducation(payload);
+        }
+
         if (response.isSuccess) {
+            onFetch?.()
             form.resetFields()
+            setShowYear(false)
             message.success(response.message)
         } else {
             message.error(response.message)
@@ -68,142 +82,116 @@ const ModifyUserEducation: FC<ModifyUserEducationProps> = ({
         }
     }
 
-    const handleExpandForm = (index: number) => {
-        setForms(prev => {
-            const updateForm = [...prev];
-            updateForm[index].expand = true
-            return updateForm
-        })
+    const fetchMajors = async (name: string) => {
+        const response = await majorService.searchMajors(name);
+        if (response.isSuccess) {
+            setMajors(response.data)
+        }
     }
 
-    return <div className="flex flex-col gap-y-2 py-4 max-h-[550px] overflow-y-auto custom-scrollbar">
+    useEffect(() => {
+        form.resetFields();
+
+        if (form && userSchool) {
+            setSearchValue(userSchool.school.name)
+            form.setFieldsValue({
+                "isGraduated": userSchool.status === EducationStatus.GRADUATED,
+                "schoolId": userSchool.school.id,
+                "majorId": userSchool.major.id,
+                "school": userSchool.school.name,
+                "major": userSchool.major.name,
+                "startYear": dayjs().set('year', userSchool.startYear),
+            })
+
+            setDisabled(true)
+            setShowYear(userSchool ? userSchool.status !== EducationStatus.GRADUATED : false)
+        }
+    }, [userSchool, form])
+
+    return <div className="max-h-[550px] overflow-y-auto custom-scrollbar">
         <Form
             form={form}
+            key={userSchool?.school.id}
             onFinish={onFinish}
-            layout="vertical"
-            className="flex flex-col"
             initialValues={{
-                educations: [...userSchools.map(item => ({
-                    school: item.school.name,
-                    isGraduated: item.status === EducationStatus.GRADUATED,
-                    schoolId: item.school.id,
-                    startDate: item.startDate
-                }))]
+                school: userSchool?.school.name,
+                schoolId: userSchool?.school.id,
+                isGraduated: userSchool?.status === EducationStatus.GRADUATED || true,
+                startYear: dayjs().set('year', userSchool?.startYear ?? 2025)
             }}
+            onValuesChange={() => setDisabled(false)}
+            layout="vertical"
         >
-            {forms.map((formItem, index) => {
-                if (formItem.expand) {
-                    return <React.Fragment key={formItem.item.id}>
+            <Form.Item<ModifyEducationForm>
+                label="Ngành học"
+                name="major"
+                rules={[{ required: true, message: 'Vui lòng nhập ngành học!' }]}
+            >
+                <InputSearchDropdown
+                    id={`major-${userSchool?.major.id}`}
+                    onSearch={fetchMajors}
+                    options={majors.map(item => ({
+                        label: item.name,
+                        value: item.id
+                    }))}
+                    value={searchMajor}
+                    placeholder='Nhập tên ngành học'
+                    onChange={(value) => {
+                        setSearchMajor(value)
+                        form.setFieldValue("majorId", '')
+                        form.setFieldValue("major", value)
+                    }}
+                    onSelect={(value) => form.setFieldValue("majorId", value)}
+                />
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <Form.Item<EducationFormRequest>
-                                label="Trường học"
-                                name={["educations", index, "school"]}
-                                rules={[{ required: true, message: 'Vui lòng nhập trường học!' }]}
-                            >
-                                <InputSearchDropdown
-                                    onSearch={fetchSchools}
-                                    options={schools}
-                                    value={formItem.searchValue}
-                                    onChange={(value) => {
-                                        setForms(prev => {
-                                            const udpateList = [...prev]
-                                            udpateList[index].searchValue = value
-                                            return udpateList
-                                        })
-                                        form.setFieldValue(["educations", index, "schoolId"], '')
-                                    }}
-                                    onSelect={(value) => form.setFieldValue(["educations", index, "schoolId"], value)}
-                                />
-
-                            </Form.Item>
-
-                            {
-                                formItem.showYear && <Form.Item<EducationFormRequest>
-                                    label="Năm bắt đầu"
-                                    name={["educations", index, "startYear"]}
-                                    rules={[{ required: true, message: 'Vui lòng nhập bắt đầu nhập học!' }]}
-                                >
-                                    <DatePicker picker="year" size="large" classNames={{
-                                        popup: 'text-sm'
-                                    }} className="w-full" placeholder="Chọn năm bắt đầu" />
-                                </Form.Item>
-                            }
-                        </div>
-                        <Form.Item<EducationFormRequest> name={["educations", index, "schoolId"]} hidden>
-                            <Input />
-                        </Form.Item>
-                        <Form.Item<EducationFormRequest> name={["educations", index, "isGraduated"]} valuePropName="checked" label={null}>
-                            <Checkbox onChange={(e) => {
-                                setForms(prev => {
-                                    const udpateList = [...prev]
-                                    udpateList[index].showYear = !e.target.checked
-                                    return udpateList
-                                })
-                                form.setFieldValue(["educations", index, "isGraduated"], e.target.checked)
-                            }} checked>Đã tốt nghiệp</Checkbox>
-                        </Form.Item>
-
-
-                        <Divider className="mt-0 mb-2" />
-                    </React.Fragment>
-                }
-
-                return <React.Fragment key={formItem.item.id}>
-                    <div className="flex items-center gap-x-3">
-                        <School size={20} />
-                        <div className="flex items-center">
-                            <div className="flex items-center gap-x-1">
-                                {formItem.item.status === EducationStatus.GRADUATED ? 'Đã học' : 'Đang học'} tại <span className="font-bold">{formItem.item.school.name}</span>
-                                <Edit3 onClick={() => handleExpandForm(index)} size={12} className="ml-1 cursor-pointer" />
-                            </div>
-                        </div>
-                    </div>
-                    <Divider className="my-2" />
-                </React.Fragment>
-            })}
-            {/* <Form.Item<ModifyEducationForm>
+            </Form.Item>
+            <Form.Item<ModifyEducationForm>
                 label="Trường học"
                 name="school"
                 rules={[{ required: true, message: 'Vui lòng nhập trường học!' }]}
             >
                 <InputSearchDropdown
+                    id={`school-${userSchool?.school.id}`}
                     onSearch={fetchSchools}
-                    options={schools}
+                    options={schools.map(item => ({
+                        label: item.name,
+                        value: item.id
+                    }))}
+                    placeholder='Nhập tên trường học'
                     value={searchValue}
                     onChange={(value) => {
                         setSearchValue(value)
-                        form.setFieldValue('schoolId', '')
+                        form.setFieldValue("schoolId", '')
+                        form.setFieldValue("school", value)
                     }}
-                    onSelect={(value) => form.setFieldValue('schoolId', value)}
+                    onSelect={(value) => form.setFieldValue("schoolId", value)}
                 />
 
             </Form.Item>
+            {
+                showYear && <Form.Item<ModifyEducationForm>
+                    label="Năm bắt đầu"
+                    name="startYear"
+                    rules={[{ required: true, message: 'Vui lòng nhập năm bắt đầu nhập học!' }]}
+                >
+                    <DatePicker picker="year" className="w-full" placeholder="Chọn năm bắt đầu" />
+                </Form.Item>
+            }
             <Form.Item<ModifyEducationForm> name="schoolId" hidden>
                 <Input />
             </Form.Item>
-            <Form.Item<ModifyEducationForm> name="isGraduated" valuePropName="checked" label={null}>
+            <Form.Item<ModifyEducationForm> name="isGraduated" valuePropName="checked" >
                 <Checkbox onChange={(e) => {
-                    setIsShowYear(!e.target.checked)
-                    form.setFieldValue('isGraduated', e.target.checked)
-                }} checked>Đã tốt nghiệp</Checkbox>
+                    setShowYear(!e.target.checked)
+                    form.setFieldValue("isGraduated", e.target.checked)
+                }} >Đã tốt nghiệp</Checkbox>
             </Form.Item>
 
-            {isShowYear && <Form.Item<ModifyEducationForm>
-                label="Năm bắt đầu"
-                name="startYear"
-                rules={[{ required: true, message: 'Vui lòng nhập bắt đầu nhập học!' }]}
-            >
-                <DatePicker picker="year" className="w-full" placeholder="Chọn năm bắt đầu" />
-            </Form.Item>
-            }
-
-
-            <Form.Item label={null}>
-                <Button type="primary" htmlType="submit">
+            <Form.Item>
+                <Button disabled={disabled} type="primary" htmlType="submit">
                     Lưu lại
                 </Button>
-            </Form.Item> */}
+            </Form.Item>
         </Form>
     </div>
 };

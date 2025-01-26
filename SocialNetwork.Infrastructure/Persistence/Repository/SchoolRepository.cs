@@ -26,6 +26,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.Schools.ToListAsync();
         }
 
+        public async Task<School?> GetSchoolByIdAsync(Guid schoolId)
+        {
+            return await _context.Schools
+                .SingleOrDefaultAsync(s => s.Id.Equals(schoolId));
+        }
+
         public async Task<School?> GetSchoolByNameAsync(string name)
         {
             return await _context.Schools

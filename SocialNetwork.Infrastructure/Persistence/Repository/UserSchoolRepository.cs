@@ -20,12 +20,23 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.UserSchools.AddAsync(userSchool);
         }
 
+        public void DeleteUserSchool(UserSchool userSchool)
+        {
+            _context.UserSchools.Remove(userSchool);
+        }
+
         public async Task<List<UserSchool>> GetAllUserSchoolsAsync(string userId)
         {
             return await _context.UserSchools
                 .Where(u => u.UserId == userId)
+                .Include(s => s.Major)
                 .Include(s => s.School)
                 .ToListAsync();
+        }
+
+        public async Task<UserSchool?> GetUserSchoolsByIdAsync(Guid userSchoolId)
+        {
+            return await _context.UserSchools.SingleOrDefaultAsync(s => s.Id == userSchoolId);
         }
     }
 }

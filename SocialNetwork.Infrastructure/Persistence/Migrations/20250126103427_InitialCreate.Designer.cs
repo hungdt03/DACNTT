@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250124085505_InitialCreate")]
+    [Migration("20250126103427_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -779,6 +779,30 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.ToTable("Locations");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.System.Major", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Majors");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.System.Notification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -900,6 +924,30 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Positions");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.System.Profession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Professions");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.System.RefreshToken", b =>
@@ -1223,11 +1271,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DateUpdated")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid?>("MajorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("StartDate")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<int?>("StartYear")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -1238,6 +1289,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MajorId");
 
                     b.HasIndex("SchoolId");
 
@@ -1297,6 +1350,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid?>("PositionId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("StartYear")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -1793,6 +1849,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.UserInfo.UserSchool", b =>
                 {
+                    b.HasOne("SocialNetwork.Domain.Entity.System.Major", "Major")
+                        .WithMany()
+                        .HasForeignKey("MajorId");
+
                     b.HasOne("SocialNetwork.Domain.Entity.System.School", "School")
                         .WithMany()
                         .HasForeignKey("SchoolId")
@@ -1804,6 +1864,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Major");
 
                     b.Navigation("School");
 

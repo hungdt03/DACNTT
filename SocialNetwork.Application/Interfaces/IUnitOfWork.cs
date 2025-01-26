@@ -19,7 +19,13 @@ namespace SocialNetwork.Application.Interfaces
         public IViewerRepository ViewerRepository { get; }
         public IFollowRepository FollowRepository { get; }
         public ISchoolRepository SchoolRepository { get; }
+        public IProfessionRepository ProfessionRepository { get; }
+        public IMajorRepository MajorRepository { get; }
+        public ILocationRepository LocationRepository { get; }
         public IUserSchoolRepository UserSchoolRepository { get; }
+        public ICompanyRepository CompanyRepository { get; }
+        public IPositionRepository PositionRepository { get; }
+        public IUserWorkPlaceRepository UserWorkPlaceRepository { get; }
         public IMessageMediaRepository MessageMediaRepository { get; }
         public IOTPRepository OTPRepository { get; }
 
