@@ -54,6 +54,15 @@ class PostService {
         })
     }
 
+    getAllPostsByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/group/' + groupId, {
+            params: {
+                page: page,  
+                size: size  
+            }
+        })
+    }
+
     getAllSharesByPostId(postId: string, page: number, size: number)  : Promise<PaginationResponse<PostResource[]>> {
         return axiosInterceptor.get('/api/posts/share/' + postId, {
             params: {

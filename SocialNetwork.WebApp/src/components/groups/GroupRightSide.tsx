@@ -3,14 +3,21 @@ import { Image } from "antd";
 import { Lock, Newspaper } from "lucide-react";
 import { FC } from "react";
 import images from "../../assets";
+import { GroupResource } from "../../types/group";
 
-const GroupRightSide: FC = () => {
+type GroupRightSideProps = {
+    group: GroupResource
+}
+
+const GroupRightSide: FC<GroupRightSideProps> = ({
+    group
+}) => {
     return <div className="lg:flex flex-col h-full gap-y-4 hidden lg:col-span-5">
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-2">
             <span className="font-bold text-lg text-gray-700">Giới thiệu</span>
 
             <div className="flex flex-col gap-y-2">
-                <p>Group này được lập ra để mọi người share đáp án bài kiếm điểm rèn luyện, đáp án môn kỹ năng, ... Cùng nhau đóng góp nha mọi người</p>
+                <p>{group.description}</p>
                 <div className="flex items-start gap-x-2">
                     <Lock size={22} />
                     <div className="flex flex-col gap-y-1">

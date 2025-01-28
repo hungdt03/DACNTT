@@ -1,5 +1,6 @@
 import { MediaType } from "../enums/media";
 import { PrivacyType } from "../enums/privacy";
+import { GroupResource } from "./group";
 import { TagResource } from "./tag";
 import { UserResource } from "./user";
 
@@ -18,6 +19,7 @@ export type PostResource = {
     sharePost: PostResource;
     originalPost: PostResource;
     sharePostId: string;
+    group: GroupResource
     tags: TagResource[]
 }
 

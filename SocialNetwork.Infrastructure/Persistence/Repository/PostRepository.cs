@@ -34,6 +34,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             var query = _context.Posts
                  .Include(p => p.User)
+                 .Include(p => p.Group)
                  .Include(p => p.Tags).ThenInclude(t => t.User)
                  .Include(p => p.Comments)
                  .Include(p => p.Medias)
@@ -83,6 +84,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)
+                .Include(p => p.Group)
                 .Include(p => p.User)
                 .Include(p => p.Tags)
                     .ThenInclude(p => p.User)
@@ -116,6 +118,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Skip((page - 1) * size)
                 .Take(size)
                 .Include(p => p.User)
+                .Include(p => p.Group)
                 .Include(p => p.Tags)
                     .ThenInclude(p => p.User)
                 .Include(p => p.Comments)
@@ -138,12 +141,41 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.Tags)
                     .ThenInclude(p => p.User)
                 .Include(p => p.Comments)
+                .Include(p => p.Group)
                 .Include(p => p.SharePost)
                 .Include(p => p.OriginalPost)
                     .ThenInclude(p => p.User)
                 .Include(p => p.OriginalPost)
                     .ThenInclude(p => p.Medias)
                 .SingleOrDefaultAsync(p => p.Id == id);
+        }
+
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsByGroupIdAsync(Guid groupId, int page, int size)
+        {
+            var query = _context.Posts.AsQueryable();
+
+            var totalCount = await query.Where(p => p.GroupId == groupId).CountAsync();
+
+            var posts = await query
+            //.AsNoTracking()
+                .Where(p => p.GroupId == groupId)
+                .OrderByDescending(p => p.DateCreated)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .Include(p => p.User)
+                .Include(p => p.Group)
+                .Include(p => p.Tags)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.Comments)
+                .Include(p => p.Medias)
+                .Include(p => p.SharePost)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.Medias)
+                .ToListAsync();
+
+            return (posts, totalCount);
         }
     }
 }

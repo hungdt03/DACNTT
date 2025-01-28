@@ -10,7 +10,6 @@ import { UserResource } from '../types/user';
 import { UserSchoolResource } from '../types/userSchool';
 import { UserWorkPlaceResource } from '../types/userWorkPlace';
 
-
 class UserService {
     private static instance: UserService;
 
@@ -56,6 +55,10 @@ class UserService {
         return axiosInterceptor.get('/api/users/education')
     }
 
+    getUserEducationByUserId(userId: string) : Promise<DataResponse<UserSchoolResource[]>> {
+        return axiosInterceptor.get('/api/users/education/' + userId)
+    }
+
      // Work place
 
      addUserWorkPlace(payload: ModifyUserWorkPlaceRequest) : Promise<DataResponse<string>> {
@@ -74,9 +77,18 @@ class UserService {
         return axiosInterceptor.get('/api/users/workPlace')
     }
 
+    getUserWorkPlaceByUserId(userId: string) : Promise<DataResponse<UserWorkPlaceResource[]>> {
+        return axiosInterceptor.get('/api/users/workPlace/' + userId)
+    }
+
+
     // Location
     getUserLocation () : Promise<DataResponse<LocationResource>> {
         return axiosInterceptor.get('/api/users/location')
+    }
+
+    getUserLocationByUserId (userId: string) : Promise<DataResponse<LocationResource>> {
+        return axiosInterceptor.get('/api/users/location/' + userId)
     }
 
     modifyUserLocation(payload: ModifyUserLocationRequest) : Promise<BaseResponse> {
@@ -87,6 +99,11 @@ class UserService {
     getUserHometown () : Promise<DataResponse<LocationResource>> {
         return axiosInterceptor.get('/api/users/hometown')
     }
+
+    getUserHometownByUserId (userId: string) : Promise<DataResponse<LocationResource>> {
+        return axiosInterceptor.get('/api/users/hometown/' + userId)
+    }
+
 
     modifyUserHometown(payload: ModifyUserHometownRequest) : Promise<BaseResponse> {
         return axiosInterceptor.post('/api/users/hometown', payload)

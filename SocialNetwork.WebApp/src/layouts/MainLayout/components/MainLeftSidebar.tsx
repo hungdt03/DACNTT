@@ -40,7 +40,7 @@ const MainLeftSidebar: FC = () => {
             </div>
             <Divider className="my-0" />
             <div className="p-4 flex flex-col gap-y-1">
-                <Link to={'/profile'} className="flex items-center gap-x-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer">
+                <Link to={`/profile/${user?.id}`} className="flex items-center gap-x-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer">
                     <img alt="Trang cá nhân" className="w-8 h-8" src={images.userProfile} />
                     <span className="text-[15px] font-semibold text-gray-500">Trang cá nhân</span>
                 </Link>
@@ -56,7 +56,7 @@ const MainLeftSidebar: FC = () => {
                     <img alt="Người theo dõi" className="w-8 h-8" src={images.follower} />
                     <span className="text-[15px] font-semibold text-gray-500">Người theo dõi</span>
                 </Link>
-                <Link to='/groups' className="flex items-center gap-x-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer">
+                <Link to='/group-manager' className="flex items-center gap-x-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer">
                     <img alt="Nhóm" className="w-8 h-8" src={images.group} />
                     <span className="text-[15px] font-semibold text-gray-500">Nhóm</span>
                 </Link>

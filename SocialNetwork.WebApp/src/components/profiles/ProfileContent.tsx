@@ -15,9 +15,9 @@ import { setUserDetails } from "../../features/slices/auth-slice";
 import Loading from "../Loading";
 import { RcFile } from "antd/es/upload";
 import { Link } from "react-router-dom";
-import ProfileFriendList from "./ProfileFriendList";
-import ProfileFollowerList from "./ProfileFollowerList";
-import ProfileFolloweeList from "./ProfileFolloweesList";
+import ProfileFriendList from "./shared/ProfileFriendList";
+import ProfileFollowerList from "./shared/ProfileFollowerList";
+import ProfileFolloweeList from "./shared/ProfileFolloweesList";
 
 type ProfileContentProps = {
     user: UserResource;

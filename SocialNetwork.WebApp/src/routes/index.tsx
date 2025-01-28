@@ -11,11 +11,12 @@ import ChatPage from "../pages/ChatPage";
 import AuthGuard from "./authGuard";
 import NotFoundPage from "../pages/errors/NotFoundPage";
 import GuestGuard from "./guestGuard";
-import UserPage from "../pages/UserPage";
 import ErrorBoundaryPage from "../pages/errors/ErrorBoundaryPage";
 import CreateStoryPage from "../pages/CreateStoryPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ViewStoryPage from "../pages/ViewStoryPage";
+import GroupManagerLayout from "../layouts/GroupManagerLayout/GroupManagerLayout";
+import CreateGroupPage from "../pages/CreateGroupPage";
 
 const appRouter = createBrowserRouter([
     {
@@ -48,21 +49,29 @@ const appRouter = createBrowserRouter([
         ]
     },
     {
+        path: '/group-manager',
+        element: <AuthGuard element={<GroupManagerLayout />} />,
+        children: [
+           
+        ]
+    },
+    {
+        path: '/groups/create',
+        element: <CreateGroupPage />,
+        
+    },  
+    {
         path: '/',
         errorElement: <ErrorBoundaryPage />,
         element: <AuthGuard element={<HeaderOnlyLayout />} />,
         children: [
             {
-                path: 'groups',
+                path: 'groups/:id',
                 element: <GroupPage />
             },
             {
-                path: 'profile',
-                element: <ProfilePage />
-            },
-            {
                 path: 'profile/:id',
-                element: <UserPage />
+                element: <ProfilePage />
             },
         ]
     },

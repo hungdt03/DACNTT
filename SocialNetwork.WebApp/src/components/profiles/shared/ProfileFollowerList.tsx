@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from "react";
-import images from "../../assets";
+import images from "../../../assets";
 import { MoreHorizontal } from "lucide-react";
-import { UserResource } from "../../types/user";
-import followService from "../../services/followService";
+import { UserResource } from "../../../types/user";
+import followService from "../../../services/followService";
 import { Empty } from "antd";
 
 type ProfileFollowerListProps = {

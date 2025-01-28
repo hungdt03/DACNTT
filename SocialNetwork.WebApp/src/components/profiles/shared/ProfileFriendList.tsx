@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from "react";
-import images from "../../assets";
+import images from "../../../assets";
 import { MoreHorizontal } from "lucide-react";
-import { FriendResource } from "../../types/friend";
-import friendService from "../../services/friendService";
+import { FriendResource } from "../../../types/friend";
+import friendService from "../../../services/friendService";
 import { Empty } from "antd";
 
 type ProfileFriendListProps = {

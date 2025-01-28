@@ -1,67 +1,39 @@
 import { FC } from "react";
 import images from "../../assets";
-import { Avatar, Button, Divider, Modal } from "antd";
+import { Avatar, Button, Divider, Modal, Tooltip } from "antd";
 import { Plus } from "lucide-react";
 import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
 import useModal from "../../hooks/useModal";
+import { GroupResource } from "../../types/group";
+import { Link } from "react-router-dom";
 
-const GroupHeader: FC = () => {
+type GroupHeaderProps = {
+    group: GroupResource
+}
+
+const GroupHeader: FC<GroupHeaderProps> = ({
+    group
+}) => {
     const { handleCancel, handleOk, showModal, isModalOpen } = useModal()
 
     return <div className="bg-white w-full shadow">
         <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto overflow-hidden">
-            <img className="w-full object-cover max-h-[40vh] rounded-b-xl" src={images.coverGroup} />
+            <img className="w-full object-cover max-h-[40vh] rounded-b-xl" src={group.coverImage ?? images.coverGroup} />
             <div className="py-4 flex flex-col gap-y-2">
-                <span className="font-bold text-3xl">Share đáp án TDTU</span>
+                <span className="font-bold text-3xl">{group.name}</span>
                 <div className="flex items-center gap-x-3">
-                    <span className="text-gray-500">Nhóm riêng tư</span>
-                    <span className="font-semibold text-gray-500">33.5k thành viên</span>
+                    <span className="text-gray-500">Nhóm {group.privacy}</span>
+                    <span className="font-semibold text-gray-500">{group.members.length} thành viên</span>
                 </div>
 
                 <div className="flex md:flex-row flex-col items-start gap-4 md:gap-0 md:items-center justify-between">
                     <Avatar.Group>
-                        <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
-                        <a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a><a href="https://ant.design">
-                            <Avatar style={{ backgroundColor: '#f56a00' }}>K</Avatar>
-                        </a>
+                        {group.members.map(member => <Link key={member.id} to={`/profile/${member.id}`}>
+                            <Tooltip title={member.fullName}>
+                                <Avatar src={member.avatar} />
+                            </Tooltip>
+                        </Link>)}
+
                     </Avatar.Group>
 
                     <div className="flex items-center gap-x-2">

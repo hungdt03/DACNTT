@@ -13,9 +13,9 @@ import friendService from "../../services/friendService";
 import { FriendRequestStatus } from "../../enums/friend-request";
 import followService from "../../services/followService";
 import { FriendResource } from "../../types/friend";
-import ProfileFriendList from "./ProfileFriendList";
-import ProfileFollowerList from "./ProfileFollowerList";
-import ProfileFolloweeList from "./ProfileFolloweesList";
+import ProfileFriendList from "./shared/ProfileFriendList";
+import ProfileFollowerList from "./shared/ProfileFollowerList";
+import ProfileFolloweeList from "./shared/ProfileFolloweesList";
 
 type ProfileUserContentProps = {
     user: UserResource;

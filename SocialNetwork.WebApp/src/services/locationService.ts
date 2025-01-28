@@ -2,8 +2,6 @@
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { LocationResource } from '../types/location';
 import { DataResponse } from '../types/response';
-import { SchoolResource } from '../types/school';
-
 
 class LocationService {
     private static instance: LocationService;

@@ -10,6 +10,7 @@ import PostSkeletonList from "../components/skeletons/PostSkeletonList";
 import { Pagination } from "../types/response";
 import { inititalValues } from "../utils/pagination";
 import StoryWrapper from "../components/story/StoryWrapper";
+import PostGroup from "../components/posts/PostGroup";
 
 
 const HomePage: FC = () => {
@@ -22,7 +23,8 @@ const HomePage: FC = () => {
     const fetchPosts = async (page: number, size: number) => {
         setLoading(true);
         const response = await postService.getAllPosts(page, size);
-        setTimeout(() => setLoading(false), 2000)
+        setLoading(false)
+        console.log(response)
 
         if (response.isSuccess) {
             setPagination(response.pagination);
@@ -111,6 +113,8 @@ const HomePage: FC = () => {
             {posts.map(post => {
                 if (post.postType === PostType.SHARE_POST) {
                     return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
+                } else if(post.postType === PostType.GROUP_POST && post.group) {
+                    return <PostGroup key={post.id} post={post} />;
                 }
 
                 return <Post onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;

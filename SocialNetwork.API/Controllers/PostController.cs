@@ -75,6 +75,13 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("group/{groupId}")]
+        public async Task<IActionResult> GetAllPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
+        {
+            var response = await _mediator.Send(new GetAllPostsByGroupIdQuery(groupId, page, size));
+            return Ok(response);
+        }
+
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetPostById([FromRoute] Guid postId)
         {

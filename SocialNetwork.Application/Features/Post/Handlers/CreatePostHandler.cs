@@ -11,7 +11,6 @@ using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
-using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.Post.Handlers
 {
@@ -69,7 +68,6 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                         User = tagUser,
                     });
                 }
-                
             }
 
             var post = new Domain.Entity.PostInfo.Post
@@ -81,7 +79,20 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 UserId = _contextAccessor.HttpContext.User.GetUserId(),
                 Tags = tags,
                 Background = request.Background,
+               
             };
+
+            if (request.GroupId.HasValue)
+            {
+                var group = await _unitOfWork.GroupRepository.GetGroupByIdAsync(request.GroupId.Value);
+                if(group != null)
+                {
+                    post.PostType = PostType.GROUP_POST;
+                    post.Group = group;
+                    post.GroupId = group.Id;
+                    post.Privacy = PrivacyConstant.PUBLIC;
+                }
+            }
 
             var fullName = _contextAccessor.HttpContext.User.GetFullName();
             var imageUrl = _contextAccessor.HttpContext.User.GetAvatar();

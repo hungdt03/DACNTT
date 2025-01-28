@@ -59,6 +59,8 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IPositionRepository, PositionRepository>();
             services.AddScoped<IUserWorkPlaceRepository, UserWorkPlaceRepository>();
             services.AddScoped<ILocationRepository, LocationRepository>();
+            services.AddScoped<IGroupRepository, GroupRepository>();
+            services.AddScoped<IGroupMemberRepository, GroupMemberRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>

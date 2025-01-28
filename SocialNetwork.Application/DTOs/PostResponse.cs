@@ -23,6 +23,6 @@ namespace SocialNetwork.Application.DTOs
         public Guid? SharePostId { get; set; }
         public PostResponse SharePost { get; set; }
         public PostResponse OriginalPost { get; set; }
-
+        public GroupResponse Group { get; set; }
     }
 }

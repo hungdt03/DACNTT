@@ -43,7 +43,6 @@ const ProfilePersonalInfo: FC<ProfilePersonalInfoProps> = ({
 
     const fetchUserWorkPlaces = async () => {
         const response = await userService.getUserWorkPlace();
-        console.log(response)
         if (response.isSuccess) {
             setUserWorkPlaces(response.data)
         }
@@ -84,7 +83,6 @@ const ProfilePersonalInfo: FC<ProfilePersonalInfoProps> = ({
     }
 
     const handleDeleteUserWorkPlace = async (userWorkPlaceId: string) => {
-        console.log(userWorkPlaceId)
         const response = await userService.deleteUserWorkPlace(userWorkPlaceId);
         if (response.isSuccess) {
             fetchUserWorkPlaces()
@@ -143,7 +141,7 @@ const ProfilePersonalInfo: FC<ProfilePersonalInfoProps> = ({
                         <Workflow size={20} />
                         <span>Làm việc</span>
                     </div>
-                    <button onClick={() => handleSelectUserWorlPlace(undefined)} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
+                    <button onClick={() => handleSelectUserWorlPlace()} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                         <Plus size={16} className="text-white" />
                     </button>
                 </div>

@@ -1,6 +1,7 @@
 ﻿
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
+using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Domain.Entity.MessageInfo;
 using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Domain.Entity.StoryInfo;
@@ -31,6 +32,19 @@ namespace SocialNetwork.Application.Mappers
             {
                 Id = tag.Id,
                 User = tag.User != null ? MapToFriend(tag.User) : null
+            };
+        }
+
+        public static GroupResponse MapToGroup(Group group)
+        {
+            return new GroupResponse()
+            {
+                Id = group.Id,
+                Name = group.Name,
+                Description = group.Description,
+                CoverImage = group.CoverImage,
+                Privacy = group.Privacy,
+                Members = group.Members != null ? group.Members.Select(m => MapToUser(m.User)).ToList() : new(),
             };
         }
 
@@ -90,6 +104,7 @@ namespace SocialNetwork.Application.Mappers
                 Shares = post.Shares != null ? post.Shares.Count : 0,
                 SharePost = MapToPost(post.SharePost),
                 OriginalPost = MapToPost(post.OriginalPost),
+                Group = post.Group != null ? MapToGroup(post.Group) : null,
             };
         }
 

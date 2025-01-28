@@ -13,6 +13,7 @@ namespace SocialNetwork.Application.Features.Post.Commands
         public string Content { get; set; }
         public string Privacy { get; set; } = PrivacyConstant.PUBLIC;
         public string? Background {  get; set; }
+        public Guid? GroupId { get; set; }
         public List<IFormFile>? Images { get; set; }
         public List<IFormFile>? Videos { get; set; }
         public List<string>? TagIds { get; set; }

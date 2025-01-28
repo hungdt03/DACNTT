@@ -1,0 +1,33 @@
+﻿
+using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Entity.GroupInfo;
+using SocialNetwork.Infrastructure.DBContext;
+
+namespace SocialNetwork.Infrastructure.Persistence.Repository
+{
+    public class GroupMemberRepository : IGroupMemberRepository
+    {
+        private readonly AppDbContext _context;
+
+        public GroupMemberRepository(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task CreateGroupMemberAsync(GroupMember groupMember)
+        {
+            await _context.GroupMembers.AddAsync(groupMember);
+        }
+
+        public async Task<IEnumerable<GroupMember>> GetAllMembersInGroupAsync(Guid groupId)
+        {
+            return await _context.GroupMembers.Where(m  => m.GroupId == groupId).ToListAsync();   
+        }
+
+        public async Task<GroupMember?> GetGroupMemberByIdAsync(Guid groupMemberId)
+        {
+            return await _context.GroupMembers.SingleOrDefaultAsync(g => g.Id == groupMemberId);
+        }
+    }
+}

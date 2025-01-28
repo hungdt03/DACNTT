@@ -12,15 +12,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public IUserRepository UserRepository { get; }
         public IPostRepository PostRepository { get; }
-
         public ICommentRepository CommentRepository { get; }
-
         public IReactionRepository ReactionRepository { get; }
-
         public IPostMediaRepository PostMediaRepository { get; }
-
         public IFriendShipRepository FriendShipRepository { get; }
-
         public INotificationRepository NotificationRepository { get; }
         public ITagRepository TagRepository { get; }
         public IChatRoomRepository ChatRoomRepository { get; }
@@ -40,6 +35,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public IPositionRepository PositionRepository { get; }
         public IUserWorkPlaceRepository UserWorkPlaceRepository { get; }
         public ILocationRepository LocationRepository { get; }
+        public IGroupRepository GroupRepository { get; }
+        public IGroupMemberRepository GroupMemberRepository { get; }
 
         public UnitOfWork
         (
@@ -68,7 +65,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 ICompanyRepository companyRepository,
                 IPositionRepository positionRepository,
                 IUserWorkPlaceRepository userWorkPlaceRepository,
-                ILocationRepository locationRepository  
+                ILocationRepository locationRepository,
+                IGroupRepository groupRepository,
+                IGroupMemberRepository groupMemberRepository
         )
         {
             _context = context;
@@ -98,6 +97,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             PositionRepository = positionRepository;
             CompanyRepository = companyRepository;
             UserWorkPlaceRepository = userWorkPlaceRepository;
+            GroupRepository = groupRepository;
+            GroupMemberRepository = groupMemberRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

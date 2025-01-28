@@ -27,6 +27,8 @@ namespace SocialNetwork.Application.Interfaces
         public IPositionRepository PositionRepository { get; }
         public IUserWorkPlaceRepository UserWorkPlaceRepository { get; }
         public IMessageMediaRepository MessageMediaRepository { get; }
+        public IGroupRepository GroupRepository { get; }
+        public IGroupMemberRepository GroupMemberRepository { get; }
         public IOTPRepository OTPRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);

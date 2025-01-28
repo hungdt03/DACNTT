@@ -1,76 +1,89 @@
 import { FC } from "react";
 import useModal from "../../hooks/useModal";
-import { Avatar, Divider, Image, Modal, Popover, Tooltip } from "antd";
+import { Avatar, Divider, Modal, Popover, Tooltip } from "antd";
 import images from "../../assets";
-import { HeartIcon, MoreHorizontal, SendHorizonal, ShareIcon } from "lucide-react";
+import { HeartIcon, MoreHorizontal, ShareIcon } from "lucide-react";
 import { svgReaction } from "../../assets/svg";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import PostReactionModal from "../modals/PostReactionModal";
 import PostModal from "../modals/PostModal";
 import SharePostModal from "../modals/SharePostModal";
 import { Link } from "react-router-dom";
-import videos from "../../assets/video";
 import PostMedia from "./PostMedia";
-import BoxSendComment from "../comments/BoxSendComment";
 import { PostMoreAction } from "./PostMoreAction";
+import { PostResource } from "../../types/post";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
+import { PostReaction } from "./PostReaction";
+import PostOtherTags from "./PostOtherTags";
+import { formatTime, formatVietnamDate } from "../../utils/date";
+import { getPrivacyPost } from "../../utils/post";
 
-const PostGroup: FC = () => {
+type PostGroupProps = {
+    post: PostResource
+}
+
+const PostGroup: FC<PostGroupProps> = ({
+    post
+}) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
 
-    const photos = Array(2).fill(images.cover);
-    const video = Array(1).fill(videos.test);
-
-    // Kết hợp hai mảng thành một
-    const media = [...photos, ...video];
-
-    // Hàm trộn mảng ngẫu nhiên
-    const shuffleArray = (array: any[]) => {
-        for (let i = array.length - 1; i > 0; i--) {
-            const randomIndex = Math.floor(Math.random() * (i + 1));
-            [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
-        }
-        return array;
-    };
-
-    const shuffledMedia = shuffleArray(media);
+    const { user } = useSelector(selectAuth)
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
-            <div className="flex items-center gap-x-4">
+            <div className="flex items-center gap-x-2">
                 <div className="relative">
-                    <img className="w-10 h-10 rounded-md object-cover" src={images.cover} />
-                    <Avatar className="w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50" src={images.user} />
+                    <img className="w-10 h-10 rounded-md object-cover" src={post.group.coverImage ?? images.cover} />
+                    <Avatar className="w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} />
                 </div>
                 <div className="flex flex-col gap-y-[1px]">
-                    <span className="font-semibold text-[16px] text-gray-600">Hiểu Biết Hơn Mỗi Ngày</span>
+                    <div className="font-semibold text-[15px] text-gray-600">
+                        <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                        {post.tags.length > 0 &&
+                            (() => {
+                                const maxDisplay = 3;
+                                const displayedTags = post.tags.slice(0, maxDisplay);
+                                const remainingTagsCount = post.tags.length - maxDisplay;
+                                const remainingTags = post.tags.slice(maxDisplay)
+
+                                return (
+                                    <>
+                                        {' cùng với '}
+                                        {displayedTags.map((tag, index) => (
+                                            <Link className="hover:underline" to={`/profile/${tag.user.id}`} key={tag.id}>
+                                                {tag.user.fullName}
+                                                {index < displayedTags.length - 1 ? ', ' : ''}
+                                            </Link>
+                                        ))}
+                                        <Tooltip title={<PostOtherTags tags={remainingTags} />}>
+                                            {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
+                                        </Tooltip>
+                                    </>
+                                );
+                            })()}
+                    </div>
                     <div className="flex items-center gap-x-2">
-                        <Tooltip title='Trần Phan Hoàn Việt'>
-                            <Link to='#' className="font-bold text-[13px] text-gray-600 hover:underline transition-all ease-linear duration-75">Trần Phan Hoàn Việt</Link>
+                        <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
+                            <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
-                        <Tooltip title='Thứ bảy, 23 tháng 11, 2014 lúc 19:17'>
-                            <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">35 phút trước</span>
-                        </Tooltip>
-                        <Tooltip title='Công khai'>
-                            <button className="mb-[2px]">
-                                <img className="w-3 h-3" src={images.earth} alt="Public" />
-                            </button>
-                        </Tooltip>
+                        {getPrivacyPost(post.privacy)}
                     </div>
                 </div>
             </div>
-            {/* <Popover content={<PostMoreAction />}>
+
+            <Popover content={<PostMoreAction isMine={post.user.id === user?.id} />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
                     <MoreHorizontal className="text-gray-400" />
                 </button>
-            </Popover> */}
+            </Popover>
         </div>
 
         <div className="flex flex-col gap-y-3">
-            <p className="text-sm text-gray-700">Các cao nhân IT chỉ cách cứu dùm em, ổ C của lap em đang bị đỏ mặc dù đã xóa bớt đi mấy file không dùng. Giờ em phải làm sao cho nó về bth lại đây ạ :(((. Cao nhân chỉ điểm giúp em với</p>
-
-            <PostMedia files={shuffledMedia} />
+            {post.content && <p className="text-sm text-gray-700">{post.content}</p>}
+            {post.medias.length > 0 && <PostMedia files={post.medias} />}
         </div>
         <div className="flex items-center justify-between text-sm">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
@@ -82,18 +95,18 @@ const PostGroup: FC = () => {
                 <span className="hover:underline">112</span>
             </button>
             <div className="flex gap-x-4 items-center">
-                <button className="hover:underline text-gray-500">17 bình luận</button>
-                <button className="hover:underline text-gray-500">17 lượt chia sẻ</button>
+                <button className="hover:underline text-gray-500">{post.comments} bình luận</button>
+                <button className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>
             </div>
         </div>
         <Divider className='my-0' />
         <div className="flex items-center justify-between gap-x-4">
-            {/* <Popover content={<PostReaction />}>
+            <Popover content={<PostReaction />}>
                 <button className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                     <HeartIcon className="h-5 w-5 text-gray-500" />
                     <span>Thích</span>
                 </button>
-            </Popover> */}
+            </Popover>
             <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
@@ -104,12 +117,11 @@ const PostGroup: FC = () => {
             </button>
         </div>
         <Divider className='mt-0 mb-2' />
-        <BoxSendComment />
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của Bùi Việt</p>} width='700px' footer={[
-            <BoxSendComment />
-        ]} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            {/* <PostModal /> */}
+        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của Bùi Việt</p>} width='700px' classNames={{
+            footer: 'hidden'
+        }} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+            <PostModal post={post} />
         </Modal>
 
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
@@ -118,7 +130,7 @@ const PostGroup: FC = () => {
 
 
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
-            {/* <SharePostModal /> */}
+            <SharePostModal post={post} />
         </Modal>
     </div>
 };
