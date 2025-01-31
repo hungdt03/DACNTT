@@ -8,6 +8,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.Post.Handlers
 {
@@ -58,7 +59,6 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             }
 
             var medias = new List<PostMedia>();
-            
 
             if (request.Post.Images != null && request.Post.Images.Count > 0)
             {

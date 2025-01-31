@@ -27,7 +27,15 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<GroupMember?> GetGroupMemberByIdAsync(Guid groupMemberId)
         {
-            return await _context.GroupMembers.SingleOrDefaultAsync(g => g.Id == groupMemberId);
+            return await _context.GroupMembers
+                .SingleOrDefaultAsync(g => g.Id == groupMemberId);
+        }
+
+        async Task<GroupMember?> IGroupMemberRepository.GetGroupMemberByGroupIdAndUserId(Guid groupId, string userId)
+        {
+            return await _context.GroupMembers
+                .Include(m => m.User)
+                .SingleOrDefaultAsync(g => g.GroupId == groupId && g.UserId == userId); 
         }
     }
 }

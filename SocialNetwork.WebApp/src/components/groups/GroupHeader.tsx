@@ -1,11 +1,18 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import images from "../../assets";
-import { Avatar, Button, Divider, Modal, Tooltip } from "antd";
-import { Plus } from "lucide-react";
+import { Avatar, Button, Divider, Drawer, Modal, Tooltip, message } from "antd";
+import { Plus, Settings } from "lucide-react";
 import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
 import useModal from "../../hooks/useModal";
 import { GroupResource } from "../../types/group";
 import { Link } from "react-router-dom";
+import groupService from "../../services/groupService";
+import GroupSettingModal from "../modals/GroupSettingModal";
+
+export type InviteFriendsRequest = {
+    inviteeIds: string[];
+    groupId: string;
+}
 
 type GroupHeaderProps = {
     group: GroupResource
@@ -14,7 +21,27 @@ type GroupHeaderProps = {
 const GroupHeader: FC<GroupHeaderProps> = ({
     group
 }) => {
-    const { handleCancel, handleOk, showModal, isModalOpen } = useModal()
+    const { handleCancel, handleOk, showModal, isModalOpen } = useModal();
+    const [openSetting, setOpenSetting] = useState(false)
+
+    const [loading, setLoading] = useState(false)
+    const [inviteRequest, setInviteRequest] = useState<InviteFriendsRequest>({
+        groupId: group.id,
+        inviteeIds: []
+    });
+
+    const handleInviteFriends = async () => {
+        console.log(inviteRequest)
+        setLoading(true)
+        const response = await groupService.inviteFriends(inviteRequest);
+        setLoading(false)
+        if (response.isSuccess) {
+            message.success(response.message)
+            handleOk()
+        } else {
+            message.error(response.message)
+        }
+    }
 
     return <div className="bg-white w-full shadow">
         <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto overflow-hidden">
@@ -33,10 +60,10 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 <Avatar src={member.avatar} />
                             </Tooltip>
                         </Link>)}
-
                     </Avatar.Group>
 
                     <div className="flex items-center gap-x-2">
+                        <Button onClick={() => setOpenSetting(true)} icon={<Settings size={16} />} type='primary'>Quản lí nhóm</Button>
                         <Button onClick={showModal} icon={<Plus size={16} />} type='primary'>Mời</Button>
                         <button className="bg-sky-50 text-primary px-3 py-1 rounded-md">Đã tham gia</button>
                     </div>
@@ -55,9 +82,23 @@ const GroupHeader: FC<GroupHeaderProps> = ({
             onCancel={handleCancel}
             cancelText='Hủy'
             okText='Gửi lời mời'
+            okButtonProps={{
+                loading: loading,
+                onClick: () => void handleInviteFriends()
+            }}
         >
-            <InviteFriendsJoinGroup />
+            {isModalOpen && <InviteFriendsJoinGroup
+                groupId={group.id}
+                onChange={(friendIds) => setInviteRequest({
+                    ...inviteRequest,
+                    inviteeIds: friendIds
+                })}
+            />}
         </Modal>
+
+        <Drawer title='Quản lí nhóm' onClose={() => setOpenSetting(false)} open={openSetting}>
+            <GroupSettingModal />
+        </Drawer>
     </div>
 };
 

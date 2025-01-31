@@ -8,5 +8,6 @@ namespace SocialNetwork.Application.Interfaces
         Task CreateGroupMemberAsync(GroupMember groupMember);
         Task<IEnumerable<GroupMember>> GetAllMembersInGroupAsync(Guid groupId);
         Task<GroupMember?> GetGroupMemberByIdAsync(Guid groupMemberId);
+        Task<GroupMember?> GetGroupMemberByGroupIdAndUserId(Guid groupId, string userId);
     }
 }

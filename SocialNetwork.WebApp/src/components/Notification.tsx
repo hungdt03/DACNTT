@@ -9,6 +9,7 @@ import { NotificationType } from "../enums/notification-type";
 import friendRequestService from "../services/friendRequestService";
 import { toast } from "react-toastify";
 import notificationService from "../services/notificationService";
+import groupService from "../services/groupService";
 
 
 type NotificationMoreActionProps = {
@@ -52,12 +53,13 @@ const Notification: FC<NotificationProps> = ({
     onStoryReactionNotification
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false);
-    const [accepted, setAccepted] = useState<'accepted' | 'cancel' | 'none'>('none');
-    
+    const [acceptedFriendRequest, setAcceptedFriendRequest] = useState<'accepted' | 'cancel' | 'none'>('none');
+    const [acceptedJoinGroup, setAcceptedJoinGroup] = useState<'accepted' | 'cancel' | 'none'>('none');
+
     const handleCancelFriendRequest = async (requestId: string) => {
         const response = await friendRequestService.cancelFriendRequest(requestId)
         if (response.isSuccess) {
-            setAccepted('cancel')
+            setAcceptedFriendRequest('cancel')
             toast.success(response.message)
             handleDeleteNotification(notification.id)
         } else {
@@ -69,27 +71,50 @@ const Notification: FC<NotificationProps> = ({
     const handleAcceptFriendRequest = async (requestId: string) => {
         const response = await friendRequestService.acceptFriendRequest(requestId)
         if (response.isSuccess) {
-            setAccepted('accepted')
+            setAcceptedFriendRequest('accepted')
             toast.success(response.message)
             handleDeleteNotification(notification.id)
         } else {
             toast.error(response.message)
             onDelete?.()
         }
+    };
 
-       
+    const handleRejectJoinGroup = async (inviteId: string) => {
+        const response = await groupService.rejectInviteFriend(inviteId)
+        if (response.isSuccess) {
+            setAcceptedJoinGroup('cancel')
+            toast.success(response.message)
+            handleDeleteNotification(notification.id)
+        } else {
+            toast.error(response.message);
+            onDelete?.()
+        }
+    };
+
+    const handleAcceptJoinGroup = async (inviteId: string) => {
+        console.log(notification)
+        const response = await groupService.acceptInviteFriend(inviteId)
+        if (response.isSuccess) {
+            setAcceptedJoinGroup('accepted')
+            toast.success(response.message)
+            handleDeleteNotification(notification.id)
+        } else {
+            toast.error(response.message)
+            onDelete?.()
+        }
     };
 
     const handleDeleteNotification = async (notificationId: string) => {
-        const response = await notificationService.deleteNotification(notificationId);
+        await notificationService.deleteNotification(notificationId);
     }
 
     const handleSelectNotification = () => {
-        if(notification.type.includes('COMMENT')) {
+        if (notification.type.includes('COMMENT')) {
             onCommentNotification()
-        } else if(notification.type === NotificationType.POST_SHARED) {
+        } else if (notification.type === NotificationType.POST_SHARED) {
             onShareNotification()
-        } else if(notification.type === NotificationType.REACT_STORY) {
+        } else if (notification.type === NotificationType.REACT_STORY) {
             onStoryReactionNotification()
         }
     }
@@ -104,11 +129,36 @@ const Notification: FC<NotificationProps> = ({
                 <span className={cn("text-gray-500 text-xs font-semibold", !notification.isRead && 'text-primary')}>{formatTime(new Date(notification.dateSent))}</span>
             </div>
 
+            {notification.type === NotificationType.INVITE_JOIN_GROUP && (
+                <>
+                    {acceptedJoinGroup === 'accepted' ? (
+                        <span className="text-xs text-gray-600">Đã chấp nhận tham gia nhóm</span>
+                    ) : acceptedJoinGroup === 'cancel' ? (
+                        <span className="text-xs text-gray-600">Đã gỡ lời mời tham gia nhóm</span>
+                    ) : (
+                        <div className="flex items-center gap-x-2">
+                            <button
+                                className="px-3 py-1 rounded-md bg-gray-200 text-gray-600"
+                                onClick={() => handleRejectJoinGroup(notification.groupInvitationId)}
+                            >
+                                Gỡ
+                            </button>
+                            <Button
+                                type="primary"
+                                onClick={() => handleAcceptJoinGroup(notification.groupInvitationId)}
+                            >
+                                Chấp nhận
+                            </Button>
+                        </div>
+                    )}
+                </>
+            )}
+
             {notification.type === NotificationType.FRIEND_REQUEST_SENT && (
                 <>
-                    {accepted === 'accepted' ? (
+                    {acceptedFriendRequest === 'accepted' ? (
                         <span className="text-xs text-gray-600">Đã chấp nhận lời mời kết bạn</span>
-                    ) : accepted === 'cancel' ? (
+                    ) : acceptedFriendRequest === 'cancel' ? (
                         <span className="text-xs text-gray-600">Đã gỡ lời mời kết bạn</span>
                     ) : (
                         <div className="flex items-center gap-x-2">

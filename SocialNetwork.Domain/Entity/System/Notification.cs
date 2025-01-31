@@ -1,4 +1,5 @@
 ﻿using SocialNetwork.Domain.Abstractions;
+using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Domain.Entity.StoryInfo;
 using SocialNetwork.Domain.Entity.UserInfo;
@@ -17,6 +18,10 @@ namespace SocialNetwork.Domain.Entity.System
         public bool IsRead { get; set; }
 
         // Đối tượng mà thông báo liên quan đến (ví dụ: bài viết, bạn bè, bình luận)
+        public Guid? GroupId { get; set; }
+        public Group Group { get; set; }
+        public Guid? GroupInvitationId { get; set; }
+        public GroupInvitation GroupInvitation { get; set; }
         public Guid? PostId { get; set; }
         public Post Post { get; set; }
         public Guid? CommentId { get; set; }

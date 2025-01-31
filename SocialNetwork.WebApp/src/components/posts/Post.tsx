@@ -71,8 +71,8 @@ const Post: FC<PostProps> = ({
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
     const { handleCancel: cancelListShare, isModalOpen: openListShare, handleOk: okListShare, showModal: showListShare } = useModal();
 
-    const [reactions, setReactions] = useState<ReactionResource[]>();
     const { user } = useSelector(selectAuth)
+    const [reactions, setReactions] = useState<ReactionResource[]>();
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
 

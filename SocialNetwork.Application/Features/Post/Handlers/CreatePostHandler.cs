@@ -31,6 +31,38 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
         public async Task<BaseResponse> Handle(CreatePostCommand request, CancellationToken cancellationToken)
         {
+            var userId = _contextAccessor.HttpContext.User.GetUserId();
+
+            var post = new Domain.Entity.PostInfo.Post
+            {
+                Content = request.Content,
+                PostType = PostType.ORIGINAL_POST,
+                Privacy = request.Privacy,
+                UserId = userId,
+                Background = request.Background,
+            };
+
+            if (request.GroupId.HasValue)
+            {
+                var group = await _unitOfWork.GroupRepository.GetGroupByIdAsync(request.GroupId.Value)
+                    ?? throw new NotFoundException("Mã nhóm không tồn tại");
+               
+                var member = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId.Value, userId)
+                     ?? throw new AppException("Chỉ có thành viên trong nhóm mới được đăng bài");
+
+                if (group.RequirePostApproval)
+                {
+                    post.IsApproved = member.IsAdmin;
+                }
+                else post.IsApproved = true;
+               
+                post.Privacy = PrivacyConstant.PUBLIC;
+                post.PostType = PostType.GROUP_POST;
+                post.Group = group;
+                post.GroupId = group.Id;
+                post.IsGroupPost = true;
+            }
+
             var medias = new List<PostMedia>();
 
             if (request.Images?.Any() == true)
@@ -53,6 +85,11 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 }));
             }
 
+            if(medias.Count > 0)
+            {
+                post.Medias = medias;
+            }
+
             var tags = new List<Tag>();
             if (request.TagIds != null && request.TagIds.Count > 0)
             {
@@ -70,29 +107,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 }
             }
 
-            var post = new Domain.Entity.PostInfo.Post
-            {
-                Content = request.Content,
-                Medias = medias,
-                PostType = PostType.ORIGINAL_POST,
-                Privacy = request.Privacy,
-                UserId = _contextAccessor.HttpContext.User.GetUserId(),
-                Tags = tags,
-                Background = request.Background,
-               
-            };
-
-            if (request.GroupId.HasValue)
-            {
-                var group = await _unitOfWork.GroupRepository.GetGroupByIdAsync(request.GroupId.Value);
-                if(group != null)
-                {
-                    post.PostType = PostType.GROUP_POST;
-                    post.Group = group;
-                    post.GroupId = group.Id;
-                    post.Privacy = PrivacyConstant.PUBLIC;
-                }
-            }
+            if(tags.Count > 0) post.Tags = tags;
 
             var fullName = _contextAccessor.HttpContext.User.GetFullName();
             var imageUrl = _contextAccessor.HttpContext.User.GetAvatar();

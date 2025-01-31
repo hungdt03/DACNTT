@@ -9,5 +9,6 @@ namespace SocialNetwork.Application.DTOs
         public string CoverImage { get; set; }
         public string Privacy { get; set; }
         public List<UserResponse> Members { get; set; }
+        public bool IsMine { get; set; }
     }
 }

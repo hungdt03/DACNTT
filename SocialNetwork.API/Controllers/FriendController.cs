@@ -49,6 +49,13 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("invitable/{groupId}")]
+        public async Task<IActionResult> GetAllInvitableFriends([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new GetInvitableFriendsQuery(groupId));
+            return Ok(response);
+        }
+
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetAllFriendsByUserId([FromRoute] string userId)
         {

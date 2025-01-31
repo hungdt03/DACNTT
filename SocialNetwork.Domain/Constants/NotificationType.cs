@@ -13,5 +13,6 @@ namespace SocialNetwork.Domain.Constants
         public const string COMMENT_MENTION = "COMMENT_MENTION";
         public const string VIEW_STORY = "VIEW_STORY";
         public const string REACT_STORY = "REACT_STORY";
+        public const string INVITE_JOIN_GROUP = "INVITE_JOIN_GROUP";
     }
 }

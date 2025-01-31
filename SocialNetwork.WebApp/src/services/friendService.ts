@@ -1,6 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { FriendResource } from '../types/friend';
+import { InvitableFriendResource } from '../types/invitable-friend';
 import { BaseResponse, DataResponse } from '../types/response';
 
 class FriendService {
@@ -22,6 +23,9 @@ class FriendService {
         return axiosInterceptor.get('/api/friends/' + userId)
     }
 
+    getInvitableFriends(groupId: string) : Promise<DataResponse<InvitableFriendResource[]>> {
+        return axiosInterceptor.get('/api/friends/invitable/' + groupId)
+    }
 
     getTopNineOfUserFriends(friendId: string) : Promise<DataResponse<FriendResource[]>> {
         return axiosInterceptor.get('/api/friends/top-nine-user-friend/'+ friendId)

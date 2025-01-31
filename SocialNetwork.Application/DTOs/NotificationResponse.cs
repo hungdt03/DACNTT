@@ -17,6 +17,8 @@ namespace SocialNetwork.Application.DTOs
         public Guid? StoryId { get; set; }
         public Guid? CommentId { get; set; }
         public Guid? FriendRequestId { get; set; }
+        public Guid? GroupId { get; set; }
+        public Guid? GroupInvitationId { get; set; }
 
         // Thời gian gửi thông báo
         public DateTimeOffset DateSent { get; set; }

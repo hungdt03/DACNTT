@@ -16,6 +16,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Configurations
             builder.HasOne(n => n.Post).WithMany().HasForeignKey(f => f.PostId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(n => n.Comment).WithMany().HasForeignKey(f => f.CommentId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(n => n.FriendRequest).WithMany().HasForeignKey(f => f.FriendRequestId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(n => n.Group).WithMany().HasForeignKey(f => f.GroupId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(n => n.GroupInvitation).WithMany().HasForeignKey(f => f.GroupInvitationId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

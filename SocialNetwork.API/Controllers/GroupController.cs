@@ -49,5 +49,33 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetAllGroupsJoinByUserIdQuery(userId));
             return Ok(response);
         }
+
+        [HttpPost("invite-friends")]
+        public async Task<IActionResult> InviteFriendsJoinGroup([FromBody] InviteFriendsCommand command)
+        {
+            var response = await mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpPut("invite-friends/accept/{inviteId}")]
+        public async Task<IActionResult> AcceptInviteFriend([FromRoute] Guid inviteId)
+        {
+            var response = await mediator.Send(new AcceptInviteFriendCommand(inviteId));
+            return Ok(response);
+        }
+
+        [HttpPut("invite-friends/cancel/{inviteId}")]
+        public async Task<IActionResult> CancelInviteFriend([FromRoute] Guid inviteId)
+        {
+            var response = await mediator.Send(new CancelInviteFriendCommand(inviteId));
+            return Ok(response);
+        }
+
+        [HttpPut("invite-friends/reject/{inviteId}")]
+        public async Task<IActionResult> RejectInviteFriend([FromRoute] Guid inviteId)
+        {
+            var response = await mediator.Send(new RejectInviteFriendCommand(inviteId));
+            return Ok(response);
+        }
     }
 }

@@ -232,7 +232,7 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
         </div>
 
         <div className="absolute left-0 right-0 bottom-0 shadow border-t-[1px] bg-white z-10 border-gray-100 px-3 py-4">
-            <Button onClick={handleSubmit} type="primary" loading={loading} disabled={disabled || loading}>Tạo</Button>
+            <Button className="w-full" onClick={handleSubmit} type="primary" loading={loading} disabled={disabled || loading}>Tạo</Button>
         </div>
     </div>
 };

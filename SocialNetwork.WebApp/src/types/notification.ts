@@ -9,6 +9,8 @@ export type NotificationResource = {
     recipient: UserResource;
     isRead: boolean;
   
+    groupId: string; 
+    groupInvitationId: string; 
     storyId: string; 
     postId: string; 
     commentId: string;

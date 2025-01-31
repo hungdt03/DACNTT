@@ -7,5 +7,6 @@ export type GroupResource = {
     description: string;
     coverImage: string;
     privacy: GroupPrivacy;
-    members: UserResource[]
+    members: UserResource[];
+    isMine: boolean;
 }

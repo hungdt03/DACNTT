@@ -1,4 +1,4 @@
-import { Divider } from "antd";
+import { Divider, Empty } from "antd";
 import { FenceIcon, Search } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -20,7 +20,6 @@ const GroupManagerSidebar: FC = () => {
 
     const fetchManageGroups = async () => {
         const response = await groupService.getAllManageGroup();
-        console.log(response)
         if (response.isSuccess) {
             setManageGroups(response.data)
         }
@@ -45,15 +44,6 @@ const GroupManagerSidebar: FC = () => {
                     <FenceIcon />
                     <span className="font-semibold">Bảng tin của bạn</span>
                 </Link>
-                <Link to='/group-manager/feeds' className="flex items-center gap-x-2 py-3 px-2 rounded-md w-full hover:bg-gray-100">
-                    <FenceIcon />
-                    <span className="font-semibold">Bảng tin của bạn</span>
-                </Link>
-                <Link to='/group-manager/feeds' className="flex items-center gap-x-2 py-3 px-2 rounded-md w-full hover:bg-gray-100">
-                    <FenceIcon />
-                    <span className="font-semibold">Bảng tin của bạn</span>
-                </Link>
-
                 <Link to='/groups/create' className="mt-2 w-full py-2 rounded-md text-center bg-sky-50 hover:bg-sky-100 text-primary font-semibold">
                     Tạo nhóm mới
                 </Link>
@@ -74,9 +64,9 @@ const GroupManagerSidebar: FC = () => {
             <div className="flex flex-col gap-y-2">
                 <span className="text-[16px] font-semibold">Nhóm bạn đã tham gia</span>
 
-                <div className="flex flex-col gap-y-1">
+                {joinGroups.length === 0 ? <Empty description='Bạn chưa tham gia nhóm nào' /> : <div className="flex flex-col gap-y-1">
                     {joinGroups.map(group => <GroupRowItem key={group.id} group={group} />)}
-                </div>
+                </div>}
             </div>
         </div>
     </div>

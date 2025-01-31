@@ -205,6 +205,8 @@ namespace SocialNetwork.Application.Mappers
                 IsRead = notification.IsRead,
                 PostId = notification.PostId,
                 StoryId = notification.StoryId,
+                GroupId = notification.GroupId,
+                GroupInvitationId = notification.GroupInvitationId,
                 Recipient = notification.Recipient != null ? MapToUser(notification.Recipient) : null,
                 Title = notification.Title,
                 Type = notification.Type,

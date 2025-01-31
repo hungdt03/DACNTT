@@ -1,7 +1,8 @@
 
+import { InviteFriendsRequest } from '../components/groups/GroupHeader';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { GroupResource } from '../types/group';
-import { DataResponse } from '../types/response';
+import { BaseResponse, DataResponse } from '../types/response';
 
 
 class GroupService {
@@ -29,6 +30,22 @@ class GroupService {
 
     getGroupById(groupId: string) : Promise<DataResponse<GroupResource>> {
         return axiosInterceptor.get('/api/groups/' + groupId)
+    }
+
+    inviteFriends(payload: InviteFriendsRequest) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/groups/invite-friends', payload)
+    }
+
+    acceptInviteFriend(inviteId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/invite-friends/accept/' + inviteId)
+    }
+
+    cancelInviteFriend(inviteId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/invite-friends/cancel/' + inviteId)
+    }
+
+    rejectInviteFriend(inviteId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/invite-friends/reject/' + inviteId)
     }
 }
 

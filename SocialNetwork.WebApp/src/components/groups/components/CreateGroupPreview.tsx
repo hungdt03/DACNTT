@@ -21,7 +21,7 @@ const CreateGroupPreview: FC<CreateGroupPreviewProps> = ({
                 <div style={{
                     aspectRatio: 14 / 5
                 }}>
-                    <img className="w-full h-full object-cover rounded-xl" src={values?.coverUrl ?? images.cover} />
+                    <img className="w-full h-full object-cover rounded-xl" src={values?.coverUrl ? values?.coverUrl : images.cover} />
                 </div>
 
                 <div className="px-4 py-6 flex flex-col gap-y-2 bg-white shadow-xl">

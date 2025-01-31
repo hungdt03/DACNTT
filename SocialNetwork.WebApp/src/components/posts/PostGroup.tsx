@@ -1,9 +1,9 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import useModal from "../../hooks/useModal";
-import { Avatar, Divider, Modal, Popover, Tooltip } from "antd";
+import { Avatar, Divider, Modal, Popover, Tooltip, message } from "antd";
 import images from "../../assets";
 import { HeartIcon, MoreHorizontal, ShareIcon } from "lucide-react";
-import { svgReaction } from "../../assets/svg";
+import { ReactionSvgType, svgReaction } from "../../assets/svg";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import PostReactionModal from "../modals/PostReactionModal";
 import PostModal from "../modals/PostModal";
@@ -17,20 +17,134 @@ import { selectAuth } from "../../features/slices/auth-slice";
 import { PostReaction } from "./PostReaction";
 import PostOtherTags from "./PostOtherTags";
 import { formatTime, formatVietnamDate } from "../../utils/date";
-import { getPrivacyPost } from "../../utils/post";
+import { getBtnReaction, getPrivacyPost } from "../../utils/post";
+import reactionService from "../../services/reactionService";
+import { ReactionRequest, getTopReactions } from "./Post";
+import { ReactionResource } from "../../types/reaction";
+import { Id, toast } from "react-toastify";
+import { ReactionType } from "../../enums/reaction";
+import postService from "../../services/postService";
+import ListSharePostModal from "../modals/ListSharePostModal";
+import EditPostModal from "../modals/EditPostModal";
 
 type PostGroupProps = {
-    post: PostResource
+    post: PostResource;
+    onFetch?: (data: PostResource) => void;
+    onRemovePost?: (postId: string) => void
 }
 
 const PostGroup: FC<PostGroupProps> = ({
-    post
+    post: postParam,
+    onFetch,
+    onRemovePost
 }) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
+    const { handleCancel: editPostCancel, isModalOpen: isEditPostOpen, handleOk: handleEditPostOk, showModal: showEditPostModal } = useModal();
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
+    const { handleCancel: cancelListShare, isModalOpen: openListShare, handleOk: okListShare, showModal: showListShare } = useModal();
 
-    const { user } = useSelector(selectAuth)
+    const { user } = useSelector(selectAuth);
+
+    const [post, setPost] = useState<PostResource>(postParam)
+    const [reactions, setReactions] = useState<ReactionResource[]>();
+    const [reaction, setReaction] = useState<ReactionResource | null>();
+    const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
+
+
+    const fetchReactions = async () => {
+        const response = await reactionService.getAllReactionsByPostId(post.id);
+
+        if (response.isSuccess) {
+            setReactions(response.data)
+
+            const top3Reactions = getTopReactions(response.data)
+            setTopReactions(top3Reactions)
+
+            const findMyReaction = response.data.find(s => s.user.id === user?.id);
+            setReaction(findMyReaction)
+        }
+    }
+
+    useEffect(() => {
+        fetchReactions();
+    }, [post])
+
+    const fetchPostById = async () => {
+        const response = await postService.getPostById(post.id);
+
+        if (response.isSuccess) {
+            setPost(response.data);
+        } else {
+            toast.error(response.message);
+        }
+    }
+
+    const handleSaveReaction = async (reactionType: ReactionType) => {
+        const payload: ReactionRequest = {
+            postId: post.id,
+            reactionType
+        };
+
+
+        const response = await reactionService.saveReaction(payload);
+        if (response.isSuccess) {
+            fetchReactions()
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleEditPostAsync = async (values: FormData): Promise<boolean> => {
+        const toastId: Id = toast.loading('Đang cập nhật bài viết... Vui lòng không refresh lại trang');
+        handleEditPostOk();
+
+        post.group && values.append('groupId', post.group.id)
+
+        try {
+            const response = await postService.editPost(post.id, values);
+            if (response.isSuccess) {
+                fetchPostById();
+
+                toast.update(toastId, {
+                    render: response.message,
+                    type: 'success',
+                    isLoading: false,
+                    autoClose: 3000,
+                });
+
+                return true;
+            } else {
+                toast.update(toastId, {
+                    render: response.message,
+                    type: 'error',
+                    isLoading: false,
+                    autoClose: 3000,
+                });
+
+                return false;
+            }
+        } catch (error) {
+            toast.update(toastId, {
+                render: error as string,
+                type: 'error',
+                isLoading: false,
+                autoClose: 3000,
+            });
+            return false;
+        }
+    }
+
+    const handleDeletePost = async () => {
+        const response = await postService.deletePost(post.id);
+        if (response.isSuccess) {
+            onRemovePost?.(post.id)
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
@@ -74,7 +188,11 @@ const PostGroup: FC<PostGroupProps> = ({
                 </div>
             </div>
 
-            <Popover content={<PostMoreAction isMine={post.user.id === user?.id} />}>
+            <Popover className="flex-shrink-0" content={<PostMoreAction
+                onEditPost={showEditPostModal}
+                onDeletePost={handleDeletePost}
+                isMine={post.user.id === user?.id}
+            />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
                     <MoreHorizontal className="text-gray-400" />
                 </button>
@@ -82,30 +200,33 @@ const PostGroup: FC<PostGroupProps> = ({
         </div>
 
         <div className="flex flex-col gap-y-3">
-            {post.content && <p className="text-sm text-gray-700">{post.content}</p>}
+            {post.background ? <div style={{
+                background: post.background,
+                width: '100%',
+                height: 380
+            }} className="flex items-center justify-center px-6 py-8 rounded-md">
+                <p className="text-2xl font-bold text-center break-words break-all text-white">{post.content}</p>
+            </div> : <p className="text-sm text-gray-700 break-words">{post.content}</p>}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
         </div>
         <div className="flex items-center justify-between text-sm">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
                 <Avatar.Group>
-                    <img src={svgReaction.like} className="w-5 h-5 mx-[5px]" />
-                    <img src={svgReaction.love} className="w-5 h-5 mx-[5px]" />
-                    <img src={svgReaction.care} className="w-5 h-5 mx-[5px]" />
+                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="w-5 h-5 mx-[5px]" />)}
                 </Avatar.Group>
-                <span className="hover:underline">112</span>
+                <span className="hover:underline">{reactions?.length === 0 ? '' : reactions?.length}</span>
             </button>
             <div className="flex gap-x-4 items-center">
-                <button className="hover:underline text-gray-500">{post.comments} bình luận</button>
-                <button className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>
+                <button onClick={showModal} className="hover:underline text-gray-500">{post.comments} bình luận</button>
+                <button onClick={showListShare} className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>
             </div>
         </div>
         <Divider className='my-0' />
         <div className="flex items-center justify-between gap-x-4">
-            <Popover content={<PostReaction />}>
-                <button className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
-                    <HeartIcon className="h-5 w-5 text-gray-500" />
-                    <span>Thích</span>
-                </button>
+            <Popover content={<PostReaction
+                onSelect={handleSaveReaction}
+            />}>
+                {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
             </Popover>
             <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
@@ -121,16 +242,48 @@ const PostGroup: FC<PostGroupProps> = ({
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của Bùi Việt</p>} width='700px' classNames={{
             footer: 'hidden'
         }} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-            <PostModal post={post} />
+            {isModalOpen && <PostModal post={post} />}
         </Modal>
 
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
-            <PostReactionModal />
+            <PostReactionModal reactions={reactions} />
+        </Modal>
+
+        {/*======== MODAL EDIT POST ====== */}
+
+        <Modal title={<p className="text-center font-semibold text-xl">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
+            <EditPostModal
+                onSubmit={handleEditPostAsync}
+                post={post}
+            />
         </Modal>
 
 
         <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
-            <SharePostModal post={post} />
+            <SharePostModal
+                onSuccess={(data, msg) => {
+                    okSharePost()
+                    onFetch?.(data)
+                    toast.success(msg)
+                }}
+                onFailed={msg => toast.error(msg)}
+                post={post}
+            />
+        </Modal>
+
+        <Modal
+            style={{ top: 20 }}
+            title={<p className="text-center font-semibold text-xl">Những người đã chia sẻ bài viết</p>}
+            width='500px'
+            centered
+            open={openListShare}
+            onOk={okListShare}
+            onCancel={cancelListShare}
+            classNames={{
+                footer: 'hidden'
+            }}
+        >
+            <ListSharePostModal post={post} />
         </Modal>
     </div>
 };
