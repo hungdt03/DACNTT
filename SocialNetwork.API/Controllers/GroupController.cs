@@ -50,6 +50,27 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpPost("join/{groupId}")]
+        public async Task<IActionResult> RequestJoinGroup([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new CreateJoinGroupRequestCommand(groupId));
+            return Ok(response);
+        }
+
+        [HttpPost("approval/{requestId}")]
+        public async Task<IActionResult> ApprovalRequestJoinGroup([FromRoute] Guid requestId)
+        {
+            var response = await mediator.Send(new ApprovalJoinGroupRequestCommand(requestId));
+            return Ok(response);
+        }
+
+        [HttpGet("approval-summary/{groupId}")]
+        public async Task<IActionResult> GetGroupApprovalSummary([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new GetPendingApprovalsSummaryQuery(groupId));
+            return Ok(response);
+        }
+
         [HttpPost("invite-friends")]
         public async Task<IActionResult> InviteFriendsJoinGroup([FromBody] InviteFriendsCommand command)
         {

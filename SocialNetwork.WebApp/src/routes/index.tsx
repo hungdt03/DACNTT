@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout/MainLayout";
 import HomePage from "../pages/HomePage";
 import GroupPage from "../pages/GroupPage";
-import HeaderOnlyLayout from "../layouts/HeaderOnlyLayout/HeaderOnlyLayout";
 import ProfilePage from "../pages/ProfilePage";
 import AuthLayout from "../layouts/AuthLayout/AuthLayout";
 import SignInPage from "../pages/SignInPage";
@@ -17,6 +16,11 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ViewStoryPage from "../pages/ViewStoryPage";
 import GroupManagerLayout from "../layouts/GroupManagerLayout/GroupManagerLayout";
 import CreateGroupPage from "../pages/CreateGroupPage";
+import HeaderFullWidthLayout from "../layouts/HeaderFullWidthLayout/HeaderFullWidthLayout";
+import GroupFeedPage from "../pages/GroupFeedPage";
+import HeaderOnlyLayout from "../layouts/HeaderOnlyLayout/HeaderOnlyLayout";
+import SearchPage from "../pages/SearchPage";
+import SearchLayout from "../layouts/SearchLayout/SearchLayout";
 
 const appRouter = createBrowserRouter([
     {
@@ -49,10 +53,13 @@ const appRouter = createBrowserRouter([
         ]
     },
     {
-        path: '/group-manager',
+        path: '/groups',
         element: <AuthGuard element={<GroupManagerLayout />} />,
         children: [
-           
+            {
+                path: 'feeds',
+                element: <GroupFeedPage />
+            }
         ]
     },
     {
@@ -63,7 +70,7 @@ const appRouter = createBrowserRouter([
     {
         path: '/',
         errorElement: <ErrorBoundaryPage />,
-        element: <AuthGuard element={<HeaderOnlyLayout />} />,
+        element: <AuthGuard element={<HeaderFullWidthLayout />} />,
         children: [
             {
                 path: 'groups/:id',
@@ -72,6 +79,17 @@ const appRouter = createBrowserRouter([
             {
                 path: 'profile/:id',
                 element: <ProfilePage />
+            },
+        ]
+    },
+    {
+        path: '/',
+        errorElement: <ErrorBoundaryPage />,
+        element: <AuthGuard element={<SearchLayout />} />,
+        children: [
+            {
+                path: 'search',
+                element: <SearchPage />
             },
         ]
     },

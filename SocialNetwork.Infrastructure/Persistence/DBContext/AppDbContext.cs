@@ -36,6 +36,7 @@ namespace SocialNetwork.Infrastructure.DBContext
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupInvitation> GroupInvitations { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
+        public DbSet<JoinGroupRequest> JoinGroupRequests { get; set; }
 
         // POST
         public DbSet<Post> Posts { get; set; }

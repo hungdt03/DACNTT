@@ -1,8 +1,10 @@
 import { FC } from "react";
 import images from "../../../assets";
-import { Image, Lock, User2 } from "lucide-react";
+import { Earth, Image, Lock, User2 } from "lucide-react";
 import { Avatar, Divider, Tag, Tooltip } from "antd";
 import { CreateGroupForm } from "./CreateGroupSidebar";
+import { getGroupPrivacyTitle } from "../../../utils/privacy";
+import { GroupPrivacy } from "../../../enums/group-privacy";
 
 type CreateGroupPreviewProps = {
     values: CreateGroupForm | undefined
@@ -27,10 +29,15 @@ const CreateGroupPreview: FC<CreateGroupPreviewProps> = ({
                 <div className="px-4 py-6 flex flex-col gap-y-2 bg-white shadow-xl">
                     <span className="text-xl font-bold">{values?.name ?? 'Tên nhóm'}</span>
                     <div className="flex items-center gap-x-2">
-                        <div className="flex items-center gap-x-2">
-                            <Lock size={12} />
-                            <span className="text-sm">Nhóm {values?.privacy}</span>
-                        </div>
+                        {values?.privacy && <>
+                            {values.privacy === GroupPrivacy.PRIVATE ? <div className="flex items-center gap-x-2">
+                                <Lock size={12} />
+                                <span className="text-sm">Nhóm Riêng tư</span>
+                            </div> : <div className="flex items-center gap-x-2">
+                                <Earth size={12} />
+                                <span className="text-sm">Nhóm Công khai</span>
+                            </div>}
+                        </>}
                         <span className="text-sm font-bold">1 thành viên</span>
                     </div>
 
@@ -80,11 +87,11 @@ const CreateGroupPreview: FC<CreateGroupPreviewProps> = ({
                                         <p>{values?.description ?? 'Mô tả về nhóm'}</p>
                                     </div>
                                 </div>
-                               
+
                                 <div className="flex items-start gap-x-2">
-                                    <Lock className="flex-shrink-0 inline-block mt-1" size={14} />
+                                    {values?.privacy === GroupPrivacy.PRIVATE ? <Lock className="flex-shrink-0 inline-block mt-1" size={14} /> : <Earth className="flex-shrink-0 inline-block mt-1" size={14} />}
                                     <div className="flex flex-col gap-y-1">
-                                        <span className="font-bold">{values?.privacy ?? 'Quyền riêng tư'}</span>
+                                        <span className="font-bold">{values?.privacy ? getGroupPrivacyTitle(values.privacy) : 'Quyền riêng tư'}</span>
                                         <p>Chỉ thành viên mới nhìn thấy mọi người trong nhóm và những gì họ đăng.</p>
                                     </div>
                                 </div>

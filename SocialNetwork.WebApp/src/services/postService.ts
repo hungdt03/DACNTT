@@ -3,7 +3,7 @@
 import { EditSharePostRequest } from '../components/modals/EditSharePostModal';
 import { SharePostRequest } from '../components/modals/SharePostModal';
 import axiosInterceptor from '../configurations/axiosInterceptor'
-import { PostResource } from '../types/post';
+import { PostMediaResource, PostResource } from '../types/post';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
 
@@ -56,6 +56,33 @@ class PostService {
 
     getAllPostsByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
         return axiosInterceptor.get('/api/posts/group/' + groupId, {
+            params: {
+                page: page,  
+                size: size  
+            }
+        })
+    }
+
+    getAllGroupPostsByCurrentUser(page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/group', {
+            params: {
+                page: page,  
+                size: size  
+            }
+        })
+    }
+
+    getGroupPostMediaByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<PostMediaResource[]>> {
+        return axiosInterceptor.get('/api/posts/media/group/' + groupId, {
+            params: {
+                page: page,  
+                size: size  
+            }
+        })
+    }
+
+    getAllPendingPostsByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/group/pending/' + groupId, {
             params: {
                 page: page,  
                 size: size  

@@ -1,5 +1,4 @@
 import { FC, useEffect, useRef, useState } from "react";
-import PostGroup from "../posts/PostGroup";
 import PostGroupCreator from "../posts/PostGroupCreator";
 import { Id, toast } from "react-toastify";
 import { PostResource } from "../../types/post";
@@ -9,13 +8,16 @@ import { inititalValues } from "../../utils/pagination";
 import SharePost from "../posts/SharePost";
 import { PostType } from "../../enums/post-type";
 import PostSkeletonList from "../skeletons/PostSkeletonList";
+import Post from "../posts/Post";
+import { GroupResource } from "../../types/group";
+import { GroupPrivacy } from "../../enums/group-privacy";
 
 type GroupPostListProps = {
-    groupId: string
+    group: GroupResource
 }
 
 const GroupPostList: FC<GroupPostListProps> = ({
-    groupId
+    group
 }) => {
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
@@ -25,7 +27,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
 
     const fetchPosts = async (page: number, size: number) => {
         setLoading(true);
-        const response = await postService.getAllPostsByGroupId(groupId, page, size);
+        const response = await postService.getAllPostsByGroupId(group.id, page, size);
         setTimeout(() => setLoading(false), 2000)
 
         if (response.isSuccess) {
@@ -86,7 +88,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
                     fetchNewPosts();
                 }
             },
-            { root: containerRef.current, rootMargin: '100px' } 
+            { root: containerRef.current, rootMargin: '100px' }
         );
 
         observerRef.current = observer;
@@ -103,22 +105,26 @@ const GroupPostList: FC<GroupPostListProps> = ({
         };
     }, [pagination, loading]);
 
-    return <div className="col-span-12 lg:col-span-7 flex flex-col gap-y-4 overflow-y-auto">
-        <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} groupId={groupId} />
-        {posts.map(post => {
-            if (post.postType === PostType.SHARE_POST) {
-                return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
-            }
+    return <div className="col-span-12 lg:col-span-7 h-full overflow-y-auto custom-scrollbar py-6">
+        <div className="flex flex-col gap-y-4 h-full">
+            <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} groupId={group.id} />
+            {posts.map(post => {
+                if (post.postType === PostType.SHARE_POST) {
+                    return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
+                }
 
-            return <PostGroup key={post.id} post={post} />;
-        })}
+                return <Post key={post.id} post={post} allowShare={group.privacy === GroupPrivacy.PUBLIC} />
+            })}
 
-        {loading && <PostSkeletonList />}
-        <div id="scroll-trigger" className="w-full h-1" />
+            {loading && <PostSkeletonList />}
+            <div id="scroll-trigger" className="w-full h-1" />
 
-        {!pagination.hasMore && !loading && (
-            <p className="text-center text-gray-500">Không còn bài viết để tải.</p>
-        )}
+            {!pagination.hasMore && !loading && posts.length > 0 && (
+                <p className="text-center text-gray-500">Không còn bài viết để tải.</p>
+            )}
+
+            {posts.length === 0 && <p className="text-center text-gray-500">Không có bài viết để tải</p>}
+        </div>
     </div>
 };
 

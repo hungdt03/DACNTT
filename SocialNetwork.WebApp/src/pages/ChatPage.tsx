@@ -36,9 +36,6 @@ const ChatPage: FC = () => {
             </div>
         </div>
     </div>
-
-
-
 };
 
 export default ChatPage;

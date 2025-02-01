@@ -57,7 +57,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 else post.IsApproved = true;
                
                 post.Privacy = PrivacyConstant.PUBLIC;
-                post.PostType = PostType.GROUP_POST;
+                post.PostType = PostType.ORIGINAL_POST;
                 post.Group = group;
                 post.GroupId = group.Id;
                 post.IsGroupPost = true;
@@ -146,7 +146,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 IsSuccess = true,
                 Message = "Tạo bài viết mới thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Data = ApplicationMapper.MapToPost(post)
+                Data = (post.IsApproved && post.IsGroupPost) || !post.IsGroupPost ? ApplicationMapper.MapToPost(post) : null
             };
         }
     }

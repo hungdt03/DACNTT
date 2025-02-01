@@ -30,6 +30,7 @@ namespace SocialNetwork.Application.Interfaces
         public IGroupRepository GroupRepository { get; }
         public IGroupMemberRepository GroupMemberRepository { get; }
         public IGroupInvitationRepository GroupInvitationRepository { get; }
+        public IJoinGroupRequestRepository JoinGroupRequestRepository { get; }
         public IOTPRepository OTPRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);

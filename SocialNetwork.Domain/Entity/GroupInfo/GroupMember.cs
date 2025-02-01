@@ -9,7 +9,6 @@ namespace SocialNetwork.Domain.Entity.GroupInfo
         public string UserId { get; set; }
         public bool IsAdmin { get; set; }
         public DateTimeOffset JoinDate { get; set; }
-
         public Group Group { get; set; }
         public User User { get; set; }
     }

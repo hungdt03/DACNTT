@@ -12,6 +12,7 @@ namespace SocialNetwork.Application.DTOs
         public string Content { get; set; }
         public string Background {  get; set; }
         public string Privacy { get; set; }
+        public bool IsGroupPost { get; set; }
         public List<MediaResponse> Medias { get; set; }
         public UserResponse User { get; set; }
         public List<TagResponse> Tags { get; set; }

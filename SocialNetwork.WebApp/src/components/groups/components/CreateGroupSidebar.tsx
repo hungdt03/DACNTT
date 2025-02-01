@@ -12,6 +12,7 @@ import { RcFile } from "antd/es/upload";
 import groupService from "../../../services/groupService";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../../features/slices/auth-slice";
+import { getGroupPrivacyTitle } from "../../../utils/privacy";
 
 export type CreateGroupForm = {
     name: string;
@@ -210,7 +211,7 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
                     </Dropdown>
                     {values.privacy && <div className="flex items-center gap-x-1 text-sm">
                         <span>Đã chọn:</span>
-                        <span className="font-bold">{values.privacy}</span>
+                        <span className="font-bold">{getGroupPrivacyTitle(values.privacy)}</span>
                     </div>}
                 </div>
                 <div className="flex flex-col gap-y-1">

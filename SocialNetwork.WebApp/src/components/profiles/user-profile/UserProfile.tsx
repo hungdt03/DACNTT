@@ -96,7 +96,7 @@ const UserProfile: FC<UserProfileProps> = ({
     return <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto w-full grid grid-cols-12 gap-4 h-full lg:h-[90vh] bg-slate-100">
         {loading && <Loading />}
         {user && <UserProfileSide user={user} friends={friends} />}
-        {user && <ProfileUserContent  friends={friends} onRefresh={() => fetchFriendRequestData(userId)} user={user} friendRequest={friendRequest} />}
+        {user && <ProfileUserContent friends={friends} onRefresh={() => fetchFriendRequestData(userId)} user={user} friendRequest={friendRequest} />}
     </div>
 };
 

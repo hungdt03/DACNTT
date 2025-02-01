@@ -6,5 +6,6 @@ namespace SocialNetwork.Application.Interfaces
     {
         Task<PostMedia?> GetPostMediaByIdAsync(Guid postId);
         void DeletePostMedia(PostMedia media);
+        Task<(List<PostMedia> PostMedias, int TotalCount)> GetAllGroupPostMediaByGroupIdAsync(Guid groupId, int page, int size);
     }
 }

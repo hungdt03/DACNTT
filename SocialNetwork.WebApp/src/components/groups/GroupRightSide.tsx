@@ -1,9 +1,11 @@
 import { UserGroupIcon } from "@heroicons/react/24/outline";
-import { Image } from "antd";
+import { Empty, Image } from "antd";
 import { Lock, Newspaper } from "lucide-react";
-import { FC } from "react";
-import images from "../../assets";
+import { FC, useEffect, useState } from "react";
 import { GroupResource } from "../../types/group";
+import { PostMediaResource } from "../../types/post";
+import postService from "../../services/postService";
+import { MediaType } from "../../enums/media";
 
 type GroupRightSideProps = {
     group: GroupResource
@@ -12,7 +14,22 @@ type GroupRightSideProps = {
 const GroupRightSide: FC<GroupRightSideProps> = ({
     group
 }) => {
-    return <div className="lg:flex flex-col h-full gap-y-4 hidden lg:col-span-5">
+    const [medias, setMedias] = useState<PostMediaResource[]>([]);
+    const [hasNext, setHasNext] = useState(false)
+
+    const fetchGroupPostMedias = async () => {
+        const response = await postService.getGroupPostMediaByGroupId(group.id, 1, 4);
+        if (response.isSuccess) {
+            setMedias(response.data);
+            setHasNext(response.pagination.hasMore)
+        }
+    }
+
+    useEffect(() => {
+        fetchGroupPostMedias()
+    }, [group])
+
+    return <div className="lg:flex flex-col h-full gap-y-4 hidden lg:col-span-5 py-6 overflow-y-auto custom-scrollbar">
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-2">
             <span className="font-bold text-lg text-gray-700">Giới thiệu</span>
 
@@ -47,14 +64,22 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
             <span className="font-bold text-lg text-gray-700">File phương tiện mới đây</span>
 
-            <div className="grid grid-cols-2 gap-1">
-                <Image src={images.cover} />
-                <Image src={images.cover} />
-                <Image src={images.cover} />
-                <Image src={images.cover} />
-            </div>
+            {medias.length > 0 ? <div className="grid grid-cols-2 gap-1 rounded-md overflow-hidden">
+                {medias.map(media => {
+                    if (media.mediaType === MediaType.IMAGE)
+                        return <Image preview={{
+                            mask: 'Xem'
+                        }} className="object-cover" width={'100%'} height={'100%'} key={media.id} src={media.mediaUrl} />
 
-            <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button>
+                    return <video key={media.id}
+                        src={media.mediaUrl}
+                        className="w-full object-cover h-full"
+                        controls
+                    />
+                })}
+            </div> : <Empty description='Chưa có file phương tiện nào' />}
+
+            {hasNext && <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button>}
         </div>
     </div>
 };

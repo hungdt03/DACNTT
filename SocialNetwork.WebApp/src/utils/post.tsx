@@ -1,8 +1,7 @@
 import { ReactNode } from "react"
 import { PrivacyType } from "../enums/privacy"
 import { Tooltip } from "antd"
-import {  Lock, ThumbsUp, User } from "lucide-react"
-import { LikeOutlined } from '@ant-design/icons'
+import {  Lock, User } from "lucide-react"
 import { ReactionType } from "../enums/reaction"
 import { svgReaction } from "../assets/svg"
 import images from "../assets"

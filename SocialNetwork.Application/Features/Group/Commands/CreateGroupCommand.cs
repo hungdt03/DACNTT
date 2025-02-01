@@ -15,5 +15,6 @@ namespace SocialNetwork.Application.Features.Group.Commands
         public string Description { get; set; }
         [Required(ErrorMessage = "Vui lòng cung cấp quyền riêng tư của nhóm")]
         public string Privacy { get; set; }
+        public bool IsHidden { get; set; }
     }
 }

@@ -59,7 +59,7 @@ const HomePage: FC = () => {
     };
 
     const handleCreatePostSuccess = (toastId: Id, msg: string, data: PostResource) => {
-        fetchPostByID(data.id);
+        data && fetchPostByID(data.id);
         toast.update(toastId, {
             render: msg,
             type: 'success',
@@ -113,7 +113,7 @@ const HomePage: FC = () => {
             {posts.map(post => {
                 if (post.postType === PostType.SHARE_POST) {
                     return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
-                } else if(post.postType === PostType.GROUP_POST && post.group) {
+                } else if(post.isGroupPost) {
                     return <PostGroup key={post.id} post={post} />;
                 }
 

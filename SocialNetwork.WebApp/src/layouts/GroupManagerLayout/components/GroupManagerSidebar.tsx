@@ -40,7 +40,7 @@ const GroupManagerSidebar: FC = () => {
         </div>
         <div className="px-4 py-2">
             <div className="flex flex-col">
-                <Link to='/group-manager/feeds' className="flex items-center gap-x-2 py-3 px-2 rounded-md w-full hover:bg-gray-100">
+                <Link to='/groups/feeds' className="flex items-center gap-x-2 py-3 px-2 rounded-md w-full hover:bg-gray-100">
                     <FenceIcon />
                     <span className="font-semibold">Bảng tin của bạn</span>
                 </Link>
@@ -53,10 +53,10 @@ const GroupManagerSidebar: FC = () => {
 
             <div className="flex flex-col gap-y-2">
                 <span className="text-[16px] font-semibold">Nhóm do bạn quản lí</span>
-
-                <div className="flex flex-col gap-y-1">
+                {manageGroups.length === 0 ? <Empty description='Bạn chưa quản lí nhóm nào' /> : <div className="flex flex-col gap-y-1">
                     {manageGroups.map(group => <GroupRowItem key={group.id} group={group} />)}
-                </div>
+                </div>}
+
             </div>
 
             <Divider className="my-3" />

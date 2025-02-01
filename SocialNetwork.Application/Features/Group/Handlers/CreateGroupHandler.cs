@@ -39,6 +39,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 Name = request.Name,
                 RequireApproval = true,
                 RequirePostApproval = true,
+                IsHidden = request.Privacy == GroupPrivacy.PUBLIC ? false : request.IsHidden,
             };
 
             if (request.CoverImage != null)

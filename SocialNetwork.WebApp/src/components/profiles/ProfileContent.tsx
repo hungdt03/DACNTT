@@ -187,8 +187,7 @@ const ProfileContent: FC<ProfileContentProps> = ({
                 </div>
             </div>
             <Divider className="my-3" />
-            <Tabs defaultActiveKey="1" className="bg-white p-4 rounded-lg" items={items} />
-            {/* <ProfilePostList user={user} /> */}
+            <Tabs defaultActiveKey="1" className="bg-slate-100 p-4 rounded-lg" items={items} />
             {loading && <Loading />}
 
         </div>

@@ -82,6 +82,27 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("group")]
+        public async Task<IActionResult> GetAllGroupPostsByCurrentUser([FromQuery] int page = 1, [FromQuery] int size = 8)
+        {
+            var response = await _mediator.Send(new GetAllGroupPostsByCurrentUserQuery(page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("group/pending/{groupId}")]
+        public async Task<IActionResult> GetAllPendingPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
+        {
+            var response = await _mediator.Send(new GetAllPendingPostsByGroupIdQuery(groupId, page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("media/group/{groupId}")]
+        public async Task<IActionResult> GetAllGroupPostMediaByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
+        {
+            var response = await _mediator.Send(new GetGroupPostMediaByGroupIdQuery(groupId, page, size));
+            return Ok(response);
+        }
+
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetPostById([FromRoute] Guid postId)
         {

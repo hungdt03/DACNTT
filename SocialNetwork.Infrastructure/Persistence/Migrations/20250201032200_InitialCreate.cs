@@ -64,10 +64,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Privacy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsHidden = table.Column<bool>(type: "bit", nullable: false),
                     RequireApproval = table.Column<bool>(type: "bit", nullable: false),
                     RequirePostApproval = table.Column<bool>(type: "bit", nullable: false),
-                    Avatar = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CoverImage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CoverImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
@@ -459,6 +460,34 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_GroupMembers_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JoinGroupRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JoinGroupRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JoinGroupRequests_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_JoinGroupRequests_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id",
@@ -872,6 +901,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RecipientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    GroupInvitationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     FriendRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -897,6 +928,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         name: "FK_Notifications_FriendShips_FriendRequestId",
                         column: x => x.FriendRequestId,
                         principalTable: "FriendShips",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_GroupInvitations_GroupInvitationId",
+                        column: x => x.GroupInvitationId,
+                        principalTable: "GroupInvitations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Notifications_Posts_PostId",
@@ -1140,6 +1181,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JoinGroupRequests_GroupId",
+                table: "JoinGroupRequests",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinGroupRequests_UserId",
+                table: "JoinGroupRequests",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Locations_Address",
                 table: "Locations",
                 column: "Address",
@@ -1200,6 +1251,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "IX_Notifications_FriendRequestId",
                 table: "Notifications",
                 column: "FriendRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_GroupId",
+                table: "Notifications",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_GroupInvitationId",
+                table: "Notifications",
+                column: "GroupInvitationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_PostId",
@@ -1388,10 +1449,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "Follows");
 
             migrationBuilder.DropTable(
-                name: "GroupInvitations");
+                name: "GroupMembers");
 
             migrationBuilder.DropTable(
-                name: "GroupMembers");
+                name: "JoinGroupRequests");
 
             migrationBuilder.DropTable(
                 name: "MessageMedias");
@@ -1443,6 +1504,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "FriendShips");
+
+            migrationBuilder.DropTable(
+                name: "GroupInvitations");
 
             migrationBuilder.DropTable(
                 name: "Comments");

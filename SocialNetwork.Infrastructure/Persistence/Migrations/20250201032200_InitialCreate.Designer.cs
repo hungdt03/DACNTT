@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250126103427_InitialCreate")]
+    [Migration("20250201032200_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -233,12 +233,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Avatar")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CoverImage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("DateCreated")
@@ -251,7 +246,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Privacy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -335,6 +337,37 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("GroupMembers");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.GroupInfo.JoinGroupRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("JoinGroupRequests");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.MessageInfo.Message", b =>
@@ -828,6 +861,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("FriendRequestId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("GroupInvitationId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -858,6 +897,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("CommentId");
 
                     b.HasIndex("FriendRequestId");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("GroupInvitationId");
 
                     b.HasIndex("PostId");
 
@@ -1485,6 +1528,25 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.GroupInfo.JoinGroupRequest", b =>
+                {
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialNetwork.Domain.Entity.System.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.MessageInfo.Message", b =>
                 {
                     b.HasOne("SocialNetwork.Domain.Entity.ChatRoomInfo.ChatRoom", "ChatRoom")
@@ -1697,6 +1759,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasForeignKey("FriendRequestId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.GroupInvitation", "GroupInvitation")
+                        .WithMany()
+                        .HasForeignKey("GroupInvitationId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("SocialNetwork.Domain.Entity.PostInfo.Post", "Post")
                         .WithMany()
                         .HasForeignKey("PostId")
@@ -1716,6 +1788,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Comment");
 
                     b.Navigation("FriendRequest");
+
+                    b.Navigation("Group");
+
+                    b.Navigation("GroupInvitation");
 
                     b.Navigation("Post");
 

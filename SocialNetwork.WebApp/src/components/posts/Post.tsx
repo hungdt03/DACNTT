@@ -54,6 +54,7 @@ export const getTopReactions = (reactions?: ReactionResource[], top: number = 3)
 };
 
 type PostProps = {
+    allowShare?: boolean;
     post: PostResource;
     onFetch?: (data: PostResource) => void;
     onRemovePost?: (postId: string) => void
@@ -61,6 +62,7 @@ type PostProps = {
 
 
 const Post: FC<PostProps> = ({
+    allowShare = true,
     post: postParam,
     onFetch,
     onRemovePost
@@ -252,7 +254,7 @@ const Post: FC<PostProps> = ({
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            {post.privacy === PrivacyType.PUBLIC && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
+            {post.privacy === PrivacyType.PUBLIC && allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>}

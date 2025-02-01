@@ -44,7 +44,7 @@ namespace SocialNetwork.Application.Mappers
                 Description = group.Description,
                 CoverImage = group.CoverImage,
                 Privacy = group.Privacy,
-                Members = group.Members != null ? group.Members.Select(m => MapToUser(m.User)).ToList() : new(),
+                Members = group.Members != null ? group.Members.Select(m => m.User != null ? MapToUser(m.User) : null).ToList() : new(),
             };
         }
 
@@ -97,6 +97,7 @@ namespace SocialNetwork.Application.Mappers
                 OriginalPostId = post.OriginalPostId,
                 CreatedAt = post.DateCreated,
                 PostType = post.PostType,
+                IsGroupPost = post.IsGroupPost,
                 Medias = post.Medias != null ? post.Medias.Select(MapToPostMedia).ToList() : new(),
                 User = post.User != null ? MapToUser(post.User) : null,
                 Tags = post.Tags != null ? post.Tags.Select(MapToTag).ToList() : new(),

@@ -8,6 +8,7 @@ export type PostResource = {
     id: string;
     content: string;
     background: string;
+    isGroupPost: boolean;
     privacy: PrivacyType;
     user: UserResource;
     createdAt: Date;
