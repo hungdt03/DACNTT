@@ -10,5 +10,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<Group?> GetGroupByIdAsync(Guid groupId); 
         Task<IEnumerable<Group>> GetAllGroupsManageByUserId(string userId);
         Task<IEnumerable<Group>> GetAllGroupsJoinByUserId(string userId);
+        Task<IEnumerable<Group>> GetAllGroupsContainsKey(string key);
     }
 }

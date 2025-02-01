@@ -13,7 +13,6 @@ import { Popover, Tooltip, UploadFile } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
 import { formatTime } from "../../utils/date";
-import { MessageSquareText } from "lucide-react";
 import { Link } from "react-router-dom";
 import cn from "../../utils/cn";
 import { add, selectChatPopup, setChatRoomRead } from "../../features/slices/chat-popup-slice";

@@ -242,5 +242,23 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Posts.Where(p => p.IsGroupPost && !p.IsApproved && p.GroupId == groupId).CountAsync();
         }
+
+        public async Task<List<Post>> GetAllPostsContainsKey(string key)
+        {
+            return await _context.Posts
+                .Where(p => p.Content.ToLower().Contains(key.ToLower()))
+                .Include(p => p.Group)
+                .Include(p => p.User)
+                .Include(p => p.Tags)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.Comments)
+                .Include(p => p.Medias)
+                .Include(p => p.SharePost)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.Medias)
+                .ToListAsync();
+        }
     }
 }
