@@ -1,8 +1,10 @@
+import { FriendResource } from "../friend";
 import { UserResource } from "../user"
 
 export type SearchUserSuggestResource = {
     user: UserResource;
     isFriend: boolean;
-    mutualFriends: number;
+    countMutualFriends: number;
     plainText: boolean;
+    mutualFriends: FriendResource[]
 }

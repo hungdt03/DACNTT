@@ -22,12 +22,15 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<IEnumerable<GroupMember>> GetAllMembersInGroupAsync(Guid groupId)
         {
-            return await _context.GroupMembers.Where(m  => m.GroupId == groupId).ToListAsync();   
+            return await _context.GroupMembers
+                .Include(m => m.User)
+                .Where(m  => m.GroupId == groupId).ToListAsync();   
         }
 
         public async Task<GroupMember?> GetGroupMemberByIdAsync(Guid groupMemberId)
         {
             return await _context.GroupMembers
+                .Include(m => m.User)
                 .SingleOrDefaultAsync(g => g.Id == groupMemberId);
         }
 

@@ -1,9 +1,9 @@
-import { GroupResource } from "../group"
 import { PostResource } from "../post";
-import { UserResource } from "../user";
+import { SearchGroupSuggestResource } from "./search-group-suggest";
+import { SearchUserSuggestResource } from "./search-user-suggest";
 
 export type SearchAllResource = {
-    groups: GroupResource[];
-    users: UserResource[];
+    groups: SearchGroupSuggestResource[];
+    users: SearchUserSuggestResource[];
     posts: PostResource[]
 }

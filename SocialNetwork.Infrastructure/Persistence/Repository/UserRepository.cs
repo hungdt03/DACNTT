@@ -14,14 +14,23 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersContainsKeyAsync(string key)
+        public async Task<(IEnumerable<User> Users, int TotalCount)> GetAllUsersContainsKeyAsync(string key, int page, int size)
         {
-            return await _context.Users
-                .Where(u => u.FullName.ToLower().Contains(key.ToLower()))
-                  .Include(u => u.Posts)
+            var query = _context.Users
+                .Where(u => u.FullName.ToLower().Contains(key))
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+
+            var users = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .Include(u => u.Posts)
                 .Include(u => u.Followers)
                 .Include(u => u.Followings)
                 .ToListAsync();
+
+            return (users, totalCount);
         }
 
         public async Task<User?> GetUserByIdAsync(string userId)

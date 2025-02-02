@@ -73,7 +73,7 @@ const appRouter = createBrowserRouter([
         element: <AuthGuard element={<HeaderFullWidthLayout />} />,
         children: [
             {
-                path: 'groups/:id',
+                path: 'groups/:id/:section',
                 element: <GroupPage />
             },
             {

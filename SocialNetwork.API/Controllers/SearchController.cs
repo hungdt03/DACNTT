@@ -30,23 +30,23 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet("groups")]
-        public async Task<IActionResult> SearchPosts([FromQuery] string query)
+        public async Task<IActionResult> SearchPosts([FromQuery] string query, [FromQuery] int page = 1, [FromQuery] int size = 6)
         {
-            var response = await _mediator.Send(new SearchPostQuery(query));
+            var response = await _mediator.Send(new SearchGroupQuery(query, page, size));
             return Ok(response);
         }
 
         [HttpGet("posts")]
-        public async Task<IActionResult> SearchGroups([FromQuery] string query)
+        public async Task<IActionResult> SearchGroups([FromQuery] string query, [FromQuery] int page = 1, [FromQuery] int size = 6)
         {
-            var response = await _mediator.Send(new SearchGroupQuery(query));
+            var response = await _mediator.Send(new SearchPostQuery(query, page, size));
             return Ok(response);
         }
 
         [HttpGet("users")]
-        public async Task<IActionResult> SearchUsers([FromQuery] string query)
+        public async Task<IActionResult> SearchUsers([FromQuery] string query, [FromQuery] int page = 1, [FromQuery] int size = 6)
         {
-            var response = await _mediator.Send(new SearchUserQuery(query));
+            var response = await _mediator.Send(new SearchUserQuery(query, page, size));
             return Ok(response);
         }
     }

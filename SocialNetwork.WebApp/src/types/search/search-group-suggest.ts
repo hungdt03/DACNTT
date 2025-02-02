@@ -1,8 +1,11 @@
 import { GroupResource } from "../group"
+import { UserResource } from "../user";
 
 export type SearchGroupSuggestResource = {
     group: GroupResource;
     plainText: boolean;
     isMember: boolean;
-    memberFriends: number;
+    countFriendMembers: number;
+    totalMembers: number;
+    friendMembers: UserResource[]
 }

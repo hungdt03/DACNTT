@@ -3,6 +3,7 @@ import { InviteFriendsRequest } from '../components/groups/GroupHeader';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { GroupResource } from '../types/group';
 import { GroupApprovalSummaryResource } from '../types/group-approval-summary';
+import { JoinGroupResource } from '../types/join-group';
 import { BaseResponse, DataResponse } from '../types/response';
 
 
@@ -49,7 +50,7 @@ class GroupService {
         return axiosInterceptor.put('/api/groups/invite-friends/reject/' + inviteId)
     }
 
-    createRequestJoinGroup(groupId: string) : Promise<BaseResponse> {
+    createRequestJoinGroup(groupId: string) : Promise<DataResponse<JoinGroupResource>> {
         return axiosInterceptor.post('/api/groups/join/' + groupId)
     }
 

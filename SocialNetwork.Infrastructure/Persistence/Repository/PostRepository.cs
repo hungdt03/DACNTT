@@ -243,10 +243,17 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.Posts.Where(p => p.IsGroupPost && !p.IsApproved && p.GroupId == groupId).CountAsync();
         }
 
-        public async Task<List<Post>> GetAllPostsContainsKey(string key)
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsContainsKey(string key, int page, int size)
         {
-            return await _context.Posts
-                .Where(p => p.Content.ToLower().Contains(key.ToLower()))
+            var query = _context.Posts
+                .Where(p => p.Content.ToLower().Contains(key))
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+
+            var posts = await query
+                 .Skip((page - 1) * size)
+                .Take(size)
                 .Include(p => p.Group)
                 .Include(p => p.User)
                 .Include(p => p.Tags)
@@ -259,6 +266,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.OriginalPost)
                     .ThenInclude(p => p.Medias)
                 .ToListAsync();
+
+            return (posts, totalCount);
         }
     }
 }

@@ -24,13 +24,22 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.Groups.ToListAsync();
         }
 
-        public async Task<IEnumerable<Group>> GetAllGroupsContainsKey(string key)
+        public async Task<(IEnumerable<Group> Groups, int TotalCount)> GetAllGroupsContainsKey(string key, int page, int size)
         {
-            return await _context.Groups
-                .Where(g => g.Name.ToLower().Contains(key.ToLower()))
+            var query = _context.Groups
+                .Where(g => g.Name.ToLower().Contains(key))
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();  
+
+            var groups = await query
+                .Skip((page - 1) * size)
+                .Take(size)
                  .Include(g => g.Members)
                     .ThenInclude(g => g.User)
                 .ToListAsync();
+
+            return (groups, totalCount);
         }
 
         public async Task<IEnumerable<Group>> GetAllGroupsJoinByUserId(string userId)

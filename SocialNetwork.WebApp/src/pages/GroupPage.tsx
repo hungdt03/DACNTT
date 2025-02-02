@@ -9,7 +9,7 @@ import MyGroupManageSidebar from "../components/groups/components/MyGroupManageS
 import cn from "../utils/cn";
 
 const GroupPage: FC = () => {
-    const { id } = useParams();
+    const { id, section } = useParams();
     const [group, setGroup] = useState<GroupResource>();
 
     const fetchGroup = async () => {
@@ -29,12 +29,12 @@ const GroupPage: FC = () => {
         {group?.isMine && <MyGroupManageSidebar group={group} />}
         <div className={cn("w-full flex flex-col h-full bg-slate-100 overflow-y-auto", group?.isMine ? 'col-span-9' : 'col-span-12')}>
             {group && <GroupHeader group={group} />}
-            <div className="flex flex-col h-full gap-y-4 lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto">
+            {group?.isMember ? <div className="flex flex-col h-full gap-y-4 lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto">
                 <div className="grid grid-cols-12 gap-6 overflow-y-auto">
                     {group && <GroupPostList group={group} />}
                     {group && <GroupRightSide group={group} />}
                 </div>
-            </div>
+            </div> : <div></div>}
         </div>
     </div>
 }

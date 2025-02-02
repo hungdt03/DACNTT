@@ -5,6 +5,8 @@ import { Book, ChartBarIcon, Home, Lock, Settings2Icon, UserCog } from "lucide-r
 import { Badge, Divider } from "antd";
 import { GroupApprovalSummaryResource } from "../../../types/group-approval-summary";
 import groupService from "../../../services/groupService";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import cn from "../../../utils/cn";
 
 type MyGroupManageSidebarProps = {
     group: GroupResource
@@ -13,7 +15,9 @@ type MyGroupManageSidebarProps = {
 const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
     group
 }) => {
-    const [approvalSummary, setApprovalSummary] = useState<GroupApprovalSummaryResource>()
+    const [approvalSummary, setApprovalSummary] = useState<GroupApprovalSummaryResource>();
+    const [searchParam] = useSearchParams();
+    const { section } = useParams();
 
     const fetchGroupApprovalSummary = async () => {
         const response = await groupService.getGroupApprovalSummary(group.id);
@@ -24,6 +28,7 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
     useEffect(() => {
         fetchGroupApprovalSummary()
     }, [group])
+
 
     return <div className="col-span-3 bg-white h-full overflow-y-auto w-full shadow border-r-[1px] border-gray-200">
         <div className="flex items-center gap-x-2 px-2 py-4">
@@ -42,36 +47,29 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
         <Divider className="my-0" />
 
         <div className="flex flex-col gap-y-1 px-2 py-4">
-            <div className="flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+            <Link to={`/groups/${group.id}/feeds`} className={cn("flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", (!section || section === 'feeds') && 'bg-gray-100')}>
                 <Home size={20} />
                 <span className="font-semibold">Trang chủ của cộng đồng</span>
-            </div>
+            </Link>
 
             <Badge.Ribbon text={approvalSummary?.pendingPost} color="cyan">
-                <div className="flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+                <Link to={`/groups/${group.id}/pending-posts`} className={cn("flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", section === 'pending-posts' && 'bg-gray-100')}>
                     <Book size={20} />
                     <span className="font-semibold">Bài viết đang chờ</span>
-                </div>
+                </Link>
             </Badge.Ribbon>
 
             <Badge.Ribbon text={approvalSummary?.pendingRequestJoinGroup} color="green">
-                <div className="flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+                <Link to={`/groups/${group.id}/pending-members`} className={cn("flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", section === 'pending-members' && 'bg-gray-100')}>
                     <UserCog size={20} />
                     <span className="font-semibold">Yêu cầu thành viên</span>
-                </div>
+                </Link>
             </Badge.Ribbon>
-            <div className="flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+            <Link to={`/groups/${group.id}/pending-reports`} className={cn("flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", section === 'pending-reports' && 'bg-gray-100')}>
                 <ChartBarIcon size={20} />
                 <span className="font-semibold">Báo cáo đang chờ</span>
-            </div>
-            <div className="flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer">
-                <Home size={20} />
-                <span className="font-semibold">Thêm nhóm trưởng</span>
-            </div>
-            <div className="flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer">
-                <Settings2Icon size={20} />
-                <span className="font-semibold">Cài đặt nhóm</span>
-            </div>
+            </Link>
+           
         </div >
     </div >
 };

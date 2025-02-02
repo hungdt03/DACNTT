@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
+using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Group.Commands;
 using SocialNetwork.Application.Interfaces;
@@ -65,8 +66,12 @@ namespace SocialNetwork.Application.Features.Group.Handlers
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            return new BaseResponse()
+            return new DataResponse<JoinGroupResponse>()
             {
+                Data = new JoinGroupResponse()
+                {
+                    IsApproval = !group.RequireApproval
+                },
                 IsSuccess = true,
                 Message = message,
                 StatusCode = System.Net.HttpStatusCode.OK,

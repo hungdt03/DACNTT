@@ -10,5 +10,6 @@ namespace SocialNetwork.Application.DTOs
         public string Privacy { get; set; }
         public List<UserResponse> Members { get; set; }
         public bool IsMine { get; set; }
+        public bool IsMember { get; set; }
     }
 }

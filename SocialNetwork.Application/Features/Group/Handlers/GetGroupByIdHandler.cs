@@ -25,9 +25,15 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 ?? throw new NotFoundException("Không tìm thấy thông tin nhóm");
 
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var isAdmin = group.Members.Any(s => s.UserId == userId && s.IsAdmin);
+            var groupMember = group.Members.SingleOrDefault(s => s.UserId == userId);
             var response = ApplicationMapper.MapToGroup(group);
-            response.IsMine = isAdmin;
+
+            if(groupMember != null)
+            {
+                response.IsMine = groupMember.IsAdmin;
+                response.IsMember = true;
+            }
+            
 
             return new DataResponse<GroupResponse>
             {

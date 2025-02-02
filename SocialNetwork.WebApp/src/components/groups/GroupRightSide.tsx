@@ -1,11 +1,12 @@
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { Empty, Image } from "antd";
-import { Lock, Newspaper } from "lucide-react";
+import { Earth, Eye, EyeClosed, EyeIcon, Lock, LucideEarth, Newspaper } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import { GroupResource } from "../../types/group";
 import { PostMediaResource } from "../../types/post";
 import postService from "../../services/postService";
 import { MediaType } from "../../enums/media";
+import { GroupPrivacy } from "../../enums/group-privacy";
 
 type GroupRightSideProps = {
     group: GroupResource
@@ -36,10 +37,18 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
             <div className="flex flex-col gap-y-2">
                 <p>{group.description}</p>
                 <div className="flex items-start gap-x-2">
-                    <Lock size={22} />
+                    {group.privacy === GroupPrivacy.PRIVATE ? <Lock size={22} /> : <LucideEarth size={22} />}
                     <div className="flex flex-col gap-y-1">
-                        <span className="font-bold">Riêng tư</span>
-                        <p>Chỉ thành viên mới nhìn thấy mọi người trong nhóm và những gì họ đăng.</p>
+                        <span className="font-bold">{group.privacy === GroupPrivacy.PRIVATE ? 'Riêng tư' : 'Công khai'}</span>
+                        {group.privacy === GroupPrivacy.PRIVATE ? <p>Chỉ thành viên mới nhìn thấy mọi người trong nhóm và những gì họ đăng.</p> : <p>Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và những gì họ đăng.</p>}
+                    </div>
+                </div>
+
+                <div className="flex items-start gap-x-2">
+                    <Eye size={22} />
+                    <div className="flex flex-col gap-y-1">
+                        <span className="font-bold">Hiển thị</span>
+                        {group.isHidden ? <p>Chỉ thành viên mới nhìn thấy mọi người trong nhóm và những gì họ đăng.</p> : <p>Ai cũng có thể tìm thấy nhóm này.</p>}
                     </div>
                 </div>
 

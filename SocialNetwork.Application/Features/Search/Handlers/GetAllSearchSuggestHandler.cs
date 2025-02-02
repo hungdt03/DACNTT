@@ -26,8 +26,8 @@ namespace SocialNetwork.Application.Features.Search.Handlers
         public async Task<BaseResponse> Handle(GetAllSearchSuggestQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var users = await _unitOfWork.UserRepository.GetAllUsersContainsKeyAsync(request.Query);
-            var groups = await _unitOfWork.GroupRepository.GetAllGroupsContainsKey(request.Query);
+            var (users, userTptalCount) = await _unitOfWork.UserRepository.GetAllUsersContainsKeyAsync(request.Query, 1, 6);
+            var (groups, groupTotalCount) = await _unitOfWork.GroupRepository.GetAllGroupsContainsKey(request.Query, 1, 6);
 
             var searchUsers = new List<SearchUserSuggestResponse>();
             var searchGroups = new List<SearchGroupSuggestResponse>();
@@ -38,14 +38,18 @@ namespace SocialNetwork.Application.Features.Search.Handlers
             foreach ( var user in users )
             {
                 if (user.Id == userId) continue;
-                var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id, FriendShipStatus.ACCEPTED);
                 var mapUser = ApplicationMapper.MapToUser(user);
+
+                var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id, FriendShipStatus.ACCEPTED);
+                var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(user.Id, FriendShipStatus.ACCEPTED);
+                var mutualFriendsCount = userFriends.Count(f => myFriendsIds.Contains(f.UserId == user.Id ? f.FriendId : user.Id));
+
                 if (friendShip == null)
                 {
                     var searchUserItem = new SearchUserSuggestResponse()
                     {
                         IsFriend = false,
-                        MutualFriends = 0,
+                        CountMutualFriends = mutualFriendsCount,
                         PlainText = true,
                         User = mapUser,
                     };
@@ -53,12 +57,11 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                     searchUsers.Add(searchUserItem);
                 } else
                 {
-                    var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(user.Id, FriendShipStatus.ACCEPTED);
-                    var mutualFriendsCount = userFriends.Count(f => myFriendsIds.Contains(f.UserId == user.Id ? f.FriendId : user.Id));
+                   
                     var searchUserItem = new SearchUserSuggestResponse()
                     {
                         IsFriend = true,
-                        MutualFriends = mutualFriendsCount,
+                        CountMutualFriends = mutualFriendsCount,
                         PlainText = false,
                         User = mapUser,
                     };
@@ -79,7 +82,8 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                 {
                     var searchGroupItem = new SearchGroupSuggestResponse()
                     {
-                        FriendMembers = countMemberFriends,
+                        TotalMembers = group.Members.Count,
+                        CountFriendMembers = countMemberFriends,
                         Group = mapGroup,
                         IsMember = false,
                         PlainText = countMemberFriends == 0
@@ -91,7 +95,8 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                 {
                     var searchGroupItem = new SearchGroupSuggestResponse()
                     {
-                        FriendMembers = countMemberFriends,
+                        TotalMembers = group.Members.Count,
+                        CountFriendMembers = countMemberFriends,
                         Group = mapGroup,
                         PlainText = false,
                         IsMember = true

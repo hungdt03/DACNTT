@@ -1,8 +1,12 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
-import { DataResponse } from '../types/response';
+import { GroupResource } from '../types/group';
+import { PostResource } from '../types/post';
+import { DataResponse, PaginationResponse } from '../types/response';
 import { SearchAllResource } from '../types/search/search-all';
 import { SearchAllSuggestResource } from '../types/search/search-all-suggest';
+import { SearchGroupSuggestResource } from '../types/search/search-group-suggest';
+import { SearchUserSuggestResource } from '../types/search/search-user-suggest';
 import { UserResource } from '../types/user';
 
 class SearchService {
@@ -32,26 +36,32 @@ class SearchService {
         })
     }
 
-    searchUsers(query: string) : Promise<DataResponse<UserResource[]>> {
+    searchUsers(query: string, page: number, size: number) : Promise<PaginationResponse<SearchUserSuggestResource[]>> {
         return axiosInterceptor.get('/api/search/users', {
             params: {
-                query
+                query,
+                page,
+                size
             }
         })
     }
 
-    searchPosts(query: string) : Promise<DataResponse<UserResource[]>> {
+    searchPosts(query: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
         return axiosInterceptor.get('/api/search/posts', {
             params: {
-                query
+                query,
+                page,
+                size
             }
         })
     }
 
-    searchGroups(query: string) : Promise<DataResponse<UserResource[]>> {
+    searchGroups(query: string, page: number, size: number) : Promise<PaginationResponse<SearchGroupSuggestResource[]>> {
         return axiosInterceptor.get('/api/search/groups', {
             params: {
-                query
+                query,
+                page,
+                size
             }
         })
     }
