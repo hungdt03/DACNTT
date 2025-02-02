@@ -1,11 +1,10 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Application.Features.Search.Queries;
 
 namespace SocialNetwork.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/search")]
     [ApiController]
     public class SearchController : ControllerBase
     {
@@ -20,6 +19,13 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> SearchAll([FromQuery] string query)
         {
             var response = await _mediator.Send(new SearchAllQuery(query));
+            return Ok(response);
+        }
+
+        [HttpGet("suggest")]
+        public async Task<IActionResult> SearchAllMention([FromQuery] string query)
+        {
+            var response = await _mediator.Send(new GetAllSearchSuggestQuery(query));
             return Ok(response);
         }
 

@@ -53,8 +53,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.FriendShips
                  .Include(f => f.User)
-               .Include(f => f.Friend)
-                .Where(s => (s.UserId == userId || s.FriendId == userId) && (string.IsNullOrEmpty(status) || s.Status.Equals(status))).ToListAsync();
+                    .Include(f => f.Friend)
+                    .Where(s => (s.UserId == userId || s.FriendId == userId) && (string.IsNullOrEmpty(status) || s.Status.Equals(status))).ToListAsync();
         }
 
         public async Task<FriendShip?> GetFriendShipByIdAsync(Guid id, string status = "PENDING")

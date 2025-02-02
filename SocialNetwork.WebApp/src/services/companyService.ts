@@ -1,7 +1,6 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { CompanyResource } from '../types/company';
-import { MajorResource } from '../types/major';
 import { DataResponse } from '../types/response';
 
 

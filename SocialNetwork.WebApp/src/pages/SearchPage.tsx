@@ -9,6 +9,7 @@ type SearchFilterType = 'all' | 'post' | 'user' | 'group'
 const SearchPage: FC = () => {
     const [searchParam] = useSearchParams();
     const [searchFilter, setSearchFilter] = useState<SearchFilterType>('all');
+    
     useEffect(() => {
         const param = searchParam.get('type');
 

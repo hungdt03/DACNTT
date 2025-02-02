@@ -1,5 +1,4 @@
-﻿
-namespace SocialNetwork.Application.DTOs
+﻿namespace SocialNetwork.Application.DTOs.Search
 {
     public class SearchAllResponse
     {

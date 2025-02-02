@@ -3,7 +3,6 @@ import { ReactStory } from '../components/story/StoryShow';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { StoryRequest } from '../pages/CreateStoryPage';
 import { BaseResponse, DataResponse } from '../types/response';
-import { StoryResource } from '../types/story';
 import { UserStoryResource } from '../types/userStory';
 import { ViewerResource } from '../types/viewer';
 

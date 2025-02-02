@@ -1,7 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { NotificationResource } from '../types/notification';
-import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
+import { BaseResponse, PaginationResponse } from '../types/response';
 import { PaginationParams } from '../utils/pagination';
 
 class FriendService {
