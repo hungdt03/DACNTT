@@ -1,6 +1,7 @@
 ﻿
 
 using SocialNetwork.Domain.Abstractions;
+using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Domain.Entity.System
@@ -16,7 +17,9 @@ namespace SocialNetwork.Domain.Entity.System
         public string? TargetUserId { get; set; }
         public Guid? TargetPostId { get; set; }
         public Guid? TargetCommentId { get; set; }
+        public Guid? GroupId { get; set; }
 
+        public Group Group { get; set; }
         public User Reporter { get; set; }
         public User? TargetUser { get; set; }
         public Post? TargetPost { get; set; }

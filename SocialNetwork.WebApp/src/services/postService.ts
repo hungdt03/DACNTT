@@ -1,5 +1,3 @@
-
-
 import { EditSharePostRequest } from '../components/modals/EditSharePostModal';
 import { SharePostRequest } from '../components/modals/SharePostModal';
 import axiosInterceptor from '../configurations/axiosInterceptor'
@@ -115,6 +113,13 @@ class PostService {
         return axiosInterceptor.delete('/api/posts/' + postId)
     }
 
+    approvalPostByGroupIdAndPostId(groupId: string, postId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/posts/group/approval/' + groupId + '/' + postId)
+    }
+
+    rejectPostByGroupIdAndPostId(groupId: string, postId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/posts/group/reject/' + groupId + '/' + postId)
+    }
  
 }
 

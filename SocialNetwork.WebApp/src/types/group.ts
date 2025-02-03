@@ -11,4 +11,9 @@ export type GroupResource = {
     isHidden: boolean;
     isMine: boolean;
     isMember: boolean;
+    onlyAdminCanPost: boolean;
+    requireApproval: boolean;
+    requireApprovalPost: boolean;
+    onlyAdminCanApprovalMember: boolean;
+    
 }

@@ -3,8 +3,9 @@ import { InviteFriendsRequest } from '../components/groups/GroupHeader';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { GroupResource } from '../types/group';
 import { GroupApprovalSummaryResource } from '../types/group-approval-summary';
-import { JoinGroupResource } from '../types/join-group';
-import { BaseResponse, DataResponse } from '../types/response';
+import { GroupMemberResource } from '../types/group-member';
+import { JoinGroupRequestResource, JoinGroupResource } from '../types/join-group';
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
 
 class GroupService {
@@ -58,8 +59,37 @@ class GroupService {
         return axiosInterceptor.post('/api/groups/approval/' + requestId)
     }
 
+    cancelRequestJoinGroup(requestId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/cancel/' + requestId)
+    }
+
+    rejectRequestJoinGroup(requestId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/reject/' + requestId)
+    }
+
     getGroupApprovalSummary(groupId: string) : Promise<DataResponse<GroupApprovalSummaryResource>> {
         return axiosInterceptor.get('/api/groups/approval-summary/' + groupId)
+    }
+
+    getJoinGroupRequestByGroupId(groupId: string) : Promise<DataResponse<JoinGroupRequestResource>> {
+        return axiosInterceptor.get('/api/groups/join/' + groupId)
+    }
+
+    getAllJoinGroupRequestByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<JoinGroupRequestResource[]>> {
+        return axiosInterceptor.get('/api/groups/pending-requests/' + groupId, {
+            params: {
+                page,
+                size
+            }
+        })
+    }
+
+    getAllMembersByGroupId(groupId: string) : Promise<DataResponse<GroupMemberResource[]>> {
+        return axiosInterceptor.get('/api/groups/members/' + groupId)
+    }
+
+    updateGeneralInfo(groupId: string, payload: any) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/' + groupId, payload)
     }
 }
 

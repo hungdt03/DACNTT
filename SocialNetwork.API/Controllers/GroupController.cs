@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Configuration;
+using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Features.Group.Commands;
 using SocialNetwork.Application.Features.Group.Queries;
 
@@ -33,6 +35,21 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("members/{groupId}")]
+        public async Task<IActionResult> GetMembersByGroupId([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new GetAllMembersByGroupIdQuery(groupId));
+            return Ok(response);
+        }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPut("{groupId}")]
+        public async Task<IActionResult> UpdateGeneralInfo([FromRoute] Guid groupId, [FromBody] UpdateGroupRequest group)
+        {
+            var response = await mediator.Send(new UpdateGeneralInfoCommand(groupId, group));
+            return Ok(response);
+        }
+
         [HttpGet("manage")]
         public async Task<IActionResult> GetAllGroupsManageByCurrentUser()
         {
@@ -41,12 +58,25 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
-
         [HttpGet("join")]
         public async Task<IActionResult> GetAllGroupsJoinByCurrentUser()
         {
             var userId = HttpContext.User.GetUserId();
             var response = await mediator.Send(new GetAllGroupsJoinByUserIdQuery(userId));
+            return Ok(response);
+        }
+
+        [HttpGet("join/{groupId}")]
+        public async Task<IActionResult> GetJoinGroupRequestByGroupIdAndCurrentUser([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new GetJoinGroupRequestByGroupIdQuery(groupId));
+            return Ok(response);
+        }
+
+        [HttpGet("pending-requests/{groupId}")]
+        public async Task<IActionResult> GetAllPendingJoinRequestesByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetAllJoinGroupRequestByGroupIdQuery(groupId, page, size));
             return Ok(response);
         }
 
@@ -61,6 +91,20 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> ApprovalRequestJoinGroup([FromRoute] Guid requestId)
         {
             var response = await mediator.Send(new ApprovalJoinGroupRequestCommand(requestId));
+            return Ok(response);
+        }
+
+        [HttpPut("cancel/{requestId}")]
+        public async Task<IActionResult> CancelRequestJoinGroup([FromRoute] Guid requestId)
+        {
+            var response = await mediator.Send(new CancelJoinGroupRequestCommand(requestId));
+            return Ok(response);
+        }
+
+        [HttpPut("reject/{requestId}")]
+        public async Task<IActionResult> RejectRequestJoinGroup([FromRoute] Guid requestId)
+        {
+            var response = await mediator.Send(new RejectJoinGroupRequestCommand(requestId));
             return Ok(response);
         }
 

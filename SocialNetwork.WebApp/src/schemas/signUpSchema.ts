@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { SignUpRequest } from '../pages/SignUpPage';
+import { SignUpRequest } from '../pages/auth/SignUpPage';
 
 const signUpSchema = Yup.object<SignUpRequest>({
     fullName: Yup.string()

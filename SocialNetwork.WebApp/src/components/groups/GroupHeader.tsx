@@ -1,7 +1,7 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import images from "../../assets";
-import { Avatar, Button, Divider, Drawer, Form, Input, Modal, Radio, Switch, Tooltip, message } from "antd";
-import { SettingOutlined } from '@ant-design/icons'
+import { Avatar, Button, Divider, Drawer, Form, FormProps, Input, Modal, Radio, Select, Switch, Tooltip, message } from "antd";
+import { DeleteOutlined, SettingOutlined } from '@ant-design/icons'
 import { Plus } from "lucide-react";
 import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
 import useModal from "../../hooks/useModal";
@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import groupService from "../../services/groupService";
 import { getGroupPrivacyTitle } from "../../utils/privacy";
 import { GroupPrivacy } from "../../enums/group-privacy";
+import { JoinGroupRequestResource } from "../../types/join-group";
 
 export type InviteFriendsRequest = {
     inviteeIds: string[];
@@ -19,21 +20,36 @@ export type InviteFriendsRequest = {
 export type EditGroupRequest = {
     name: string;
     description: string;
+    isPublic: boolean;
+    isHidden: boolean;
+    isApprovalPost: boolean;
+    isApprovalMember: boolean;
+    onlyAdminCanPost: boolean;
+    onlyAdminCanApprovalMember: boolean;
 }
 
 type GroupHeaderProps = {
-    group: GroupResource
+    group: GroupResource;
+    requestJoin?: JoinGroupRequestResource;
+    onFetch: () => void
 }
 
 const GroupHeader: FC<GroupHeaderProps> = ({
-    group
+    group,
+    requestJoin,
+    onFetch
 }) => {
     const { handleCancel, handleOk, showModal, isModalOpen } = useModal();
     const [openSetting, setOpenSetting] = useState(false);
 
-    const [isApproval, setIsApproval] = useState<boolean>(false);
-    const [isSubmit, setIsSubmit] = useState(false)
+    const [loadingUpdate, setLoadingUpdate] = useState(false)
 
+    const [isApproval, setIsApproval] = useState<boolean>(false);
+    const [isSubmit, setIsSubmit] = useState(false);
+    const [isDisabled, setIsDisabled] = useState(false);
+    const [isChange, setIsChange] = useState(false)
+
+    const [form] = Form.useForm<EditGroupRequest>();
 
     const [loading, setLoading] = useState(false)
     const [inviteRequest, setInviteRequest] = useState<InviteFriendsRequest>({
@@ -53,10 +69,6 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         }
     }
 
-    const onChange = (checked: boolean) => {
-        console.log(`switch to ${checked}`);
-    };
-
     const handleJoinGroup = async (groupId: string) => {
         const response = await groupService.createRequestJoinGroup(groupId);
         if (response.isSuccess) {
@@ -67,6 +79,22 @@ const GroupHeader: FC<GroupHeaderProps> = ({
             message.error(response.message)
         }
     }
+
+    useEffect(() => {
+        if(group.privacy === GroupPrivacy.PUBLIC) setIsDisabled(true)
+    }, [group])
+
+    const onFinish: FormProps<EditGroupRequest>['onFinish'] = async (values) => {
+        setLoadingUpdate(true)
+        const response = await groupService.updateGeneralInfo(group.id, values);
+        setLoadingUpdate(false)
+        if(response.isSuccess) {
+            message.success(response.message);
+            onFetch();
+            setOpenSetting(false)
+            form.resetFields()
+        } else message.error(response.message)
+    };
 
     return <div className="bg-white w-full shadow">
         <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto overflow-hidden">
@@ -102,10 +130,10 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 </Button>
                                 <button className="bg-sky-50 text-primary px-3 py-1 rounded-md">Đã tham gia</button>
                             </>
-                        ) : isSubmit && !isApproval ? (
+                        ) : (isSubmit && !isApproval) || requestJoin ? (
                             <>
-                                <Button danger type="primary" >Hủy</Button>
-                                <Button type="primary">Chờ phê duyệt</Button>
+                                <button className="px-3 py-[6px] text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold" >Hủy</button>
+                                <Button className="cursor-text" type="primary">Chờ phê duyệt</Button>
                             </>
                         ) : (
                             <Button onClick={() => handleJoinGroup(group.id)} icon={<Plus size={16} />} type="primary">
@@ -143,69 +171,134 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         </Modal>
 
         <Drawer title='Thiết lập nhóm' onClose={() => setOpenSetting(false)} open={openSetting}>
-            <div className="flex flex-col gap-y-6">
-                <div className="flex flex-col gap-y-6">
+            <Form
+                onFinish={onFinish}
+                form={form}
+                layout="vertical"
+                onChange={() => setIsChange(true)}
+                initialValues={{
+                    name: group.name,
+                    description: group.description,
+                    onlyAdminCanPost: group.onlyAdminCanPost,
+                    onlyAdminCanApprovalMember: group.onlyAdminCanApprovalMember,
+                    isApprovalPost: group.requireApprovalPost,
+                    isApprovalMember: group.requireApproval,
+                    isHidden: group.isHidden,
+                    privacy: group.privacy === GroupPrivacy.PUBLIC
+                }}
+            >
+                <div className="flex flex-col gap-y-4">
                     <div className="flex items-center justify-between">
                         <span className="text-[16px] font-semibold">Chung</span>
                     </div>
-                    <div className="pl-4 flex flex-col gap-y-6">
-                        <Form
-                            // onFinish={onFinish}
-                            layout="vertical"
+                    <div className="flex flex-col">
+                        <Form.Item<EditGroupRequest>
+                            label="Tên nhóm"
+                            name="name"
+                            rules={[{ required: true, message: 'Vui lòng nhập tên nhóm!' }]}
                         >
-                            <Form.Item<EditGroupRequest>
-                                label="Tên nhóm"
-                                name="name"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên nhóm!' }]}
-                            >
-                                <Input placeholder="Tên nhóm..." />
-                            </Form.Item>
+                            <Input placeholder="Tên nhóm..." />
+                        </Form.Item>
 
-                            <Form.Item<EditGroupRequest>
-                                label="Mô tả ngắn"
-                                name="description"
-                                rules={[{ required: true, message: 'Vui lòng nhập mô tả ngắn!' }]}
-                            >
-                                <Input.TextArea placeholder="Mô tả..." />
-                            </Form.Item>
-
-                            <Form.Item label={null} className="flex justify-end">
-                                <Button type="primary" htmlType="submit">
-                                    Lưu lại
-                                </Button>
-                            </Form.Item>
-                        </Form>
+                        <Form.Item<EditGroupRequest>
+                            label="Mô tả ngắn"
+                            name="description"
+                            rules={[{ required: true, message: 'Vui lòng nhập mô tả ngắn!' }]}
+                        >
+                            <Input.TextArea rows={3} placeholder="Mô tả..." />
+                        </Form.Item>
                     </div>
                 </div>
-                <div className="flex flex-col gap-y-6">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[16px] font-semibold">Quyền riêng tư</span>
-                        <div className="flex items-center gap-x-2">
-                            <Button size="small">Bỏ</Button>
-                            <Button size="small" type="primary">Lưu lại</Button>
-                        </div>
-                    </div>
-                    <div className="pl-4 flex flex-col gap-y-6">
+                <Divider className="my-4" />
+                <div className="flex flex-col gap-y-4 pb-2">
+                    <span className="text-[16px] font-semibold">Quyền riêng tư</span>
+
+                    <div className="pl-4">
                         <div className="flex items-center justify-between">
-                            <span className="text-sm">Công khai: </span>
-                            <Switch defaultChecked onChange={onChange} />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm">Hiển thị: </span>
-                            <Switch defaultChecked onChange={onChange} />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm">Phê duyệt bài viết: </span>
-                            <Switch defaultChecked onChange={onChange} />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm">Phê duyệt thành viên: </span>
-                            <Switch defaultChecked onChange={onChange} />
+                            <span className="text-sm mb-6">Công khai</span>
+                            <Form.Item<EditGroupRequest>
+                                valuePropName="checked"
+                                name="isPublic"
+                            >
+                                <Switch
+                                    onChange={e => setIsDisabled(e)}
+                                 />
+                            </Form.Item>
                         </div>
 
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm mb-6">Ẩn nhóm (Chỉ thành viên mới tìm thấy nhóm)</span>
+                            <Form.Item<EditGroupRequest>
+                                valuePropName="checked"
+                                name="isHidden"
+                            >
+                                <Switch disabled={isDisabled} />
+                            </Form.Item>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <Divider className="my-4" />
+                <div className="flex flex-col gap-y-4 pb-2">
+                    <span className="text-[16px] font-semibold">Bài viết</span>
+                    <div className="pl-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm mb-6">Phê duyệt bài viết</span>
+                            <Form.Item<EditGroupRequest>
+                                valuePropName="checked"
+                                name="isApprovalPost"
+                            >
+                                <Switch disabled={isDisabled} />
+                            </Form.Item>
+                        </div>
+
+                        <Form.Item<EditGroupRequest>
+                            name="onlyAdminCanPost"
+                            label='Ai có quyền phê duyệt'
+                        >
+                            <Select
+                                disabled={isDisabled}
+                                options={[
+                                    { value: true, label: 'Quản trị viên và người kiểm duyệt' },
+                                    { value: false, label: 'Tất cả thành viên trong nhóm' },
+                                ]}
+                            />
+                        </Form.Item>
+                    </div>
+                </div>
+                <Divider className="my-4" />
+                <div className="flex flex-col gap-y-4 pb-2">
+                    <span className="text-[16px] font-semibold">Thành viên</span>
+                    <div className="pl-4">
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm mb-6">Phê duyệt thành viên</span>
+                            <Form.Item<EditGroupRequest>
+                                valuePropName="checked"
+                                name="isApprovalMember"
+                            >
+                                <Switch disabled={isDisabled} />
+                            </Form.Item>
+                        </div>
+
+                        <Form.Item<EditGroupRequest>
+                            name="onlyAdminCanApprovalMember"
+                            label='Ai có quyền phê duyệt'
+                        >
+                            <Select
+                                disabled={isDisabled}
+                                options={[
+                                    { value: true, label: 'Quản trị viên và người kiểm duyệt' },
+                                    { value: false, label: 'Tất cả thành viên trong nhóm' },
+                                ]}
+                            />
+                        </Form.Item>
+                    </div>
+                </div>
+                <Form.Item label={null} className="flex justify-end mt-8">
+                    <Button loading={loadingUpdate} disabled={!isChange} type="primary" htmlType="submit">
+                        Lưu lại
+                    </Button>
+                </Form.Item>
+            </Form>
         </Drawer>
 
     </div>

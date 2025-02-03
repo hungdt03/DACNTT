@@ -1,7 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
-import { SignInRequest } from '../pages/SignInPage';
-import { SignUpRequest } from '../pages/SignUpPage';
+import { SignInRequest } from '../pages/auth/SignInPage';
+import { SignUpRequest } from '../pages/auth/SignUpPage';
 import { AuthResponse, BaseResponse, DataResponse } from '../types/response';
 import { UserResource } from '../types/user';
 

@@ -1,16 +1,15 @@
 import { FC,  useEffect,  useRef,  useState } from "react";
 import { Formik, Form, Field } from 'formik';
 import { Link, useNavigate } from "react-router-dom";
-import OtpInput from 'react-otp-input';
 
-import images from "../assets";
-import authService from "../services/authService";
+import images from "../../assets";
+import authService from "../../services/authService";
 import { toast } from "react-toastify";
-import signUpSchema from "../schemas/signUpSchema";
+import signUpSchema from "../../schemas/signUpSchema";
 import { Button, Modal } from "antd";
-import useModal from "../hooks/useModal";
-import otpService from "../services/otpService";
-import VerifyOTP from "../components/VerifyOTP";
+import useModal from "../../hooks/useModal";
+import otpService from "../../services/otpService";
+import VerifyOTP from "../../components/VerifyOTP";
 
 export type SignUpRequest = {
     fullName: string;

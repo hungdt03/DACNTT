@@ -250,6 +250,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("OnlyAdminCanApprovalMember")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("OnlyAdminCanPost")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Privacy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -317,11 +323,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("GroupId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
-
                     b.Property<DateTimeOffset>("JoinDate")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -334,6 +341,39 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("GroupMembers");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.GroupInfo.GroupRoleInvitation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("InviteeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("InviterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InviteeId");
+
+                    b.HasIndex("InviterId");
+
+                    b.ToTable("GroupRoleInvitations");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.GroupInfo.JoinGroupRequest", b =>
@@ -543,6 +583,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("ApprovalAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ApprovalStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Background")
                         .HasColumnType("nvarchar(max)");
 
@@ -558,9 +605,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid?>("GroupId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsGroupPost")
                         .HasColumnType("bit");
@@ -871,6 +915,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("JoinGroupRequestId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("PostId")
                         .HasColumnType("uniqueidentifier");
 
@@ -898,6 +945,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("GroupId");
 
                     b.HasIndex("GroupInvitationId");
+
+                    b.HasIndex("JoinGroupRequestId");
 
                     b.HasIndex("PostId");
 
@@ -964,6 +1013,31 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Positions");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.System.Privacy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("PrivacyFor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrivacyType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Privacies");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.System.Profession", b =>
@@ -1034,6 +1108,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DateUpdated")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1067,6 +1144,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
 
                     b.HasIndex("ReporterId");
 
@@ -1525,6 +1604,25 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.GroupInfo.GroupRoleInvitation", b =>
+                {
+                    b.HasOne("SocialNetwork.Domain.Entity.System.User", "Invitee")
+                        .WithMany()
+                        .HasForeignKey("InviteeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("SocialNetwork.Domain.Entity.System.User", "Inviter")
+                        .WithMany()
+                        .HasForeignKey("InviterId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Invitee");
+
+                    b.Navigation("Inviter");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.GroupInfo.JoinGroupRequest", b =>
                 {
                     b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "Group")
@@ -1766,6 +1864,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasForeignKey("GroupInvitationId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "JoinGroupRequest")
+                        .WithMany()
+                        .HasForeignKey("JoinGroupRequestId");
+
                     b.HasOne("SocialNetwork.Domain.Entity.PostInfo.Post", "Post")
                         .WithMany()
                         .HasForeignKey("PostId")
@@ -1789,6 +1891,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("GroupInvitation");
+
+                    b.Navigation("JoinGroupRequest");
 
                     b.Navigation("Post");
 
@@ -1821,6 +1925,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.System.Report", b =>
                 {
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "Group")
+                        .WithMany("Reports")
+                        .HasForeignKey("GroupId");
+
                     b.HasOne("SocialNetwork.Domain.Entity.System.User", "Reporter")
                         .WithMany("Reports")
                         .HasForeignKey("ReporterId")
@@ -1838,6 +1946,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasOne("SocialNetwork.Domain.Entity.System.User", "TargetUser")
                         .WithMany()
                         .HasForeignKey("TargetUserId");
+
+                    b.Navigation("Group");
 
                     b.Navigation("Reporter");
 
@@ -1995,6 +2105,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Members");
 
                     b.Navigation("Posts");
+
+                    b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.MessageInfo.Message", b =>

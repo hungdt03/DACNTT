@@ -11,8 +11,9 @@ namespace SocialNetwork.Domain.Entity.PostInfo
         public string Privacy { get; set; }
         public string PostType { get; set; }
         public bool IsGroupPost { get; set; }
-        public bool IsApproved { get; set; }
+        public string ApprovalStatus { get; set; }
 
+        public DateTimeOffset? ApprovalAt { get; set; }
         public Guid? GroupId { get; set; }
         public Group? Group { get; set; }
 

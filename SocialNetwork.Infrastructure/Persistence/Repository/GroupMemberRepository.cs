@@ -38,6 +38,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.GroupMembers
                 .Include(m => m.User)
+                .Include(m => m.Group)
                 .SingleOrDefaultAsync(g => g.GroupId == groupId && g.UserId == userId); 
         }
     }

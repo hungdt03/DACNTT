@@ -7,6 +7,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Group.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.Group.Handlers
 {
@@ -30,7 +31,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
 
             if(groupMember != null)
             {
-                response.IsMine = groupMember.IsAdmin;
+                response.IsMine = groupMember.Role == MemberRole.ADMIN;
                 response.IsMember = true;
             }
             

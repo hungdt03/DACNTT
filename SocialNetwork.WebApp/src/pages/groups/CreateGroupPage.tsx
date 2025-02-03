@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
-import CreateGroupSidebar, { CreateGroupForm } from "../components/groups/components/CreateGroupSidebar";
-import CreateGroupPreview from "../components/groups/components/CreateGroupPreview";
+import CreateGroupSidebar, { CreateGroupForm } from "../../components/groups/components/CreateGroupSidebar";
+import CreateGroupPreview from "../../components/groups/components/CreateGroupPreview";
 
 const CreateGroupPage: FC = () => {
     const [values, setValues] = useState<CreateGroupForm>()

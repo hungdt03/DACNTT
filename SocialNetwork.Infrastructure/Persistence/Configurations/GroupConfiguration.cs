@@ -13,6 +13,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Configurations
             builder.HasMany(x => x.Members).WithOne(z => z.Group).HasForeignKey(x => x.GroupId);
             builder.HasMany(x => x.Posts).WithOne(z => z.Group).HasForeignKey(x => x.GroupId);
             builder.HasMany(x => x.Invites).WithOne(z => z.Group).HasForeignKey(x => x.GroupId);
+            builder.HasMany(x => x.Reports).WithOne(z => z.Group).HasForeignKey(x => x.GroupId);
         }
     }
 }

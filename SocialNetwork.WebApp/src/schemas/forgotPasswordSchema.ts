@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { ForgotPasswordFormik } from '../pages/ForgotPasswordPage';
+import { ForgotPasswordFormik } from '../pages/auth/ForgotPasswordPage';
 
 const forgotPasswordSchema = Yup.object<ForgotPasswordFormik>({
     email: Yup.string()

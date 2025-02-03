@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Infrastructure.DBContext;
 
@@ -47,7 +48,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.Groups
                 .Include(g => g.Members)
                     .ThenInclude(g => g.User)
-                 .Where(g => g.Members.Any(m => !m.IsAdmin && m.UserId == userId))
+                 .Where(g => g.Members.Any(m => m.Role != MemberRole.ADMIN && m.UserId == userId))
                  .ToListAsync();
         }
 
@@ -56,7 +57,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.Groups
                 .Include(g => g.Members)
                  .ThenInclude(g => g.User)
-                .Where(g => g.Members.Any(m => m.IsAdmin && m.UserId == userId))
+                .Where(g => g.Members.Any(m => m.Role == MemberRole.ADMIN && m.UserId == userId))
                 .ToListAsync();
         }
 

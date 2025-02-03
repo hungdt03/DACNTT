@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { SignInRequest } from '../pages/SignInPage';
+import { SignInRequest } from '../pages/auth/SignInPage';
 
 const signInSchema = Yup.object<SignInRequest>({
     email: Yup.string()

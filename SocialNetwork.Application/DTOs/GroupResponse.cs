@@ -11,5 +11,10 @@ namespace SocialNetwork.Application.DTOs
         public List<UserResponse> Members { get; set; }
         public bool IsMine { get; set; }
         public bool IsMember { get; set; }
+        public bool OnlyAdminCanPost { get; set; }
+        public bool RequireApproval { get; set; }
+        public bool RequireApprovalPost { get; set; }
+        public bool OnlyAdminCanApprovalMember { get; set; }
+        public bool IsHidden { get; set; }
     }
 }

@@ -96,6 +96,20 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpPut("group/approval/{groupId}/{postId}")]
+        public async Task<IActionResult> ApprovalPostByGroupIdAndPostId([FromRoute] Guid groupId, [FromRoute] Guid postId)
+        {
+            var response = await _mediator.Send(new ApprovalPostByGroupIdAndPostIdCommand(groupId, postId));
+            return Ok(response);
+        }
+
+        [HttpPut("group/reject/{groupId}/{postId}")]
+        public async Task<IActionResult> RejectPostByGroupIdAndPostId([FromRoute] Guid groupId, [FromRoute] Guid postId)
+        {
+            var response = await _mediator.Send(new RejectPostByGroupIdAndPostIdCommand(groupId, postId));
+            return Ok(response);
+        }
+
         [HttpGet("media/group/{groupId}")]
         public async Task<IActionResult> GetAllGroupPostMediaByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
         {

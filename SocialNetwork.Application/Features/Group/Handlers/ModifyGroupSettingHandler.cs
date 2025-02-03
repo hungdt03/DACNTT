@@ -6,6 +6,7 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Group.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.Group.Handlers
 {
@@ -25,7 +26,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             var userId = _contextAccessor.HttpContext.User.GetUserId();
             var member = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId, userId);
 
-            if (member == null || !member.IsAdmin)
+            if (member == null || member.Role != MemberRole.ADMIN)
                 throw new AppException("Bạn không có quyền chỉnh sửa thông tin nhóm này");
 
             var group = await _unitOfWork.GroupRepository

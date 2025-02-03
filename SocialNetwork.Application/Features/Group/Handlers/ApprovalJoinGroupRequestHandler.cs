@@ -7,6 +7,7 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Group.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.GroupInfo;
 
 namespace SocialNetwork.Application.Features.Group.Handlers
@@ -32,16 +33,16 @@ namespace SocialNetwork.Application.Features.Group.Handlers
 
             var groupMember = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(joinGroupRequest.GroupId, userId);
 
-            if (groupMember == null) throw new AppException("Bạn không có quyền phê duyệt ở nhóm này");
+            if (groupMember == null || (groupMember.Group.OnlyAdminCanApprovalMember && groupMember.Role == MemberRole.MEMBER)) throw new AppException("Bạn không có quyền phê duyệt ở nhóm này");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            joinGroupRequest.Status = true;
+            _unitOfWork.JoinGroupRequestRepository.RemoveJoinGroupRequest(joinGroupRequest);
 
             var newGroupMember = new GroupMember()
             {
                 GroupId = joinGroupRequest.GroupId,
-                IsAdmin = false,
+                Role = MemberRole.MEMBER,
                 JoinDate = DateTimeOffset.UtcNow,
                 UserId = joinGroupRequest.UserId,
             };

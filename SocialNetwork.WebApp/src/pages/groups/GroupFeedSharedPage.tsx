@@ -1,19 +1,16 @@
 import { FC, useEffect, useRef, useState } from "react";
-import Post from "../components/posts/Post";
-import PostCreator from "../components/posts/PostCreator";
-import { Id, toast } from "react-toastify";
-import { PostResource } from "../types/post";
-import postService from "../services/postService";
-import { PostType } from "../enums/post-type";
-import SharePost from "../components/posts/SharePost";
-import PostSkeletonList from "../components/skeletons/PostSkeletonList";
-import { Pagination } from "../types/response";
-import { inititalValues } from "../utils/pagination";
-import StoryWrapper from "../components/story/StoryWrapper";
-import PostGroup from "../components/posts/PostGroup";
+import { toast } from "react-toastify";
+import { PostResource } from "../../types/post";
+import postService from "../../services/postService";
+import { PostType } from "../../enums/post-type";
+import SharePost from "../../components/posts/SharePost";
+import PostSkeletonList from "../../components/skeletons/PostSkeletonList";
+import { Pagination } from "../../types/response";
+import { inititalValues } from "../../utils/pagination";
+import PostGroup from "../../components/posts/PostGroup";
 
 
-const GroupFeedPage: FC = () => {
+const GroupFeedSharedPage: FC = () => {
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [posts, setPosts] = useState<PostResource[]>([]);
@@ -58,25 +55,6 @@ const GroupFeedPage: FC = () => {
         }
     };
 
-    const handleCreatePostSuccess = (toastId: Id, msg: string, data: PostResource) => {
-        fetchPostByID(data.id);
-        toast.update(toastId, {
-            render: msg,
-            type: 'success',
-            isLoading: false,
-            autoClose: 3000,
-        });
-    };
-
-    const handleCreatePostFailed = (toastId: Id, msg: string) => {
-        toast.update(toastId, {
-            render: msg,
-            type: 'error',
-            isLoading: false,
-            autoClose: 3000,
-        });
-    };
-
     useEffect(() => {
         const observer = new IntersectionObserver(
             entries => {
@@ -84,7 +62,7 @@ const GroupFeedPage: FC = () => {
                     fetchNewPosts();
                 }
             },
-            { root: containerRef.current, rootMargin: '100px' } // Tải trước khi user cuộn hẳn tới cuối
+            { root: containerRef.current, rootMargin: '100px' } 
         );
 
         observerRef.current = observer;
@@ -123,4 +101,4 @@ const GroupFeedPage: FC = () => {
     );
 };
 
-export default GroupFeedPage;
+export default GroupFeedSharedPage;

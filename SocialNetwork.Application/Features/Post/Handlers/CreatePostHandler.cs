@@ -40,6 +40,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 Privacy = request.Privacy,
                 UserId = userId,
                 Background = request.Background,
+                ApprovalStatus = ApprovalStatus.APPROVED,
             };
 
             if (request.GroupId.HasValue)
@@ -52,9 +53,11 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
                 if (group.RequirePostApproval)
                 {
-                    post.IsApproved = member.IsAdmin;
+                    if(member.Role == MemberRole.ADMIN || member.Role == MemberRole.MODERATOR)
+                        post.ApprovalStatus = ApprovalStatus.APPROVED;
+                    else post.ApprovalStatus = ApprovalStatus.PENDING;
                 }
-                else post.IsApproved = true;
+                else post.ApprovalStatus = ApprovalStatus.PENDING;
                
                 post.Privacy = PrivacyConstant.PUBLIC;
                 post.PostType = PostType.ORIGINAL_POST;
@@ -146,7 +149,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 IsSuccess = true,
                 Message = "Tạo bài viết mới thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Data = (post.IsApproved && post.IsGroupPost) || !post.IsGroupPost ? ApplicationMapper.MapToPost(post) : null
+                Data = (post.ApprovalStatus == ApprovalStatus.APPROVED && post.IsGroupPost) || !post.IsGroupPost ? ApplicationMapper.MapToPost(post) : null
             };
         }
     }

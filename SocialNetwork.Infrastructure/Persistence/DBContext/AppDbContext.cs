@@ -35,6 +35,7 @@ namespace SocialNetwork.Infrastructure.DBContext
         // GROUP
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupInvitation> GroupInvitations { get; set; }
+        public DbSet<GroupRoleInvitation> GroupRoleInvitations { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
         public DbSet<JoinGroupRequest> JoinGroupRequests { get; set; }
 
@@ -60,6 +61,7 @@ namespace SocialNetwork.Infrastructure.DBContext
 
         // SYSTEM
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Privacy> Privacies { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<OTP> OTPs { get; set; }
         public DbSet<Location> Locations { get; set; }

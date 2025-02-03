@@ -5,19 +5,19 @@ import { Book, ChartBarIcon, Home, Lock, Settings2Icon, UserCog } from "lucide-r
 import { Badge, Divider } from "antd";
 import { GroupApprovalSummaryResource } from "../../../types/group-approval-summary";
 import groupService from "../../../services/groupService";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import cn from "../../../utils/cn";
 
 type MyGroupManageSidebarProps = {
-    group: GroupResource
+    group: GroupResource;
+  
 }
 
 const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
-    group
+    group,
 }) => {
     const [approvalSummary, setApprovalSummary] = useState<GroupApprovalSummaryResource>();
-    const [searchParam] = useSearchParams();
-    const { section } = useParams();
+    const location = useLocation();
 
     const fetchGroupApprovalSummary = async () => {
         const response = await groupService.getGroupApprovalSummary(group.id);
@@ -47,25 +47,25 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
         <Divider className="my-0" />
 
         <div className="flex flex-col gap-y-1 px-2 py-4">
-            <Link to={`/groups/${group.id}/feeds`} className={cn("flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", (!section || section === 'feeds') && 'bg-gray-100')}>
+            <Link to={`/groups/${group.id}`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", !location.pathname.split('/')[3] && 'bg-gray-100')}>
                 <Home size={20} />
                 <span className="font-semibold">Trang chủ của cộng đồng</span>
             </Link>
 
             <Badge.Ribbon text={approvalSummary?.pendingPost} color="cyan">
-                <Link to={`/groups/${group.id}/pending-posts`} className={cn("flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", section === 'pending-posts' && 'bg-gray-100')}>
+                <Link to={`/groups/${group.id}/pending-posts`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-posts') && 'bg-gray-100')}>
                     <Book size={20} />
                     <span className="font-semibold">Bài viết đang chờ</span>
                 </Link>
             </Badge.Ribbon>
 
             <Badge.Ribbon text={approvalSummary?.pendingRequestJoinGroup} color="green">
-                <Link to={`/groups/${group.id}/pending-members`} className={cn("flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", section === 'pending-members' && 'bg-gray-100')}>
+                <Link to={`/groups/${group.id}/pending-members`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-members')  && 'bg-gray-100')}>
                     <UserCog size={20} />
                     <span className="font-semibold">Yêu cầu thành viên</span>
                 </Link>
             </Badge.Ribbon>
-            <Link to={`/groups/${group.id}/pending-reports`} className={cn("flex items-center text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", section === 'pending-reports' && 'bg-gray-100')}>
+            <Link to={`/groups/${group.id}/pending-reports`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-reports') && 'bg-gray-100')}>
                 <ChartBarIcon size={20} />
                 <span className="font-semibold">Báo cáo đang chờ</span>
             </Link>

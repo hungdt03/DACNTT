@@ -48,7 +48,7 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
                     <Eye size={22} />
                     <div className="flex flex-col gap-y-1">
                         <span className="font-bold">Hiển thị</span>
-                        {group.isHidden ? <p>Chỉ thành viên mới nhìn thấy mọi người trong nhóm và những gì họ đăng.</p> : <p>Ai cũng có thể tìm thấy nhóm này.</p>}
+                        {group.isHidden ? <p>Chỉ thành viên mới tìm thấy nhóm này</p> : <p>Ai cũng có thể tìm thấy nhóm này.</p>}
                     </div>
                 </div>
 

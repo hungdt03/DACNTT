@@ -7,6 +7,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Group.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.GroupInfo;
 
 namespace SocialNetwork.Application.Features.Group.Handlers
@@ -55,7 +56,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 var newGroupMember = new GroupMember()
                 {
                     GroupId = request.GroupId,
-                    IsAdmin = false,
+                    Role = MemberRole.MEMBER,
                     JoinDate = DateTimeOffset.UtcNow,
                     UserId = userId,
                 };

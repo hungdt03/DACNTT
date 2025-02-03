@@ -1,17 +1,17 @@
 import { FC, useEffect, useRef, useState } from "react";
-import images from "../assets";
-import cn from "../utils/cn";
+import images from "../../assets";
+import cn from "../../utils/cn";
 import { Link, useNavigate } from "react-router-dom";
 import { MoveLeft } from "lucide-react";
 import { Button, Modal } from "antd";
-import useModal from "../hooks/useModal";
-import authService from "../services/authService";
+import useModal from "../../hooks/useModal";
+import authService from "../../services/authService";
 import { toast } from "react-toastify";
-import ResetPassword from "../components/ResetPassword";
-import VerifyOTP from "../components/VerifyOTP";
+import ResetPassword from "../../components/ResetPassword";
+import VerifyOTP from "../../components/VerifyOTP";
 import { Field, Form, Formik } from "formik";
-import forgotPasswordSchema from "../schemas/forgotPasswordSchema";
-import otpService from "../services/otpService";
+import forgotPasswordSchema from "../../schemas/forgotPasswordSchema";
+import otpService from "../../services/otpService";
 
 export type ForgotPasswordFormik = {
     email: string;

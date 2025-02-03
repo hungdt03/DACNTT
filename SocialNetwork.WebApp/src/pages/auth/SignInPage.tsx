@@ -1,14 +1,14 @@
 import { FC, useState } from "react";
 import { Formik, Form, Field } from 'formik';
 import { Link } from "react-router-dom";
-import images from "../assets";
-import signInSchema from "../schemas/signInSchema";
-import cn from "../utils/cn";
-import authService from "../services/authService";
+import images from "../../assets";
+import signInSchema from "../../schemas/signInSchema";
+import cn from "../../utils/cn";
+import authService from "../../services/authService";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../app/store";
-import { signIn } from "../features/slices/auth-slice";
+import { AppDispatch } from "../../app/store";
+import { signIn } from "../../features/slices/auth-slice";
 import { Button } from "antd";
 
 export type SignInRequest = {

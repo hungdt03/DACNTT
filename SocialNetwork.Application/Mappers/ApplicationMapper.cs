@@ -7,7 +7,6 @@ using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Domain.Entity.StoryInfo;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Domain.Entity.UserInfo;
-using System.Linq.Expressions;
 
 namespace SocialNetwork.Application.Mappers
 {
@@ -44,7 +43,23 @@ namespace SocialNetwork.Application.Mappers
                 Description = group.Description,
                 CoverImage = group.CoverImage,
                 Privacy = group.Privacy,
+                IsHidden = group.IsHidden,
+                OnlyAdminCanApprovalMember = group.OnlyAdminCanApprovalMember,
+                OnlyAdminCanPost = group.OnlyAdminCanPost,
+                RequireApproval = group.RequireApproval,
+                RequireApprovalPost = group.RequirePostApproval,
                 Members = group.Members != null ? group.Members.Select(m => m.User != null ? MapToUser(m.User) : null).ToList() : new(),
+            };
+        }
+
+        public static GroupMemberResponse MapToGroupMember(GroupMember member)
+        {
+            return new GroupMemberResponse()
+            {
+                Id = member.Id,
+                JoinDate = member.JoinDate,
+                Role = member.Role,
+                User = member.User != null ? MapToUser(member.User) : null,
             };
         }
 
@@ -84,6 +99,16 @@ namespace SocialNetwork.Application.Mappers
             };
         }
 
+        public static JoinGroupRequestResponse MapToJoinGroupRequest(JoinGroupRequest joinGroupRequest)
+        {
+            return new JoinGroupRequestResponse()
+            {
+                Id = joinGroupRequest.Id,
+                RequestDate = joinGroupRequest.DateCreated,
+                User = joinGroupRequest.User != null ? MapToUser(joinGroupRequest.User) : null
+            };
+        }
+
         public static PostResponse MapToPost(Post post)
         {
             if (post == null) return null;
@@ -103,8 +128,8 @@ namespace SocialNetwork.Application.Mappers
                 Tags = post.Tags != null ? post.Tags.Select(MapToTag).ToList() : new(),
                 Comments = post.Comments != null ? post.Comments.Count : 0,
                 Shares = post.Shares != null ? post.Shares.Count : 0,
-                SharePost = MapToPost(post.SharePost),
-                OriginalPost = MapToPost(post.OriginalPost),
+                SharePost = post.SharePost != null ? MapToPost(post.SharePost) : null,
+                OriginalPost = post.OriginalPost != null ? MapToPost(post.OriginalPost) : null,
                 Group = post.Group != null ? MapToGroup(post.Group) : null,
             };
         }

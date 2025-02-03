@@ -54,7 +54,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             var leader = new GroupMember()
             {
                 UserId = userId,
-                IsAdmin = true,
+                Role = MemberRole.ADMIN,
                 JoinDate = DateTimeOffset.UtcNow,
                 GroupId = group.Id,
             };

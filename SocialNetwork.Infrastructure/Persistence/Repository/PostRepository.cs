@@ -48,7 +48,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             var filteredPosts = new List<Post>();
             foreach (var post in await query.ToListAsync())
             {
-                if (post.IsGroupPost && !post.IsApproved) continue;
+                if (post.IsGroupPost && post.ApprovalStatus != ApprovalStatus.APPROVED) continue;
 
                 bool isFriend = await _context.FriendShips.AnyAsync(s =>
                     ((s.UserId == post.UserId && s.FriendId == userId) ||
@@ -76,13 +76,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsByUserIdAsync(string userId, int page, int size)
         {
-            var query = _context.Posts.AsQueryable();
+            var query = _context.Posts
+                .Where(p => p.UserId == userId && ((p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.APPROVED) || !p.IsGroupPost))
+                .AsQueryable();
 
-            var totalCount = await query.Where(p => p.UserId == userId && ((p.IsGroupPost && p.IsApproved) || !p.IsGroupPost)).CountAsync();
+            var totalCount = await query.CountAsync();
 
             var posts = await query
                 //.AsNoTracking()
-                .Where(p => p.UserId == userId && ((p.IsGroupPost && p.IsApproved) || !p.IsGroupPost))
                 .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)
@@ -154,12 +155,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsByGroupIdAsync(Guid groupId, int page, int size)
         {
-            var query = _context.Posts.AsQueryable();
+            var query = _context.Posts
+                .Where(p => p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.APPROVED && p.GroupId == groupId)
+                .AsQueryable();
 
-            var totalCount = await query.Where(p => p.IsGroupPost && p.IsApproved && p.GroupId == groupId).CountAsync();
+            var totalCount = await query.CountAsync();
 
             var posts = await query
-                .Where(p => p.IsGroupPost && p.IsApproved && p.GroupId == groupId)
                 .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)
@@ -182,14 +184,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<(List<Post> Posts, int TotalCount)> GetAllGroupPostsByUserIdAsync(string userId, int page, int size)
         {
             var query = _context.Posts
+                .Where(p => p.ApprovalStatus == ApprovalStatus.APPROVED && p.IsGroupPost && p.Group != null && p.Group.Members != null && p.Group.Members.Any(m => m.UserId == userId))
                 .Include(p => p.Group)
                     .ThenInclude(p => p.Members)
                 .AsQueryable();
 
-            var totalCount = await query.Where(p => p.IsApproved && p.IsGroupPost && p.Group != null && p.Group.Members != null && p.Group.Members.Any(m => m.UserId == userId)).CountAsync();
+            var totalCount = await query.CountAsync();
 
             var posts = await query
-                .Where(p => p.IsApproved && p.IsGroupPost && p.Group != null && p.Group.Members != null && p.Group.Members.Any(m => m.UserId == userId))
                 .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)
@@ -212,13 +214,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPendingPostsByGroupIdAsync(Guid groupId, int page, int size)
         {
             var query = _context.Posts
-                .Where(p => p.IsGroupPost && !p.IsApproved && p.GroupId == groupId)
+                .Where(p => p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.PENDING && p.GroupId == groupId)
                 .AsQueryable();
 
             var totalCount = await query.CountAsync();
 
             var posts = await query
-                .Where(p => !p.IsApproved && p.IsGroupPost && p.GroupId == groupId)
                 .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)
@@ -226,13 +227,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.User)
                 .Include(p => p.Tags)
                     .ThenInclude(p => p.User)
-                .Include(p => p.Comments)
                 .Include(p => p.Medias)
-                .Include(p => p.SharePost)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.User)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.Medias)
                 .ToListAsync();
 
             return (posts, totalCount);
@@ -240,7 +235,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<int> CountPendingPostsByGroupIdAsync(Guid groupId)
         {
-            return await _context.Posts.Where(p => p.IsGroupPost && !p.IsApproved && p.GroupId == groupId).CountAsync();
+            return await _context.Posts.Where(p => p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.PENDING && p.GroupId == groupId).CountAsync();
         }
 
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsContainsKey(string key, int page, int size)

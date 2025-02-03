@@ -1,26 +1,29 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout/MainLayout";
 import HomePage from "../pages/HomePage";
-import GroupPage from "../pages/GroupPage";
+import GroupHomePage from "../pages/groups/GroupHomePage";
 import ProfilePage from "../pages/ProfilePage";
 import AuthLayout from "../layouts/AuthLayout/AuthLayout";
-import SignInPage from "../pages/SignInPage";
-import SignUpPage from "../pages/SignUpPage";
+import SignInPage from "../pages/auth/SignInPage";
+import SignUpPage from "../pages/auth/SignUpPage";
 import ChatPage from "../pages/ChatPage";
 import AuthGuard from "./authGuard";
 import NotFoundPage from "../pages/errors/NotFoundPage";
 import GuestGuard from "./guestGuard";
 import ErrorBoundaryPage from "../pages/errors/ErrorBoundaryPage";
 import CreateStoryPage from "../pages/CreateStoryPage";
-import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import ViewStoryPage from "../pages/ViewStoryPage";
 import GroupManagerLayout from "../layouts/GroupManagerLayout/GroupManagerLayout";
-import CreateGroupPage from "../pages/CreateGroupPage";
+import CreateGroupPage from "../pages/groups/CreateGroupPage";
 import HeaderFullWidthLayout from "../layouts/HeaderFullWidthLayout/HeaderFullWidthLayout";
-import GroupFeedPage from "../pages/GroupFeedPage";
+import GroupFeedSharedPage from "../pages/groups/GroupFeedSharedPage";
 import HeaderOnlyLayout from "../layouts/HeaderOnlyLayout/HeaderOnlyLayout";
 import SearchPage from "../pages/SearchPage";
 import SearchLayout from "../layouts/SearchLayout/SearchLayout";
+import GroupLayout from "../layouts/GroupLayout/GroupLayout";
+import GroupPendingMembers from "../pages/groups/GroupPendingMembers";
+import GroupPendingPosts from "../pages/groups/GroupPendingPosts";
 
 const appRouter = createBrowserRouter([
     {
@@ -58,7 +61,7 @@ const appRouter = createBrowserRouter([
         children: [
             {
                 path: 'feeds',
-                element: <GroupFeedPage />
+                element: <GroupFeedSharedPage />
             }
         ]
     },
@@ -73,8 +76,22 @@ const appRouter = createBrowserRouter([
         element: <AuthGuard element={<HeaderFullWidthLayout />} />,
         children: [
             {
-                path: 'groups/:id/:section',
-                element: <GroupPage />
+                path: 'groups/:id',
+                element: <GroupLayout />,
+                children: [
+                    {
+                        path: '',
+                        element: <GroupHomePage />
+                    },
+                    {
+                        path: 'pending-members',
+                        element: <GroupPendingMembers />
+                    },
+                    {
+                        path: 'pending-posts',
+                        element: <GroupPendingPosts />
+                    }
+                ]
             },
             {
                 path: 'profile/:id',
