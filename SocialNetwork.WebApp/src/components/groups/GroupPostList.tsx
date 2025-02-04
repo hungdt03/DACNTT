@@ -11,6 +11,7 @@ import PostSkeletonList from "../skeletons/PostSkeletonList";
 import Post from "../posts/Post";
 import { GroupResource } from "../../types/group";
 import { GroupPrivacy } from "../../enums/group-privacy";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 
 type GroupPostListProps = {
     group: GroupResource
@@ -22,8 +23,15 @@ const GroupPostList: FC<GroupPostListProps> = ({
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [posts, setPosts] = useState<PostResource[]>([]);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const observerRef = useRef<IntersectionObserver | null>(null);
+
+
+    const { containerRef } = useInfiniteScroll({
+        fetchMore: () => void fetchNewPosts(),
+        hasMore: pagination.hasMore,
+        loading,
+        rootMargin: "100px",
+        triggerId: "group-post-scroll-trigger",
+    });
 
     const fetchPosts = async (page: number, size: number) => {
         setLoading(true);
@@ -81,32 +89,8 @@ const GroupPostList: FC<GroupPostListProps> = ({
         });
     };
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            entries => {
-                if (entries[0].isIntersecting) {
-                    fetchNewPosts();
-                }
-            },
-            { root: containerRef.current, rootMargin: '100px' }
-        );
-
-        observerRef.current = observer;
-
-        const triggerElement = document.getElementById('scroll-trigger');
-        if (triggerElement) {
-            observer.observe(triggerElement);
-        }
-
-        return () => {
-            if (observerRef.current && triggerElement) {
-                observer.unobserve(triggerElement);
-            }
-        };
-    }, [pagination, loading]);
-
     return <div className="col-span-12 lg:col-span-7 h-full overflow-y-auto custom-scrollbar py-6">
-        <div className="flex flex-col gap-y-4 h-full">
+        <div ref={containerRef} className="flex flex-col gap-y-4 h-full">
             <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} groupId={group.id} />
             {posts.map(post => {
                 if (post.postType === PostType.SHARE_POST) {
@@ -117,7 +101,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
             })}
 
             {loading && <PostSkeletonList />}
-            <div id="scroll-trigger" className="w-full h-1" />
+            <div id="group-post-scroll-trigger" className="w-full h-1" />
 
             {!pagination.hasMore && !loading && posts.length > 0 && (
                 <p className="text-center text-gray-500">Không còn bài viết để tải.</p>

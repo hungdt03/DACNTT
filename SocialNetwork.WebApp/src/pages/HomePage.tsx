@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Post from "../components/posts/Post";
 import PostCreator from "../components/posts/PostCreator";
 import { Id, toast } from "react-toastify";
@@ -11,20 +11,26 @@ import { Pagination } from "../types/response";
 import { inititalValues } from "../utils/pagination";
 import StoryWrapper from "../components/story/StoryWrapper";
 import PostGroup from "../components/posts/PostGroup";
+import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 
 
 const HomePage: FC = () => {
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [posts, setPosts] = useState<PostResource[]>([]);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const observerRef = useRef<IntersectionObserver | null>(null);
+
+    const { containerRef } = useInfiniteScroll({
+        fetchMore: () => void fetchNewPosts(),
+        hasMore: pagination.hasMore,
+        loading,
+        rootMargin: "100px",
+        triggerId: "post-scroll-trigger",
+    });
 
     const fetchPosts = async (page: number, size: number) => {
         setLoading(true);
         const response = await postService.getAllPosts(page, size);
         setLoading(false)
-        console.log(response)
 
         if (response.isSuccess) {
             setPagination(response.pagination);
@@ -77,29 +83,7 @@ const HomePage: FC = () => {
         });
     };
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            entries => {
-                if (entries[0].isIntersecting) {
-                    fetchNewPosts();
-                }
-            },
-            { root: containerRef.current, rootMargin: '100px' } // Tải trước khi user cuộn hẳn tới cuối
-        );
 
-        observerRef.current = observer;
-
-        const triggerElement = document.getElementById('scroll-trigger');
-        if (triggerElement) {
-            observer.observe(triggerElement);
-        }
-
-        return () => {
-            if (observerRef.current && triggerElement) {
-                observer.unobserve(triggerElement);
-            }
-        };
-    }, [pagination, loading]);
 
     return (
         <div ref={containerRef} className="flex flex-col gap-y-4 pb-20">
@@ -113,7 +97,7 @@ const HomePage: FC = () => {
             {posts.map(post => {
                 if (post.postType === PostType.SHARE_POST) {
                     return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
-                } else if(post.isGroupPost) {
+                } else if (post.isGroupPost) {
                     return <PostGroup key={post.id} post={post} />;
                 }
 
@@ -121,7 +105,7 @@ const HomePage: FC = () => {
             })}
 
             {loading && <PostSkeletonList />}
-            <div id="scroll-trigger" className="w-full h-1" />
+            <div id="post-scroll-trigger" className="w-full h-1" />
 
             {!pagination.hasMore && !loading && (
                 <p className="text-center text-gray-500">Không còn bài viết để tải.</p>

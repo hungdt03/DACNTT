@@ -1,6 +1,8 @@
+import { date } from 'yup';
 import { EditSharePostRequest } from '../components/modals/EditSharePostModal';
 import { SharePostRequest } from '../components/modals/SharePostModal';
 import axiosInterceptor from '../configurations/axiosInterceptor'
+import { PendingPostsFilter } from '../pages/groups/GroupPendingPosts';
 import { PostMediaResource, PostResource } from '../types/post';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
@@ -79,11 +81,16 @@ class PostService {
         })
     }
 
-    getAllPendingPostsByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+    getAllPendingPostsByGroupId(groupId: string, page: number, size: number, query: string, filtering: PendingPostsFilter) : Promise<PaginationResponse<PostResource[]>> {
         return axiosInterceptor.get('/api/posts/group/pending/' + groupId, {
             params: {
                 page: page,  
-                size: size  
+                size: size,
+                date: filtering.date,
+                userId: filtering.author?.id,
+                sortOrder: filtering.sortOrder,
+                contentType: filtering.contentType,
+                query
             }
         })
     }

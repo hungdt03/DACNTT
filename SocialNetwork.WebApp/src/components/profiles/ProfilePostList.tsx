@@ -11,6 +11,7 @@ import { inititalValues } from "../../utils/pagination";
 import { UserResource } from "../../types/user";
 import PostSkeletonList from "../skeletons/PostSkeletonList";
 import PostGroup from "../posts/PostGroup";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 
 type ProfilePostListProps = {
     isShowPostCreator?: boolean;
@@ -25,13 +26,21 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
     const [loading, setLoading] = useState(false)
     const [posts, setPosts] = useState<PostResource[]>([]);
 
+    const { containerRef } = useInfiniteScroll({
+        fetchMore: () => void fetchNewPosts(),
+        hasMore: pagination.hasMore,
+        loading,
+        rootMargin: "100px",
+        triggerId: "profile-post-scroll-trigger",
+    });
+
+
     const fetchPosts = async (page: number, size: number) => {
         setLoading(true)
         const response = await postService.getAllPostsByUserId(user.id, page, size);
         setLoading(false)
 
         if (response.isSuccess) {
-            
             setPagination(response.pagination)
             setPosts(prevPosts => {
                 const existingIds = new Set(prevPosts.map(post => post.id));
@@ -68,13 +77,13 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
         });
     }
 
-    return <div className="col-span-12 lg:col-span-7 max-w-screen-sm mx-auto flex flex-col gap-y-4">
+    return <div ref={containerRef} className="col-span-12 lg:col-span-7 max-w-screen-sm mx-auto flex flex-col gap-y-4">
         {isShowPostCreator && <PostCreator
             onSuccess={handleCreatePostSuccess}
             onFalied={handleCreatePostFailed}
         />}
-       
-       {posts.map(post => {
+
+        {posts.map(post => {
             if (post.postType === PostType.SHARE_POST) {
                 return <SharePost onFetch={() => fetchPosts(1, pagination.size)} key={post.id} post={post} />;
             } else if (post.isGroupPost) {
@@ -84,8 +93,11 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
             return <Post onFetch={() => fetchPosts(1, pagination.size)} key={post.id} post={post} />;
         })}
 
-        {loading && <PostSkeletonList />} 
-        {pagination.hasMore && !loading && <button onClick={fetchNewPosts} className="text-gray-400 font-bold text-center">Tải thêm bài viết</button>}
+        {loading && <PostSkeletonList />}
+        <div id="profile-post-scroll-trigger" className="w-full h-1" />
+        {!pagination.hasMore && !loading && (
+            <p className="text-center text-gray-500">Không còn bài viết để tải.</p>
+        )}
     </div>
 };
 

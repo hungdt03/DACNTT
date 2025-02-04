@@ -24,6 +24,7 @@ import SearchLayout from "../layouts/SearchLayout/SearchLayout";
 import GroupLayout from "../layouts/GroupLayout/GroupLayout";
 import GroupPendingMembers from "../pages/groups/GroupPendingMembers";
 import GroupPendingPosts from "../pages/groups/GroupPendingPosts";
+import GroupMemberPage from "../pages/groups/GroupMemberPage";
 
 const appRouter = createBrowserRouter([
     {
@@ -82,6 +83,10 @@ const appRouter = createBrowserRouter([
                     {
                         path: '',
                         element: <GroupHomePage />
+                    },
+                    {
+                        path: 'members',
+                        element: <GroupMemberPage />
                     },
                     {
                         path: 'pending-members',

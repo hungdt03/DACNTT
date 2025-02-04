@@ -22,7 +22,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
         public async Task<BaseResponse> Handle(GetAllPendingPostsByGroupIdQuery request, CancellationToken cancellationToken)
         {
-            var (pendingPosts, totalCount) = await _unitOfWork.PostRepository.GetAllPendingPostsByGroupIdAsync(request.GroupId, request.Page, request.Size);
+            var (pendingPosts, totalCount) = await _unitOfWork.PostRepository.GetAllPendingPostsByGroupIdAsync(request.GroupId, request.Page, request.Size, request.SortOrder, request.Query, request.UserId, request.ContentType, request.Date);
             var response = pendingPosts.Select(ApplicationMapper.MapToPost).ToList();
 
             return new PaginationResponse<List<PostResponse>>

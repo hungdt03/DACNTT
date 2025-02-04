@@ -1,7 +1,4 @@
 import { FC, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { selectAuth } from "../../../features/slices/auth-slice";
 import { FriendRequestResource } from "../../../types/friendRequest";
 import { UserResource } from "../../../types/user";
 import { FriendResource } from "../../../types/friend";

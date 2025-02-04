@@ -68,5 +68,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                     .ThenInclude(g => g.User)
                 .SingleOrDefaultAsync(g => g.Id == groupId);    
         }
+
+        public void RemoveGroup(Group group)
+        {
+            _context.Groups.Remove(group);
+        }
     }
 }

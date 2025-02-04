@@ -28,6 +28,8 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             var userId = _contextAccessor.HttpContext.User.GetUserId();
             var groupMember = group.Members.SingleOrDefault(s => s.UserId == userId);
             var response = ApplicationMapper.MapToGroup(group);
+            response.AdminCount = await _unitOfWork.GroupMemberRepository
+                .CountAdminsByGroupIdAsync(request.GroupId);
 
             if(groupMember != null)
             {

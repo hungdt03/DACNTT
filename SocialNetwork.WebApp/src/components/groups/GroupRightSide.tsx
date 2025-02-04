@@ -1,6 +1,6 @@
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { Empty, Image } from "antd";
-import { Earth, Eye, EyeClosed, EyeIcon, Lock, LucideEarth, Newspaper } from "lucide-react";
+import { Eye, Lock, LucideEarth, Newspaper } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import { GroupResource } from "../../types/group";
 import { PostMediaResource } from "../../types/post";
@@ -73,20 +73,34 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
             <span className="font-bold text-lg text-gray-700">File phương tiện mới đây</span>
 
-            {medias.length > 0 ? <div className="grid grid-cols-2 gap-1 rounded-md overflow-hidden">
-                {medias.map(media => {
-                    if (media.mediaType === MediaType.IMAGE)
-                        return <Image preview={{
-                            mask: 'Xem'
-                        }} className="object-cover" width={'100%'} height={'100%'} key={media.id} src={media.mediaUrl} />
+            {medias.length > 0 ? (
+                <div className="grid grid-cols-2 gap-1 rounded-md overflow-hidden">
+                    {medias.map(media => (
+                        <div key={media.id} style={{
+                            aspectRatio: 1/1
+                        }} className="relative w-full overflow-hidden">
+                            {media.mediaType === MediaType.IMAGE ? (
+                                <Image
+                                    preview={{ mask: 'Xem' }}
+                                    className="object-cover"
+                                    width={'100%'}
+                                    height={'100%'}
+                                    src={media.mediaUrl}
+                                />
+                            ) : (
+                                <video
+                                    src={media.mediaUrl}
+                                    className="w-full h-full object-cover"
+                                    controls
+                                />
+                            )}
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <Empty description="Chưa có file phương tiện nào" />
+            )}
 
-                    return <video key={media.id}
-                        src={media.mediaUrl}
-                        className="w-full object-cover h-full"
-                        controls
-                    />
-                })}
-            </div> : <Empty description='Chưa có file phương tiện nào' />}
 
             {hasNext && <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button>}
         </div>

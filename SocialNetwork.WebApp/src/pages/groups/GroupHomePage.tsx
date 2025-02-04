@@ -40,7 +40,7 @@ const GroupHomePage: FC = () => {
     return <>
         {group && <GroupHeader onFetch={fetchGroup} requestJoin={requestJoin} group={group} />}
         <div className="flex flex-col h-full gap-y-4 lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto">
-            {group?.isMember || group?.privacy === GroupPrivacy.PUBLIC ? <div className="grid grid-cols-12 gap-6 overflow-y-auto">
+            {group?.isMember || group?.privacy === GroupPrivacy.PUBLIC ? <div className="grid grid-cols-12 gap-6 overflow-y-auto h-full">
                 {group && <GroupPostList group={group} />}
                 {group && <GroupRightSide group={group} />}
             </div> : group && <GroupPending group={group} />}

@@ -211,16 +211,49 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return (posts, totalCount);
         }
 
-        public async Task<(List<Post> Posts, int TotalCount)> GetAllPendingPostsByGroupIdAsync(Guid groupId, int page, int size)
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllPendingPostsByGroupIdAsync(Guid groupId, int page, int size, string sortOrder, string query, string? userId, string contentType, DateTimeOffset? date)
         {
-            var query = _context.Posts
-                .Where(p => p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.PENDING && p.GroupId == groupId)
-                .AsQueryable();
+            var queryable = _context.Posts
+                .AsNoTracking() 
+                .Where(p => p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.PENDING && p.GroupId == groupId);
 
-            var totalCount = await query.CountAsync();
+            if (!string.IsNullOrEmpty(query))
+            {
+                queryable = queryable.Where(p => p.Content.ToLower().Contains(query.ToLower()));
+            }
 
-            var posts = await query
-                .OrderByDescending(p => p.DateCreated)
+            if (date.HasValue)
+            {
+                var startDate = date.Value.Date;
+                var endDate = startDate.AddDays(1);
+                queryable = queryable.Where(p => p.DateCreated >= startDate && p.DateCreated < endDate);
+            }
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                queryable = queryable.Where(p => p.UserId == userId);
+            }
+
+            if (contentType != "ALL")
+            {
+                queryable = contentType switch
+                {
+                    PostContentType.TEXT => queryable.Where(p => (p.Medias == null || p.Medias.Count == 0) && p.Background == null && p.OriginalPostId == null),
+                    PostContentType.MEDIA => queryable.Where(p => p.Medias != null && p.Medias.Count > 0),
+                    PostContentType.BACKGROUND => queryable.Where(p => p.Background != null),
+                    PostContentType.SHARE => queryable.Where(p => p.OriginalPostId != null),
+                    _ => queryable
+                };
+            }
+
+            if (sortOrder.Equals("desc", StringComparison.OrdinalIgnoreCase))
+            {
+                queryable = queryable.OrderByDescending(p => p.DateCreated);
+            }
+
+            var totalCount = await queryable.CountAsync();
+
+            var posts = await queryable
                 .Skip((page - 1) * size)
                 .Take(size)
                 .Include(p => p.Group)
@@ -264,5 +297,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
             return (posts, totalCount);
         }
+
     }
 }

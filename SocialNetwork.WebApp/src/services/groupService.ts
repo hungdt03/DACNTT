@@ -84,12 +84,37 @@ class GroupService {
         })
     }
 
-    getAllMembersByGroupId(groupId: string) : Promise<DataResponse<GroupMemberResource[]>> {
-        return axiosInterceptor.get('/api/groups/members/' + groupId)
+    getAllMembersByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<GroupMemberResource[]>> {
+        return axiosInterceptor.get('/api/groups/members/' + groupId, {
+            params: {
+                page,
+                size
+            }
+        })
+    }
+
+    getAllNonAdminMembersByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<GroupMemberResource[]>> {
+        return axiosInterceptor.get('/api/groups/members-non-admins/' + groupId, {
+            params: {
+                page,
+                size
+            }
+        })
     }
 
     updateGeneralInfo(groupId: string, payload: any) : Promise<BaseResponse> {
         return axiosInterceptor.put('/api/groups/' + groupId, payload)
+    }
+
+    kickMember(memberId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.delete('/api/groups/kick/' + memberId)
+    }
+
+    leaveGroup(groupId: string, memberId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/groups/leave-group', {
+            groupId,
+            memberId
+        })
     }
 }
 

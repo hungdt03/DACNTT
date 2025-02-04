@@ -5,15 +5,18 @@ import postService from "../../services/postService";
 import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";
 import { useParams } from "react-router-dom";
-import { Avatar, DatePicker, Dropdown, MenuProps, message } from "antd";
+import { Avatar, DatePicker, Dropdown, Empty, message } from "antd";
 import { Search } from "lucide-react";
 import groupService from "../../services/groupService";
 import { GroupMemberResource } from "../../types/group-member";
 import { Dayjs } from "dayjs";
 import { UserResource } from "../../types/user";
+import useDebounce from "../../hooks/useDebounce";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+import LoadingIndicator from "../../components/LoadingIndicator";
 
-type ContentTypeKey = 'media' | 'text' | 'background' | 'share';
-type SortOrderKey = 'asc' | 'desc';
+export type ContentTypeKey = 'MEDIA' | 'TEXT' | 'BACKGROUND' | 'SHARE';
+export type SortOrderKey = 'asc' | 'desc';
 
 interface ContentType {
     key: ContentTypeKey;
@@ -26,10 +29,10 @@ interface SortOrder {
 }
 
 const CONTENT_TYPES: ContentType[] = [
-    { key: 'media', label: 'Ảnh/video' },
-    { key: 'text', label: 'Văn bản' },
-    { key: 'background', label: 'Phông nền' },
-    { key: 'share', label: 'Chia sẻ lại' },
+    { key: 'MEDIA', label: 'Ảnh/video' },
+    { key: 'TEXT', label: 'Văn bản' },
+    { key: 'BACKGROUND', label: 'Phông nền' },
+    { key: 'SHARE', label: 'Chia sẻ lại' },
 ];
 
 const SORT_ORDER: SortOrder[] = [
@@ -39,10 +42,10 @@ const SORT_ORDER: SortOrder[] = [
 
 
 export type PendingPostsFilter = {
-    date?: Dayjs;
-    sortOrder: 'asc' | 'desc',
+    date?: string;
+    sortOrder: SortOrderKey;
     author?: UserResource;
-    contentType?: 'media' | 'text' | 'background' | 'share'
+    contentType?: ContentTypeKey;
 }
 
 type GroupPendingPostsProps = {
@@ -52,16 +55,54 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
 }) => {
     const { id } = useParams()
     const [pendingPosts, setPendingPosts] = useState<PostResource[]>([]);
-    const [pagination, setPagination] = useState<Pagination>(inititalValues);
-    const [loading, setLoading] = useState(false);
     const [members, setMembers] = useState<GroupMemberResource[]>([]);
+    const [searchValue, setSearchValue] = useState('')
+
+    const [pagination, setPagination] = useState<Pagination>(inititalValues);
+    const [memberPagination, setMemberPagination] = useState<Pagination>(inititalValues);
+
+    const [loading, setLoading] = useState(false);
+    const [memberLoading, setMemberLoading] = useState(false);
+
     const [filter, setFilter] = useState<PendingPostsFilter>({
-        sortOrder: 'asc'
+        sortOrder: 'asc',
     })
 
-    const fetchPendingPosts = async (groupId: string, page: number, size: number) => {
+    const debouncedValue = useDebounce(searchValue, 300);
+
+    const { containerRef } = useInfiniteScroll({
+        fetchMore: () => void fetchMoreMembers(),
+        hasMore: memberPagination.hasMore,
+        loading: memberLoading,
+        rootMargin: "10px",
+        triggerId: "select-member-scroll-trigger",
+    });
+
+    const fetchMembers = async (groupId: string, page: number, size: number) => {
+        setMemberLoading(true);
+        const response = await groupService.getAllMembersByGroupId(groupId, page, size);
+        setTimeout(() => {
+            setMemberLoading(false);
+
+            if (response.isSuccess) {
+                setMemberPagination(response.pagination);
+                setMembers(prevMembers => {
+                    const existingIds = new Set(prevMembers.map(m => m.user.id));
+                    const newMembers = response.data.filter(m => !existingIds.has(m.user.id));
+                    return [...prevMembers, ...newMembers];
+                });
+            }
+        }, 2000)
+    };
+
+    const fetchMoreMembers = async () => {
+        if (!memberPagination.hasMore || memberLoading || !id) return;
+        fetchMembers(id, memberPagination.page + 1, memberPagination.size);
+    };
+
+    const fetchPendingPosts = async (groupId: string, page: number, size: number, query: string, filterParams: PendingPostsFilter) => {
         setLoading(true)
-        const response = await postService.getAllPendingPostsByGroupId(groupId, page, size);
+        const response = await postService.getAllPendingPostsByGroupId(groupId, page, size, query, filterParams);
         setLoading(false)
         if (response.isSuccess) {
             setPendingPosts(response.data);
@@ -69,18 +110,9 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
         }
     }
 
-    const fetchMembers = async () => {
-        if (id) {
-            const response = await groupService.getAllMembersByGroupId(id);
-            if (response.isSuccess) {
-                setMembers(response.data)
-            }
-        }
-    }
-
     useEffect(() => {
-        id && fetchPendingPosts(id, pagination.page, pagination.size);
-        fetchMembers();
+        id && fetchPendingPosts(id, pagination.page, pagination.size, searchValue, filter);
+        id && fetchMembers(id, memberPagination.page, memberPagination.size);
     }, [id])
 
     const handleApprovalPost = async (postId: string) => {
@@ -88,7 +120,7 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
             const response = await postService.approvalPostByGroupIdAndPostId(id, postId);
             if (response.isSuccess) {
                 message.success(response.message);
-                fetchPendingPosts(id, 1, 6)
+                fetchPendingPosts(id, 1, 6, searchValue, filter)
             } else {
                 message.error(response.message)
             }
@@ -100,7 +132,7 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
             const response = await postService.rejectPostByGroupIdAndPostId(id, postId);
             if (response.isSuccess) {
                 message.success(response.message);
-                fetchPendingPosts(id, 1, 6)
+                fetchPendingPosts(id, 1, 6, searchValue, filter)
             } else {
                 message.error(response.message)
             }
@@ -108,56 +140,87 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
     }
 
     const handleMemberChange = (member: UserResource) => {
-        setFilter(prev => ({
-            ...prev,
+        const updateFilter = {
+            ...filter,
             author: member
-        }))
+        }
+        setFilter(updateFilter)
+        id && fetchPendingPosts(id, 1, 6, searchValue, updateFilter)
     }
 
     const handleContentTypeClick = (key: ContentTypeKey) => {
-        setFilter(prev => ({
-            ...prev,
+        const updateFilter = {
+            ...filter,
             contentType: key
-        }))
+        }
+        setFilter(updateFilter)
+        id && fetchPendingPosts(id, 1, 6, searchValue, updateFilter)
     };
 
     const handleSortOrderClick = (key: SortOrderKey) => {
-        setFilter(prev => ({
-            ...prev,
+        const updateFilter = {
+            ...filter,
             sortOrder: key
-        }))
+        }
+        setFilter(updateFilter)
+        id && fetchPendingPosts(id, 1, 6, searchValue, updateFilter)
     };
 
+    const handleChangeDate = (date: Dayjs, dateString: string | string[]) => {
+        const updateFilter = {
+            ...filter,
+            date: dateString as string
+        }
+        setFilter(updateFilter)
+        id && fetchPendingPosts(id, 1, 6, searchValue, updateFilter)
+    }
+
+
+    useEffect(() => {
+        if ((debouncedValue.trim().length > 1 || debouncedValue.trim().length === 0) && id) {
+            fetchPendingPosts(id, 1, 6, debouncedValue, filter)
+        }
+    }, [debouncedValue])
 
     return <div className="w-full">
         <div className="w-full flex items-center justify-center bg-white shadow sticky top-0 z-10">
-            <div className="max-w-screen-sm w-full py-8 flex flex-col gap-y-3">
+            <div className="max-w-screen-lg w-full py-3 flex flex-col gap-y-3">
                 <div className="flex items-center gap-x-2">
                     <span className="text-xl font-bold">Đang chờ phê duyệt</span>
                     <span className="w-1 h-1 rounded-full bg-gray-500"></span>
-                    <span className="text-xl font-bold">2</span>
+                    <span className="text-xl font-bold">{pendingPosts.length}</span>
                 </div>
-                <div className="px-4 flex items-center gap-x-2 rounded-3xl bg-gray-100">
-                    <Search size={14} />
-                    <input placeholder="Tìm kiếm" className="px-2 py-2 w-full bg-gray-100 outline-none border-none" />
-                </div>
-
                 <div className="flex items-center gap-x-4">
-                    <DatePicker placeholder="Chọn ngày" className="text-sm" />
-                    <Dropdown menu={{
-                        items: members.map(member => ({
-                            label: <button
-                                onClick={() => handleMemberChange(member.user)}
-                                className="py-1 flex items-center gap-x-2">
-                                <Avatar
-                                    size={'small'}
-                                    src={member.user.avatar}
-                                />
-                                <span>{member.user.fullName}</span>
-                            </button>,
-                            key: member.user.id
-                        }))
-                    }} placement="bottom">
+                    <div className="px-4 flex items-center gap-x-2 rounded-3xl bg-gray-100">
+                        <Search size={14} />
+                        <input value={searchValue} onChange={e => setSearchValue(e.target.value)} placeholder="Tìm kiếm" className="px-2 py-1 w-full bg-gray-100 outline-none border-none" />
+                    </div>
+
+                    <DatePicker placeholder="Chọn ngày" className="text-sm" onChange={handleChangeDate} />
+                    <Dropdown
+                        trigger={['click']}
+                        dropdownRender={() => (
+                            <div ref={containerRef} className="bg-white shadow-lg rounded-lg w-56 max-h-[400px] custom-scrollbar overflow-y-auto">
+                                {members.map((member) => (
+                                    <button
+                                        key={member.user.id}
+                                        onClick={() => handleMemberChange(member.user)}
+                                        className="w-full py-2 px-4 flex items-center gap-x-2 hover:bg-gray-100 transition"
+                                    >
+                                        <Avatar size="small" src={member.user.avatar} />
+                                        <span>{member.user.fullName}</span>
+                                    </button>
+                                ))}
+
+                                <div id="select-member-scroll-trigger" className="w-full h-1" />
+
+                                {memberLoading && (
+                                    <LoadingIndicator />
+                                )}
+                            </div>
+                        )}
+                        placement="bottom"
+                    >
                         {filter.author ? <button className="py-[6px] px-4 text-sm rounded-md bg-sky-100 text-primary font-semibold">
                             {filter.author.fullName}
                         </button> : <button className="py-[6px] px-4 text-sm rounded-md font-semibold bg-gray-100 hover:bg-gray-200">Chọn tác giả</button>}
@@ -199,17 +262,20 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
                         </button> : <button className="py-[6px] px-4 text-sm rounded-md font-semibold bg-gray-100 hover:bg-gray-200">Cũ nhất trước</button>}
                     </Dropdown>
                 </div>
+
             </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 py-4 px-8">
+        {pendingPosts.length === 0 ? <div className="w-full h-full flex items-center justify-center">
+            <Empty description='Không có bài viết nào đang chờ phê duyệt' />
+        </div> : <div className="grid grid-cols-2 gap-4 py-4 px-8">
             {pendingPosts.map(post => <PendingPost
                 onReject={() => handleRejectPost(post.id)}
                 onApproval={() => handleApprovalPost(post.id)}
                 key={post.id}
                 post={post}
             />)}
-        </div>
+        </div>}
     </div>
 };
 

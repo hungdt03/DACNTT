@@ -144,6 +144,13 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                 </div>
 
                 <Divider className="my-3" />
+
+                <div className="flex gap-x-2 items-center">
+                    <Link className="px-4 py-2 border-b-[3px] border-primary rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold" to={`/groups/${group.id}`}>Thảo luận</Link>
+                    <Link className="px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold" to={`/groups/${group.id}/members`}>Thành viên</Link>
+                    <Link className="px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold" to={`/groups/${group.id}/images`}>Ảnh</Link>
+                    <Link className="px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold" to={`/groups/${group.id}/videos`}>Video</Link>
+                </div>
             </div>
         </div>
 
@@ -175,7 +182,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                 onFinish={onFinish}
                 form={form}
                 layout="vertical"
-                onChange={() => setIsChange(true)}
+                onValuesChange={() => setIsChange(true)}
                 initialValues={{
                     name: group.name,
                     description: group.description,

@@ -90,9 +90,14 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet("group/pending/{groupId}")]
-        public async Task<IActionResult> GetAllPendingPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
+        public async Task<IActionResult> GetAllPendingPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8, [FromQuery] string query = "", [FromQuery] string? userId = null, [FromQuery] string sortOrder = "asc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset date = default)
         {
-            var response = await _mediator.Send(new GetAllPendingPostsByGroupIdQuery(groupId, page, size));
+            if (date == default)
+            {
+                date = DateTimeOffset.UtcNow;
+            }
+
+            var response = await _mediator.Send(new GetAllPendingPostsByGroupIdQuery(groupId, page, size, sortOrder, query, userId, contentType, date));
             return Ok(response);
         }
 

@@ -119,7 +119,7 @@ const ProfileContent: FC<ProfileContentProps> = ({
 
 
     return <div className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
-        <div className="flex flex-col gap-y-4 overflow-y-auto shadow">
+        <div className="flex flex-col gap-y-4 overflow-y-auto">
             <div className="w-full h-full relative z-10">
                 <img alt="Ảnh bìa" className="w-full object-cover max-h-[25vh] h-full md:max-h-[30vh] rounded-lg" src={tempCoverImage || user.coverImage || images.cover} />
                 <div className="flex items-center gap-x-2 absolute right-4 top-4 md:top-auto md:bottom-4 shadow">

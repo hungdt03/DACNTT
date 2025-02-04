@@ -35,12 +35,6 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("members/{groupId}")]
-        public async Task<IActionResult> GetMembersByGroupId([FromRoute] Guid groupId)
-        {
-            var response = await mediator.Send(new GetAllMembersByGroupIdQuery(groupId));
-            return Ok(response);
-        }
 
         [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPut("{groupId}")]
@@ -142,5 +136,44 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new RejectInviteFriendCommand(inviteId));
             return Ok(response);
         }
+
+
+        [HttpGet("members/{groupId}")]
+        public async Task<IActionResult> GetMembersByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetAllMembersByGroupIdQuery(groupId, page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("members-non-admins/{groupId}")]
+        public async Task<IActionResult> GetAllNonAdminsMembersByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetAllNonAdminMembersByGroupIdQuery(groupId, page, size));
+            return Ok(response);
+        }
+
+
+        [HttpDelete("kick/{memberId}")]
+        public async Task<IActionResult> KickGroupMember([FromRoute] Guid memberId)
+        {
+            var response = await mediator.Send(new KickGroupMemberCommand(memberId));
+            return Ok(response);
+        }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("leave-group")]
+        public async Task<IActionResult> LeaveGroup([FromBody] LeaveGroupCommand command)
+        {
+            var response = await mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpPut("revoke-permission/{memberId}")]
+        public async Task<IActionResult> RevokeMemberPermission([FromRoute] Guid memberId)
+        {
+            var response = await mediator.Send(new RevokeUserPermissionCommand(memberId));
+            return Ok(response);
+        }
+
     }
 }

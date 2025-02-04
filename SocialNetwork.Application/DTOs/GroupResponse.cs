@@ -16,5 +16,6 @@ namespace SocialNetwork.Application.DTOs
         public bool RequireApprovalPost { get; set; }
         public bool OnlyAdminCanApprovalMember { get; set; }
         public bool IsHidden { get; set; }
+        public int AdminCount { get; set; }
     }
 }

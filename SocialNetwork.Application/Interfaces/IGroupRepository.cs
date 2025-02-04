@@ -11,5 +11,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<IEnumerable<Group>> GetAllGroupsManageByUserId(string userId);
         Task<IEnumerable<Group>> GetAllGroupsJoinByUserId(string userId);
         Task<(IEnumerable<Group> Groups, int TotalCount)> GetAllGroupsContainsKey(string key, int page, int size);
+        void RemoveGroup(Group group);
     }
 }

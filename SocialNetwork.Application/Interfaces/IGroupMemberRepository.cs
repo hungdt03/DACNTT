@@ -6,8 +6,12 @@ namespace SocialNetwork.Application.Interfaces
     public interface IGroupMemberRepository 
     {
         Task CreateGroupMemberAsync(GroupMember groupMember);
-        Task<IEnumerable<GroupMember>> GetAllMembersInGroupAsync(Guid groupId);
+        Task<(IEnumerable<GroupMember> Members, int TotalCount)> GetAllNonAdminMembersInGroupAsync(Guid groupId, int page, int size);
+        Task<(IEnumerable<GroupMember> Members, int TotalCount)> GetAllMembersInGroupAsync(Guid groupId, int page, int size);
         Task<GroupMember?> GetGroupMemberByIdAsync(Guid groupMemberId);
         Task<GroupMember?> GetGroupMemberByGroupIdAndUserId(Guid groupId, string userId);
+        void RemoveGroupMember(GroupMember groupMember);
+        Task<int> CountGroupMembersByGroupIdAsync(Guid groupId);
+        Task<int> CountAdminsByGroupIdAsync(Guid groupId);
     }
 }
