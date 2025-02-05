@@ -40,6 +40,11 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 response.Friend = ApplicationMapper.MapToUser(friend.User);
                 response.Friend.IsOnline = response.IsOnline = isOnline;
 
+                var haveStory = await _unitOfWork.StoryRepository
+                       .IsUserHaveStoryAsync(friend.UserId);
+
+                response.Friend.HaveStory = haveStory;
+
                 if (!isOnline)
                 {
                     var recentOnlineTime = await _userStatusService.GetLastActiveTimeAsync(userId);

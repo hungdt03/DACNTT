@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Auth.Commands;
+using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 
@@ -12,11 +13,13 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
     {
         private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly ITokenService tokenService;
+        private readonly IUnitOfWork unitOfWork;
 
-        public LoginCommandHandler(UserManager<Domain.Entity.System.User> userManager, ITokenService tokenService)
+        public LoginCommandHandler(UserManager<Domain.Entity.System.User> userManager, ITokenService tokenService, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
             this.tokenService = tokenService;
+            this.unitOfWork = unitOfWork;
         }
 
         public async Task<BaseResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -39,6 +42,10 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
                 Token = tokens,
                 User = ApplicationMapper.MapToUser(user),
             };
+
+            var haveStory = await unitOfWork.StoryRepository
+                   .IsUserHaveStoryAsync(user.Id);
+            response.User.HaveStory = haveStory;
 
             return new DataResponse<AuthResponse>
             {

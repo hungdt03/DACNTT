@@ -1,15 +1,13 @@
 import { FC } from "react";
 import Header from "../shared/Header";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import MainLeftSidebar from "./components/MainLeftSidebar";
 import MainRightSidebar from "./components/MainRightSidebar";
 import PopupWrapper from "../../components/chats/PopupWrapper";
 import MinimizePopupWrapper from "../../components/chats/MinimizePopupWrapper";
-import { FloatButton } from "antd";
-
 
 const MainLayout: FC = () => {
-   
+
     return <div className="flex flex-col w-screen h-screen overflow-y-hidden">
         <Header />
         <div className="bg-slate-100 w-ful h-full">
@@ -20,7 +18,7 @@ const MainLayout: FC = () => {
                 </div>
                 <MainRightSidebar />
             </div>
-         
+
         </div>
 
         <div className="absolute right-24 bottom-0 flex gap-x-4">
@@ -32,7 +30,6 @@ const MainLayout: FC = () => {
                 <MinimizePopupWrapper />
             </div>
         </div>
-
     </div>
 };
 

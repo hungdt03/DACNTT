@@ -30,7 +30,7 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
         fetchGroupPostMedias()
     }, [group])
 
-    return <div className="lg:flex flex-col h-full gap-y-4 hidden lg:col-span-5 py-6 overflow-y-auto custom-scrollbar">
+    return <div className="lg:flex flex-col h-full gap-y-4 hidden lg:col-span-5 py-6 overflow-y-auto scrollbar-hide">
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-2">
             <span className="font-bold text-lg text-gray-700">Giới thiệu</span>
 

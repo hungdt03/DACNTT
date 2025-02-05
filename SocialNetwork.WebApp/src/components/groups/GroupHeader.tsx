@@ -122,9 +122,9 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                     <div className="flex items-center gap-x-2">
                         {group.isMember ? (
                             <>
-                                <Button onClick={() => setOpenSetting(true)} icon={<SettingOutlined size={16} />} type="primary">
+                                {group.isMine && <Button onClick={() => setOpenSetting(true)} icon={<SettingOutlined size={16} />} type="primary">
                                     Cài đặt
-                                </Button>
+                                </Button>}
                                 <Button onClick={showModal} icon={<Plus size={16} />} type="primary">
                                     Mời
                                 </Button>
@@ -156,7 +156,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
 
         <Modal
             centered
-            title={<p className="text-center font-semibold text-xl">Mời bạn bè tham gia nhóm</p>}
+            title={<p className="text-center font-bold text-lg">Mời bạn bè tham gia nhóm</p>}
             width='800px'
             open={isModalOpen}
             onOk={handleOk}

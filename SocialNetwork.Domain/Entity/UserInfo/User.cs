@@ -27,6 +27,7 @@ namespace SocialNetwork.Domain.Entity.System
         public Location? Location { get; set; }
         public Location? HomeTown { get; set; }
 
+        public ICollection<SavedPost> SavedPosts { get; set; }
         public ICollection<SearchHistory> Searches { get; set; }
         public ICollection<BlockList> BlockLists { get; set; }
         public ICollection<Report> Reports { get; set; }

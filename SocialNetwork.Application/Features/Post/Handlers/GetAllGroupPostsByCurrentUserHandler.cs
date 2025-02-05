@@ -30,6 +30,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var response = new List<PostResponse>();
             foreach (var post in posts)
             {
+                
                 var postItem = ApplicationMapper.MapToPost(post);
                 if (post.PostType == PostType.ORIGINAL_POST)
                 {
@@ -37,8 +38,11 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     postItem.Shares = shares;
                 };
 
-                response.Add(postItem);
+                var haveStory = await _unitOfWork.StoryRepository
+                    .IsUserHaveStoryAsync(post.UserId);
+                postItem.User.HaveStory = haveStory;
 
+                response.Add(postItem);
             }
 
             var hasMore = request.Page * request.Size < totalCount;

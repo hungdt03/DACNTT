@@ -33,7 +33,7 @@ const CreateStorySidebar: FC<CreateStorySidebarProps> = ({
     return <>
         <div className="flex flex-col shadow h-full relative">
             <div className="flex items-center gap-x-2 p-3">
-                <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-300">
+                <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-500">
                     <CloseOutlined />
                 </Link>
                 <Link to='/'><img width='36px' height='36px' src={images.facebook} /></Link>

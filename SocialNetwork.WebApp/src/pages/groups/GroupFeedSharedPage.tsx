@@ -75,8 +75,12 @@ const GroupFeedSharedPage: FC = () => {
                 {loading && <PostSkeletonList />}
                 <div id="share-group-post-scroll-trigger" className="w-full h-1" />
 
-                {!pagination.hasMore && !loading && (
+                {posts.length > 0 && !pagination.hasMore && !loading && (
                     <p className="text-center text-gray-500">Không còn bài viết để tải.</p>
+                )}
+
+                {posts.length === 0 && !loading && (
+                    <p className="text-center text-gray-500">Không có bài viết nào để tải.</p>
                 )}
             </div>
         </div>

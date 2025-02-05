@@ -16,7 +16,6 @@ const MessageFromMe: FC<MessageFromMeProps> = ({
             {message.content && <p className="bg-sky-500 text-white p-2 rounded-lg text-sm break-words max-w-full">
                 {message.content}
             </p>}
-
             <span className="text-xs text-gray-400 pl-1">{message.status === 'sending' ? 'Đang gửi' : `Đã gửi vào lúc ${formatTimeMessage(new Date(message.sentAt))}`}</span>
         </div>
     </div>

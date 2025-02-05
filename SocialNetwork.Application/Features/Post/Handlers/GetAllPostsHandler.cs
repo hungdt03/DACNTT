@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
@@ -8,6 +9,9 @@ using SocialNetwork.Application.Features.Post.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Drawing;
+using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.Post.Handlers
 {
@@ -25,23 +29,63 @@ namespace SocialNetwork.Application.Features.Post.Handlers
         public async Task<BaseResponse> Handle(GetAllPostQuery request, CancellationToken cancellationToken)
         {
             var userId = httpContextAccessor.HttpContext.User.GetUserId();
-            var (posts, totalCount) = await unitOfWork.PostRepository.GetAllPostsAsync(request.Page, request.Size, userId);
+            var allPosts = await unitOfWork.PostRepository.GetAllPostsAsync();
 
-            var response = new List<PostResponse>();
-            foreach (var post in posts)
+            var filteredPosts = new List<Domain.Entity.PostInfo.Post>();
+            foreach (var post in allPosts)
             {
-                var postItem = ApplicationMapper.MapToPost(post);
-                if (post.PostType == PostType.ORIGINAL_POST)
+                if(post.GroupId.HasValue)
                 {
-                    var shares = await unitOfWork.PostRepository.CountSharesByPostIdAsync(post.Id);
-                    postItem.Shares = shares;
-                };
+                    var member = await unitOfWork.GroupMemberRepository
+                        .GetGroupMemberByGroupIdAndUserId(post.GroupId.Value, userId);
+                    if (member == null || post.IsGroupPost && post.ApprovalStatus != ApprovalStatus.APPROVED) continue;
+                }
 
-                response.Add(postItem);
+                bool isMe = post.UserId == userId;
+              
+                if (!isMe)
+                {
+                    if (post.Privacy.Equals(PrivacyConstant.PUBLIC))
+                    {
+                       
+                        filteredPosts.Add(post);
+                    }
+                    else if (post.Privacy.Equals(PrivacyConstant.FRIENDS))
+                    {
+                        var friendShip = await unitOfWork.FriendShipRepository
+                            .GetFriendShipByUserIdAndFriendIdAsync(post.UserId, userId, FriendShipStatus.ACCEPTED);
 
+                        if (friendShip != null)
+                        {
+                            filteredPosts.Add(post);
+                        }
+                    }
+
+                }
+                else
+                {
+                    filteredPosts.Add(post);
+                }
             }
 
-            var hasMore = request.Page * request.Size < totalCount;
+            // Phân trang
+            var takePosts = filteredPosts
+                .OrderByDescending(p => p.DateCreated)
+                .Skip((request.Page - 1) * request.Size)
+                .Take(request.Size)
+                .ToList();
+
+            var response = new List<PostResponse>();
+            foreach (var item in takePosts)
+            {
+                var mapPost = ApplicationMapper.MapToPost(item);
+                var haveStory = await unitOfWork.StoryRepository
+                .IsUserHaveStoryAsync(item.UserId);
+                mapPost.User.HaveStory = haveStory;
+
+                response.Add(mapPost);
+
+            }
 
             return new PaginationResponse<List<PostResponse>>
             {
@@ -50,7 +94,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 {
                     Size = request.Size,
                     Page = request.Page,
-                    HasMore = hasMore,
+                    HasMore = request.Page * request.Size < filteredPosts.Count,
                 },
                 IsSuccess = true,
                 Message = "Lấy danh sách bài viết thành công",

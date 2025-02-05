@@ -1,13 +1,12 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
-import { GroupResource } from '../types/group';
 import { PostResource } from '../types/post';
-import { DataResponse, PaginationResponse } from '../types/response';
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 import { SearchAllResource } from '../types/search/search-all';
 import { SearchAllSuggestResource } from '../types/search/search-all-suggest';
 import { SearchGroupSuggestResource } from '../types/search/search-group-suggest';
+import { SearchHistoryResource } from '../types/search/search-history';
 import { SearchUserSuggestResource } from '../types/search/search-user-suggest';
-import { UserResource } from '../types/user';
 
 class SearchService {
     private static instance: SearchService;
@@ -64,6 +63,35 @@ class SearchService {
                 size
             }
         })
+    }
+
+    addSeachGroup(groupId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/search/histories/group', { groupId });
+    }
+
+    addSearchUser(userId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/search/histories/user', { userId });
+    }
+
+    addSearchTextPlain(text: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/search/histories/text', { text });
+    }
+
+    getUserSearchHistories(page: number, size: number) : Promise<PaginationResponse<SearchHistoryResource[]>> {
+        return axiosInterceptor.get('/api/search/histories', {
+            params: {
+                page,
+                size
+            }
+        })
+    }
+
+    removeSearchHistory(historyId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.delete('/api/search/histories/' + historyId);
+    }
+
+    removeAllSearchHistories() : Promise<BaseResponse> {
+        return axiosInterceptor.delete('/api/search/histories');
     }
 }
 

@@ -13,6 +13,7 @@ import notificationService from "../../services/notificationService";
 import SignalRConnector from '../../app/signalR/signalr-connection'
 import { toast } from "react-toastify";
 import NotificationSkeleton from "../skeletons/NotificationSkeleton";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 
 type NotificationDialogProps = {
     onCountNotification: (count: number) => void
@@ -21,7 +22,6 @@ type NotificationDialogProps = {
 const NotificationDialog: FC<NotificationDialogProps> = ({
     onCountNotification
 }) => {
-
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const [notification, setNotification] = useState<NotificationResource>();
     const [loading, setLoading] = useState(false)
@@ -29,10 +29,20 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
 
-    const containerRef = useRef<HTMLDivElement>(null);
-    const observerRef = useRef<IntersectionObserver | null>(null);
-
     const navigate = useNavigate();
+
+    const { containerRef } = useInfiniteScroll({
+        fetchMore: () => void fetchMoreNotificatiions(),
+        hasMore: pagination.hasMore,
+        loading,
+        rootMargin: "50px",
+        triggerId: "noti-scroll-trigger",
+    });
+
+    const fetchMoreNotificatiions = async () => {
+        if (!pagination.hasMore || loading || !isInitialLoadComplete) return;
+        fetchNotifications(pagination.page + 1);
+    };
 
     const fetchNotifications = async (page: number) => {
         setLoading(true)
@@ -70,33 +80,6 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     useEffect(() => {
         onCountNotification(notifications.filter(noti => !noti.isRead).length)
     }, [notifications])
-
-    useEffect(() => {
-        if (!isInitialLoadComplete) return;
-
-        const observer = new IntersectionObserver(
-            entries => {
-                if (entries[0].isIntersecting) {
-                    pagination.hasMore && !loading && fetchNotifications(pagination.page + 1);
-                }
-            },
-            { root: containerRef.current, rootMargin: '80px' }
-        );
-
-        observerRef.current = observer;
-
-        const triggerElement = document.getElementById('noti-scroll-trigger');
-        if (triggerElement) {
-            observer.observe(triggerElement);
-        }
-
-        return () => {
-            if (observerRef.current && triggerElement) {
-                observer.unobserve(triggerElement);
-            }
-        };
-    }, [pagination, isInitialLoadComplete, loading]);
-
 
     const handleDeleteNotification = async (notificationId: string) => {
         const response = await notificationService.deleteNotification(notificationId);
@@ -171,19 +154,19 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         className="w-full text-center text-sm"
                         onClick={() => {
                             fetchNotifications(pagination.page + 1);
-                            setIsInitialLoadComplete(true); 
+                            setIsInitialLoadComplete(true);
                         }}
                     >
                         Tải thêm ...
                     </button>
                 )}
             </div>
-           
+
         </div>
 
         {isModalOpen && <Modal
             style={{ top: 20 }}
-            title={<p className="text-center font-semibold text-xl">Bài viết được nhắc đến</p>}
+            title={<p className="text-center font-bold text-lg">Bài viết được nhắc đến</p>}
             width='700px'
             footer={[
             ]}

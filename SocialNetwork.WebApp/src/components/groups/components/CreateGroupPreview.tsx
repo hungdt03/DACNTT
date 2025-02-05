@@ -1,7 +1,7 @@
 import { FC } from "react";
 import images from "../../../assets";
 import { Earth, Image, Lock, User2 } from "lucide-react";
-import { Avatar, Divider, Tag, Tooltip } from "antd";
+import { Avatar, Divider, Tooltip } from "antd";
 import { CreateGroupForm } from "./CreateGroupSidebar";
 import { getGroupPrivacyTitle } from "../../../utils/privacy";
 import { GroupPrivacy } from "../../../enums/group-privacy";
@@ -16,7 +16,7 @@ const CreateGroupPreview: FC<CreateGroupPreviewProps> = ({
     return <div className="w-[85%] h-full mx-auto">
         <div className="p-4 flex flex-col h-full gap-y-5 rounded-lg shadow-2xl border-[1px] border-gray-100 overflow-hidden">
             <div>
-                <span className="font-bold">Xem trước trên máy tính</span>
+                <span className="font-bold">Xem trước</span>
             </div>
 
             <div className="rounded-xl border-[1px] border-gray-200 h-full overflow-y-auto custom-scrollbar">

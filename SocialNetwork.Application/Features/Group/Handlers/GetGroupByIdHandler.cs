@@ -30,13 +30,11 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             var response = ApplicationMapper.MapToGroup(group);
             response.AdminCount = await _unitOfWork.GroupMemberRepository
                 .CountAdminsByGroupIdAsync(request.GroupId);
-
             if(groupMember != null)
             {
                 response.IsMine = groupMember.Role == MemberRole.ADMIN;
                 response.IsMember = true;
             }
-            
 
             return new DataResponse<GroupResponse>
             {

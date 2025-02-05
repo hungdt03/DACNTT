@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react";
 import useModal from "../../hooks/useModal";
 import { Avatar, Divider, Modal, Popover, Tooltip, message } from "antd";
 import images from "../../assets";
-import { HeartIcon, MoreHorizontal, ShareIcon } from "lucide-react";
+import { MoreHorizontal, ShareIcon } from "lucide-react";
 import { ReactionSvgType, svgReaction } from "../../assets/svg";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import PostReactionModal from "../modals/PostReactionModal";
@@ -26,6 +26,7 @@ import { ReactionType } from "../../enums/reaction";
 import postService from "../../services/postService";
 import ListSharePostModal from "../modals/ListSharePostModal";
 import EditPostModal from "../modals/EditPostModal";
+import { GroupPrivacy } from "../../enums/group-privacy";
 
 type PostGroupProps = {
     post: PostResource;
@@ -151,11 +152,15 @@ const PostGroup: FC<PostGroupProps> = ({
             <div className="flex items-center gap-x-2">
                 <div className="relative">
                     <img className="w-10 h-10 rounded-md object-cover" src={post.group.coverImage ?? images.cover} />
-                    <Avatar className="w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} />
+
+                    {!post.user.haveStory
+                        ? <Avatar className="w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} />
+                        : <Link className="absolute -right-2 -bottom-2 border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-6 h-6 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} /> </Link>
+                    }
                 </div>
                 <div className="flex flex-col gap-y-[1px]">
-                    <div className="font-semibold text-[15px] text-gray-600">
-                        <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                    <div className="font-semibold text-[15px] text-gray-800">
+                        <Link to={`/groups/${post.group.id}`}>{post.group?.name}</Link>
                         {post.tags.length > 0 &&
                             (() => {
                                 const maxDisplay = 3;
@@ -180,6 +185,8 @@ const PostGroup: FC<PostGroupProps> = ({
                             })()}
                     </div>
                     <div className="flex items-center gap-x-2">
+
+                        <Link className="font-semibold text-[13px] text-gray-600" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
                             <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
@@ -232,10 +239,10 @@ const PostGroup: FC<PostGroupProps> = ({
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            {post.group.privacy === GroupPrivacy.PUBLIC && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
-            </button>
+            </button>}
         </div>
         <Divider className='mt-0 mb-2' />
 

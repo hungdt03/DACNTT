@@ -33,6 +33,9 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     postItem.Shares = shares;
                 };
 
+                var haveStory = await _unitOfWork.StoryRepository
+                    .IsUserHaveStoryAsync(post.UserId);
+                postItem.User.HaveStory = haveStory;
                 response.Add(postItem);
 
             }

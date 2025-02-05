@@ -13,7 +13,6 @@ import StoryWrapper from "../components/story/StoryWrapper";
 import PostGroup from "../components/posts/PostGroup";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 
-
 const HomePage: FC = () => {
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
@@ -91,7 +90,7 @@ const HomePage: FC = () => {
                 onSuccess={handleCreatePostSuccess}
                 onFalied={handleCreatePostFailed}
             />
-
+            
             <StoryWrapper />
 
             {posts.map(post => {

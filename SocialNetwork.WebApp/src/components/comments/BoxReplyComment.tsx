@@ -311,7 +311,7 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     return <div className="flex flex-col items-start gap-y-2 mb-2">
         <div className="flex items-center gap-x-2 w-full">
             <Avatar size='small' className="flex-shrink-0" src={user?.avatar ?? images.user} />
-            <div className={cn("relative bg-gray-100 px-1 rounded-3xl w-full flex items-center justify-between py-[2px]")}>
+            <div className={cn("relative bg-gray-100 px-1 rounded-xl w-full flex items-center justify-between py-[2px]")}>
                 {initialEditorState && <LexicalComposer initialConfig={{
                     ...editorConfig,
                     editorState: initialEditorState

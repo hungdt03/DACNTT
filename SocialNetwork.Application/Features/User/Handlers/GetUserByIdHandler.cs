@@ -7,6 +7,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.User.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.User.Handlers
 {
@@ -30,7 +31,9 @@ namespace SocialNetwork.Application.Features.User.Handlers
             response.FriendCount = await unitOfWork.FriendShipRepository.CountFriendsByUserIdAsync(request.UserId);
             response.FollowerCount = await unitOfWork.FollowRepository.CountFollowersByUserIdAsync(request.UserId);
             response.FollowingCount = await unitOfWork.FollowRepository.CountFolloweesByUserIdAsync(request.UserId);
-
+            var haveStory = await unitOfWork.StoryRepository
+                   .IsUserHaveStoryAsync(user.Id);
+            response.HaveStory = haveStory;
             return new DataResponse<UserResponse>()
             {
                 Data = response,

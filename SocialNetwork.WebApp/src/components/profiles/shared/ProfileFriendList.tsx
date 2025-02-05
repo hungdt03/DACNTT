@@ -26,7 +26,7 @@ const ProfileFriendList: FC<ProfileFriendListProps> = ({
     }, [])
 
     return <div className="grid grid-cols-2 gap-4">
-        {friends.map(friend => <div key={friend.id} className="flex items-center justify-between p-4 rounded-md border-[1px] border-gray-100">
+        {friends.map(friend => <div key={friend.id} className="flex items-center justify-between bg-white shadow p-4 rounded-md border-[1px] border-gray-100">
             <div className="flex items-center gap-x-3">
                 <img className="w-[50px] h-[50px] rounded-md border-[1px] border-gray-50" src={friend.avatar ?? images.photo} />
                 <div className="flex flex-col">
@@ -36,7 +36,7 @@ const ProfileFriendList: FC<ProfileFriendListProps> = ({
             </div>
 
             <button>
-                <MoreHorizontal />
+                <MoreHorizontal className="text-gray-600" size={16} />
             </button>
         </div>)}
 

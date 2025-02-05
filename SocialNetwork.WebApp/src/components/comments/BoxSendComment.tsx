@@ -261,7 +261,7 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
         <div className="flex items-center gap-x-4 w-full">
             <Avatar size='default' className="flex-shrink-0" src={user?.avatar ?? images.user} />
 
-            <div className={cn("bg-gray-100 px-1 rounded-3xl w-full flex items-center justify-between py-[2px]")}>
+            <div className={cn("bg-gray-100 px-1 rounded-xl w-full flex items-center justify-between py-[2px]")}>
 
                 {initialEditorState &&
                     <LexicalComposer initialConfig={{

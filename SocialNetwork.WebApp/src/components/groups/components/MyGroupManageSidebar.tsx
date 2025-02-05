@@ -1,11 +1,11 @@
 import { FC, useEffect, useState } from "react";
 import { GroupResource } from "../../../types/group";
 import images from "../../../assets";
-import { Book, ChartBarIcon, Home, Lock, Settings2Icon, UserCog } from "lucide-react";
+import { Book, ChartBarIcon, Home, Lock, UserCog } from "lucide-react";
 import { Badge, Divider } from "antd";
 import { GroupApprovalSummaryResource } from "../../../types/group-approval-summary";
 import groupService from "../../../services/groupService";
-import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import cn from "../../../utils/cn";
 
 type MyGroupManageSidebarProps = {
@@ -34,13 +34,13 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
         <div className="flex items-center gap-x-2 px-2 py-4">
             <img className="w-[50px] h-[50px] rounded-md object-cover border-[1px] border-gray-100" src={group.coverImage ?? images.cover} />
             <div className="flex flex-col">
-                <span className="font-bold">DACNTT</span>
+                <span className="font-bold">{group.name}</span>
                 <div className="flex gap-x-2 items-center text-sm">
                     <div className="flex items-center gap-x-1 text-gray-400">
                         <Lock className="mb-1" size={14} />
                         <span>Nhóm riêng tư</span>
                     </div>
-                    <span className="font-bold text-gray-500">2 thành viên</span>
+                    <span className="font-bold text-gray-500">{group.members.length} thành viên</span>
                 </div>
             </div>
         </div>

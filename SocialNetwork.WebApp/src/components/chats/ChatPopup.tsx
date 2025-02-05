@@ -310,11 +310,11 @@ const ChatPopup: FC<ChatPopupProps> = ({
             </Popover>
 
             <div className={cn("flex gap-x-1 items-center", isRead && 'text-sky-500')}>
-                {room.isPrivate && <Tooltip title="Gọi điện">
+                {/* {room.isPrivate && <Tooltip title="Gọi điện">
                     <button onClick={() => onCalling?.()} className="p-2 bg-transparent border-none">
                         <PhoneOutlined className="rotate-90" />
                     </button>
-                </Tooltip>}
+                </Tooltip>} */}
                 <Tooltip title="Thu nhỏ đoạn chat">
                     <button onClick={() => onMinimize?.()} className="p-2 bg-transparent border-none">
                         <MinusOutlined />

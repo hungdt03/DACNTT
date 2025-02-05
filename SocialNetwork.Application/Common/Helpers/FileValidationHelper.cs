@@ -1,6 +1,5 @@
 ﻿
 using Microsoft.AspNetCore.Http;
-using System.Linq;
 
 namespace SocialNetwork.Application.Common.Helpers
 {
@@ -9,25 +8,24 @@ namespace SocialNetwork.Application.Common.Helpers
         public static bool IsImageFile(IFormFile file)
         {
             if (file == null) return false;
-
-            var allowedImageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp" };
-            var allowedImageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
-
-            var fileExtension = Path.GetExtension(file.FileName).ToLower();
-
-            return allowedImageTypes.Contains(file.ContentType) && allowedImageExtensions.Contains(fileExtension);
+            return file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool IsVideoFile(IFormFile file)
         {
             if (file == null) return false;
+            return file.ContentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase);
+        }
 
-            var allowedVideoTypes = new[] { "video/mp4", "video/avi", "video/mpeg", "video/webm", "video/quicktime" };
-            var allowedVideoExtensions = new[] { ".mp4", ".avi", ".mpeg", ".webm", ".mov" };
+        public static bool AreFilesTooLarge(List<IFormFile> files, long maxSizeInBytes)
+        {
+            if (files == null || files.Count == 0)
+            {
+                throw new ArgumentNullException(nameof(files), "Danh sách tệp không được null hoặc rỗng");
+            }
 
-            var fileExtension = Path.GetExtension(file.FileName).ToLower();
-
-            return allowedVideoTypes.Contains(file.ContentType) && allowedVideoExtensions.Contains(fileExtension);
+            long totalSize = files.Sum(file => file.Length);
+            return totalSize > maxSizeInBytes;
         }
     }
 }

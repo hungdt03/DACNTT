@@ -46,7 +46,12 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     item.Friend = ApplicationMapper.MapToUser(friend.User);
                     item.Friend.IsOnline = item.IsOnline = isOnline;
 
-                    if(!isOnline)
+                    var haveStory = await _unitOfWork.StoryRepository
+                        .IsUserHaveStoryAsync(friend.UserId);
+
+                    item.Friend.HaveStory = haveStory;
+
+                    if (!isOnline)
                     {
                         var recentOnlineTime = await _userStatusService.GetLastActiveTimeAsync(userId);
                         DateTimeOffset utcDateTimeOffset = DateTimeOffset.Parse(recentOnlineTime).ToUniversalTime();
@@ -90,6 +95,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     var isRead = readUsers.Any(s => s.UserId == userId);
                     item.IsRead = isRead;
                 }
+
+              
 
                 response.Add(item);
             }

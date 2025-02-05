@@ -8,6 +8,7 @@ export type GroupResource = {
     coverImage: string;
     privacy: GroupPrivacy;
     members: UserResource[];
+    countMembers: number;
     isHidden: boolean;
     isMine: boolean;
     isMember: boolean;

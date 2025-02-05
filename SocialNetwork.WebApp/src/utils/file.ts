@@ -13,4 +13,8 @@ const getBase64 = (file: FileType): Promise<string> =>
 const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/jpg'];
 const videoTypes = ['video/mp4', 'video/avi', 'video/mkv', 'video/webm'];
 
-export { getBase64, imageTypes, videoTypes }
+const isValidImage = (file: File): boolean => file.type.startsWith("image/");
+const isValidVideo = (file: File): boolean => file.type.startsWith("video/");
+
+
+export { getBase64, imageTypes, videoTypes, isValidImage, isValidVideo }

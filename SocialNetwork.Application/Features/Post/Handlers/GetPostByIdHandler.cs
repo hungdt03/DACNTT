@@ -33,6 +33,10 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 response.Shares = shares;
             }
 
+            var haveStory = await _unitOfWork.StoryRepository
+                    .IsUserHaveStoryAsync(post.UserId);
+            response.User.HaveStory = haveStory;
+
             return new DataResponse<PostResponse>
             {
                 Data = response,

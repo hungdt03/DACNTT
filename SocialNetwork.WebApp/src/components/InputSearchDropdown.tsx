@@ -1,6 +1,5 @@
 import { Input } from "antd";
 import { FC, useEffect, useState } from "react";
-import { SchoolResource } from "../types/school";
 import useDebounce from "../hooks/useDebounce";
 
 type InputSearchDropdownType = {
@@ -28,7 +27,7 @@ const InputSearchDropdown: FC<InputSearchDropdownProps> = ({
     placeholder = ''
 }) => {
     const [valueName, setValueName] = useState(value)
-    const debounceValue = useDebounce(value ?? '', 500);
+    const debounceValue = useDebounce(value ?? '', 200);
     const [isSelect, setIsSelect] = useState(true)
 
     const handleSelectOption = (option: InputSearchDropdownType) => {

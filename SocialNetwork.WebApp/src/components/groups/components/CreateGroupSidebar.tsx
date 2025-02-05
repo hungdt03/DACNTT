@@ -7,7 +7,7 @@ import { GroupPrivacy } from "../../../enums/group-privacy";
 import { FriendResource } from "../../../types/friend";
 import friendService from "../../../services/friendService";
 import UploadButton from "../../uploads/UploadButton";
-import { getBase64 } from "../../../utils/file";
+import { getBase64, isValidImage } from "../../../utils/file";
 import { RcFile } from "antd/es/upload";
 import groupService from "../../../services/groupService";
 import { useSelector } from "react-redux";
@@ -88,6 +88,19 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
     }
 
     const handleUploadChange: UploadProps['onChange'] = async (info) => {
+        if (!isValidImage(info.file as RcFile)) {
+            message.error('Vui lòng chọn file ảnh')
+            return;
+        } else {
+            const totalSize = (info.file as RcFile).size;
+            const maxSize = 4 * 1024 * 1024;
+
+            if (totalSize > maxSize) {
+                message.error("Vui lòng chọn file ảnh tối đa 4MB");
+                return;
+            }
+        }
+
         const url = await getBase64(info.file as RcFile)
         const updateValues = {
             ...values,
@@ -162,7 +175,7 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
 
     return <div className="relative h-full col-span-3 shadow overflow-hidden">
         <div className="flex items-center gap-x-2 p-3">
-            <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-300">
+            <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-400">
                 <CloseOutlined />
             </Link>
             <Link to='/'><img width='36px' height='36px' src={images.facebook} /></Link>
@@ -172,7 +185,7 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
             <span className="font-bold text-2xl">Tạo nhóm</span>
 
             <div className="flex items-center gap-x-2">
-                <Avatar size='large' src={images.user} />
+                <Avatar size='large' src={user?.avatar ?? images.user} />
                 <div className="flex flex-col">
                     <span className="font-bold">{user?.fullName}</span>
                     <span className="text-gray-500 text-xs">Quản trị viên</span>

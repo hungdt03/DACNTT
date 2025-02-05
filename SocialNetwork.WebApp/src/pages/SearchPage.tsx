@@ -22,7 +22,8 @@ const SearchPage: FC = () => {
         posts: [],
         users: []
     })
-    
+
+   
     useEffect(() => {
         const paramType = searchParam.get('type');
 

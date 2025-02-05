@@ -4,16 +4,18 @@ import images from "../../assets";
 import UploadMultipleFile from "../uploads/UploadMultiFile";
 import TagFriendModal from "./TagFriendModal";
 import { PrivacyType } from "../../enums/privacy";
-import { imageTypes, videoTypes } from "../../utils/file";
+import { imageTypes, isValidImage, isValidVideo, videoTypes } from "../../utils/file";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
-import { getButtonPrivacyContent } from "../../utils/post";
+import { getButtonPrivacyContent, getGroupButtonPrivacyContent } from "../../utils/post";
 import { FriendResource } from "../../types/friend";
 
 
 import cn from "../../utils/cn";
 import BackgroundPostOption from "./BackgroundPostOption";
+import { GroupResource } from "../../types/group";
+import { GroupPrivacy } from "../../enums/group-privacy";
 
 
 export type PostForm = {
@@ -26,11 +28,13 @@ export type PostForm = {
 }
 
 type CreatePostModalProps = {
-    onSubmit?: (values: FormData) => Promise<boolean>
+    onSubmit?: (values: FormData) => Promise<boolean>;
+    group?: GroupResource
 }
 
 const CreatePostModal: FC<CreatePostModalProps> = ({
-    onSubmit
+    onSubmit,
+    group
 }) => {
     const [showUpload, setShowUpload] = useState(false);
     const uploadRef = useRef<{ clear: () => void }>(null);
@@ -39,8 +43,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
     const { user } = useSelector(selectAuth);
     const contentRef = useRef<HTMLDivElement>(null)
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const [finishTag, setFinishTag] = useState(false)
-
+    const [finishTag, setFinishTag] = useState(false);
 
     const handleReset = () => {
         uploadRef.current?.clear();
@@ -55,11 +58,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
     })
 
     const handleUploadFiles = (files: UploadFile[]) => {
-        const imageFiles = files
-            .filter(file => imageTypes.includes(file.type as string) || (file.type as string).includes("image/"))
-
-        const videoFiles = files
-            .filter(file => videoTypes.includes(file.type as string) || (file.type as string).includes("video/"))
+        const imageFiles = files.filter(file => file.originFileObj && isValidImage(file.originFileObj));
+        const videoFiles = files.filter(file => file.originFileObj && isValidVideo(file.originFileObj));
 
         setPostRequest(prev => ({
             ...prev,
@@ -85,6 +85,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
 
     const handleCreatePost = () => {
         const formData = new FormData();
+
+        console.log(postRequest)
 
         postRequest.images.forEach(file => {
             if (file.originFileObj) {
@@ -126,11 +128,11 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         setShowUpload(!showUpload)
     }
 
-    return <div className="flex flex-col gap-y-4">
+    return <div className="flex flex-col gap-y-4 max-h-[600px] overflow-y-auto custom-scrollbar">
         <div className="flex items-center gap-x-2">
             <Avatar className="flex-shrink-0" size='large' src={user?.avatar ?? images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
-                <div className="text-[16px] font-semibold">
+                <div className="text-[14px] font-semibold text-gray-700">
                     {user?.fullName}
                     {postRequest.tagIds.length > 0 &&
                         (() => {
@@ -152,14 +154,14 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                             );
                         })()}
                 </div>
-                <Popover trigger='click' content={<PostPrivacryOption
+                {group ? getGroupButtonPrivacyContent(group.privacy) : <Popover trigger='click' content={<PostPrivacryOption
                     onChange={(privacy) => setPostRequest({
                         ...postRequest,
                         privacy
                     })}
                 />}>
                     {getButtonPrivacyContent(postRequest.privacy)}
-                </Popover>
+                </Popover>}
             </div>
         </div>
         <div className="flex flex-col gap-y-4">
@@ -182,17 +184,20 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                             })
                         }}
                         contentEditable
-                        aria-placeholder="Hưng ơi, bạn đang nghĩ gì thế"
+                        aria-placeholder="Bạn đang nghĩ gì thế"
                         className="text-2xl font-bold editable-div bg-transparent text-center w-full outline-none border-none text-white break-words break-all"
                     ></div>
 
                 </div>
-                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 3 : 5} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full h-full overflow-y-auto custom-scrollbar p-2", isLongText ? 'text-[16px]' : 'text-xl')} placeholder="Long ơi, bạn đang nghĩ gì thế" />}
+                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 5 : 8} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full max-h-[400px] overflow-y-auto custom-scrollbar p-2", isLongText ? 'text-[16px]' : 'text-xl')} placeholder="Bạn đang nghĩ gì thế" />}
             </div>
-            {showUpload && <UploadMultipleFile
-                ref={uploadRef}
-                onChange={handleUploadFiles}
-            />}
+            {showUpload && <div className="flex flex-col">
+                <UploadMultipleFile
+                    ref={uploadRef}
+                    onChange={handleUploadFiles}
+                />
+                <span className="text-sm italic">(Tối đa 50MB)</span>
+            </div>}
             <div className="p-2 rounded-md border-[1px] border-gray-200 flex justify-between items-center">
                 <span>Thêm vào bài viết của bạn</span>
                 <div className="flex items-center gap-x-1">
@@ -201,9 +206,9 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                             onChange={background => {
                                 if (contentRef.current && background) {
                                     contentRef.current.innerText = postRequest.content;
-                                } 
-                                
-                                if(!background && textareaRef.current) {
+                                }
+
+                                if (!background && textareaRef.current) {
                                     textareaRef.current.focus()
                                 }
 
@@ -213,13 +218,13 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                                 })
                             }}
                         />}>
-                            <button disabled={postRequest.images.length > 0 || postRequest.videos.length > 0} onClick={() => setIsUseBackground(!isUseBackground)}>
+                            <button className={cn(postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 120 && 'cursor-not-allowed')} disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 120} onClick={() => setIsUseBackground(!isUseBackground)}>
                                 <img width={30} height={30} src={images.AaBackground} />
                             </button>
                         </Popover>
                     </Tooltip>
                     <Tooltip title='Ảnh/video'>
-                        <button disabled={!!postRequest.background || postRequest.images.length > 0 || postRequest.videos.length > 0} onClick={handleShowUploadBtn} className="p-2 rounded-full hover:bg-gray-100">
+                        <button disabled={!!postRequest.background || postRequest.images.length > 0 || postRequest.videos.length > 0} onClick={handleShowUploadBtn} className={cn("p-2 rounded-full hover:bg-gray-100", (!!postRequest.background || postRequest.images.length > 0 || postRequest.videos.length > 0) && 'cursor-not-allowed')}>
                             <img alt="Ảnh" className="w-6 h-6" src={images.photo} />
                         </button>
                     </Tooltip>

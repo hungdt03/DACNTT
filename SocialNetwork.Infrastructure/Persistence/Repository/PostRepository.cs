@@ -30,9 +30,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context.Posts.Remove(post);
         }
 
-        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsAsync(int page, int size, string userId)
+        public async Task<List<Post>> GetAllPostsAsync()
         {
-            var query = _context.Posts
+            var posts = await _context.Posts
                  .Include(p => p.User)
                  .Include(p => p.Group)
                  .Include(p => p.Tags).ThenInclude(t => t.User)
@@ -41,43 +41,15 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                  .Include(p => p.SharePost)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
-                 .AsQueryable();
+                 .ToListAsync();
 
-            var totalCount = await query.CountAsync();
-
-            var filteredPosts = new List<Post>();
-            foreach (var post in await query.ToListAsync())
-            {
-                if (post.IsGroupPost && post.ApprovalStatus != ApprovalStatus.APPROVED) continue;
-
-                bool isFriend = await _context.FriendShips.AnyAsync(s =>
-                    ((s.UserId == post.UserId && s.FriendId == userId) ||
-                     (s.UserId == userId && s.FriendId == post.UserId)) &&
-                     s.Status.Equals(FriendShipStatus.ACCEPTED));
-
-                bool isMe = post.UserId == userId;
-
-                if (isMe || isFriend || post.Privacy.Equals(PrivacyConstant.PUBLIC) ||
-                    (post.Privacy.Equals(PrivacyConstant.FRIENDS)))
-                {
-                    filteredPosts.Add(post);
-                }
-            }
-
-            // Phân trang
-            var posts = filteredPosts
-                .OrderByDescending(p => p.DateCreated)
-                .Skip((page - 1) * size)
-                .Take(size)
-                .ToList();
-
-            return (posts, totalCount);
+            return posts;     
         }
 
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsByUserIdAsync(string userId, int page, int size)
         {
             var query = _context.Posts
-                .Where(p => p.UserId == userId && ((p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.APPROVED) || !p.IsGroupPost))
+                .Where(p => p.UserId == userId && p.GroupId == null)
                 .AsQueryable();
 
             var totalCount = await query.CountAsync();

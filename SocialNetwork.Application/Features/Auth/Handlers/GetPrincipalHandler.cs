@@ -34,7 +34,9 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
             response.FriendCount = await unitOfWork.FriendShipRepository.CountFriendsByUserIdAsync(userId);
             response.FollowerCount = await unitOfWork.FollowRepository.CountFollowersByUserIdAsync(userId);
             response.FollowingCount = await unitOfWork.FollowRepository.CountFolloweesByUserIdAsync(userId);
-
+            var haveStory = await unitOfWork.StoryRepository
+                   .IsUserHaveStoryAsync(user.Id);
+            response.HaveStory = haveStory;
             return new DataResponse<UserResponse>()
             {
                 Data = response,

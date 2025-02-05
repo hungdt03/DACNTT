@@ -16,5 +16,6 @@ namespace SocialNetwork.Application.DTOs
         public int FriendCount { get; set; }
         public bool IsOnline { get; set; }
         public DateTimeOffset RecentOnlineTime { get; set; }
+        public bool HaveStory { get; set; }
     }
 }

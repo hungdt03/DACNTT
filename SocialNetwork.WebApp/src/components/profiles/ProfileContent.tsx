@@ -1,12 +1,12 @@
 import { Camera, CheckIcon, Upload as LucideUpload, Plus } from "lucide-react";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import ImgCrop from 'antd-img-crop';
 import images from "../../assets";
-import { Avatar, Button, Divider, Tabs, TabsProps, Tooltip, Upload, UploadFile, UploadProps } from "antd";
+import { Avatar, Button, Divider, message, Tabs, TabsProps, Tooltip, Upload, UploadFile, UploadProps } from "antd";
 import ProfilePostList from "./ProfilePostList";
 import { FriendResource } from "../../types/friend";
 import { UserResource } from "../../types/user";
-import { getBase64 } from "../../utils/file";
+import { getBase64, isValidImage } from "../../utils/file";
 import userService from "../../services/userService";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
@@ -14,7 +14,7 @@ import { AppDispatch } from "../../app/store";
 import { setUserDetails } from "../../features/slices/auth-slice";
 import Loading from "../Loading";
 import { RcFile } from "antd/es/upload";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import ProfileFriendList from "./shared/ProfileFriendList";
 import ProfileFollowerList from "./shared/ProfileFollowerList";
 import ProfileFolloweeList from "./shared/ProfileFolloweesList";
@@ -24,20 +24,58 @@ type ProfileContentProps = {
     friends: FriendResource[]
 }
 
+const VALID_TABS = ["friends", "followers", "followees", "saved-posts"];
+
 const ProfileContent: FC<ProfileContentProps> = ({
     user,
     friends
 }) => {
+    
     const dispatch = useDispatch<AppDispatch>();
     const [loading, setLoading] = useState(false);
     const [tempCoverImage, setTempCoverImage] = useState<string>('')
-    const [fileCoverImage, setFileCoverImage] = useState<UploadFile>()
+    const [fileCoverImage, setFileCoverImage] = useState<UploadFile>();
+
+    const { id, tab } = useParams();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (id && tab && !VALID_TABS.includes(tab)) {
+            navigate(`/profile/${id}`, { replace: true });
+        }
+    }, [tab, id, navigate]);
 
     const onAvatarChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+        if (!isValidImage(newFileList[0] as RcFile)) {
+            message.error('Vui lòng chọn file ảnh')
+            return false;
+        } else {
+            const totalSize = (newFileList[0] as RcFile).size;
+            const maxSize = 4 * 1024 * 1024;
+
+            if (totalSize > maxSize) {
+                message.error("Vui lòng chọn file ảnh tối đa 4MB");
+                return false;
+            }
+        }
+
         uploadAvatar(newFileList[0])
     };
 
     const onCoverImageChange: UploadProps['onChange'] = async ({ file }) => {
+        if (!isValidImage(file as RcFile)) {
+            message.error('Vui lòng chọn file ảnh')
+            return;
+        } else {
+            const totalSize = (file as RcFile).size;
+            const maxSize = 4 * 1024 * 1024;
+
+            if (totalSize > maxSize) {
+                message.error("Vui lòng chọn file ảnh tối đa 4MB");
+                return;
+            }
+        }
+
         const base64Url = await getBase64(file as RcFile);
         setTempCoverImage(base64Url);
         setFileCoverImage(file)
@@ -86,42 +124,40 @@ const ProfileContent: FC<ProfileContentProps> = ({
 
     const items: TabsProps['items'] = [
         {
-            key: '1',
+            key: '',
             label: 'Bài viết',
             children: <ProfilePostList user={user} isShowPostCreator={true} />,
         },
         {
-            key: '2',
-            label: 'Giới thiệu',
-            children: 'Content of Tab Pane 2',
-        },
-        {
-            key: '3',
+            key: 'friends',
             label: 'Bạn bè',
             children: <ProfileFriendList userId={user.id} />,
         },
         {
-            key: '4',
+            key: 'followers',
             label: 'Người theo dõi',
             children: <ProfileFollowerList userId={user.id} />,
         },
         {
-            key: '5',
+            key: 'followees',
             label: 'Đang theo dõi',
             children: <ProfileFolloweeList userId={user.id} />,
         },
         {
-            key: '6',
+            key: 'saved-posts',
             label: 'Bài viết đã lưu',
             children: 'Content of Tab Pane 3',
         },
     ];
 
+    const handleTabChange = (key: string) => {
+        navigate(`/profile/${id}/${key}`);
+    };
 
     return <div className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
-        <div className="flex flex-col gap-y-4 overflow-y-auto">
+        <div className="flex flex-col gap-y-4 overflow-y-auto bg-white p-4">
             <div className="w-full h-full relative z-10">
-                <img alt="Ảnh bìa" className="w-full object-cover max-h-[25vh] h-full md:max-h-[30vh] rounded-lg" src={tempCoverImage || user.coverImage || images.cover} />
+                <img alt="Ảnh bìa" className="w-full border-[1px] object-cover max-h-[25vh] h-full md:max-h-[30vh] rounded-lg" src={tempCoverImage || user.coverImage || images.cover} />
                 <div className="flex items-center gap-x-2 absolute right-4 top-4 md:top-auto md:bottom-4 shadow">
                     <Upload
                         beforeUpload={() => false}
@@ -151,7 +187,7 @@ const ProfileContent: FC<ProfileContentProps> = ({
                         <Upload
                             multiple={false}
                             maxCount={1}
-                            beforeUpload={() => false}
+                            beforeUpload={(_) => false}
                             showUploadList={false}
                             onChange={onAvatarChange}
                             className="cursor-pointer absolute bottom-0 right-0 p-1 bg-white border-primary border-[1px] w-8 h-8 flex items-center justify-center rounded-full"
@@ -181,13 +217,13 @@ const ProfileContent: FC<ProfileContentProps> = ({
                     </Tooltip>)}
                 </Avatar.Group>
                 <div className="flex items-center gap-x-2">
-                    <Link to='/story/create'>
+                    <Link to='/stories/create'>
                         <Button icon={<Plus size={16} />} type='primary'>Thêm vào tin</Button>
                     </Link>
                 </div>
             </div>
             <Divider className="my-3" />
-            <Tabs defaultActiveKey="1" className="bg-slate-100 p-4 rounded-lg" items={items} />
+            <Tabs defaultActiveKey="" activeKey={tab} onChange={handleTabChange} className="bg-white p-4 rounded-lg" items={items} />
             {loading && <Loading />}
 
         </div>

@@ -8,6 +8,7 @@ using SocialNetwork.Application.Features.Search.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.UserInfo;
 
 namespace SocialNetwork.Application.Features.Search.Handlers
 {
@@ -81,6 +82,18 @@ namespace SocialNetwork.Application.Features.Search.Handlers
             }
 
             var countResult = groupResponse.Count + userResponse.Count + postTotalCount;
+
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            var searchHistory = new SearchHistory()
+            {
+                SearchText = request.Query,
+                UserId = userId,
+            };
+
+            await _unitOfWork.SearchRepository.CreateSearchHistoryAsync(searchHistory);
+
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             return new DataResponse<SearchAllResponse>
             {

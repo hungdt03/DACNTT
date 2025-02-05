@@ -1,6 +1,7 @@
 ﻿
 
 using MediatR;
+using SocialNetwork.Application.Common.Helpers;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Post.Commands;
@@ -25,6 +26,20 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
         public async Task<BaseResponse> Handle(EditPostCommand request, CancellationToken cancellationToken)
         {
+
+            if (request.Post.Images != null || request.Post.Videos != null)
+            {
+                var totalFiles = request.Post.Images != null && request.Post.Videos != null
+                    ? request.Post.Images.Concat(request.Post.Videos).ToList()
+                    : request.Post.Images ?? request.Post.Videos?.ToList();
+
+                long maxSizeInBytes = 50 * 1024 * 1024;
+                if (FileValidationHelper.AreFilesTooLarge(totalFiles, maxSizeInBytes))
+                {
+                    throw new AppException("Tổng kích thước các tệp vượt quá giới hạn 50MB.");
+                }
+            }
+
             var post = await _unitOfWork.PostRepository.GetPostByIdAsync(request.PostId)
                 ?? throw new AppException("Không tìm thấy bài viết");
 

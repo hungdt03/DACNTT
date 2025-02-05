@@ -8,6 +8,7 @@ import images from "../assets"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons"
 import { HandThumbUpIcon } from "@heroicons/react/24/outline"
+import { GroupPrivacy } from "../enums/group-privacy"
 
 export const getPrivacyPost = (privacy: PrivacyType): ReactNode => {
     switch (privacy) {
@@ -80,20 +81,29 @@ export const getBtnReaction = (reactionType: ReactionType | 'UNKNOWN', handleSav
 
 export const renderButtonContent = (icon: JSX.Element, label: string, imageSrc?: string) => (
     <button className="flex items-center gap-x-2 font-semibold text-gray-700 py-[1px] px-2 bg-gray-100 rounded-sm">
-        {imageSrc ? <img className="w-3 h-3" src={imageSrc} alt={label} /> : icon}
-        <span className="text-[13px]">{label}</span>
-        <FontAwesomeIcon icon={faCaretDown} />
+        {imageSrc ? <img className="w-3 h-3 mb-[2px]" src={imageSrc} alt={label} /> : icon}
+        <span className="text-[12px]">{label}</span>
+        <FontAwesomeIcon className="mb-[2px]" icon={faCaretDown} />
     </button>
 );
 
 export const getButtonPrivacyContent = (privacy: PrivacyType) => {
     switch (privacy) {
         case PrivacyType.PRIVATE:
-            return renderButtonContent(<Lock size={14} />, 'Chỉ mình tôi');
+            return renderButtonContent(<Lock className="mb-[3px]" size={12} />, 'Chỉ mình tôi');
         case PrivacyType.FRIENDS:
-            return renderButtonContent(<User size={14} />, 'Bạn bè');
+            return renderButtonContent(<User className="mb-[3px]" size={12} />, 'Bạn bè');
         case PrivacyType.PUBLIC:
         default:
             return renderButtonContent(<img className="w-3 h-3" src={images.earth} alt="Công khai" />, 'Công khai', images.earth);
+    }
+};
+
+export const getGroupButtonPrivacyContent = (privacy: GroupPrivacy) => {
+    switch (privacy) {
+        case GroupPrivacy.PRIVATE:
+            return renderButtonContent(<Lock className="mb-[3px]" size={12} />, 'Nhóm riêng tư');
+        case GroupPrivacy.PUBLIC:
+            return renderButtonContent(<User className="mb-[3px]" size={12} />, 'Nhóm công khai', images.earth);
     }
 };

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import GroupRowItem from "../../../components/groups/components/GroupRowItem";
 import { GroupResource } from "../../../types/group";
 import groupService from "../../../services/groupService";
+import images from "../../../assets";
 
 const GroupManagerSidebar: FC = () => {
     const [joinGroups, setJoinGroups] = useState<GroupResource[]>([]);
@@ -12,7 +13,6 @@ const GroupManagerSidebar: FC = () => {
 
     const fetchJoinGroups = async () => {
         const response = await groupService.getAllJoinGroup();
-        console.log(response)
         if (response.isSuccess) {
             setJoinGroups(response.data)
         }
@@ -41,8 +41,8 @@ const GroupManagerSidebar: FC = () => {
         <div className="px-4 py-2">
             <div className="flex flex-col">
                 <Link to='/groups/feeds' className="flex items-center gap-x-2 py-3 px-2 rounded-md w-full hover:bg-gray-100">
-                    <FenceIcon />
-                    <span className="font-semibold">Bảng tin của bạn</span>
+                    <img alt="Bảng tin" className="w-6 h-6" src={images.feed} />
+                    <span className="text-[15px]">Bảng tin của bạn</span>
                 </Link>
                 <Link to='/groups/create' className="mt-2 w-full py-2 rounded-md text-center bg-sky-50 hover:bg-sky-100 text-primary font-semibold">
                     Tạo nhóm mới

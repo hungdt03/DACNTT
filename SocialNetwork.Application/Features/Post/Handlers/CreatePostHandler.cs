@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using SocialNetwork.Application.Common.Helpers;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
@@ -31,6 +32,19 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
         public async Task<BaseResponse> Handle(CreatePostCommand request, CancellationToken cancellationToken)
         {
+           if (request.Images != null || request.Videos != null)
+            {
+                var totalFiles = request.Images != null && request.Videos != null 
+                    ? request.Images.Concat(request.Videos).ToList()
+                    : request.Images ?? request.Videos?.ToList();
+
+                long maxSizeInBytes = 50 * 1024 * 1024; 
+                if (FileValidationHelper.AreFilesTooLarge(totalFiles, maxSizeInBytes))
+                {
+                     throw new AppException("Tổng kích thước các tệp vượt quá giới hạn 50MB.");
+                }
+            }
+
             var userId = _contextAccessor.HttpContext.User.GetUserId();
 
             var post = new Domain.Entity.PostInfo.Post
@@ -144,12 +158,18 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 await _signalRService.SendNotificationToSpecificUser(noti.Recipient.UserName, ApplicationMapper.MapToNotification(noti));
             }
 
+            var savedPost = await _unitOfWork.PostRepository.GetPostByIdAsync(post.Id);
+            var mapPost = ApplicationMapper.MapToPost(savedPost);
+            var haveStory = await _unitOfWork.StoryRepository
+                    .IsUserHaveStoryAsync(post.UserId);
+            mapPost.User.HaveStory = haveStory;
+
             return new DataResponse<PostResponse>
             {
                 IsSuccess = true,
-                Message = "Tạo bài viết mới thành công",
+                Message = (post.ApprovalStatus == ApprovalStatus.APPROVED && post.IsGroupPost) || !post.IsGroupPost ? "Tạo bài viết mới thành công" : "Bài viết của bạn đã được gửi tới quản trị viên chờ phê duyệt",
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Data = (post.ApprovalStatus == ApprovalStatus.APPROVED && post.IsGroupPost) || !post.IsGroupPost ? ApplicationMapper.MapToPost(post) : null
+                Data = (post.ApprovalStatus == ApprovalStatus.APPROVED && post.IsGroupPost) || !post.IsGroupPost ? mapPost : null
             };
         }
     }

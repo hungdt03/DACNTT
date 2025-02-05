@@ -1,9 +1,11 @@
 import { Image, Upload, UploadFile, UploadProps } from "antd";
 import { InboxOutlined } from '@ant-design/icons'
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { FileType, getBase64 } from "../../utils/file";
+import { FileType, getBase64, isValidImage, isValidVideo } from "../../utils/file";
 import UploadButton from "./UploadButton";
 
+const MAX_SIZE_MB_UPLOAD = 50;
+const MAX_SIZE_IN_BYTES = MAX_SIZE_MB_UPLOAD * 1024 * 1024;
 
 type UploadMultipleFileProps = {
     onChange?: (fileList: UploadFile[]) => void;
@@ -23,6 +25,7 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
     const [fileList, setFileList] = useState<UploadFile[] | any[]>([]);
     const [previewImageOpen, setPreviewImageOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleImagePreview = async (file: UploadFile) => {
         if (!file.url && !file.preview) {
@@ -34,9 +37,28 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
     };
 
     const handleImageChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-        onChange?.(newFileList)
-        setFileList(newFileList)
-    }
+        const isValidFile = (file: UploadFile) => {
+            return isValidImage(file.originFileObj as File) || isValidVideo(file.originFileObj as File);
+        };
+
+        const filterFiles = newFileList.filter(file => file.name);
+        const totalSize = filterFiles.reduce((acc, file) => acc + (file.originFileObj as File).size, 0);
+        const invalidFile = filterFiles.find(file => !isValidFile(file));
+
+        if (invalidFile) {
+            setErrorMessage('Vui lòng chọn tệp ảnh hoặc video hợp lệ!');
+            return;
+        } else if (totalSize > MAX_SIZE_IN_BYTES) {
+            setErrorMessage('Tổng kích thước các tệp vượt quá 50MB!');
+            return;
+        } else {
+            setErrorMessage(null); 
+        }
+
+        // Cập nhật fileList
+        onChange?.(newFileList);
+        setFileList(newFileList);
+    };
 
     const handleRemoveFile = (file: UploadFile) => {
         if (!file.name) {
@@ -49,13 +71,28 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
         fileList: fileList,
         multiple: true,
         onChange(info) {
+            const isValidFile = (file: UploadFile) => {
+                return isValidImage(file.originFileObj as File) || isValidVideo(file.originFileObj as File);
+            };
+    
+            const totalSize = info.fileList.reduce((acc, file) => acc + (file.originFileObj as File).size, 0);
+            const invalidFile = info.fileList.find(file => !isValidFile(file));
+    
+            if (invalidFile) {
+                setErrorMessage('Vui lòng chọn tệp ảnh hoặc video hợp lệ!');
+                return;
+            } else if (totalSize > MAX_SIZE_IN_BYTES) {
+                setErrorMessage('Tổng kích thước các tệp vượt quá 50MB!');
+                return;
+            } else {
+                setErrorMessage(null); 
+            }
+
             onChange?.(info.fileList)
             setFileList(info.fileList)
         },
         onRemove: handleRemoveFile,
-        beforeUpload(_) {
-            return false;
-        }
+        beforeUpload: (_) => false
     };
 
     useEffect(() => {
@@ -88,7 +125,7 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
         ) : (
             <div className="mb-4">
                 <Upload
-                    beforeUpload={() => false}
+                    beforeUpload={_ => false}
                     listType="picture-card"
                     fileList={fileList}
                     onPreview={handleImagePreview}
@@ -110,6 +147,13 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
                 )}
             </div>
         )}
+
+        {errorMessage && (
+            <div style={{ color: 'red', marginTop: 10 }}>
+                {errorMessage}
+            </div>
+        )}
+
     </>
 });
 

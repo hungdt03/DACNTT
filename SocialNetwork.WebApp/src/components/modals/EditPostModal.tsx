@@ -129,7 +129,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
             formData.append('removeMediaIds', mediaId);
         });
 
-        if(postRequest.background) {
+        if (postRequest.background) {
             formData.append('background', postRequest.background);
         }
 
@@ -176,7 +176,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
         setTags([...post.tags.map(p => p.user)])
 
         if (contentRef.current) {
-            contentRef.current.innerHTML = postRequest.content
+            contentRef.current.innerHTML = post.content
         }
 
     }, [post]);
@@ -222,7 +222,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
         <div className="flex items-center gap-x-2">
             <Avatar size='large' src={images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
-                <div className="text-[16px] font-semibold">
+                <div className="text-[15px] font-semibold">
                     {user?.fullName}
                     {tags.length > 0 &&
                         (() => {
@@ -280,14 +280,17 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     ></div>
 
                 </div>
-                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 3 : 5} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full h-full overflow-y-auto custom-scrollbar p-2", isLongText ? 'text-[16px]' : 'text-xl')} placeholder="Long ơi, bạn đang nghĩ gì thế" />}
+                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 5 : 8} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full h-full overflow-y-auto custom-scrollbar p-2", isLongText ? 'text-[16px]' : 'text-xl')} placeholder="Long ơi, bạn đang nghĩ gì thế" />}
             </div>
-            {showUpload && <UploadMultipleFile
-                valueUrls={valueUrls}
-                ref={uploadRef}
-                onRemoveFileUrl={handleRemoveFiles}
-                onChange={handleUploadFiles}
-            />}
+            {showUpload && <div className="flex flex-col">
+                <UploadMultipleFile
+                    valueUrls={valueUrls}
+                    ref={uploadRef}
+                    onRemoveFileUrl={handleRemoveFiles}
+                    onChange={handleUploadFiles}
+                />
+                 <span className="text-sm italic">(Tối đa 50MB)</span>
+            </div>}
             <div className="p-2 rounded-md border-[1px] border-gray-200 flex justify-between items-center">
                 <span>Thêm vào bài viết của bạn</span>
                 <div className="flex items-center gap-x-1">
@@ -296,7 +299,6 @@ const EditPostModal: FC<EditPostModalProps> = ({
                             onChange={background => {
                                 if (background) {
                                     if (contentRef.current) contentRef.current.innerText = postRequest.content;
-
                                     setShowUpload(false)
                                 }
 
@@ -312,13 +314,13 @@ const EditPostModal: FC<EditPostModalProps> = ({
                                 setIsEdited(true)
                             }}
                         />}>
-                            <button disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.removeMedias.length < post.medias.length} onClick={() => setIsUseBackground(!isUseBackground)}>
+                            <button className={cn((postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.removeMedias.length < post.medias.length || postRequest.content.trim().length > 120) && 'cursor-not-allowed')} disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.removeMedias.length < post.medias.length || postRequest.content.trim().length > 120} onClick={() => setIsUseBackground(!isUseBackground)}>
                                 <img width={30} height={30} src={images.AaBackground} />
                             </button>
                         </Popover>
                     </Tooltip>
                     <Tooltip title='Ảnh/video'>
-                        <button disabled={!!postRequest.background || postRequest.images.length > 0 || postRequest.videos.length > 0} onClick={handleShowUploadBtn} className="p-2 rounded-full hover:bg-gray-100">
+                        <button disabled={!!postRequest.background || postRequest.images.length > 0 || postRequest.videos.length > 0} onClick={handleShowUploadBtn} className={cn("p-2 rounded-full hover:bg-gray-100", (!!postRequest.background || postRequest.images.length > 0 || postRequest.videos.length > 0) && 'cursor-not-allowed')}>
                             <img alt="Ảnh" className="w-6 h-6" src={images.photo} />
                         </button>
                     </Tooltip>

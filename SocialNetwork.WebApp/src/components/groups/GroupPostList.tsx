@@ -36,7 +36,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
     const fetchPosts = async (page: number, size: number) => {
         setLoading(true);
         const response = await postService.getAllPostsByGroupId(group.id, page, size);
-        setTimeout(() => setLoading(false), 2000)
+        setTimeout(() => setLoading(false), 1000)
 
         if (response.isSuccess) {
             setPagination(response.pagination);
@@ -71,7 +71,10 @@ const GroupPostList: FC<GroupPostListProps> = ({
     };
 
     const handleCreatePostSuccess = (toastId: Id, msg: string, data: PostResource) => {
-        fetchPostByID(data.id);
+        if(data) {
+            fetchPostByID(data.id);
+        }   
+       
         toast.update(toastId, {
             render: msg,
             type: 'success',
@@ -89,9 +92,9 @@ const GroupPostList: FC<GroupPostListProps> = ({
         });
     };
 
-    return <div className="col-span-12 lg:col-span-7 h-full overflow-y-auto custom-scrollbar py-6">
+    return <div className="col-span-12 lg:col-span-7 h-full overflow-y-auto scrollbar-hide py-6">
         <div ref={containerRef} className="flex flex-col gap-y-4 h-full">
-            <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} groupId={group.id} />
+            <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} group={group} />
             {posts.map(post => {
                 if (post.postType === PostType.SHARE_POST) {
                     return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
@@ -104,10 +107,10 @@ const GroupPostList: FC<GroupPostListProps> = ({
             <div id="group-post-scroll-trigger" className="w-full h-1" />
 
             {!pagination.hasMore && !loading && posts.length > 0 && (
-                <p className="text-center text-gray-500">Không còn bài viết để tải.</p>
+                <p className="text-center text-gray-500 pb-6">Không còn bài viết để tải.</p>
             )}
 
-            {posts.length === 0 && <p className="text-center text-gray-500">Không có bài viết để tải</p>}
+            {posts.length === 0 && !loading && <p className="text-center text-gray-500">Không có bài viết để tải</p>}
         </div>
     </div>
 };

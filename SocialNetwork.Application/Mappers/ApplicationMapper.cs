@@ -63,6 +63,18 @@ namespace SocialNetwork.Application.Mappers
             };
         }
 
+        public static SearchHistoryResponse MapToSearch(SearchHistory searchHistory)
+        {
+            return new SearchHistoryResponse()
+            {
+                Id = searchHistory.Id,
+                Group = searchHistory.SearchGroup != null ? MapToGroup(searchHistory.SearchGroup) : null,
+                User = searchHistory.SearchUser != null ? MapToUser(searchHistory.SearchUser) : null,
+                SearchAt = searchHistory.DateCreated,
+                SearchText = searchHistory.SearchText
+            };
+        }
+
         public static MessageResponse MapToMessage(Message message)
         {
             return new MessageResponse()

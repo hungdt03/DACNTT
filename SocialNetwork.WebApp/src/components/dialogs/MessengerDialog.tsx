@@ -109,7 +109,7 @@ const MessengerDialog: FC<MessengerDialogProps> = ({
     return <>
         <div className="flex flex-col gap-y-3 w-[380px]">
             <div className="flex items-center justify-between">
-                <span className="font-semibold text-gray-500 px-1 text-lg">Đoạn chat</span>
+                <span className="font-bold text-gray-700 px-1 text-[15px]">Đoạn chat</span>
                 <button onClick={showModal} className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100">
                     <Edit size={14} />
                 </button>
@@ -149,7 +149,7 @@ const MessengerDialog: FC<MessengerDialogProps> = ({
             style={{
                 top: 20
             }}
-            title={<p className="text-center font-semibold text-xl">Tạo nhóm chat</p>}
+            title={<p className="text-center font-bold text-lg">Tạo nhóm chat</p>}
             width='500px'
             open={isModalOpen}
             onOk={handleOk}

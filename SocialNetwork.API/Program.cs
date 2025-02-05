@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using SocialNetwork.API.DI;
 using SocialNetwork.API.Middlewares;
 using SocialNetwork.Infrastructure.SignalR;
@@ -17,10 +18,16 @@ namespace SocialNetwork.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddControllers()
-            .AddJsonOptions(options =>
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                });
+
+            builder.Services.Configure<KestrelServerOptions>(options =>
             {
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; 
             });
+
 
             var app = builder.Build();
 

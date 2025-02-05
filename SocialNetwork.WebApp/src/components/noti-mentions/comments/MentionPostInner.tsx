@@ -244,13 +244,13 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
         <Divider className='mt-0 mb-2' />
 
         {/*======== MODAL REACTION ====== */}
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
             <PostReactionModal reactions={reactions} />
         </Modal>
 
         {/*======== MODAL EDIT POST ====== */}
 
-        <Modal title={<p className="text-center font-semibold text-xl">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
+        <Modal title={<p className="text-center font-bold text-lg">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
             <EditPostModal
                 onSubmit={handleEditPostAsync}
                 post={post}
@@ -259,7 +259,7 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
 
         {/*======== MODAL SHARE POST ====== */}
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
             <SharePostModal
                 onSuccess={(data, msg) => {
                     okSharePost()
@@ -275,7 +275,7 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
 
         <Modal
             style={{ top: 20 }}
-            title={<p className="text-center font-semibold text-xl">Những người đã chia sẻ bài viết</p>}
+            title={<p className="text-center font-bold text-lg">Những người đã chia sẻ bài viết</p>}
             width='500px'
             centered
             open={openListShare}

@@ -100,7 +100,6 @@ const Post: FC<PostProps> = ({
 
     const fetchPostById = async () => {
         const response = await postService.getPostById(post.id);
-
         if (response.isSuccess) {
             setPost(response.data);
         } else {
@@ -125,7 +124,6 @@ const Post: FC<PostProps> = ({
 
     const handleEditPostAsync = async (values: FormData): Promise<boolean> => {
         const toastId: Id = toast.loading('Đang cập nhật bài viết... Vui lòng không refresh lại trang');
-        handleEditPostOk();
 
         try {
             const response = await postService.editPost(post.id, values);
@@ -139,6 +137,7 @@ const Post: FC<PostProps> = ({
                     autoClose: 3000,
                 });
 
+                handleEditPostOk();
                 return true;
             } else {
                 toast.update(toastId, {
@@ -163,7 +162,7 @@ const Post: FC<PostProps> = ({
 
     const handleDeletePost = async () => {
         const response = await postService.deletePost(post.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             onRemovePost?.(post.id)
             message.success(response.message)
         } else {
@@ -174,9 +173,13 @@ const Post: FC<PostProps> = ({
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
-                <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
+                {!post.user.haveStory 
+                    ? <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} /> 
+                    : <Link className="p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
+                }
+                
                 <div className="flex flex-col gap-y-[1px]">
-                    <div className="font-semibold text-[15px] text-gray-600">
+                    <div className="font-bold text-[14px] text-gray-600">
                         <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
                         {post.tags.length > 0 &&
                             (() => {
@@ -214,8 +217,8 @@ const Post: FC<PostProps> = ({
                 onDeletePost={handleDeletePost}
                 isMine={post.user.id === user?.id}
             />}>
-                <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
-                    <MoreHorizontal className="text-gray-400" />
+                <button className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100">
+                    <MoreHorizontal size={18} className="text-gray-400" />
                 </button>
             </Popover>
         </div>
@@ -265,10 +268,8 @@ const Post: FC<PostProps> = ({
 
         <Modal
             style={{ top: 20 }}
-            title={<p className="text-center font-semibold text-xl">Bình luận về bài viết của {post.user.fullName}</p>}
+            title={<p className="text-center font-bold text-lg">Bình luận về bài viết của {post.user.fullName}</p>}
             width='700px'
-            footer={[
-            ]}
             open={isModalOpen}
             onOk={handleOk}
             onCancel={handleCancel}
@@ -279,7 +280,6 @@ const Post: FC<PostProps> = ({
                 body: {
                     padding: '0px',
                     paddingBottom: 20,
-
                 },
                 content: {
                     position: 'relative'
@@ -293,22 +293,24 @@ const Post: FC<PostProps> = ({
         </Modal>
 
         {/*======== MODAL REACTION ====== */}
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
             <PostReactionModal reactions={reactions} />
         </Modal>
 
         {/*======== MODAL EDIT POST ====== */}
 
-        <Modal title={<p className="text-center font-semibold text-xl">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
-            <EditPostModal
+        <Modal title={<p className="text-center font-bold text-lg">Chỉnh sửa bài viết</p>} classNames={{
+            footer: 'hidden'
+        }} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
+            {isEditPostOpen && <EditPostModal
                 onSubmit={handleEditPostAsync}
                 post={post}
-            />
+            />}
         </Modal>
 
         {/*======== MODAL SHARE POST ====== */}
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
             <SharePostModal
                 onSuccess={(data, msg) => {
                     okSharePost()
@@ -324,7 +326,7 @@ const Post: FC<PostProps> = ({
 
         <Modal
             style={{ top: 20 }}
-            title={<p className="text-center font-semibold text-xl">Những người đã chia sẻ bài viết</p>}
+            title={<p className="text-center font-bold text-lg">Những người đã chia sẻ bài viết</p>}
             width='500px'
             centered
             open={openListShare}

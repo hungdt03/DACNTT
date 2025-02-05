@@ -18,7 +18,6 @@ import GroupManagerLayout from "../layouts/GroupManagerLayout/GroupManagerLayout
 import CreateGroupPage from "../pages/groups/CreateGroupPage";
 import HeaderFullWidthLayout from "../layouts/HeaderFullWidthLayout/HeaderFullWidthLayout";
 import GroupFeedSharedPage from "../pages/groups/GroupFeedSharedPage";
-import HeaderOnlyLayout from "../layouts/HeaderOnlyLayout/HeaderOnlyLayout";
 import SearchPage from "../pages/SearchPage";
 import SearchLayout from "../layouts/SearchLayout/SearchLayout";
 import GroupLayout from "../layouts/GroupLayout/GroupLayout";
@@ -99,7 +98,7 @@ const appRouter = createBrowserRouter([
                 ]
             },
             {
-                path: 'profile/:id',
+                path: 'profile/:id/:tab?',
                 element: <ProfilePage />
             },
         ]

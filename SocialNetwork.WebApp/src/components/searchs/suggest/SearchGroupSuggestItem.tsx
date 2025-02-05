@@ -1,17 +1,18 @@
 import { Search } from "lucide-react";
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import images from "../../../assets";
 import { SearchGroupSuggestResource } from "../../../types/search/search-group-suggest";
-import { Link } from "react-router-dom";
 
 type SearchGroupSuggestItemProps = {
     suggest: SearchGroupSuggestResource;
+    onClick: () => void
 }
 
 const SearchGroupSuggestItem: FC<SearchGroupSuggestItemProps> = ({
     suggest,
+    onClick
 }) => { 
-    return <Link to={`/groups/${suggest.group.id}`} className="hover:text-black px-1 py-2 rounded-md hover:bg-gray-100 flex items-center gap-x-2 cursor-pointer">
+    return <button onClick={onClick} className="hover:text-black px-1 py-2 rounded-md hover:bg-gray-100 flex items-center gap-x-2 cursor-pointer">
         {!suggest.isMember && <span className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center">
             <Search size={14} strokeWidth={3} className="text-gray-500" />
         </span>}
@@ -25,7 +26,7 @@ const SearchGroupSuggestItem: FC<SearchGroupSuggestItemProps> = ({
                 </span>
             </div>
         </div>
-    </Link>
+    </button>
 };
 
 export default SearchGroupSuggestItem;

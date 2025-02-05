@@ -27,7 +27,7 @@ const StorySidebar: FC<StorySidebarProps> = ({
     const { user } = useSelector(selectAuth)
     return <div className="flex flex-col gap-y-4 p-4 overflow-y-auto custom-scrollbar h-full">
         <div className="flex items-center gap-x-2 px-2 w-full">
-            <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-300">
+            <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-500">
                 <CloseOutlined />
             </Link>
             <Link to='/'><img width='36px' height='36px' src={images.facebook} /></Link>

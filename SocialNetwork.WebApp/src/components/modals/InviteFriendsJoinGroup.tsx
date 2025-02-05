@@ -82,7 +82,7 @@ const InviteFriendsJoinGroup: FC<InviteFriendsJoinGroupProps> = ({
                 </div>
             </div>
             <div className="col-span-1 bg-slate-100 p-2 flex flex-col gap-y-2 h-full overflow-y-auto custom-scrollbar">
-                <span className="text-xs uppercase font-semibold text-gray-500">Đã chọn 0 người bạn</span>
+                <span className="text-xs uppercase font-semibold text-gray-500">Đã chọn {selectFriends.length} người bạn</span>
 
                 <div className="flex flex-col gap-y-4">
                     {selectFriends.map(friend => <div key={friend.id} className="flex items-center justify-between">

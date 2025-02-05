@@ -214,6 +214,7 @@ const MentionSharePostModal: FC<MentionSharePostModalProps> = ({
             updatedComments={handleUpdateCommentList}
             pagination={pagination}
             fetchNextPage={fetchComments}
+            onDeleteComment={() => {}}
         />
 
         <div className="shadow p-4 absolute left-0 right-0 bottom-0 bg-white rounded-b-md">

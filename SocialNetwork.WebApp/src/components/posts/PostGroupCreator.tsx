@@ -8,17 +8,18 @@ import { Id, toast } from "react-toastify";
 import { PostResource } from "../../types/post";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
+import { GroupResource } from "../../types/group";
 
 type PostGroupCreatorProps = {
     onSuccess?: (toastId: Id, message: string, data: PostResource) => void;
     onFalied?: (toastId: Id, message: string) => void;
-    groupId: string
+    group: GroupResource
 }
 
 const PostGroupCreator: FC<PostGroupCreatorProps> = ({
     onSuccess,
     onFalied,
-    groupId
+    group
 }) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const { user } = useSelector(selectAuth)
@@ -28,7 +29,7 @@ const PostGroupCreator: FC<PostGroupCreatorProps> = ({
         handleOk()
 
         try {
-            values.append('groupId', groupId)
+            values.append('groupId', group.id)
             const response = await postService.createPost(values);
             if (response.isSuccess) {
                 onSuccess?.(toastId, response.message, response.data)
@@ -49,23 +50,12 @@ const PostGroupCreator: FC<PostGroupCreatorProps> = ({
             <button onClick={showModal} className="text-gray-500 py-2 px-3 rounded-xl bg-gray-50 w-full text-left">{user?.fullName?.split(' ').slice(-1)[0]} ơi, bạn đang nghĩ gì thế?</button>
         </div>
         <Divider className="my-2" />
-        <div className="flex items-center gap-x-4">
-            <button className="py-[6px] px-4 bg-gray-100 flex items-center gap-x-2 rounded-md text-gray-500 text-sm">
-                <img alt="Ảnh" className="w-6 h-6" src={images.photo} />
-                <span>Ảnh</span>
-            </button>
-            <button className="py-[6px] px-4 bg-gray-100 flex items-center gap-x-2 rounded-md text-gray-500 text-sm">
-                <img alt="Video" className="w-6 h-6" src={images.video} />
-                <span>Video</span>
-            </button>
-            <button className="py-[6px] px-4 bg-gray-100 flex items-center gap-x-2 rounded-md text-gray-500 text-sm">
-                <img alt="Âm thanh" className="w-6 h-6" src={images.music} />
-                <span> Âm thanh</span>
-            </button>
-        </div>
 
-        <Modal title={<p className="text-center font-semibold text-xl">Tạo bài viết</p>} footer={[]} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <Modal title={<p className="text-center font-bold text-lg">Tạo bài viết</p>} classNames={{
+            footer: 'hidden'
+        }} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <CreatePostModal
+                group={group}
                 onSubmit={handleCreatePostAsync}
             />
         </Modal>

@@ -9,6 +9,7 @@ namespace SocialNetwork.Application.DTOs
         public string CoverImage { get; set; }
         public string Privacy { get; set; }
         public List<UserResponse> Members { get; set; }
+        public int CountMembers { get; set; }
         public bool IsMine { get; set; }
         public bool IsMember { get; set; }
         public bool OnlyAdminCanPost { get; set; }

@@ -49,5 +49,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(s => s.User)
                 .SingleOrDefaultAsync(s => s.Id == id);
         }
+
+        public async Task<bool> IsUserHaveStoryAsync(string userId)
+        {
+            return await _context.Stories
+               .AnyAsync(s => s.UserId == userId && s.ExpiresAt > DateTimeOffset.UtcNow);
+        }
     }
 }
