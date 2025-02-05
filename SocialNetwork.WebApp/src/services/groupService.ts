@@ -116,6 +116,26 @@ class GroupService {
             memberId
         })
     }
+
+    inviteAsAdmin(memberId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/invite-role-admin/' + memberId)
+    }
+
+    inviteAsModerator(memberId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/invite-role-moderator/' + memberId)
+    }
+
+    acceptRoleInvitation(invitationId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/accept-invite-role/' + invitationId)
+    }
+
+    cancelRoleInvitation(memberId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/cancel-invite-role/' + memberId)
+    }
+
+    rejectRoleInvitation(invitationId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/reject-invite-role/' + invitationId)
+    }
 }
 
 export default GroupService.getInstance();

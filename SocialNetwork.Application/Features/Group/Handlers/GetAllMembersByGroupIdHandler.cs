@@ -20,7 +20,32 @@ namespace SocialNetwork.Application.Features.Group.Handlers
         public async Task<BaseResponse> Handle(GetAllMembersByGroupIdQuery request, CancellationToken cancellationToken)
         {
             var (groupMembers, totalCount) = await _unitOfWork.GroupMemberRepository.GetAllMembersInGroupAsync(request.GroupId, request.Page, request.Size);
-            var response = groupMembers.Select(ApplicationMapper.MapToGroupMember).ToList();
+            
+            var response = new List<GroupMemberResponse>();
+
+            foreach (var groupMember in groupMembers)
+            {
+                var responseItem = ApplicationMapper.MapToGroupMember(groupMember);
+
+                var adminInvitation = await _unitOfWork.GroupRoleInvitationRepository
+                    .GetAdminInvitationByInviteeAndGroupIdAsync(groupMember.UserId, groupMember.GroupId);
+
+                var moderator = await _unitOfWork.GroupRoleInvitationRepository
+                   .GetModeratorInvitationByInviteeAndGroupIdAsync(groupMember.UserId, groupMember.GroupId);
+
+                if(adminInvitation != null)
+                {
+                    responseItem.IsInvitedAsModerator = false;
+                    responseItem.IsInvitedAsAdmin = true;
+                } else if(moderator != null) 
+                {
+                    responseItem.IsInvitedAsModerator = true;
+                    responseItem.IsInvitedAsAdmin = false;
+                }
+
+                response.Add(responseItem);
+
+            }
 
             return new PaginationResponse<List<GroupMemberResponse>>()
             {

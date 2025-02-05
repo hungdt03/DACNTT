@@ -31,6 +31,7 @@ namespace SocialNetwork.Infrastructure.DBContext
         public DbSet<UserSchool> UserSchools { get; set; }
         public DbSet<UserWorkPlace> UserWorkPlaces { get; set; }
         public DbSet<UserSocialLink> UserSocialLinks { get; set; }
+        public DbSet<SearchHistory> SearchHistories { get; set; }
 
         // GROUP
         public DbSet<Group> Groups { get; set; }

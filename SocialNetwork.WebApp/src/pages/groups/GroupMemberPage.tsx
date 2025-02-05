@@ -15,14 +15,14 @@ import useModal from "../../hooks/useModal";
 
 const GroupMemberPage: FC = () => {
     const { id } = useParams()
+
     const [members, setMembers] = useState<GroupMemberResource[]>([]);
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
+
     const [searchValue, setSearchValue] = useState('');
     const [group, setGroup] = useState<GroupResource>();
-
     const [selectMember, setSelectMember] = useState<GroupMemberResource>()
-
     const { isModalOpen, handleCancel, handleOk, showModal } = useModal()
 
     const { containerRef } = useInfiniteScroll({
@@ -83,6 +83,63 @@ const GroupMemberPage: FC = () => {
         }
     }
 
+    const handleInviteAsAdmin = async (memberId: string) => {
+        const response = await groupService.inviteAsAdmin(memberId);
+        if(response.isSuccess) {
+            setMembers(prevMembers => {
+                const updateMembers = [...prevMembers];
+                const findIndex = updateMembers.findIndex(m => m.id === memberId);
+                if(findIndex > 0) {
+                    updateMembers[findIndex].isInvitedAsAdmin = true;
+                    updateMembers[findIndex].isInvitedAsModerator = false;
+                }
+
+                return updateMembers
+            })
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleInviteAsModerator = async (memberId: string) => {
+        const response = await groupService.inviteAsModerator(memberId);
+        if(response.isSuccess) {
+            setMembers(prevMembers => {
+                const updateMembers = [...prevMembers];
+                const findIndex = updateMembers.findIndex(m => m.id === memberId);
+                if(findIndex > 0) {
+                    updateMembers[findIndex].isInvitedAsModerator = true;
+                    updateMembers[findIndex].isInvitedAsAdmin = false;
+                }
+
+                return updateMembers
+            })
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleCancelInvitation = async (memberId: string) => {
+        const response = await groupService.cancelRoleInvitation(memberId);
+        if(response.isSuccess) {
+            setMembers(prevMembers => {
+                const updateMembers = [...prevMembers];
+                const findIndex = updateMembers.findIndex(m => m.id === memberId);
+                if(findIndex > 0) {
+                    updateMembers[findIndex].isInvitedAsModerator = false;
+                    updateMembers[findIndex].isInvitedAsAdmin = false;
+                }
+
+                return updateMembers
+            })
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
     useEffect(() => {
         fetchGroup();
         fetchMembers(pagination.page, pagination.size)
@@ -116,6 +173,10 @@ const GroupMemberPage: FC = () => {
                     member={member}
                     onChooseNewAdmin={showModal}
                     onLeaveGroup={() => handleLeaveGroup(group.id, member.id)}
+                    onCancelInviteAsAdmin={() => handleCancelInvitation(member.id)}
+                    onCancelInviteAsModerator={() => handleCancelInvitation(member.id)}
+                    onInviteAsAdmin={() => handleInviteAsAdmin(member.id)}
+                    onInviteAsModerator={() => handleInviteAsModerator(member.id)}
                 />)}
             </div>
 

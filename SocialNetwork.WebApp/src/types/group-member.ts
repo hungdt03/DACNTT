@@ -4,5 +4,7 @@ export type GroupMemberResource = {
     id: string;
     user: UserResource;
     role: string;
-    joinDate: Date
-}
+    joinDate: Date;
+    isInvitedAsAdmin: boolean;
+    isInvitedAsModerator: boolean;
+};

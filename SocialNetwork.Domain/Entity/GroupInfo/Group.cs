@@ -20,5 +20,6 @@ namespace SocialNetwork.Domain.Entity.GroupInfo
         public ICollection<GroupMember> Members { get; set; }
         public ICollection<GroupInvitation> Invites { get; set; }
         public ICollection<Report> Reports { get; set; }
+        public ICollection<GroupRoleInvitation> RoleInvitations { get; set; }
     }
 }

@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250203132859_InitialCreate")]
+    [Migration("20250205041555_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -358,6 +358,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("DateUpdated")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("InviteeId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -371,6 +374,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
 
                     b.HasIndex("InviteeId");
 
@@ -911,6 +916,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("GroupInvitationId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("GroupRoleInvitationId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -948,6 +956,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("GroupId");
 
                     b.HasIndex("GroupInvitationId");
+
+                    b.HasIndex("GroupRoleInvitationId");
 
                     b.HasIndex("JoinGroupRequestId");
 
@@ -1381,6 +1391,42 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.ToTable("FriendShips");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.UserInfo.SearchHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("SearchGroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SearchText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SearchUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SearchGroupId");
+
+                    b.HasIndex("SearchUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SearchHistories");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.UserInfo.UserSchool", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1609,6 +1655,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.GroupInfo.GroupRoleInvitation", b =>
                 {
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "Group")
+                        .WithMany("RoleInvitations")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("SocialNetwork.Domain.Entity.System.User", "Invitee")
                         .WithMany()
                         .HasForeignKey("InviteeId")
@@ -1620,6 +1672,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasForeignKey("InviterId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Group");
 
                     b.Navigation("Invitee");
 
@@ -1867,6 +1921,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasForeignKey("GroupInvitationId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "GroupRoleInvitation")
+                        .WithMany()
+                        .HasForeignKey("GroupRoleInvitationId");
+
                     b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "JoinGroupRequest")
                         .WithMany()
                         .HasForeignKey("JoinGroupRequestId");
@@ -1894,6 +1952,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("GroupInvitation");
+
+                    b.Navigation("GroupRoleInvitation");
 
                     b.Navigation("JoinGroupRequest");
 
@@ -2033,6 +2093,31 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.UserInfo.SearchHistory", b =>
+                {
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "SearchGroup")
+                        .WithMany()
+                        .HasForeignKey("SearchGroupId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("SocialNetwork.Domain.Entity.System.User", "SearchUser")
+                        .WithMany()
+                        .HasForeignKey("SearchUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("SocialNetwork.Domain.Entity.System.User", "User")
+                        .WithMany("Searches")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("SearchGroup");
+
+                    b.Navigation("SearchUser");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SocialNetwork.Domain.Entity.UserInfo.UserSchool", b =>
                 {
                     b.HasOne("SocialNetwork.Domain.Entity.System.Major", "Major")
@@ -2110,6 +2195,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("Reports");
+
+                    b.Navigation("RoleInvitations");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.MessageInfo.Message", b =>
@@ -2179,6 +2266,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("RequestSends");
 
                     b.Navigation("Schools");
+
+                    b.Navigation("Searches");
 
                     b.Navigation("Stories");
 

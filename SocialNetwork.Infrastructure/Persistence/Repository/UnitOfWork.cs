@@ -39,6 +39,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public IGroupMemberRepository GroupMemberRepository { get; }
         public IGroupInvitationRepository GroupInvitationRepository {  get; }
         public IJoinGroupRequestRepository JoinGroupRequestRepository {  get; }
+        public IGroupRoleInvitationRepository GroupRoleInvitationRepository {  get; }
 
         public UnitOfWork
         (
@@ -71,7 +72,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 IGroupRepository groupRepository,
                 IGroupMemberRepository groupMemberRepository,
                 IGroupInvitationRepository groupInvitationRepository,
-                IJoinGroupRequestRepository joinGroupRequestRepository
+                IJoinGroupRequestRepository joinGroupRequestRepository,
+                IGroupRoleInvitationRepository groupRoleInvitationRepository
         )
         {
             _context = context;
@@ -105,6 +107,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             GroupMemberRepository = groupMemberRepository;
             GroupInvitationRepository = groupInvitationRepository;
             JoinGroupRequestRepository = joinGroupRequestRepository;
+            GroupRoleInvitationRepository = groupRoleInvitationRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)

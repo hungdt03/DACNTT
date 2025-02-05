@@ -175,5 +175,40 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpPut("invite-role-admin/{memberId}")]
+        public async Task<IActionResult> InviteAsAdmin([FromRoute] Guid memberId)
+        {
+            var response = await mediator.Send(new InviteUserAsAdminCommand(memberId));
+            return Ok(response);
+        }
+
+        [HttpPut("invite-role-moderator/{memberId}")]
+        public async Task<IActionResult> InviteAsModerator([FromRoute] Guid memberId)
+        {
+            var response = await mediator.Send(new InviteUserAsModeratorCommand(memberId));
+            return Ok(response);
+        }
+
+        [HttpPut("cancel-invite-role/{memberId}")]
+        public async Task<IActionResult> ancelRoleInvitation([FromRoute] Guid memberId)
+        {
+            var response = await mediator.Send(new CancelRoleInvitationCommand(memberId));
+            return Ok(response);
+        }
+
+        [HttpPut("reject-invite-role/{invitationId}")]
+        public async Task<IActionResult> RejectRoleInvitation([FromRoute] Guid invitationId)
+        {
+            var response = await mediator.Send(new RejectRoleInvitationCommand(invitationId));
+            return Ok(response);
+        }
+
+        [HttpPut("accept-invite-role/{invitationId}")]
+        public async Task<IActionResult> AcceptRoleInvitation([FromRoute] Guid invitationId)
+        {
+            var response = await mediator.Send(new AcceptRoleInvitationCommand(invitationId));
+            return Ok(response);
+        }
+
     }
 }

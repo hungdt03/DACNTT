@@ -488,6 +488,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     InviterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     InviteeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -506,6 +507,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         name: "FK_GroupRoleInvitations_AspNetUsers_InviterId",
                         column: x => x.InviterId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_GroupRoleInvitations_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
                         principalColumn: "Id");
                 });
 
@@ -626,6 +632,38 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SearchHistories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SearchText = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SearchGroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SearchUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SearchHistories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SearchHistories_AspNetUsers_SearchUserId",
+                        column: x => x.SearchUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SearchHistories_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SearchHistories_Groups_SearchGroupId",
+                        column: x => x.SearchGroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -947,6 +985,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     IsRead = table.Column<bool>(type: "bit", nullable: false),
                     JoinGroupRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    GroupRoleInvitationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     GroupInvitationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -982,6 +1021,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_Notifications_Groups_GroupId",
                         column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Groups_GroupRoleInvitationId",
+                        column: x => x.GroupRoleInvitationId,
                         principalTable: "Groups",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -1237,6 +1281,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GroupRoleInvitations_GroupId",
+                table: "GroupRoleInvitations",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GroupRoleInvitations_InviteeId",
                 table: "GroupRoleInvitations",
                 column: "InviteeId");
@@ -1327,6 +1376,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "IX_Notifications_GroupInvitationId",
                 table: "Notifications",
                 column: "GroupInvitationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_GroupRoleInvitationId",
+                table: "Notifications",
+                column: "GroupRoleInvitationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_JoinGroupRequestId",
@@ -1435,6 +1489,21 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 table: "Schools",
                 column: "Name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SearchHistories_SearchGroupId",
+                table: "SearchHistories",
+                column: "SearchGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SearchHistories_SearchUserId",
+                table: "SearchHistories",
+                column: "SearchUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SearchHistories_UserId",
+                table: "SearchHistories",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stories_UserId",
@@ -1562,6 +1631,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Reports");
+
+            migrationBuilder.DropTable(
+                name: "SearchHistories");
 
             migrationBuilder.DropTable(
                 name: "Tags");

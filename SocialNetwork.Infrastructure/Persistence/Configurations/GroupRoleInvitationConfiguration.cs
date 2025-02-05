@@ -11,6 +11,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Configurations
             builder.HasKey(x => x.Id);
             builder.HasOne(x => x.Invitee).WithMany().HasForeignKey(x => x.InviteeId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(x => x.Inviter).WithMany().HasForeignKey(x => x.InviterId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(x => x.Group).WithMany(g => g.RoleInvitations).HasForeignKey(x => x.GroupId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
