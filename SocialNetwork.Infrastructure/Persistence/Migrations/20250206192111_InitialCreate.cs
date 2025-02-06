@@ -1004,7 +1004,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReportType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ResolutionNotes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResolutionNotes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReporterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TargetUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),

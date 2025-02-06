@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectAuth, signOut } from "../../features/slices/auth-slice";
 import { LogOut } from "lucide-react";
 import { AppDispatch } from "../../app/store";
+import { Link } from "react-router-dom";
 
 const AccountDialog: FC = () => {
     const { user } = useSelector(selectAuth);
@@ -18,7 +19,9 @@ const AccountDialog: FC = () => {
                 <span className="font-semibold text-[15px]">{user?.fullName}</span>
             </div>
             <Divider className="mt-2 mb-3" />
-            <button className="px-2 py-1 rounded-md bg-gray-200 text-gray-800 font-semibold w-full">Xem trang cá nhân</button>
+            <Link to={`/profile/${user?.id}`}>
+                    <span className="px-2 py-1 rounded-md bg-gray-200 text-gray-800 font-semibold w-full">Xem trang cá nhân</span>
+            </Link>
         </div>
 
         <Popconfirm onConfirm={handleLogout} title='Đăng xuất' description='Bạn có chắc là muốn đăng xuất?' cancelText='Không' okText='Chắc chắn' >
