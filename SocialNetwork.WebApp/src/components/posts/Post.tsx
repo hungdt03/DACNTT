@@ -26,6 +26,9 @@ import { Link } from "react-router-dom";
 import ListSharePostModal from "../modals/ListSharePostModal";
 import PostOtherTags from "./PostOtherTags";
 import { PrivacyType } from "../../enums/privacy";
+import { GroupResource } from "../../types/group";
+import reportService from "../../services/reportService";
+import ReportPostModal from "../modals/reports/ReportPostModal";
 
 export type CommentRequest = {
     postId: string;
@@ -55,6 +58,7 @@ export const getTopReactions = (reactions?: ReactionResource[], top: number = 3)
 
 type PostProps = {
     allowShare?: boolean;
+    group?: GroupResource;
     post: PostResource;
     onFetch?: (data: PostResource) => void;
     onRemovePost?: (postId: string) => void
@@ -64,6 +68,7 @@ type PostProps = {
 const Post: FC<PostProps> = ({
     allowShare = true,
     post: postParam,
+    group,
     onFetch,
     onRemovePost
 }) => {
@@ -72,13 +77,16 @@ const Post: FC<PostProps> = ({
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
     const { handleCancel: cancelListShare, isModalOpen: openListShare, handleOk: okListShare, showModal: showListShare } = useModal();
+    const { handleCancel: cancelReportAdmin, isModalOpen: openReportAdmin, handleOk: okReportAdmin, showModal: showReportAdmin } = useModal();
+    // const { handleCancel: cancelReport, isModalOpen: openReport, handleOk: okReport, showModal: showReport } = useModal();
 
     const { user } = useSelector(selectAuth)
     const [reactions, setReactions] = useState<ReactionResource[]>();
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
 
-    const [post, setPost] = useState<PostResource>(postParam)
+    const [post, setPost] = useState<PostResource>(postParam);
+    const [reason, setReason] = useState('')
 
     const fetchReactions = async () => {
         const response = await reactionService.getAllReactionsByPostId(post.id);
@@ -170,6 +178,17 @@ const Post: FC<PostProps> = ({
         }
     }
 
+    const handleReportPost = async (reason: string) => {
+        const response = await reportService.reportPost(post.id, reason, group?.id);
+        if(response.isSuccess) {
+            message.success(response.message)
+            okReportAdmin()
+            setReason('')
+        } else {
+            message.error(response.message)
+        }
+    }
+
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -215,6 +234,9 @@ const Post: FC<PostProps> = ({
             <Popover className="flex-shrink-0" content={<PostMoreAction
                 onEditPost={showEditPostModal}
                 onDeletePost={handleDeletePost}
+                onReportPost={showReportAdmin}
+                isAdmin={group?.isMine}
+                isPostGroup={group != undefined}
                 isMine={post.user.id === user?.id}
             />}>
                 <button className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100">
@@ -284,9 +306,6 @@ const Post: FC<PostProps> = ({
                 content: {
                     position: 'relative'
                 },
-                footer: {
-                    display: 'none'
-                },
             }}
         >
             {isModalOpen && <PostModal post={post} />}
@@ -337,6 +356,29 @@ const Post: FC<PostProps> = ({
             }}
         >
             <ListSharePostModal post={post} />
+        </Modal>
+
+
+        {/* REPORT TO ADMIN OF GROUP */}
+        <Modal
+            title={<p className="text-center font-bold text-lg">Báo cáo bài viết tới quản trị viên nhóm</p>}
+            centered
+            open={openReportAdmin}
+            onOk={okReportAdmin}
+            onCancel={cancelReportAdmin}
+            okText='Gửi báo cáo'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason),
+                disabled: reason.trim().length < 20
+            }}
+        >
+            <ReportPostModal
+                value={reason}
+                onChange={(newValue) => setReason(newValue)}
+                title="Tại sao bạn báo cáo bài viết này"
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+            />
         </Modal>
     </div>
 };

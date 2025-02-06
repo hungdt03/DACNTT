@@ -75,6 +75,25 @@ namespace SocialNetwork.Application.Mappers
             };
         }
 
+        public static ReportResponse MapToReport(Report report)
+        {
+            return new ReportResponse()
+            {
+                Id = report.Id,
+                Group = report.Group != null ? MapToGroup(report.Group) : null,
+                Reason = report.Reason,
+                Reporter = report.Reporter != null ? MapToUser(report.Reporter) : null,
+                ReportType = report.ReportType,
+                ResolutionNotes = report.ResolutionNotes,
+                ResolvedAt = report.ResolvedAt,
+                Status = report.Status,
+                TargetComment = report.TargetComment != null ? MapToComment(report.TargetComment) : null,
+                TargetGroup = report.TargetGroup != null ? MapToGroup(report.TargetGroup) : null,
+                TargetPost = report.TargetPost != null ? MapToPost(report.TargetPost) : null,
+                TargetUser = report.TargetUser != null ? MapToUser(report.TargetUser) : null,
+            };
+        }
+
         public static MessageResponse MapToMessage(Message message)
         {
             return new MessageResponse()

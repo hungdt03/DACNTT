@@ -9,5 +9,6 @@ namespace SocialNetwork.Domain.Constants
         public const string USER = "USER";
         public const string COMMENT = "COMMENT";
         public const string POST = "POST";
+        public const string GROUP = "GROUP";
     }
 }

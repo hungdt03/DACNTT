@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250205041555_InitialCreate")]
+    [Migration("20250206143823_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -936,6 +936,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<Guid?>("ReportId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("StoryId")
                         .HasColumnType("uniqueidentifier");
 
@@ -964,6 +967,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("PostId");
 
                     b.HasIndex("RecipientId");
+
+                    b.HasIndex("ReportId");
 
                     b.HasIndex("StoryId");
 
@@ -1150,6 +1155,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("TargetCommentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("TargetGroupId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("TargetPostId")
                         .HasColumnType("uniqueidentifier");
 
@@ -1163,6 +1171,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("ReporterId");
 
                     b.HasIndex("TargetCommentId");
+
+                    b.HasIndex("TargetGroupId");
 
                     b.HasIndex("TargetPostId");
 
@@ -1389,6 +1399,34 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("FriendShips");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.UserInfo.SavedPost", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DateUpdated")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("PostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SavedPosts");
                 });
 
             modelBuilder.Entity("SocialNetwork.Domain.Entity.UserInfo.SearchHistory", b =>
@@ -1940,6 +1978,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("SocialNetwork.Domain.Entity.System.Report", "Report")
+                        .WithMany()
+                        .HasForeignKey("ReportId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("SocialNetwork.Domain.Entity.StoryInfo.Story", "Story")
                         .WithMany()
                         .HasForeignKey("StoryId")
@@ -1960,6 +2003,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Post");
 
                     b.Navigation("Recipient");
+
+                    b.Navigation("Report");
 
                     b.Navigation("Story");
                 });
@@ -2002,6 +2047,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("TargetCommentId");
 
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "TargetGroup")
+                        .WithMany()
+                        .HasForeignKey("TargetGroupId");
+
                     b.HasOne("SocialNetwork.Domain.Entity.PostInfo.Post", "TargetPost")
                         .WithMany()
                         .HasForeignKey("TargetPostId");
@@ -2015,6 +2064,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("Reporter");
 
                     b.Navigation("TargetComment");
+
+                    b.Navigation("TargetGroup");
 
                     b.Navigation("TargetPost");
 
@@ -2089,6 +2140,24 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Friend");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Domain.Entity.UserInfo.SavedPost", b =>
+                {
+                    b.HasOne("SocialNetwork.Domain.Entity.PostInfo.Post", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("SocialNetwork.Domain.Entity.System.User", "User")
+                        .WithMany("SavedPosts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Post");
 
                     b.Navigation("User");
                 });
@@ -2264,6 +2333,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Navigation("RequestReceives");
 
                     b.Navigation("RequestSends");
+
+                    b.Navigation("SavedPosts");
 
                     b.Navigation("Schools");
 

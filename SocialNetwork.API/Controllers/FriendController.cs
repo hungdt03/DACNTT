@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Application.Configuration;
+using SocialNetwork.Application.Features.BlockList.Commands;
 using SocialNetwork.Application.Features.Friend.Commands;
 using SocialNetwork.Application.Features.Friend.Queries;
 
@@ -67,6 +68,13 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> GetAllFriendsByFullName([FromQuery] string fullName = "")
         {
             var response = await mediator.Send(new GetAllFriendsByFullNameQuery(fullName));
+            return Ok(response);
+        }
+
+        [HttpPost("block")]
+        public async Task<IActionResult> BlockUser([FromBody] AddBlockUserCommand command)
+        {
+            var response = await mediator.Send(command);
             return Ok(response);
         }
     }

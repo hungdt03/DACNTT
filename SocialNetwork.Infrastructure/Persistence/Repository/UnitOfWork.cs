@@ -37,16 +37,19 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public ILocationRepository LocationRepository { get; }
         public IGroupRepository GroupRepository { get; }
         public IGroupMemberRepository GroupMemberRepository { get; }
-        public IGroupInvitationRepository GroupInvitationRepository {  get; }
-        public IJoinGroupRequestRepository JoinGroupRequestRepository {  get; }
-        public IGroupRoleInvitationRepository GroupRoleInvitationRepository {  get; }
-        public ISearchRepository SearchRepository {  get; }
+        public IGroupInvitationRepository GroupInvitationRepository { get; }
+        public IJoinGroupRequestRepository JoinGroupRequestRepository { get; }
+        public IGroupRoleInvitationRepository GroupRoleInvitationRepository { get; }
+        public IReportRepository ReportRepository { get; }
+        public IBlockListRepository BlockListRepository { get; }
+        public ISavedPostRepository SavedPostRepository { get; }
+        public ISearchRepository SearchRepository { get; }
 
         public UnitOfWork
         (
-                AppDbContext context, 
-                IUserRepository userRepository, 
-                IPostRepository postRepository, 
+                AppDbContext context,
+                IUserRepository userRepository,
+                IPostRepository postRepository,
                 ICommentRepository commentRepository,
                 IReactionRepository reactionRepository,
                 IPostMediaRepository postMediaRepository,
@@ -75,7 +78,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 IGroupInvitationRepository groupInvitationRepository,
                 IJoinGroupRequestRepository joinGroupRequestRepository,
                 IGroupRoleInvitationRepository groupRoleInvitationRepository,
-                ISearchRepository searchRepository
+                ISearchRepository searchRepository,
+                IReportRepository reportRepository,
+                IBlockListRepository blockListRepository,
+                ISavedPostRepository savedPostRepository
         )
         {
             _context = context;
@@ -97,7 +103,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             MessageMediaRepository = messageMediaRepository;
             OTPRepository = oTPRepository;
             SchoolRepository = schoolRepository;
-            UserSchoolRepository = userSchoolRepository;    
+            UserSchoolRepository = userSchoolRepository;
             ProfessionRepository = professionRepository;
             MajorRepository = majorRepository;
             LocationRepository = locationRepository;
@@ -111,6 +117,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             JoinGroupRequestRepository = joinGroupRequestRepository;
             GroupRoleInvitationRepository = groupRoleInvitationRepository;
             SearchRepository = searchRepository;
+            SavedPostRepository = savedPostRepository;
+            ReportRepository = reportRepository;
+            BlockListRepository = blockListRepository;
         }
 
         public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
@@ -142,7 +151,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             if (_currentTransaction == null)
             {
                 throw new InvalidOperationException("Transaction has not been started.");
-            } else
+            }
+            else
             {
                 await _currentTransaction.RollbackAsync(cancellationToken);
             }

@@ -65,6 +65,9 @@ namespace SocialNetwork.Infrastructure.Configuration
             services.AddScoped<IJoinGroupRequestRepository, JoinGroupRequestRepository>();
             services.AddScoped<IGroupRoleInvitationRepository, GroupRoleInvitationRepository>();
             services.AddScoped<ISearchRepository, SearchRepository>();
+            services.AddScoped<ISavedPostRepository, SavedPostRepository>();
+            services.AddScoped<IBlockListRepository, BlockListRepository>();
+            services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSingleton<IConnectionMultiplexer>(sp =>

@@ -1,0 +1,62 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.API.Filters;
+using SocialNetwork.Application.Features.Report.Commands;
+using SocialNetwork.Application.Features.Report.Queries;
+
+namespace SocialNetwork.API.Controllers
+{
+    [Authorize]
+    [Route("api/reports")]
+    [ApiController]
+    public class ReportController : ControllerBase
+    {
+        private readonly IMediator _mediator;
+
+        public ReportController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("user")]
+        public async Task<IActionResult> ReportUser([FromBody] ReportUserCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("comment")]
+        public async Task<IActionResult> ReportComment([FromBody] ReportCommentCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("post")]
+        public async Task<IActionResult> ReportPost([FromBody] ReportPostCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("group")]
+        public async Task<IActionResult> ReportGroup([FromBody] ReportPostCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpGet("groups/pending/{groupId}")]
+        public async Task<IActionResult> GetAllPendingReportsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
+        {
+            var response = await _mediator.Send(new GetAllPendingReportsByGroupIdQuery(groupId, page, size));
+            return Ok(response);
+        }
+    }
+}

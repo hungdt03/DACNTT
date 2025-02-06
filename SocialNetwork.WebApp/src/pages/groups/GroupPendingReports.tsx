@@ -1,0 +1,91 @@
+import { FC, useEffect, useState } from "react";
+import { Pagination } from "../../types/response";
+import { inititalValues } from "../../utils/pagination";
+import { useParams } from "react-router-dom";
+import { Empty } from "antd";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+import LoadingIndicator from "../../components/LoadingIndicator";
+import { ReportResource } from "../../types/report";
+import reportService from "../../services/reportService";
+import { ReportType } from "../../enums/report-type";
+import ReportComment from "../../components/reports/ReportComment";
+import ReportPost from "../../components/reports/ReportPost";
+import ReportUser from "../../components/reports/ReportUser";
+
+const GroupPendingReports: FC = ({
+}) => {
+    const { id } = useParams()
+    const [pendingReports, setPendingReports] = useState<ReportResource[]>([]);
+    const [pagination, setPagination] = useState<Pagination>(inititalValues);
+    const [loading, setLoading] = useState(false);
+
+    const { containerRef } = useInfiniteScroll({
+        fetchMore: () => void fetchMoreMembers(),
+        hasMore: pagination.hasMore,
+        loading: loading,
+        rootMargin: "10px",
+        triggerId: "group-report-scroll-trigger",
+    });
+
+    const fetchPendingReports = async (groupId: string, page: number, size: number) => {
+        setLoading(true);
+        const response = await reportService.getGroupReports(groupId, page, size);
+        console.log(response)
+        setTimeout(() => {
+            setLoading(false);
+
+            if (response.isSuccess) {
+                setPagination(response.pagination);
+                setPendingReports(prevReports => {
+                    const existingIds = new Set(prevReports.map(m => m.id));
+                    const newReports = response.data.filter(m => !existingIds.has(m.id));
+                    return [...prevReports, ...newReports];
+                });
+            }
+        }, 2000)
+    };
+
+    const fetchMoreMembers = async () => {
+        if (!pagination.hasMore || loading || !id) return;
+        fetchPendingReports(id, pagination.page + 1, pagination.size);
+    };
+
+
+    useEffect(() => {
+        id && fetchPendingReports(id, pagination.page, pagination.size);
+    }, [id])
+
+    return <div className="w-full">
+        <div className="w-full flex items-center justify-center bg-white shadow sticky top-0 z-10">
+            <div className="max-w-screen-lg w-full py-3 flex flex-col gap-y-3">
+                <div className="flex items-center gap-x-2">
+                    <span className="text-xl font-bold">Đang chờ xử lí</span>
+                    <span className="w-1 h-1 rounded-full bg-gray-500"></span>
+                    <span className="text-xl font-bold">{pendingReports.length}</span>
+                </div>
+            </div>
+        </div>
+
+        {pendingReports.length === 0 && !loading && <div className="w-full h-full flex items-center justify-center">
+            <Empty description='Không có báo cáo nào để xử lí' />
+        </div>}
+        <div ref={containerRef} className="grid grid-cols-2 gap-4 py-4 px-8">
+            {pendingReports.map(report => {
+                if (report.reportType === ReportType.COMMENT) {
+                    return <ReportComment key={report.id} report={report} />
+                } else if (report.reportType === ReportType.POST) {
+                    return <ReportPost key={report.id} report={report} />
+                }
+
+                return <ReportUser key={report.id} report={report} />
+            })}
+
+            <div className="col-span-2">
+                {loading && <LoadingIndicator />}
+                <div className="w-full h-1" id='group-report-scroll-trigger'></div>
+            </div>
+        </div>
+    </div>
+};
+
+export default GroupPendingReports;

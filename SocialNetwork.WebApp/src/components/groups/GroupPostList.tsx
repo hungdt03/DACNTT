@@ -24,7 +24,6 @@ const GroupPostList: FC<GroupPostListProps> = ({
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [posts, setPosts] = useState<PostResource[]>([]);
 
-
     const { containerRef } = useInfiniteScroll({
         fetchMore: () => void fetchNewPosts(),
         hasMore: pagination.hasMore,
@@ -100,7 +99,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
                     return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
                 }
 
-                return <Post key={post.id} post={post} allowShare={group.privacy === GroupPrivacy.PUBLIC} />
+                return <Post group={group} key={post.id} post={post} allowShare={group.privacy === GroupPrivacy.PUBLIC} />
             })}
 
             {loading && <PostSkeletonList />}

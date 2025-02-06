@@ -43,6 +43,10 @@ class FriendService {
     getAllFriendsByFullName(fullName: string) : Promise<DataResponse<FriendResource[]>> {
         return axiosInterceptor.get('/api/friends/fullName?fullName=' + encodeURIComponent(fullName))
     }
+
+    blockUser(userId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/friends/block', { userId })
+    }
  
 }
 

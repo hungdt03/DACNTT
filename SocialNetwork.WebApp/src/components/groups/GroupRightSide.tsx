@@ -77,7 +77,7 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
                 </div>
                 <div className="flex items-center gap-x-2 text-gray-600">
                     <UserGroupIcon className="w-5" />
-                    <p>Tổng cộng 35.757 thành viên</p>
+                    <p>Tổng cộng {group.members.length} thành viên</p>
                 </div>
             </div>
         </div>

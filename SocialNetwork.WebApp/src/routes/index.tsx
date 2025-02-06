@@ -26,6 +26,7 @@ import GroupPendingPosts from "../pages/groups/GroupPendingPosts";
 import GroupMemberPage from "../pages/groups/GroupMemberPage";
 import GroupImagePage from "../pages/groups/GroupImagePage";
 import GroupVideoPage from "../pages/groups/GroupVideoPage";
+import GroupPendingReports from "../pages/groups/GroupPendingReports";
 
 const appRouter = createBrowserRouter([
     {
@@ -104,6 +105,10 @@ const appRouter = createBrowserRouter([
                     {
                         path: 'pending-posts',
                         element: <GroupPendingPosts />
+                    },
+                    {
+                        path: 'pending-reports',
+                        element: <GroupPendingReports />
                     }
                 ]
             },

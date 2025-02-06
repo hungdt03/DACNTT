@@ -872,6 +872,31 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SavedPosts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SavedPosts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SavedPosts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SavedPosts_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tags",
                 columns: table => new
                 {
@@ -973,79 +998,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Notifications",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RecipientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    JoinGroupRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    GroupRoleInvitationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    GroupInvitationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    FriendRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    DateSent = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Notifications", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Notifications_AspNetUsers_RecipientId",
-                        column: x => x.RecipientId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_Comments_CommentId",
-                        column: x => x.CommentId,
-                        principalTable: "Comments",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_FriendShips_FriendRequestId",
-                        column: x => x.FriendRequestId,
-                        principalTable: "FriendShips",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_GroupInvitations_GroupInvitationId",
-                        column: x => x.GroupInvitationId,
-                        principalTable: "GroupInvitations",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_Groups_GroupRoleInvitationId",
-                        column: x => x.GroupRoleInvitationId,
-                        principalTable: "Groups",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_Groups_JoinGroupRequestId",
-                        column: x => x.JoinGroupRequestId,
-                        principalTable: "Groups",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_Posts_PostId",
-                        column: x => x.PostId,
-                        principalTable: "Posts",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_Stories_StoryId",
-                        column: x => x.StoryId,
-                        principalTable: "Stories",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Reports",
                 columns: table => new
                 {
@@ -1058,6 +1010,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     TargetUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     TargetPostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     TargetCommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TargetGroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ResolvedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -1085,6 +1038,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_Reports_Groups_GroupId",
                         column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Reports_Groups_TargetGroupId",
+                        column: x => x.TargetGroupId,
                         principalTable: "Groups",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -1143,6 +1101,85 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         principalTable: "Messages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RecipientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    JoinGroupRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    GroupRoleInvitationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    GroupInvitationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    FriendRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ReportId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DateSent = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_AspNetUsers_RecipientId",
+                        column: x => x.RecipientId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Comments_CommentId",
+                        column: x => x.CommentId,
+                        principalTable: "Comments",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_FriendShips_FriendRequestId",
+                        column: x => x.FriendRequestId,
+                        principalTable: "FriendShips",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_GroupInvitations_GroupInvitationId",
+                        column: x => x.GroupInvitationId,
+                        principalTable: "GroupInvitations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Groups_GroupRoleInvitationId",
+                        column: x => x.GroupRoleInvitationId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Groups_JoinGroupRequestId",
+                        column: x => x.JoinGroupRequestId,
+                        principalTable: "Groups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Reports_ReportId",
+                        column: x => x.ReportId,
+                        principalTable: "Reports",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Notifications_Stories_StoryId",
+                        column: x => x.StoryId,
+                        principalTable: "Stories",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -1398,6 +1435,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "RecipientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notifications_ReportId",
+                table: "Notifications",
+                column: "ReportId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notifications_StoryId",
                 table: "Notifications",
                 column: "StoryId");
@@ -1475,6 +1517,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "TargetCommentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reports_TargetGroupId",
+                table: "Reports",
+                column: "TargetGroupId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reports_TargetPostId",
                 table: "Reports",
                 column: "TargetPostId");
@@ -1483,6 +1530,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "IX_Reports_TargetUserId",
                 table: "Reports",
                 column: "TargetUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SavedPosts_PostId",
+                table: "SavedPosts",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SavedPosts_UserId",
+                table: "SavedPosts",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Schools_Name",
@@ -1630,7 +1687,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "Reports");
+                name: "SavedPosts");
 
             migrationBuilder.DropTable(
                 name: "SearchHistories");
@@ -1663,7 +1720,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "GroupInvitations");
 
             migrationBuilder.DropTable(
-                name: "Comments");
+                name: "Reports");
 
             migrationBuilder.DropTable(
                 name: "Majors");
@@ -1682,6 +1739,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Stories");
+
+            migrationBuilder.DropTable(
+                name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "Posts");

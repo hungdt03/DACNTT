@@ -28,6 +28,7 @@ namespace SocialNetwork.Infrastructure.DBContext
         public DbSet<FriendShip> FriendShips { get; set; }
         public DbSet<Follow> Follows { get; set; }
         public DbSet<BlockList> BlockLists { get; set; }
+        public DbSet<SavedPost> SavedPosts { get; set; }
         public DbSet<UserSchool> UserSchools { get; set; }
         public DbSet<UserWorkPlace> UserWorkPlaces { get; set; }
         public DbSet<UserSocialLink> UserSocialLinks { get; set; }

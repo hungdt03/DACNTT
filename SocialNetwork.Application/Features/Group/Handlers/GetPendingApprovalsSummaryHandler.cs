@@ -23,11 +23,13 @@ namespace SocialNetwork.Application.Features.Group.Handlers
         {
             var countPendingRequestJoinGroup = await _unitOfWork.JoinGroupRequestRepository.CountPendingJoinGroupRequestedAsync(request.GroupId);
             var countPendingPosts = await _unitOfWork.PostRepository.CountPendingPostsByGroupIdAsync(request.GroupId);
+            var countPendingReports = await _unitOfWork.ReportRepository.CountPendingReportsByGroupIdAsync(request.GroupId);
 
             var response = new GroupApprovalSummaryResponse()
             {
                 PendingPost = countPendingPosts,
                 PendingRequestJoinGroup = countPendingRequestJoinGroup,
+                PendingReports = countPendingReports
             };
 
             return new DataResponse<GroupApprovalSummaryResponse>

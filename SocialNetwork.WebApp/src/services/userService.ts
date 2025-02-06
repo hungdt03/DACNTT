@@ -5,7 +5,7 @@ import { ModifyUserLocationRequest } from '../components/modals/ModifyUserLocati
 import { ModifyUserWorkPlaceRequest } from '../components/modals/ModifyUserWorkPlace';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { LocationResource } from '../types/location';
-import { BaseResponse, DataResponse } from '../types/response';
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 import { UserResource } from '../types/user';
 import { UserSchoolResource } from '../types/userSchool';
 import { UserWorkPlaceResource } from '../types/userWorkPlace';
@@ -107,6 +107,15 @@ class UserService {
 
     modifyUserHometown(payload: ModifyUserHometownRequest) : Promise<BaseResponse> {
         return axiosInterceptor.post('/api/users/hometown', payload)
+    }
+
+    getAllBlockUsers(page: number, size: number) : Promise<PaginationResponse<UserResource[]>> {
+        return axiosInterceptor.get('/api/users/blocks', {
+            params: {
+                page,
+                size
+            }
+        })
     }
 }
 

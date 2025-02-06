@@ -10,7 +10,7 @@ import cn from "../../../utils/cn";
 
 type MyGroupManageSidebarProps = {
     group: GroupResource;
-  
+
 }
 
 const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
@@ -60,16 +60,19 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
             </Badge.Ribbon>
 
             <Badge.Ribbon text={approvalSummary?.pendingRequestJoinGroup} color="green">
-                <Link to={`/groups/${group.id}/pending-members`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-members')  && 'bg-gray-100')}>
+                <Link to={`/groups/${group.id}/pending-members`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-members') && 'bg-gray-100')}>
                     <UserCog size={20} />
                     <span className="font-semibold">Yêu cầu thành viên</span>
                 </Link>
             </Badge.Ribbon>
-            <Link to={`/groups/${group.id}/pending-reports`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-reports') && 'bg-gray-100')}>
-                <ChartBarIcon size={20} />
-                <span className="font-semibold">Báo cáo đang chờ</span>
-            </Link>
-           
+            <Badge.Ribbon text={approvalSummary?.pendingReports} color="red">
+                <Link to={`/groups/${group.id}/pending-reports`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-reports') && 'bg-gray-100')}>
+                    <ChartBarIcon size={20} />
+                    <span className="font-semibold">Báo cáo đang chờ</span>
+                </Link>
+            </Badge.Ribbon>
+
+
         </div >
     </div >
 };

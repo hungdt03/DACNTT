@@ -242,6 +242,7 @@ const PostModal: FC<PostModalProps> = ({
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
         <CommentList
             loading={loading}
+            group={post.group}
             replyComment={handleReplyComment}
             comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
             updatedComments={handleUpdateCommentList}

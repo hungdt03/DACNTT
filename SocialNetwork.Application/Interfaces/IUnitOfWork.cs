@@ -33,6 +33,9 @@ namespace SocialNetwork.Application.Interfaces
         public IJoinGroupRequestRepository JoinGroupRequestRepository { get; }
         public IGroupRoleInvitationRepository GroupRoleInvitationRepository { get; }
         public ISearchRepository SearchRepository { get; }
+        public IReportRepository ReportRepository { get; }
+        public IBlockListRepository BlockListRepository { get; }
+        public ISavedPostRepository SavedPostRepository { get; }
         public IOTPRepository OTPRepository { get; }
 
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);

@@ -12,10 +12,14 @@ import { UserResource } from "../../types/user";
 import { Link } from "react-router-dom";
 import CommentSkeleton from "../skeletons/CommentSkeleton";
 import { MoreHorizontal } from "lucide-react";
+import { GroupResource } from "../../types/group";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
 
 type CommentItemProps = {
     parentComment: CommentResource | null;
     comment: CommentResource;
+    group?: GroupResource;
     level: number;
     onReply?: (comment: CommentResource) => void;
     updatePagination?: (page: number, size: number, hasMore: boolean) => void;
@@ -23,9 +27,10 @@ type CommentItemProps = {
     updatedComments: (commentId: string, fetchedReplies: CommentResource[]) => void;
     replyComment: (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void;
     onDeleteComment: (commentId: string) => void
+    onReportComment: () => void
 }
 
-const extractContentFromJSON = (commentJSON: string): JSX.Element => {
+export const extractContentFromJSON = (commentJSON: string): JSX.Element => {
     try {
         const nodeContents = JSON.parse(commentJSON) as NodeContent[];
 
@@ -55,17 +60,20 @@ const extractContentFromJSON = (commentJSON: string): JSX.Element => {
 };
 export const CommentItem: React.FC<CommentItemProps> = ({
     comment,
+    group,
     replyComment,
     onFetchReplies,
     updatedComments,
     level,
     onReply,
-    onDeleteComment
+    onDeleteComment,
+    onReportComment
 }) => {
     const [isReplying, setIsReplying] = useState(false)
     const [replyToUser, setReplyToUser] = useState<UserResource>(comment.user);
     const [content, setContent] = useState<string>('');
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const { user } = useSelector(selectAuth)
 
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
@@ -86,7 +94,6 @@ export const CommentItem: React.FC<CommentItemProps> = ({
 
     const handleReplyComment = (values: BoxReplyCommentType, parentCommentId: string | null) => {
         replyComment(values, parentCommentId, replyToUser?.id, level);
-
     }
 
     return (
@@ -107,8 +114,15 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                             </p>
                         </div>
 
-                        <Popover content={<div className="flex flex-col gap-y-2">
-                            <button onClick={() => onDeleteComment(comment.id)} className="w-full px-2 py-2 rounded-md hover:bg-gray-100">Xóa bình luận</button>
+                        <Popover content={<div className="flex flex-col items-start gap-y-2">
+                            {user?.id === comment.user.id ? <button onClick={() => onDeleteComment(comment.id)} className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100">Xóa bình luận</button>
+                                :
+                                <>
+                                    {group && !group.isMine && <button onClick={onReportComment} className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100">Báo cáo bình luận với quản trị viên nhóm</button>}
+                                    <button onClick={onReportComment} className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100">Báo cáo bình luận</button>
+                                </>
+                            }
+
                         </div>}>
                             <button className="hidden group-hover:flex w-7 h-7 items-center justify-center rounded-full hover:bg-gray-100">
                                 <MoreHorizontal size={16} />
@@ -167,6 +181,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 <div className="relative flex flex-col gap-y-3 pl-6">
                     {comment?.replies?.map((child) => (
                         <CommentItem
+                            onReportComment={onReportComment}
                             parentComment={comment}
                             key={child.id}
                             comment={child}

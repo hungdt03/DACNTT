@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
+using SocialNetwork.Application.Features.BlockList.Queries;
 using SocialNetwork.Application.Features.Story.Commands;
 using SocialNetwork.Application.Features.User.Commands;
 using SocialNetwork.Application.Features.User.Handlers;
@@ -27,6 +28,13 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> GetUserById([FromRoute] string userId)
         {
             var response = await mediator.Send(new GetUserByIdQuery(userId));
+            return Ok(response);
+        }
+
+        [HttpGet("blocks")]
+        public async Task<IActionResult> GetAllBlockUsers([FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetAllBlockUsersQuery(page, size));
             return Ok(response);
         }
       

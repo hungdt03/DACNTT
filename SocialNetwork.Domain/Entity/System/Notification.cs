@@ -34,6 +34,8 @@ namespace SocialNetwork.Domain.Entity.System
         public FriendShip? FriendRequest { get; set; }
         public Guid? StoryId { get; set; }
         public Story? Story { get; set; }
+        public Guid? ReportId { get; set; }
+        public Report? Report { get; set; }
 
         // Thời gian gửi thông báo
         public DateTimeOffset DateSent { get; set; }

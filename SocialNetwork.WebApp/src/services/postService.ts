@@ -127,6 +127,24 @@ class PostService {
     rejectPostByGroupIdAndPostId(groupId: string, postId: string) : Promise<BaseResponse> {
         return axiosInterceptor.put('/api/posts/group/reject/' + groupId + '/' + postId)
     }
+
+    getUserSavedPosts(page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/saved-posts', {
+            params: {
+                page,
+                size
+            }
+        })
+    }
+
+    addSavedPost(postId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/posts/saved-posts', { postId })
+    }
+
+    removeSavedPostByPostId(postId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.delete('/api/posts/saved-posts/' + postId)
+    }
+
  
 }
 

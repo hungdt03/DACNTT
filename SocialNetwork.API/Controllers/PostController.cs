@@ -6,6 +6,8 @@ using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Features.Post.Commands;
 using SocialNetwork.Application.Features.Post.Queries;
+using SocialNetwork.Application.Features.SavedPost.Commands;
+using SocialNetwork.Application.Features.SavedPost.Queries;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -28,6 +30,32 @@ namespace SocialNetwork.API.Controllers
             var response = await _mediator.Send(command);
             return Ok(response);
         }
+
+        // SAVED POSTS
+
+        [HttpGet("saved-posts")]
+        public async Task<IActionResult> GetAllSavedPosts([FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await _mediator.Send(new GetSavedPostsQuery(page, size));
+            return Ok(response);
+        }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("saved-posts")]
+        public async Task<IActionResult> AddSavedPost([FromBody] AddSavedPostCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpDelete("saved-posts/{postId}")]
+        public async Task<IActionResult> DeleteSavedPostByPostId([FromRoute] Guid postId)
+        {
+            var response = await _mediator.Send(new RemoveSavedPostCommand(postId));
+            return Ok(response);
+        }
+
+        // SHARE POSTS
 
         [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost("share")]
@@ -60,6 +88,8 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        // GET POST FOR USER PAGE
+
         [HttpGet("principal")]
         public async Task<IActionResult> GetAllPostsByPrincipal([FromQuery] int page = 1, [FromQuery] int size = 8)
         {
@@ -74,6 +104,8 @@ namespace SocialNetwork.API.Controllers
             var response = await _mediator.Send(new GetAllPostByUserIdQuery(userId, page, size));
             return Ok(response);
         }
+
+        // POST GROUPS
 
         [HttpGet("group/{groupId}")]
         public async Task<IActionResult> GetAllPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
