@@ -210,5 +210,20 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("medias/videos/{groupId}")]
+        public async Task<IActionResult> GetAllGroupVideosByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetGroupVideosQuery(groupId, page, size));
+            return Ok(response);
+        }
+
+
+        [HttpGet("medias/images/{groupId}")]
+        public async Task<IActionResult> GetAllGroupImagesByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetGroupImagesQuery(page, size, groupId));
+            return Ok(response);
+        }
+
     }
 }

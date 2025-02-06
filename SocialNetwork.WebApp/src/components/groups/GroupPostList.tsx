@@ -29,7 +29,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
         fetchMore: () => void fetchNewPosts(),
         hasMore: pagination.hasMore,
         loading,
-        rootMargin: "100px",
+        rootMargin: "50px",
         triggerId: "group-post-scroll-trigger",
     });
 
@@ -93,7 +93,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
     };
 
     return <div className="col-span-12 lg:col-span-7 h-full overflow-y-auto scrollbar-hide py-6">
-        <div ref={containerRef} className="flex flex-col gap-y-4 h-full">
+        <div ref={containerRef} className="flex flex-col gap-y-4">
             <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} group={group} />
             {posts.map(post => {
                 if (post.postType === PostType.SHARE_POST) {

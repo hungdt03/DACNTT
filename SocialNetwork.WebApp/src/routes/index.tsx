@@ -24,6 +24,8 @@ import GroupLayout from "../layouts/GroupLayout/GroupLayout";
 import GroupPendingMembers from "../pages/groups/GroupPendingMembers";
 import GroupPendingPosts from "../pages/groups/GroupPendingPosts";
 import GroupMemberPage from "../pages/groups/GroupMemberPage";
+import GroupImagePage from "../pages/groups/GroupImagePage";
+import GroupVideoPage from "../pages/groups/GroupVideoPage";
 
 const appRouter = createBrowserRouter([
     {
@@ -82,6 +84,14 @@ const appRouter = createBrowserRouter([
                     {
                         path: '',
                         element: <GroupHomePage />
+                    },
+                    {
+                        path: 'images',
+                        element: <GroupImagePage />
+                    },
+                    {
+                        path: 'videos',
+                        element: <GroupVideoPage />
                     },
                     {
                         path: 'members',

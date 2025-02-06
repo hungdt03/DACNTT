@@ -6,11 +6,12 @@ import { Plus } from "lucide-react";
 import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
 import useModal from "../../hooks/useModal";
 import { GroupResource } from "../../types/group";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import groupService from "../../services/groupService";
 import { getGroupPrivacyTitle } from "../../utils/privacy";
 import { GroupPrivacy } from "../../enums/group-privacy";
 import { JoinGroupRequestResource } from "../../types/join-group";
+import cn from "../../utils/cn";
 
 export type InviteFriendsRequest = {
     inviteeIds: string[];
@@ -39,6 +40,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     requestJoin,
     onFetch
 }) => {
+    const location = useLocation()
     const { handleCancel, handleOk, showModal, isModalOpen } = useModal();
     const [openSetting, setOpenSetting] = useState(false);
 
@@ -146,10 +148,10 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                 <Divider className="my-3" />
 
                 <div className="flex gap-x-2 items-center">
-                    <Link className="px-4 py-2 border-b-[3px] border-primary rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold" to={`/groups/${group.id}`}>Thảo luận</Link>
-                    <Link className="px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold" to={`/groups/${group.id}/members`}>Thành viên</Link>
-                    <Link className="px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold" to={`/groups/${group.id}/images`}>Ảnh</Link>
-                    <Link className="px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold" to={`/groups/${group.id}/videos`}>Video</Link>
+                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold")} to={`/groups/${group.id}`}>Thảo luận</Link>
+                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/members') && 'border-b-[3px] border-primary')} to={`/groups/${group.id}/members`}>Thành viên</Link>
+                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/images') && 'border-b-[3px] border-primary')} to={`/groups/${group.id}/images`}>Ảnh</Link>
+                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/videos') && 'border-b-[3px] border-primary')} to={`/groups/${group.id}/videos`}>Video</Link>
                 </div>
             </div>
         </div>

@@ -5,6 +5,7 @@ import { GroupResource } from '../types/group';
 import { GroupApprovalSummaryResource } from '../types/group-approval-summary';
 import { GroupMemberResource } from '../types/group-member';
 import { JoinGroupRequestResource, JoinGroupResource } from '../types/join-group';
+import { PostMediaResource } from '../types/post';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
 
@@ -135,6 +136,24 @@ class GroupService {
 
     rejectRoleInvitation(invitationId: string) : Promise<BaseResponse> {
         return axiosInterceptor.put('/api/groups/reject-invite-role/' + invitationId)
+    }
+
+    getAllGroupImagesByGroupId(groupId: string, page: number, size:  number) : Promise<PaginationResponse<PostMediaResource[]>> {
+        return axiosInterceptor.get('/api/groups/medias/images/' + groupId, {
+            params: {
+                page,
+                size
+            }
+        })
+    }
+
+    getAllGroupVideosByGroupId(groupId: string, page: number, size:  number) : Promise<PaginationResponse<PostMediaResource[]>> {
+        return axiosInterceptor.get('/api/groups/medias/videos/' + groupId, {
+            params: {
+                page,
+                size
+            }
+        })
     }
 }
 

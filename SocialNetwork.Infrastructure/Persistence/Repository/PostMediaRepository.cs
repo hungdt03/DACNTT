@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Infrastructure.DBContext;
 
@@ -20,10 +21,42 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context.PostMedias.Remove(media);
         }
 
+        public async Task<(List<PostMedia> Images, int TotalCount)> GetAllGroupImagesByGroupId(Guid groupId, int page, int size)
+        {
+            var query = _context.PostMedias
+                .Include(s => s.Post)
+                .Where(s => s.Post.GroupId == groupId && s.MediaType == MediaType.IMAGE)
+                .Where(s => s.Post.GroupId == groupId).AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var medias = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (medias, totalCount);
+        }
+
         public async Task<(List<PostMedia> PostMedias, int TotalCount)> GetAllGroupPostMediaByGroupIdAsync(Guid groupId, int page, int size)
         {
             var query = _context.PostMedias
                 .Include(s => s.Post)
+                .Where(s => s.Post.GroupId == groupId).AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var medias = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (medias, totalCount);
+        }
+
+        public async Task<(List<PostMedia> Videos, int TotalCount)> GetAllGroupVideosByGroupId(Guid groupId , int page, int size)
+        {
+            var query = _context.PostMedias
+                .Include(s => s.Post)
+                .Where(s => s.Post.GroupId == groupId && s.MediaType == MediaType.VIDEO)  
                 .Where(s => s.Post.GroupId == groupId).AsQueryable();
 
             var totalCount = await query.CountAsync();

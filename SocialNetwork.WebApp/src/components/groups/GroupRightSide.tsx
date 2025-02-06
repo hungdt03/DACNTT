@@ -4,9 +4,9 @@ import { Eye, Lock, LucideEarth, Newspaper } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import { GroupResource } from "../../types/group";
 import { PostMediaResource } from "../../types/post";
-import postService from "../../services/postService";
-import { MediaType } from "../../enums/media";
 import { GroupPrivacy } from "../../enums/group-privacy";
+import groupService from "../../services/groupService";
+import { Link } from "react-router-dom";
 
 type GroupRightSideProps = {
     group: GroupResource
@@ -15,19 +15,31 @@ type GroupRightSideProps = {
 const GroupRightSide: FC<GroupRightSideProps> = ({
     group
 }) => {
-    const [medias, setMedias] = useState<PostMediaResource[]>([]);
-    const [hasNext, setHasNext] = useState(false)
+    const [images, setImages] = useState<PostMediaResource[]>([]);
+    const [videos, setVideos] = useState<PostMediaResource[]>([]);
+    const [hasImageNext, setHasImageNext] = useState(false)
+    const [hasVideoNext, setHasVideoNext] = useState(false)
 
-    const fetchGroupPostMedias = async () => {
-        const response = await postService.getGroupPostMediaByGroupId(group.id, 1, 4);
+    const fetchGroupImages = async () => {
+        const response = await groupService.getAllGroupImagesByGroupId(group.id, 1, 4);
         if (response.isSuccess) {
-            setMedias(response.data);
-            setHasNext(response.pagination.hasMore)
+            setImages(response.data);
+            setHasImageNext(response.pagination.hasMore)
+        }
+    }
+
+
+    const fetchGroupVideos = async () => {
+        const response = await groupService.getAllGroupVideosByGroupId(group.id, 1, 4);
+        if (response.isSuccess) {
+            setVideos(response.data);
+            setHasVideoNext(response.pagination.hasMore)
         }
     }
 
     useEffect(() => {
-        fetchGroupPostMedias()
+        fetchGroupImages();
+        fetchGroupVideos()
     }, [group])
 
     return <div className="lg:flex flex-col h-full gap-y-4 hidden lg:col-span-5 py-6 overflow-y-auto scrollbar-hide">
@@ -71,38 +83,42 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
         </div>
 
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
-            <span className="font-bold text-lg text-gray-700">File phương tiện mới đây</span>
+            <span className="font-bold text-lg text-gray-700">Ảnh</span>
 
-            {medias.length > 0 ? (
-                <div className="grid grid-cols-2 gap-1 rounded-md overflow-hidden">
-                    {medias.map(media => (
-                        <div key={media.id} style={{
-                            aspectRatio: 1/1
-                        }} className="relative w-full overflow-hidden">
-                            {media.mediaType === MediaType.IMAGE ? (
-                                <Image
-                                    preview={{ mask: 'Xem' }}
-                                    className="object-cover"
-                                    width={'100%'}
-                                    height={'100%'}
-                                    src={media.mediaUrl}
-                                />
-                            ) : (
-                                <video
-                                    src={media.mediaUrl}
-                                    className="w-full h-full object-cover"
-                                    controls
-                                />
-                            )}
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <Empty description="Chưa có file phương tiện nào" />
-            )}
+            {images.length > 0 ? <div className="grid grid-cols-2 gap-1 rounded-md overflow-hidden">
+                {images.map(media => (
+                    <div key={media.id} style={{
+                        aspectRatio: 1 / 1
+                    }} className="relative w-full overflow-hidden">
+                        <Image
+                            preview={{ mask: 'Xem' }}
+                            className="object-cover"
+                            width={'100%'}
+                            height={'100%'}
+                            src={media.mediaUrl}
+                        />
+                    </div>
+                ))}
+            </div> : <Empty description="Chưa có file ảnh nào" />}
+            {hasImageNext && <Link to={`/groups/${group.id}/images`} className="text-center bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</Link>}
+        </div>
 
-
-            {hasNext && <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button>}
+        <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
+            <span className="font-bold text-lg text-gray-700">Video</span>
+            {videos.length > 0 ? <div className="grid grid-cols-2 gap-1 rounded-md overflow-hidden">
+                {videos.map(media => (
+                    <div key={media.id} style={{
+                        aspectRatio: 1 / 1
+                    }} className="relative w-full overflow-hidden">
+                        <video
+                            src={media.mediaUrl}
+                            className="w-full h-full object-cover"
+                            controls
+                        />
+                    </div>
+                ))}
+            </div> : <Empty description="Chưa có file video nào" />}
+            {hasVideoNext && <Link to={`/groups/${group.id}/videos`} className="text-center bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</Link>}
         </div>
     </div>
 };
