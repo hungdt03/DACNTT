@@ -45,7 +45,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
     const { isModalOpen, handleCancel, handleOk, showModal } = useModal()
     const { isModalOpen: openReport, handleCancel: cancelReport, handleOk: okReport, showModal: showReport } = useModal()
-
+ 
     const handleSendFriendRequest = async () => {
         const response = await friendRequestService.createFriendRequest(targetUser.id)
         if (response.isSuccess) {
@@ -167,7 +167,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
         <div className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
             <div className="flex flex-col gap-y-4 overflow-y-auto shadow">
                 <div className="w-full h-full relative z-10">
-                    <img className="w-full object-cover max-h-[25vh] h-full md:max-h-[30vh] rounded-lg" alt="Ảnh bìa" src={images.cover} />
+                    <img className="w-full object-cover max-h-[25vh] h-full md:max-h-[30vh] rounded-lg" alt="Ảnh bìa" src={targetUser.coverImage} />
                 </div>
 
                 <div className="flex flex-col lg:flex-row items-center lg:items-end -mt-20 gap-x-6 lg:-mt-12 px-8">

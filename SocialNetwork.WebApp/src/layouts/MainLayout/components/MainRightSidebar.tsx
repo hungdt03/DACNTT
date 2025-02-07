@@ -13,13 +13,7 @@ import { selectAuth } from "../../../features/slices/auth-slice";
 import { FriendRequestResource } from "../../../types/friendRequest";
 import { toast } from "react-toastify";
 
-type FriendRequestContentProps = {
-    onRefresh?: () => void
-}
-
-const MainRightSidebar: FC<FriendRequestContentProps> = (
-    { onRefresh }
-) => {
+const MainRightSidebar: FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector(selectAuth);
     const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
@@ -32,23 +26,17 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
                 setChatRooms(response.data);
             }
         };
-
         fetchChatRooms();
 
-        const friendRequests = async () => {
-            const response = await friendRequestService.getAllFriendRequestByUserId(user?.id ?? "");
-            if (response.isSuccess) {
-                setListFriendRequests(response.data);
-                console.log("Không có lời mời kết bạn nào.1111");
-                console.log(response.data, user);
-            } else {
-                console.log("Không có lời mời kết bạn nào.");
-                //console.log(user?.id);
-                console.log(response.data);
-            }
-        };
-        friendRequests();
+        loadFriendRequests();
     }, []);
+    const loadFriendRequests = async () => {
+        const response = await friendRequestService.getAllFriendRequestByUserId(user?.id ?? "");
+        if (response.isSuccess) {
+            setListFriendRequests(response.data);
+        }
+    };
+    
 
     // // Dữ liệu giả định 
     const friendSuggestions = [
@@ -59,9 +47,8 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
     const handleCancelFriendRequest = async (requestId: string) => {
         const response = await friendRequestService.cancelFriendRequest(requestId);
         if (response.isSuccess) {
-            setListFriendRequests((prev) => prev.filter((req) => req.id !== requestId)); // Xóa khỏi danh sách
-            onRefresh?.();
             toast.success(response.message);
+            loadFriendRequests();
         } else {
             toast.error(response.message);
         }
@@ -70,9 +57,8 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
     const handleAcceptFriendRequest = async (requestId: string) => {
         const response = await friendRequestService.acceptFriendRequest(requestId);
         if (response.isSuccess) {
-            setListFriendRequests((prev) => prev.filter((req) => req.id !== requestId)); // Xóa khỏi danh sách
-            onRefresh?.();
             toast.success(response.message);
+            loadFriendRequests();
         } else {
             toast.error(response.message);
         }
@@ -83,22 +69,20 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
         <div className="flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-2">
                 {listFriendRequests.map((request) => (
-                    <div key={request.sender.id} className="flex items-center justify-between hover:bg-gray-100 px-2 py-2 rounded-md">
-                        <div className="flex items-center gap-x-3">
-                            <Avatar size="default" src={request.sender.avatar} />
-                            <span className="font-semibold text-sm">{request.sender.fullName}</span>
-                        </div>
-                        <div className="flex items-center gap-x-2">
-                            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100"
-                                onClick={() => handleCancelFriendRequest(request.id)}>
-                                <X size={16} className="text-gray-600" />
-                            </button>
-                            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-sky-100"
-                                onClick={() => handleAcceptFriendRequest(request.id)}>
-                                <Plus size={16} className="text-sky-500" />
-                            </button>
-                        </div>
-                    </div>
+                   <div key={request.sender.id} className="flex items-center justify-between hover:bg-gray-100 px-2 py-2 rounded-md">
+                   <Link to={`/profile/${request.sender.id}`} className="flex items-center gap-x-3 cursor-pointer">
+                       <Avatar size="default" src={request.sender.avatar} />
+                       <span className="font-semibold text-sm">{request.sender.fullName}</span>
+                   </Link>
+                   <div className="flex items-center gap-x-2">
+                       <button className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100" onClick={() => handleCancelFriendRequest(request.id)}>
+                           <X size={16} className="text-gray-600" />
+                       </button>
+                       <button className="w-7 h-7 flex items-center justify-center rounded-full bg-sky-100"onClick={() => handleAcceptFriendRequest(request.id)}>
+                           <Plus size={16} className="text-sky-500" />
+                       </button>
+                   </div>
+               </div>                     
                 ))}
             </div>
             <Link to='/friends/requests' className="text-center bg-sky-100 text-sky-500 py-[6px] rounded-md text-sm">Xem thêm</Link>

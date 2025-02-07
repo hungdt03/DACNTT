@@ -225,14 +225,14 @@ const SharePost: FC<SharePostProps> = ({
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            {post.originalPostId || allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            {(post.originalPostId || allowShare) && (<button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
-            </button>}
+            </button>)}
         </div>
         <Divider className='mt-0 mb-2' />
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của Bùi Việt</p>} width='700px' footer={[
+        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của {post.user.fullName}</p>} width='700px' footer={[
 
         ]} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <PostModal post={post} />
