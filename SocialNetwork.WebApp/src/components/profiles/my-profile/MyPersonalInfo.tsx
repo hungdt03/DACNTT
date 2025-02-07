@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Delete, DotSquareIcon, Edit3, Home, Plus, School, Workflow } from "lucide-react";
+import { BriefcaseBusiness, Delete, DotSquareIcon, Edit3, GraduationCap, Home, MapPin, Plus, School, Workflow } from "lucide-react";
 import useModal from "../../../hooks/useModal";
 import { Modal, message } from "antd";
 import ModifyUserEducation from "../../modals/ModifyUserEducation";
@@ -103,17 +103,14 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
         <div className="flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-3">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-x-2">
-                        <School size={20} />
-                        <span >Học vấn</span>
-                    </div>
+                    <span className="font-bold">Học vấn</span>
                     <button onClick={() => handleSelectUserSchool(undefined)} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                         <Plus size={16} className="text-white" />
                     </button>
                 </div>
-                {userSchools.length > 0 && <div className="flex flex-col gap-y-3 pl-4">
+                {userSchools.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
                     {userSchools.map(userSchool => <div key={userSchool.id} className="flex items-center gap-x-3">
-                        <DotSquareIcon className="flex-shrink-0" size={16} />
+                        <GraduationCap className="flex-shrink-0 text-gray-400" size={20} />
                         <div>
                             <span>
                                 {userSchool.status === EducationStatus.GRADUATED ? 'Đã học ' : 'Đang học '}
@@ -137,17 +134,14 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
 
             <div className="flex flex-col gap-y-3">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-x-2">
-                        <Workflow size={20} />
-                        <span>Làm việc</span>
-                    </div>
+                    <span className="font-bold">Làm việc</span>
                     <button onClick={() => handleSelectUserWorlPlace()} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                         <Plus size={16} className="text-white" />
                     </button>
                 </div>
-                {userWorkPlaces.length > 0 && <div className="flex flex-col gap-y-3 pl-4">
+                {userWorkPlaces.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
                     {userWorkPlaces.map(workPlace => <div key={workPlace.id} className="flex items-center gap-x-3">
-                        <DotSquareIcon className="flex-shrink-0" size={16} />
+                        <BriefcaseBusiness className="flex-shrink-0 text-gray-400" size={20} />
                         <div>
                             <span>
                                 {workPlace.isCurrent ? 'Đang làm ' : 'Từng làm '}
@@ -171,7 +165,7 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
 
 
             {currentLocation ? <div className="flex items-center gap-x-3">
-                <Home size={20} />
+                <Home size={20} className="text-gray-400" />
                 <span>
                     <span>{' Sống tại '}</span>
                     <span className="font-bold">{currentLocation.address + ' '}</span>
@@ -187,8 +181,8 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
                 </button>
             </div>}
 
-            {userHometown ? <div className="flex items-center gap-x-3">
-                <Home size={20} />
+            {userHometown ? <div className="flex items-center gap-x-3 text-gray-700">
+                <MapPin size={20} className="text-gray-400" />
                 <span>
                     <span>{' Đến từ '}</span>
                     <span className="font-bold">{userHometown.address + ' '}</span>

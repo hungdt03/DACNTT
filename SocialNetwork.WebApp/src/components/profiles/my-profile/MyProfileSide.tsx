@@ -6,7 +6,6 @@ import { AppDispatch } from "../../../app/store";
 import userService from "../../../services/userService";
 import { Divider, Empty, Image, message } from "antd";
 import BoxModifyBio from "../components/BoxModifyBio";
-import ProfilePersonalInfo from "../ProfilePersonalInfo";
 import images from "../../../assets";
 import { Link } from "react-router-dom";
 import MyPersonalInfo from "./MyPersonalInfo";

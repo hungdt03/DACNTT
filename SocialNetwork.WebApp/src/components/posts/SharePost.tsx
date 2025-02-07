@@ -27,6 +27,7 @@ import { Link } from "react-router-dom";
 import ListSharePostModal from "../modals/ListSharePostModal";
 import PostOtherTags from "./PostOtherTags";
 import PostNotFound from "./PostNotFound";
+import ExpandableText from "../ExpandableText";
 
 type SharePostProps = {
     post: PostResource;
@@ -51,7 +52,7 @@ const SharePost: FC<SharePostProps> = ({
     const { user } = useSelector(selectAuth)
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
-  
+
     const [post, setPost] = useState<PostResource>(postParam)
 
     const fetchReactions = async () => {
@@ -83,7 +84,7 @@ const SharePost: FC<SharePostProps> = ({
 
     const handleDeletePost = async () => {
         const response = await postService.deletePost(post.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             onRemovePost?.(post.id)
             message.success(response.message)
         } else {
@@ -198,7 +199,7 @@ const SharePost: FC<SharePostProps> = ({
         </div>
 
         <div className="flex flex-col gap-y-3">
-            <p className="text-sm text-gray-700">{post.content}</p>
+            <ExpandableText content={post.content} />
             {post.originalPostId ? <PostShareInner post={post.originalPost} /> : <PostNotFound />}
         </div>
         <div className="flex items-center justify-between text-sm">
@@ -224,7 +225,7 @@ const SharePost: FC<SharePostProps> = ({
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-           {post.originalPostId || allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            {post.originalPostId || allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>}

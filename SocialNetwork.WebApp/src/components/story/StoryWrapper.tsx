@@ -11,6 +11,7 @@ import storyService from "../../services/storyService";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import StorySkeleton from "../skeletons/StorySkeleton";
+import CreateStoryArea from "./CreateStoryArea";
 
 
 const StoryWrapper: FC = () => {
@@ -35,7 +36,7 @@ const StoryWrapper: FC = () => {
         fetchUserStories()
     }, [])
 
-    return <div className="relative w-full h-[200px]">
+    return userStories.length > 0 && !loading ? <div className="relative w-full h-[200px]">
             <Swiper
                 modules={[Navigation]}
                 slidesPerView={4.75} // Mặc định cho desktop
@@ -50,18 +51,18 @@ const StoryWrapper: FC = () => {
                         spaceBetween: 8,
                     },
                     540: { // Tablet
-                        slidesPerView: 4.75, 
+                        slidesPerView: 4.75,
                         spaceBetween: 8,
                     },
                     380: { // Mobile 
-                        slidesPerView: 3.75, 
+                        slidesPerView: 3.75,
                         spaceBetween: 8,
                     },
                     300: { // Mobile 
-                        slidesPerView: 2.75, 
+                        slidesPerView: 2.75,
                         spaceBetween: 8,
                     },
-                    
+
                 }}
                 onSlideChange={(swiper) => setShowPrev(swiper.isBeginning === false)}
                 navigation={{
@@ -102,7 +103,7 @@ const StoryWrapper: FC = () => {
                             .map((story, index) => (
                                 <SwiperSlide key={`other-${index}`}>
                                     <StoryItem
-                                       
+
                                         story={story}
                                     />
                                 </SwiperSlide>
@@ -114,19 +115,18 @@ const StoryWrapper: FC = () => {
 
             <button
                 ref={prevRef}
-                className={`absolute w-10 h-10 flex text-white bg-sky-400 hover:bg-primary items-center justify-center shadow rounded-full left-2 top-1/2 -translate-y-1/2 z-10 ${showPrev ? 'block' : 'hidden'
+                className={`absolute w-10 h-10 flex bg-sky-50 text-primary hover:bg-sky-100 items-center justify-center shadow rounded-full left-2 top-1/2 -translate-y-1/2 z-10 ${showPrev ? 'block' : 'hidden'
                     }`}
             >
                 <ChevronLeft />
             </button>
             <button
                 ref={nextRef}
-                className="absolute w-10 h-10 flex text-white bg-sky-400 hover:bg-primary items-center justify-center shadow rounded-full right-2 top-1/2 -translate-y-1/2 z-10"
+                className="absolute w-10 h-10 flex bg-sky-50 text-primary hover:bg-sky-100 items-center justify-center shadow rounded-full right-2 top-1/2 -translate-y-1/2 z-10"
             >
                 <ChevronRight />
             </button>
-        </div>
-
-};
+        </div> : <CreateStoryArea />
+    }
 
 export default StoryWrapper;

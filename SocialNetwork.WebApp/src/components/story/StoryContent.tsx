@@ -47,8 +47,18 @@ const StoryContent: FC<StoryContentProps> = ({
             <div className="flex items-center gap-x-2">
                 <img className="rounded-full w-[40px] h-[40px] object-cover" src={story.user.avatar} />
                 <div className="flex flex-col text-white">
-                    <span className="text-[15px]">{story.user.fullName}</span>
-                    <span className="text-[11px]">{formatTime(new Date(story.createdDate))}</span>
+                    <span
+                        className="text-[15px]"
+                        style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)" }}
+                    >
+                        {story.user.fullName}
+                    </span>
+                    <span
+                        className="text-[11px]"
+                        style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)" }}
+                    >
+                        {formatTime(new Date(story.createdDate))}
+                    </span>
                 </div>
             </div>
 
@@ -63,7 +73,7 @@ const StoryContent: FC<StoryContentProps> = ({
         </div>
         <p style={{
             fontFamily: story.fontFamily,
-        }} className="text-white text-center break-words break-all font-semibold px-4 py-8 text-[16px]">
+        }} className="text-white text-center break-words break-all font-semibold px-4 py-8 text-[20px]">
             {story?.content}
         </p>
     </div>

@@ -23,7 +23,7 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector(selectAuth);
     const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
-    const [listFriendRequests, setlistFriendRequests] = useState<FriendRequestResource[]>([]);
+    const [listFriendRequests, setListFriendRequests] = useState<FriendRequestResource[]>([]);
     
     useEffect(() => {
         const fetchChatRooms = async () => {
@@ -32,12 +32,13 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
                 setChatRooms(response.data);
             }
         };
+
         fetchChatRooms();
 
         const friendRequests = async () => {
             const response = await friendRequestService.getAllFriendRequestByUserId(user?.id ?? "");
             if (response.isSuccess) {
-                setlistFriendRequests(response.data);
+                setListFriendRequests(response.data);
                 console.log("Không có lời mời kết bạn nào.1111");
                 console.log(response.data, user);
             } else {
@@ -58,7 +59,7 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
     const handleCancelFriendRequest = async (requestId: string) => {
         const response = await friendRequestService.cancelFriendRequest(requestId);
         if (response.isSuccess) {
-            setlistFriendRequests((prev) => prev.filter((req) => req.id !== requestId)); // Xóa khỏi danh sách
+            setListFriendRequests((prev) => prev.filter((req) => req.id !== requestId)); // Xóa khỏi danh sách
             onRefresh?.();
             toast.success(response.message);
         } else {
@@ -69,7 +70,7 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
     const handleAcceptFriendRequest = async (requestId: string) => {
         const response = await friendRequestService.acceptFriendRequest(requestId);
         if (response.isSuccess) {
-            setlistFriendRequests((prev) => prev.filter((req) => req.id !== requestId)); // Xóa khỏi danh sách
+            setListFriendRequests((prev) => prev.filter((req) => req.id !== requestId)); // Xóa khỏi danh sách
             onRefresh?.();
             toast.success(response.message);
         } else {

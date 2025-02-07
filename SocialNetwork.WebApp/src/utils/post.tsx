@@ -14,34 +14,34 @@ export const getPrivacyPost = (privacy: PrivacyType): ReactNode => {
     switch (privacy) {
         case PrivacyType.PRIVATE:
             return <Tooltip title='Chỉ mình tôi'>
-                <button className="mb-[2px]">
+                <span className="mb-[2px]">
                     <Lock size={14} />
-                </button>
+                </span>
             </Tooltip>
         case PrivacyType.FRIENDS:
             return <Tooltip title='Bạn bè'>
-                <button className="mb-[2px]">
+                <span className="mb-[2px]">
                     <User size={14} />
-                </button>
+                </span>
             </Tooltip>
         case PrivacyType.GROUP_PUBLIC:
             return <Tooltip title='Nhóm công khai'>
-                <button className="mb-[2px]">
+                <span className="mb-[2px]">
                     <UserGroupIcon width={14} />
-                </button>
+                </span>
             </Tooltip>
         case PrivacyType.GROUP_PRIVATE:
             return <Tooltip title='Nhóm riêng tư'>
-                <button className="mb-[2px]">
+                <span className="mb-[2px]">
                     <UserGroupIcon width={14} />
-                </button>
+                </span>
             </Tooltip>
         case PrivacyType.PUBLIC:
         default:
             return <Tooltip title='Công khai'>
-                <button className="mb-[2px]">
+                <span className="mb-[2px]">
                     <img className="w-3 h-3" src={images.earth} alt="Public" />
-                </button>
+                </span>
             </Tooltip>
     }
 }

@@ -233,7 +233,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
         </div>
         <div className="flex flex-col gap-y-4">
             <div className="relative w-full flex justify-center">
-                <div className={cn("relative items-center justify-center w-full h-[380px] rounded-md px-6 py-8", postRequest.background ? 'flex' : 'hidden')} style={{
+                <div className={cn("relative items-center justify-center w-full h-[320px] rounded-md px-6 py-8", postRequest.background ? 'flex' : 'hidden')} style={{
                     background: postRequest.background
                 }} >
                     <div
@@ -257,7 +257,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     ></div>
 
                 </div>
-                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 5 : 8} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full h-full overflow-y-auto custom-scrollbar p-2", isLongText ? 'text-[16px]' : 'text-xl')} placeholder="Long ơi, bạn đang nghĩ gì thế" />}
+                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 3 : 5} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full h-full overflow-y-auto custom-scrollbar p-2", isLongText ? 'text-[16px]' : 'text-xl')} placeholder="Long ơi, bạn đang nghĩ gì thế" />}
             </div>
             {showUpload && <div className="flex flex-col">
                 <UploadMultipleFile

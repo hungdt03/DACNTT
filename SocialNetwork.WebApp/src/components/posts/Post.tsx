@@ -30,6 +30,7 @@ import { GroupResource } from "../../types/group";
 import reportService from "../../services/reportService";
 import ReportPostModal from "../modals/reports/ReportPostModal";
 import ChangePostPrivacyModal from "../modals/ChangePostPrivacyModal";
+import ExpandableText from "../ExpandableText";
 
 export type CommentRequest = {
     postId: string;
@@ -298,7 +299,7 @@ const Post: FC<PostProps> = ({
                 height: 380
             }} className="flex items-center justify-center px-6 py-8 rounded-md">
                 <p className="text-2xl font-bold text-center break-words break-all text-white">{post.content}</p>
-            </div> : <p className="text-sm text-gray-700 break-words">{post.content}</p>}
+            </div> : <ExpandableText content={post.content} />}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
         </div>
         <div className="flex items-center justify-between md:text-sm text-[13px]">

@@ -38,7 +38,7 @@ const StoryItem: FC<StoryItemProps> = ({
 
             <div style={{
                 fontFamily: story.stories[0].fontFamily,
-            }} className="text-white text-center break-words break-all font-semibold text-xs z-10">
+            }} className="text-white text-center break-words break-all font-semibold text-[6px] z-10">
                 {story.stories[0].content}
             </div>
 

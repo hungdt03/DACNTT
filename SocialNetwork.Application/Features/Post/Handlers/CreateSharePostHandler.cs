@@ -30,8 +30,12 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
         public async Task<BaseResponse> Handle(CreateSharePostCommand request, CancellationToken cancellationToken)
         {
+            var userId = _contextAccessor.HttpContext.User.GetUserId();
             var originalPost = await _unitOfWork.PostRepository.GetPostByIdAsync(request.OriginalPostId)
                 ?? throw new AppException("Không tìm thấy bài viết gốc");
+
+            if (originalPost.UserId != userId && originalPost.Privacy == PrivacyConstant.PRIVATE)
+                throw new AppException("Không thể chia sẻ bài viết riêng tư của người khác");
 
             var post = originalPost;
             if (request.OriginalPostId != request.PostId)
@@ -70,7 +74,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
            
             var fullName = _contextAccessor.HttpContext.User.GetFullName();
-            var userId = _contextAccessor.HttpContext.User.GetUserId();
+           
             var imageUrl = _contextAccessor.HttpContext.User.GetAvatar();
             string contentNotification = $"{fullName} đã gắn thẻ bạn trong một bài viết";
 

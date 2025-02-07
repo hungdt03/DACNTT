@@ -29,7 +29,8 @@ const PostGroupCreator: FC<PostGroupCreatorProps> = ({
         handleOk()
 
         try {
-            values.append('groupId', group.id)
+            values.append('groupId', group.id);
+
             const response = await postService.createPost(values);
             if (response.isSuccess) {
                 onSuccess?.(toastId, response.message, response.data)

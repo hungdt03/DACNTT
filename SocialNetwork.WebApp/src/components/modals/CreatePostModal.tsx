@@ -166,7 +166,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         </div>
         <div className="flex flex-col gap-y-4">
             <div className="relative w-full flex justify-center">
-                <div className={cn("relative items-center justify-center w-full h-[380px] rounded-md px-6 py-8", postRequest.background ? 'flex' : 'hidden')} style={{
+                <div className={cn("relative items-center justify-center w-full h-[320px] rounded-md px-6 py-8", postRequest.background ? 'flex' : 'hidden')} style={{
                     background: postRequest.background
                 }} >
                     <div
@@ -174,7 +174,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                         onInput={(e) => {
                             const value = e.currentTarget.innerText.trim();
                             let isUseBackground = true;
-                            if (value.length > 300) {
+                            if (value.length > 200) {
                                 isUseBackground = false
                             }
                             setPostRequest({
@@ -189,7 +189,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                     ></div>
 
                 </div>
-                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 5 : 8} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full max-h-[400px] overflow-y-auto custom-scrollbar p-2", isLongText ? 'text-[16px]' : 'text-xl')} placeholder="Bạn đang nghĩ gì thế" />}
+                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 3 : 5} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full max-h-[400px] overflow-y-auto custom-scrollbar p-2", isLongText ? 'text-[16px]' : 'text-xl')} placeholder="Bạn đang nghĩ gì thế" />}
             </div>
             {showUpload && <div className="flex flex-col">
                 <UploadMultipleFile
@@ -218,7 +218,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                                 })
                             }}
                         />}>
-                            <button className={cn(postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 120 && 'cursor-not-allowed')} disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 120} onClick={() => setIsUseBackground(!isUseBackground)}>
+                            <button className={cn(postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200 && 'cursor-not-allowed')} disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200} onClick={() => setIsUseBackground(!isUseBackground)}>
                                 <img width={30} height={30} src={images.AaBackground} />
                             </button>
                         </Popover>

@@ -9,6 +9,8 @@ namespace SocialNetwork.Application.Common.Attributes
         {
             PrivacyConstant.PRIVATE,
             PrivacyConstant.FRIENDS,
+            PrivacyConstant.GROUP_PRIVATE,
+            PrivacyConstant.GROUP_PUBLIC,
             PrivacyConstant.PUBLIC
         };
 
@@ -19,7 +21,7 @@ namespace SocialNetwork.Application.Common.Attributes
                 return ValidationResult.Success;
             }
 
-            return new ValidationResult("Giá trị quyền riêng tư không hợp lệ. Chỉ chấp nhận PRIVATE, FRIENDS hoặc PUBLIC.");
+            return new ValidationResult("Giá trị quyền riêng tư không hợp lệ");
         }
     }
 }

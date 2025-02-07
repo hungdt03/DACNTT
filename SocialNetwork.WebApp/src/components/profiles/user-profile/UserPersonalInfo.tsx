@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { DotSquareIcon, Home, School, Workflow } from "lucide-react";
+import { BriefcaseBusiness, DotSquareIcon, GraduationCap, Home, MapPin, School, Workflow } from "lucide-react";
 import { UserResource } from "../../../types/user";
 import { UserSchoolResource } from "../../../types/userSchool";
 import userService from "../../../services/userService";
@@ -57,13 +57,10 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
 
     return <div className="flex flex-col gap-y-4">
         <div className="flex flex-col gap-y-3">
-            <div className="flex items-center gap-x-2">
-                <School size={20} />
-                <span >Học vấn</span>
-            </div>
-            {userSchools.length > 0 && <div className="flex flex-col gap-y-3 pl-4">
+            <span className="font-bold">Học vấn</span>
+            {userSchools.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
                 {userSchools.map(userSchool => <div key={userSchool.id} className="flex items-center gap-x-3">
-                    <DotSquareIcon className="flex-shrink-0" size={16} />
+                    <GraduationCap className="flex-shrink-0 text-gray-400" size={16} />
                     <div>
                         <span>
                             {userSchool.status === EducationStatus.GRADUATED ? 'Đã học ' : 'Đang học '}
@@ -85,14 +82,11 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
         </div>
 
         <div className="flex flex-col gap-y-3">
-            <div className="flex items-center gap-x-2">
-                <Workflow size={20} />
-                <span>Làm việc</span>
-            </div>
+            <span className="font-bold">Làm việc</span>
 
-            {userWorkPlaces.length > 0 && <div className="flex flex-col gap-y-3 pl-4">
+            {userWorkPlaces.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
                 {userWorkPlaces.map(workPlace => <div key={workPlace.id} className="flex items-center gap-x-3">
-                    <DotSquareIcon className="flex-shrink-0" size={16} />
+                    <BriefcaseBusiness className="flex-shrink-0 text-gray-400" size={16} />
                     <div>
                         <span>
                             {workPlace.isCurrent ? 'Đang làm ' : 'Từng làm '}
@@ -111,26 +105,24 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
             </div>}
         </div>
 
-        {currentLocation ? <div className="flex items-center gap-x-3">
-            <Home size={20} />
+        {currentLocation ? <div className="flex items-center gap-x-3 text-gray-700">
+            <Home size={20} className="text-gray-400" />
             <span>
                 <span>{' Sống tại '}</span>
                 <span className="font-bold">{currentLocation.address + ' '}</span>
             </span>
         </div> : <div className="flex items-center gap-x-2">
-            <School size={20} />
             <span className="font-bold">Nơi sống hiện tại</span>
         </div>}
 
-        {userHometown ? <div className="flex items-center gap-x-3">
-            <Home size={20} />
+        {userHometown ? <div className="flex items-center gap-x-3 text-gray-700">
+            <MapPin className="text-gray-400" size={20} />
             <span>
                 <span>{' Đến từ '}</span>
                 <span className="font-bold">{userHometown.address + ' '}</span>
             </span>
         </div> : <div className="flex items-center gap-x-2">
-            <School size={20} />
-            <span>Quê quán</span>
+            <span className="font-bold">Quê quán</span>
         </div>}
     </div>
 };

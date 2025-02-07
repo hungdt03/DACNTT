@@ -41,7 +41,10 @@ const StoryTextEditor: FC<StoryTextEditorProps> = ({
     }
 
     return <div className="flex flex-col gap-y-4 w-full">
-        <textarea value={value} onChange={e => onChange(e.target.value)} className="outline-none border-[1px] border-gray-300 p-2 rounded-md" placeholder="Bắt đầu nhập" rows={4}></textarea>
+        <textarea value={value} onChange={e => {
+            if(e.target.value.trim().length > 400) return;
+            onChange(e.target.value)
+        }} className="outline-none border-[1px] border-gray-300 p-2 rounded-md whitespace-pre-wrap" placeholder="Bắt đầu nhập" rows={4}></textarea>
 
         <Dropdown menu={{
             items: fontStyles.map((font, index) => ({

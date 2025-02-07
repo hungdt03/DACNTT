@@ -12,12 +12,12 @@ interface StoryCollapsedProps {
 const StoryCollapsed: React.FC<StoryCollapsedProps> = ({ isFetch, viewers, toggleMore }) => {
     return isFetch ? <div onClick={() => toggleMore(true)} className="cursor-pointer relative pl-2 py-2">
         {
-            viewers.length === 0 ? <button className="text-white text-sm">
+            viewers.length === 0 ? <button  style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)" }} className="text-white text-sm">
                 <ChevronUp size={16} />
                 Chưa có người xem
             </button> : viewers.length > 0 && <div className="flex flex-col gap-y-2">
                 <div className="flex items-center gap-x-2" >
-                    <span className="text-white font-bold text-sm pb-[2px] border-b-[1px] border-gray-200">{viewers.length} người xem</span>
+                    <span  style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)" }} className="text-white font-bold text-sm pb-[2px] border-b-[1px] border-gray-200">{viewers.length} người xem</span>
                     <ChevronUp size={16} strokeWidth={3} className="mb-1" color="white" />
                 </div>
                 <Avatar.Group>
