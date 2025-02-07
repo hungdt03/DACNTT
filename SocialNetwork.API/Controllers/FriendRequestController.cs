@@ -49,5 +49,11 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetFriendRequestByUserIdQuery(userId));
             return Ok(response);
         }
+        [HttpGet("get-allrequest/{userId}")]
+        public async Task<IActionResult> GetAllFriendRequestByUserId([FromRoute] string userId)
+        {
+            var response = await mediator.Send(new GetFriendRequestByUserIdQuery(userId));
+            return Ok(response);
+        }
     }
 }

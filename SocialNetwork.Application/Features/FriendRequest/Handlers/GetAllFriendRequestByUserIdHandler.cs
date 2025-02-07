@@ -5,34 +5,35 @@ using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
+using SocialNetwork.Application.Features.FriendShip.Commands;
 using SocialNetwork.Application.Features.FriendShip.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 
-namespace SocialNetwork.Application.Features.FriendShip.Handlers
+namespace SocialNetwork.Application.Features.FriendRequest.Handlers
 {
-    public class GetFriendRequestByUserIdHandler : IRequestHandler<GetFriendRequestByUserIdQuery, BaseResponse>
+    public class GetAllFriendRequestByUserIdHandler : IRequestHandler<GetFriendRequestByUserIdQuery, BaseResponse>
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetFriendRequestByUserIdHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public GetAllFriendRequestByUserIdHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
         {
-            _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
+            _unitOfWork = unitOfWork;   
         }
         public async Task<BaseResponse> Handle(GetFriendRequestByUserIdQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
 
-            var friendRequest = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, request.UserId)
+            var friendRequests = await _unitOfWork.FriendShipRepository.GetAllFriendRequestByUserId(userId)
                 ?? throw new AppException("Không tìm thấy lời mời kết bạn nào");
 
-            return new DataResponse<FriendRequestResponse>
+            return new DataResponse<List<FriendRequestResponse>>
             {
-                Data = ApplicationMapper.MapToFriendRequest(friendRequest),
+                Data = ApplicationMapper.MapToFriendRequestList(friendRequests.ToList()),
                 IsSuccess = true,
-                Message = "Lấy thông tin kết bạn thành công",
+                Message = "Lấy thông tin lời kết bạn thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
             };
         }

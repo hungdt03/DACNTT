@@ -248,6 +248,16 @@ namespace SocialNetwork.Application.Mappers
                 Status = friendRequest.Status,
             };
         }
+        public static List<FriendRequestResponse> MapToFriendRequestList(List<FriendShip> friendRequests)
+        {
+            return friendRequests.Select(friendRequest => new FriendRequestResponse
+            {
+                Id = friendRequest.Id,
+                Sender = friendRequest.User != null ? MapToUser(friendRequest.User) : null,
+                SentAt = friendRequest.DateCreated,
+                Status = friendRequest.Status,
+            }).ToList();
+        }
 
         public static NotificationResponse MapToNotification(Notification notification)
         {

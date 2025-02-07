@@ -34,6 +34,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context.FriendShips.Remove(request);
         }
 
+        public async Task<IEnumerable<FriendShip?>> GetAllFriendRequestByUserId(string userId, string status = "PENDING")
+        {
+            return await _context.FriendShips
+                .Include(fr => fr.User)
+                .Include(fr => fr.Friend)
+                .Where(x => x.FriendId == userId && (string.IsNullOrEmpty(status) || x.Status.Equals(status))).ToListAsync();
+        }
+
         public async Task<IEnumerable<User>> GetAllFriendsByName(string userId, string fullName)
         {
             var lowerKey = fullName.ToLower();
