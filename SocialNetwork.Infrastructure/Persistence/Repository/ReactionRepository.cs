@@ -15,6 +15,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             this.appDbContext = appDbContext;
         }
 
+        public async Task<int> CountReactionsByUserIdAsync(string userId)
+        {
+            return await appDbContext.Reactions
+                .Where(r => r.UserId == userId).CountAsync();
+        }
+
         public async Task CreateReactionAsync(Reaction reaction)
         {
             await appDbContext.Reactions.AddAsync(reaction);

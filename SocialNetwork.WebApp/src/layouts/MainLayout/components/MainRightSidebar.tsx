@@ -24,7 +24,7 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
     const { user } = useSelector(selectAuth);
     const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
     const [listFriendRequests, setListFriendRequests] = useState<FriendRequestResource[]>([]);
-    
+
     useEffect(() => {
         const fetchChatRooms = async () => {
             const response = await chatRoomService.getAllChatRooms();
@@ -66,7 +66,7 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
             toast.error(response.message);
         }
     };
-    
+
     const handleAcceptFriendRequest = async (requestId: string) => {
         const response = await friendRequestService.acceptFriendRequest(requestId);
         if (response.isSuccess) {
@@ -77,7 +77,7 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
             toast.error(response.message);
         }
     };
-    
+
     // Nội dung của tab "Lời mời kết bạn"
     const FriendRequestsTab = () => (
         <div className="flex flex-col gap-y-4">
@@ -90,18 +90,18 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
                         </div>
                         <div className="flex items-center gap-x-2">
                             <button className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100"
-                            onClick={() => handleCancelFriendRequest(request.id)}>
+                                onClick={() => handleCancelFriendRequest(request.id)}>
                                 <X size={16} className="text-gray-600" />
                             </button>
                             <button className="w-7 h-7 flex items-center justify-center rounded-full bg-sky-100"
-                            onClick={() => handleAcceptFriendRequest(request.id)}>
+                                onClick={() => handleAcceptFriendRequest(request.id)}>
                                 <Plus size={16} className="text-sky-500" />
                             </button>
                         </div>
                     </div>
                 ))}
             </div>
-            <button className="bg-sky-100 text-sky-500 py-[6px] rounded-md text-sm">Xem thêm</button>
+            <Link to='/friends/requests' className="text-center bg-sky-100 text-sky-500 py-[6px] rounded-md text-sm">Xem thêm</Link>
         </div>
     );
 
@@ -126,7 +126,7 @@ const MainRightSidebar: FC<FriendRequestContentProps> = (
                     </div>
                 ))}
             </div>
-            <button className="bg-sky-100 text-sky-500 py-[6px] rounded-md text-sm">Xem thêm</button>
+            <Link to='/friends/suggests' className="text-center bg-sky-100 text-sky-500 py-[6px] rounded-md text-sm">Xem thêm</Link>
         </div>
     );
 

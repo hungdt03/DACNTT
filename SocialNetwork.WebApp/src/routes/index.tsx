@@ -28,6 +28,9 @@ import GroupImagePage from "../pages/groups/GroupImagePage";
 import GroupVideoPage from "../pages/groups/GroupVideoPage";
 import GroupPendingReports from "../pages/groups/GroupPendingReports";
 import HeaderOnlyLayout from "../layouts/HeaderOnlyLayout/HeaderOnlyLayout";
+import FriendLayout from "../layouts/FriendLayout/FriendLayout";
+import FriendRequestsPage from "../pages/friends/FriendRequestsPage";
+import SuggestedFriendPage from "../pages/friends/SuggestedFriendPage";
 
 const appRouter = createBrowserRouter([
     {
@@ -115,6 +118,20 @@ const appRouter = createBrowserRouter([
             {
                 path: 'profile/:id/:tab?',
                 element: <ProfilePage />
+            },
+        ]
+    },
+    {
+        path: '/friends',
+        element: <AuthGuard element={<FriendLayout />} />,
+        children: [
+            {
+                path: 'requests',
+                element: <FriendRequestsPage />
+            },
+            {
+                path: 'suggests',
+                element: <SuggestedFriendPage />
             },
         ]
     },

@@ -20,6 +20,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _dbContext.Comments.CountAsync(s => s.PostId == postId);
         }
 
+        public async Task<int> CountCommentsByUserIdAsync(string userId)
+        {
+            return await _dbContext.Comments
+                .Where(c => c.UserId == userId).CountAsync();
+        }
+
         public async Task<Comment> CreateCommentAsync(Comment comment)
         {
             return (await _dbContext.Comments.AddAsync(comment)).Entity;

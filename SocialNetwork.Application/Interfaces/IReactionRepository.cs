@@ -7,6 +7,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<List<Reaction>> GetAllReactionsByPostIdAsync(Guid postId);
         Task<Reaction?> GetReactionByPostIdAndUserIdAsync(Guid postId, string userId);
         Task CreateReactionAsync(Reaction reaction);
+        Task<int> CountReactionsByUserIdAsync(string userId);
         void RemoveReaction(Reaction reaction);
         void RemoveRange(IEnumerable<Reaction> reactions);
     }

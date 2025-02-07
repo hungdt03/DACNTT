@@ -272,5 +272,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return (posts, totalCount);
         }
 
+        public async Task<int> CountPostsByUserIdAsync(string userId)
+        {
+            return await _context.Posts.Where(p => p.OriginalPostId == null && p.UserId == userId).CountAsync();
+        }
+
+        public async Task<int> CountSharePostsByUserIdAsync(string userId)
+        {
+            return await _context.Posts.Where(p => p.OriginalPostId != null && p.UserId == userId).CountAsync();
+        }
     }
 }

@@ -15,6 +15,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             _context = context;
         }
+
+        public async Task<int> CountStoriesByUserIdAsync(string userId)
+        {
+            return await _context.Stories
+                .Where(s => s.UserId == userId).CountAsync();
+        }
+
         public async Task CreateStoryAsync(Story story)
         {
             await _context.Stories.AddAsync(story);

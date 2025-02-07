@@ -5,6 +5,7 @@ using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Features.BlockList.Commands;
 using SocialNetwork.Application.Features.Friend.Commands;
 using SocialNetwork.Application.Features.Friend.Queries;
+using SocialNetwork.Application.Features.FriendRequest.Queries;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -70,6 +71,12 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("suggested")]
+        public async Task<IActionResult> GetSuggestedFriends([FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            var response = await mediator.Send(new GetFriendSuggestionsQuery(page, size));
+            return Ok(response);
+        }
    
     }
 }
