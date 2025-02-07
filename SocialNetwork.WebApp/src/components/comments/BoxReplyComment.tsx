@@ -351,7 +351,7 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
                             </div>
                         </Upload>
                     </button>}
-                    <button disabled={!content && fileList.length === 0} onClick={handleSubmit} className="w-7 h-7 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
+                    <button disabled={content.trim().length === 0 && fileList.length === 0} onClick={handleSubmit} className="w-7 h-7 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
                         <SendHorizonal size={18} className="text-sky-500" />
                     </button>
                 </div>

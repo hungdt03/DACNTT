@@ -29,6 +29,7 @@ import { PrivacyType } from "../../enums/privacy";
 import { GroupResource } from "../../types/group";
 import reportService from "../../services/reportService";
 import ReportPostModal from "../modals/reports/ReportPostModal";
+import ChangePostPrivacyModal from "../modals/ChangePostPrivacyModal";
 
 export type CommentRequest = {
     postId: string;
@@ -78,7 +79,8 @@ const Post: FC<PostProps> = ({
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
     const { handleCancel: cancelListShare, isModalOpen: openListShare, handleOk: okListShare, showModal: showListShare } = useModal();
     const { handleCancel: cancelReportAdmin, isModalOpen: openReportAdmin, handleOk: okReportAdmin, showModal: showReportAdmin } = useModal();
-    // const { handleCancel: cancelReport, isModalOpen: openReport, handleOk: okReport, showModal: showReport } = useModal();
+    const { handleCancel: cancelReport, isModalOpen: openReport, handleOk: okReport, showModal: showReport } = useModal();
+    const { handleCancel: cancelPrivacy, isModalOpen: openPrivacy, handleOk: okPrivacy, showModal: showPrivacy } = useModal();
 
     const { user } = useSelector(selectAuth)
     const [reactions, setReactions] = useState<ReactionResource[]>();
@@ -87,6 +89,7 @@ const Post: FC<PostProps> = ({
 
     const [post, setPost] = useState<PostResource>(postParam);
     const [reason, setReason] = useState('')
+    const [privacy, setPrivacy] = useState<PrivacyType>(post.privacy)
 
     const fetchReactions = async () => {
         const response = await reactionService.getAllReactionsByPostId(post.id);
@@ -189,6 +192,45 @@ const Post: FC<PostProps> = ({
         }
     }
 
+    const handleSavedPost = async (postId: string) => {
+        const response = await postService.addSavedPost(postId);
+        if(response.isSuccess) {
+            message.success(response.message);
+            setPost(prev => ({
+                ...prev,
+                isSaved: true
+            }))
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleRemoveSavedPost = async (postId: string) => {
+        const response = await postService.removeSavedPostByPostId(postId);
+        if(response.isSuccess) {
+            message.success(response.message)
+            setPost(prev => ({
+                ...prev,
+                isSaved: false
+            }))
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleChangePrivacy = async (postId: string, privacy: PrivacyType) => {
+        const response = await postService.changePrivacy(postId, privacy);
+        if(response.isSuccess) {
+            message.success(response.message)
+            setPost(prev => ({
+                ...prev,
+                privacy: privacy
+            }))
+        } else {
+            message.error(response.message)
+        }
+    }
+
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -227,20 +269,24 @@ const Post: FC<PostProps> = ({
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
                             <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
-                        {getPrivacyPost(post.privacy)}
+                       <button onClick={post.isGroupPost || post.user.id !== user?.id ? undefined : showPrivacy}>{getPrivacyPost(post.privacy)}</button>
                     </div>
                 </div>
             </div>
             <Popover className="flex-shrink-0" content={<PostMoreAction
                 onEditPost={showEditPostModal}
                 onDeletePost={handleDeletePost}
-                onReportPost={showReportAdmin}
+                onReportPost={showReport}
+                onReportPostGroup={showReportAdmin}
+                onSavedPost={() => handleSavedPost(post.id)}
+                onRemoveSavedPost={() => handleRemoveSavedPost(post.id)}
                 isAdmin={group?.isMine}
                 isPostGroup={group != undefined}
+                isSaved={post.isSaved}
                 isMine={post.user.id === user?.id}
             />}>
                 <button className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100">
-                    <MoreHorizontal size={18} className="text-gray-400" />
+                    <MoreHorizontal size={16} className="text-gray-400" />
                 </button>
             </Popover>
         </div>
@@ -279,7 +325,7 @@ const Post: FC<PostProps> = ({
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            {post.privacy === PrivacyType.PUBLIC && allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
+            {allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>}
@@ -358,6 +404,26 @@ const Post: FC<PostProps> = ({
             <ListSharePostModal post={post} />
         </Modal>
 
+        {/* MODAL CHANGE PRIVACY*/}
+        <Modal
+            title={<p className="text-center font-bold text-lg">Chọn đối tượng</p>}
+            centered
+            open={openPrivacy}
+            onOk={okPrivacy}
+            onCancel={cancelPrivacy}
+            okText='Lưu lại'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => void handleChangePrivacy(post.id, privacy),
+                disabled: privacy === post.privacy
+            }}
+        >
+            <ChangePostPrivacyModal
+                privacy={privacy}
+                onChange={(newPrivacy) => setPrivacy(newPrivacy)}
+            />
+        </Modal>
+
 
         {/* REPORT TO ADMIN OF GROUP */}
         <Modal
@@ -366,6 +432,28 @@ const Post: FC<PostProps> = ({
             open={openReportAdmin}
             onOk={okReportAdmin}
             onCancel={cancelReportAdmin}
+            okText='Gửi báo cáo'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason),
+                disabled: reason.trim().length < 20
+            }}
+        >
+            <ReportPostModal
+                value={reason}
+                onChange={(newValue) => setReason(newValue)}
+                title="Tại sao bạn báo cáo bài viết này"
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+            />
+        </Modal>
+
+        {/* REPORT TO ADMIN OF APPLICATION*/}
+        <Modal
+            title={<p className="text-center font-bold text-lg">Báo cáo bài viết</p>}
+            centered
+            open={openReport}
+            onOk={okReport}
+            onCancel={cancelReport}
             okText='Gửi báo cáo'
             cancelText='Hủy'
             okButtonProps={{

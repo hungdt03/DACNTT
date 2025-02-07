@@ -117,6 +117,18 @@ class UserService {
             }
         })
     }
+
+    blockUser(userId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/users/block', { userId })
+    }
+
+    unblockUser(userId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/users/unblock/' + userId)
+    }
+
+    checkBlockUser(userId: string) : Promise<DataResponse<boolean>> {
+        return axiosInterceptor.get('/api/users/block/' + userId)
+    }
 }
 
 export default UserService.getInstance();

@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using SocialNetwork.Application.Common.Attributes;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Domain.Constants;
 using System.ComponentModel.DataAnnotations;
@@ -17,6 +18,7 @@ namespace SocialNetwork.Application.Features.Post.Commands
 
         [Required(ErrorMessage = "Nội dung không được để trống")]
         public string Content { get; set; }
+        [PrivacyValidation]
         public string Privacy { get; set; } = PrivacyConstant.PUBLIC;
         public List<string>? TagIds { get; set; }
     }

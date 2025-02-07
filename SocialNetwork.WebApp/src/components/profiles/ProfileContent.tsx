@@ -18,6 +18,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import ProfileFriendList from "./shared/ProfileFriendList";
 import ProfileFollowerList from "./shared/ProfileFollowerList";
 import ProfileFolloweeList from "./shared/ProfileFolloweesList";
+import ProfileSavedPost from "./shared/ProfileSavedPost";
 
 type ProfileContentProps = {
     user: UserResource;
@@ -146,7 +147,7 @@ const ProfileContent: FC<ProfileContentProps> = ({
         {
             key: 'saved-posts',
             label: 'Bài viết đã lưu',
-            children: 'Content of Tab Pane 3',
+            children: <ProfileSavedPost />,
         },
     ];
 

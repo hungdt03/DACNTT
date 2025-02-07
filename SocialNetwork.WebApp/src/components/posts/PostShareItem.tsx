@@ -21,7 +21,7 @@ const PostShareItem: FC<PostShareItemProps> = ({
                 <div className="flex items-center gap-x-2">
                     <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
                     <div className="flex flex-col gap-y-[1px]">
-                        <div className="font-semibold text-[15px] text-gray-600">
+                        <div className="font-bold text-[14px] text-gray-600">
                             <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
                             {post.tags.length > 0 &&
                                 (() => {

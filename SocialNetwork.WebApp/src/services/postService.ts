@@ -5,6 +5,7 @@ import axiosInterceptor from '../configurations/axiosInterceptor'
 import { PendingPostsFilter } from '../pages/groups/GroupPendingPosts';
 import { PostMediaResource, PostResource } from '../types/post';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
+import { PrivacyType } from '../enums/privacy';
 
 
 class PostService {
@@ -21,6 +22,10 @@ class PostService {
 
     createPost(payload: FormData): Promise<DataResponse<PostResource>> {
         return axiosInterceptor.post('/api/posts', payload)
+    }
+
+    changePrivacy(postId: string, privacyType: PrivacyType) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/posts/change-privacy', { postId, privacyType })
     }
 
     editPost(postId: string, payload: FormData): Promise<BaseResponse> {

@@ -37,7 +37,7 @@ namespace SocialNetwork.Application.Features.SavedPost.Handlers
 
             foreach (var savedPost in takeSavedPost)
             {
-                var findPost = await _unitOfWork.PostRepository.GetPostByIdAsync(savedPost.Id);
+                var findPost = await _unitOfWork.PostRepository.GetPostByIdAsync(savedPost.PostId.Value);
 
                 if (findPost == null) continue;
                 var postItem = ApplicationMapper.MapToPost(findPost);

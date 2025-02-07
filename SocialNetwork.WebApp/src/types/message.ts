@@ -10,7 +10,8 @@ export type MessageResource = {
     sentAt: Date;
     chatRoomId: string;
     status: string;
-    reads?: ReadStatusResource[]
+    reads?: ReadStatusResource[];
+    seen: boolean;
 }
 
 export type ReadStatusResource = {

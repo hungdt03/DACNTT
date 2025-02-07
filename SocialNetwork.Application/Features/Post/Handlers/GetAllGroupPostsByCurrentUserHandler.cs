@@ -42,6 +42,11 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     .IsUserHaveStoryAsync(post.UserId);
                 postItem.User.HaveStory = haveStory;
 
+                var savedPost = await _unitOfWork.SavedPostRepository
+                 .GetSavedPostByPostIdAndUserId(post.Id, userId);
+
+                postItem.IsSaved = savedPost != null;
+
                 response.Add(postItem);
             }
 

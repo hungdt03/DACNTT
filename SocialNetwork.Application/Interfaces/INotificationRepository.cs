@@ -9,5 +9,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<Notification?> GetNotificationByIdAsync(Guid id);
         void DeleteNotification(Notification notification);
         Task<List<Notification>> GetAllNotificationsByPostIdAsync(Guid postId);
+        Task<List<Notification>> GetAllNotificationsByFriendShipId(Guid friendShipId);
+        void RemoveRange(IEnumerable<Notification> notifications);
     }
 }

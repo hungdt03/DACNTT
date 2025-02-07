@@ -29,6 +29,8 @@ namespace SocialNetwork.Application.Features.SavedPost.Handlers
                 .GetPostByIdAsync(request.PostId)
                     ?? throw new NotFoundException("Bài viết không tồn tại");
 
+            if (post.UserId == userId) throw new AppException("Không thể lưu bài viết của chính mình");
+
             var existedSavedPost = await _unitOfWork.SavedPostRepository
                 .GetSavedPostByPostIdAndUserId(post.Id, userId);
 

@@ -16,6 +16,7 @@ import userProfile from './images/hr-manager.png'
 import bgStoryText from './images/bg-story-text.png'
 import bgStoryImage from './images/bg-story-image.png'
 import AaBackground from './images/AaBackground.png'
+import signal from './images/signal.png'
 
 const images = {
     facebook,
@@ -35,7 +36,8 @@ const images = {
     userProfile,
     bgStoryText,
     bgStoryImage,
-    AaBackground
+    AaBackground,
+    signal
 }
 
 export default images

@@ -30,12 +30,14 @@ import { GroupPrivacy } from "../../enums/group-privacy";
 
 type PostGroupProps = {
     post: PostResource;
+    allowShare?: boolean;
     onFetch?: (data: PostResource) => void;
     onRemovePost?: (postId: string) => void
 }
 
 const PostGroup: FC<PostGroupProps> = ({
     post: postParam,
+    allowShare,
     onFetch,
     onRemovePost
 }) => {
@@ -239,7 +241,7 @@ const PostGroup: FC<PostGroupProps> = ({
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            {post.group.privacy === GroupPrivacy.PUBLIC && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+            {allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>}

@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Features.BlockList.Commands;
@@ -71,11 +70,6 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("block")]
-        public async Task<IActionResult> BlockUser([FromBody] AddBlockUserCommand command)
-        {
-            var response = await mediator.Send(command);
-            return Ok(response);
-        }
+   
     }
 }

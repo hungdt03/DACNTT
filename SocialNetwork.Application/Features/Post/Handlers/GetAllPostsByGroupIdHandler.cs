@@ -1,6 +1,8 @@
 ﻿
 
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Features.Post.Queries;
@@ -13,14 +15,17 @@ namespace SocialNetwork.Application.Features.Post.Handlers
     public class GetAllPostsByGroupIdHandler : IRequestHandler<GetAllPostsByGroupIdQuery, BaseResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public GetAllPostsByGroupIdHandler(IUnitOfWork unitOfWork)
+        public GetAllPostsByGroupIdHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
+            _contextAccessor = contextAccessor;
         }
 
         public async Task<BaseResponse> Handle(GetAllPostsByGroupIdQuery request, CancellationToken cancellationToken)
         {
+            var userId = _contextAccessor.HttpContext.User.GetUserId();
             var (posts, totalCount) = await _unitOfWork.PostRepository.GetAllPostsByGroupIdAsync(request.GroupId, request.Page, request.Size);
 
             var response = new List<PostResponse>();
@@ -36,6 +41,12 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 var haveStory = await _unitOfWork.StoryRepository
                     .IsUserHaveStoryAsync(post.UserId);
                 postItem.User.HaveStory = haveStory;
+
+                var savedPost = await _unitOfWork.SavedPostRepository
+                 .GetSavedPostByPostIdAndUserId(post.Id, userId);
+
+                postItem.IsSaved = savedPost != null;
+
                 response.Add(postItem);
 
             }

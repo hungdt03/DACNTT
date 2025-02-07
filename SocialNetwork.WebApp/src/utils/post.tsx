@@ -1,13 +1,13 @@
 import { ReactNode } from "react"
 import { PrivacyType } from "../enums/privacy"
 import { Tooltip } from "antd"
-import {  Lock, User } from "lucide-react"
+import { Lock, User } from "lucide-react"
 import { ReactionType } from "../enums/reaction"
 import { svgReaction } from "../assets/svg"
 import images from "../assets"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons"
-import { HandThumbUpIcon } from "@heroicons/react/24/outline"
+import { HandThumbUpIcon, UserGroupIcon } from "@heroicons/react/24/outline"
 import { GroupPrivacy } from "../enums/group-privacy"
 
 export const getPrivacyPost = (privacy: PrivacyType): ReactNode => {
@@ -22,6 +22,18 @@ export const getPrivacyPost = (privacy: PrivacyType): ReactNode => {
             return <Tooltip title='Bạn bè'>
                 <button className="mb-[2px]">
                     <User size={14} />
+                </button>
+            </Tooltip>
+        case PrivacyType.GROUP_PUBLIC:
+            return <Tooltip title='Nhóm công khai'>
+                <button className="mb-[2px]">
+                    <UserGroupIcon width={14} />
+                </button>
+            </Tooltip>
+        case PrivacyType.GROUP_PRIVATE:
+            return <Tooltip title='Nhóm riêng tư'>
+                <button className="mb-[2px]">
+                    <UserGroupIcon width={14} />
                 </button>
             </Tooltip>
         case PrivacyType.PUBLIC:
@@ -72,7 +84,7 @@ export const getBtnReaction = (reactionType: ReactionType | 'UNKNOWN', handleSav
         </button>
     }
 
-    return <button  onClick={() => handleSaveReaction(ReactionType.LIKE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
+    return <button onClick={() => handleSaveReaction(ReactionType.LIKE)} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-[13px] md:text-sm text-gray-500">
         <HandThumbUpIcon width={20} />
         <span>Thích</span>
     </button>
@@ -80,10 +92,17 @@ export const getBtnReaction = (reactionType: ReactionType | 'UNKNOWN', handleSav
 
 
 export const renderButtonContent = (icon: JSX.Element, label: string, imageSrc?: string) => (
-    <button className="flex items-center gap-x-2 font-semibold text-gray-700 py-[1px] px-2 bg-gray-100 rounded-sm">
+    <button className="flex items-center gap-x-1 font-semibold text-gray-700 py-[1px] px-2 bg-gray-100 rounded-md">
         {imageSrc ? <img className="w-3 h-3 mb-[2px]" src={imageSrc} alt={label} /> : icon}
         <span className="text-[12px]">{label}</span>
         <FontAwesomeIcon className="mb-[2px]" icon={faCaretDown} />
+    </button>
+);
+
+export const renderButtonGroupContent = (icon: JSX.Element, label: string) => (
+    <button className="flex items-center gap-x-1 font-semibold text-gray-700 py-[1px] px-1 bg-gray-100 rounded-md">
+        {icon}
+        <span className="text-[12px]">{label}</span>
     </button>
 );
 
@@ -102,8 +121,8 @@ export const getButtonPrivacyContent = (privacy: PrivacyType) => {
 export const getGroupButtonPrivacyContent = (privacy: GroupPrivacy) => {
     switch (privacy) {
         case GroupPrivacy.PRIVATE:
-            return renderButtonContent(<Lock className="mb-[3px]" size={12} />, 'Nhóm riêng tư');
+            return renderButtonGroupContent(<UserGroupIcon width={14} />, 'Nhóm riêng tư');
         case GroupPrivacy.PUBLIC:
-            return renderButtonContent(<User className="mb-[3px]" size={12} />, 'Nhóm công khai', images.earth);
+            return renderButtonGroupContent(<UserGroupIcon width={14} />, 'Nhóm công khai');
     }
 };

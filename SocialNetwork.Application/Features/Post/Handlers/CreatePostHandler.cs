@@ -61,19 +61,31 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             {
                 var group = await _unitOfWork.GroupRepository.GetGroupByIdAsync(request.GroupId.Value)
                     ?? throw new NotFoundException("Mã nhóm không tồn tại");
-               
-                var member = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId.Value, userId)
-                     ?? throw new AppException("Chỉ có thành viên trong nhóm mới được đăng bài");
 
-                if (group.RequirePostApproval)
+                var member = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId.Value, userId);
+
+                if (group.Privacy == GroupPrivacy.PRIVATE)
                 {
-                    if(member.Role == MemberRole.ADMIN || member.Role == MemberRole.MODERATOR)
-                        post.ApprovalStatus = ApprovalStatus.APPROVED;
-                    else post.ApprovalStatus = ApprovalStatus.PENDING;
+                    if(member == null) throw new AppException("Bạn không phải thành viên nên không thể đăng bài trong nhóm riêng tư");
+
+                    if (group.OnlyAdminCanPost && member.Role == MemberRole.MEMBER)
+                    {
+                         throw new AppException("Chỉ có QTV hoặc người kiểm duyệt mới được phép đăng bài trong nhóm này");
+                    }
+
+                    if (group.RequirePostApproval)
+                    {
+                        if (member.Role != MemberRole.MEMBER)
+                            post.ApprovalStatus = ApprovalStatus.APPROVED;
+
+                        else post.ApprovalStatus = ApprovalStatus.PENDING;
+                    }
+                    else post.ApprovalStatus = ApprovalStatus.APPROVED;
+
+                    post.Privacy = PrivacyConstant.GROUP_PRIVATE;
                 }
-                else post.ApprovalStatus = ApprovalStatus.PENDING;
-               
-                post.Privacy = PrivacyConstant.PUBLIC;
+                else post.Privacy = PrivacyConstant.GROUP_PUBLIC;
+
                 post.PostType = PostType.ORIGINAL_POST;
                 post.Group = group;
                 post.GroupId = group.Id;

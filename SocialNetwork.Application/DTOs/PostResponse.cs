@@ -25,5 +25,6 @@ namespace SocialNetwork.Application.DTOs
         public PostResponse SharePost { get; set; }
         public PostResponse OriginalPost { get; set; }
         public GroupResponse Group { get; set; }
+        public bool IsSaved { get; set; }
     }
 }

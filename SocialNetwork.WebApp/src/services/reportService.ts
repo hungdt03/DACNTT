@@ -14,7 +14,7 @@ class ReportService {
         return ReportService.instance;
     }
 
-    reportUser(userId: string, reason: string, groupId: string) : Promise<BaseResponse> {
+    reportUser(userId: string, reason: string, groupId?: string) : Promise<BaseResponse> {
         return axiosInterceptor.post('/api/reports/user', { userId, reason, groupId })
     }
 

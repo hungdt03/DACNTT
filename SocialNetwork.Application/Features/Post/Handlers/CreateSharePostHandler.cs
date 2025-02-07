@@ -54,7 +54,6 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                         UserId = tagUser.Id,
                     });
                 }
-
             }
 
             var sharePost = new Domain.Entity.PostInfo.Post
@@ -66,6 +65,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 Privacy = request.Privacy,
                 UserId = _contextAccessor.HttpContext.User.GetUserId(),
                 Tags = tags,
+                ApprovalStatus = ApprovalStatus.APPROVED
             };
 
            

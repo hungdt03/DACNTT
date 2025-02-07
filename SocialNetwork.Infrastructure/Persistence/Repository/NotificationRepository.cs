@@ -2,6 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.DBContext;
 
@@ -51,6 +52,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<List<Notification>> GetAllNotificationsByPostIdAsync(Guid postId)
         {
             return await _context.Notifications.Where(n => n.PostId == postId).ToListAsync();
+        }
+
+        public async Task<List<Notification>> GetAllNotificationsByFriendShipId(Guid friendShipId)
+        {
+            return await _context.Notifications.Where(n => n.FriendRequestId == friendShipId).ToListAsync();
+        }
+
+        public void RemoveRange(IEnumerable<Notification> notifications)
+        {
+            _context.Notifications.RemoveRange(notifications);
         }
     }
 }

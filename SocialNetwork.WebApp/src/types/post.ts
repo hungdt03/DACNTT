@@ -21,7 +21,8 @@ export type PostResource = {
     originalPost: PostResource;
     sharePostId: string;
     group: GroupResource
-    tags: TagResource[]
+    tags: TagResource[];
+    isSaved: boolean;
 }
 
 export type PostMediaResource = {

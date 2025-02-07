@@ -6,7 +6,7 @@ import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import { Lock, User } from "lucide-react";
 import UploadMultipleFile from "../uploads/UploadMultiFile";
 import { PrivacyType } from "../../enums/privacy";
-import { imageTypes, videoTypes } from "../../utils/file";
+import { imageTypes, isValidImage, isValidVideo, videoTypes } from "../../utils/file";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
@@ -16,27 +16,7 @@ import { FriendResource } from "../../types/friend";
 import { TagResource } from "../../types/tag";
 import cn from "../../utils/cn";
 import BackgroundPostOption from "./BackgroundPostOption";
-
-
-const renderButtonContent = (icon: JSX.Element, label: string, imageSrc?: string) => (
-    <button className="flex items-center gap-x-2 font-semibold text-gray-700 py-[1px] px-2 bg-gray-100 rounded-sm">
-        {imageSrc ? <img className="w-3 h-3" src={imageSrc} alt={label} /> : icon}
-        <span className="text-[13px]">{label}</span>
-        <FontAwesomeIcon icon={faCaretDown} />
-    </button>
-);
-
-const getButtonPrivacyContent = (privacy: PrivacyType) => {
-    switch (privacy) {
-        case PrivacyType.PRIVATE:
-            return renderButtonContent(<Lock size={14} />, 'Chỉ mình tôi');
-        case PrivacyType.FRIENDS:
-            return renderButtonContent(<User size={14} />, 'Bạn bè');
-        case PrivacyType.PUBLIC:
-        default:
-            return renderButtonContent(<img className="w-3 h-3" src={images.earth} alt="Công khai" />, 'Công khai', images.earth);
-    }
-};
+import { getButtonPrivacyContent, getGroupButtonPrivacyContent } from "../../utils/post";
 
 export type EditPostForm = {
     content: string;
@@ -86,11 +66,8 @@ const EditPostModal: FC<EditPostModalProps> = ({
     })
 
     const handleUploadFiles = (files: UploadFile[]) => {
-        const imageFiles = files
-            .filter(file => file.name && (imageTypes.includes(file.type as string) || (file.type as string).includes("image/")))
-
-        const videoFiles = files
-            .filter(file => file.name && (videoTypes.includes(file.type as string) || (file.type as string).includes("video/")))
+        const imageFiles = files.filter(file => file.originFileObj && isValidImage(file.originFileObj));
+        const videoFiles = files.filter(file => file.originFileObj && isValidVideo(file.originFileObj));
 
         setPostRequest(prev => ({
             ...prev,
@@ -220,9 +197,9 @@ const EditPostModal: FC<EditPostModalProps> = ({
 
     return <div className="flex flex-col gap-y-4">
         <div className="flex items-center gap-x-2">
-            <Avatar size='large' src={images.user} />
+            <Avatar size='large' src={user?.avatar ?? images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
-                <div className="text-[15px] font-semibold">
+                <div className="text-[14px] font-bold">
                     {user?.fullName}
                     {tags.length > 0 &&
                         (() => {
@@ -244,14 +221,14 @@ const EditPostModal: FC<EditPostModalProps> = ({
                             );
                         })()}
                 </div>
-                <Popover trigger='click' content={<PostPrivacryOption
+                {post.isGroupPost ? getGroupButtonPrivacyContent(post.group.privacy) : <Popover trigger='click' content={<PostPrivacryOption
                     onChange={(privacy) => setPostRequest({
                         ...postRequest,
                         privacy
                     })}
                 />}>
                     {getButtonPrivacyContent(postRequest.privacy)}
-                </Popover>
+                </Popover>}
             </div>
         </div>
         <div className="flex flex-col gap-y-4">

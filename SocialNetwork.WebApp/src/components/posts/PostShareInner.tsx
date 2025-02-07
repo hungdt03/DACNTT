@@ -20,9 +20,31 @@ const PostShareInner: FC<PostShareInnerProps> = ({
         <div className={cn("px-4 flex flex-col gap-y-2", post.medias.length > 0 ? 'py-6' : 'py-2')}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2">
-                    <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
+                    <div className="relative">
+                        {post.isGroupPost ? (
+                            <img className="w-10 h-10 rounded-md object-cover" src={post.group.coverImage ?? images.cover} />
+                        ) : null}
+
+                        {post.user.haveStory ? (
+                            <Link
+                                className={`absolute -right-2 -bottom-2 border-[2px] border-primary rounded-full ${post.isGroupPost ? '' : 'p-[1px]'}`}
+                                to={`/stories/${post.user.id}`}
+                            >
+                                <Avatar
+                                    className={`${post.isGroupPost ? 'w-6 h-6' : 'w-9 h-9 flex-shrink-0'} border-[1px] border-gray-50`}
+                                    src={post.user.avatar ?? images.user}
+                                />
+                            </Link>
+                        ) : (
+                            <Avatar
+                                className={`${post.isGroupPost ? 'w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50' : 'w-10 h-10 flex-shrink-0'}`}
+                                src={post.user.avatar ?? images.user}
+                            />
+                        )}
+                    </div>
+
                     <div className="flex flex-col gap-y-[1px]">
-                        <div className="font-semibold text-[15px] text-gray-600">
+                        <div className="font-bold text-[14px] text-gray-600">
                             <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
                             {post.tags.length > 0 &&
                                 (() => {

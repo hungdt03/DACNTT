@@ -7,6 +7,8 @@ import { GroupApprovalSummaryResource } from "../../../types/group-approval-summ
 import groupService from "../../../services/groupService";
 import { Link, useLocation } from "react-router-dom";
 import cn from "../../../utils/cn";
+import { getPrivacyTitle } from "../../../enums/privacy";
+import { getGroupPrivacyTitle } from "../../../utils/privacy";
 
 type MyGroupManageSidebarProps = {
     group: GroupResource;
@@ -38,7 +40,7 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
                 <div className="flex gap-x-2 items-center text-sm">
                     <div className="flex items-center gap-x-1 text-gray-400">
                         <Lock className="mb-1" size={14} />
-                        <span>Nhóm riêng tư</span>
+                        <span>Nhóm {getGroupPrivacyTitle(group.privacy)}</span>
                     </div>
                     <span className="font-bold text-gray-500">{group.members.length} thành viên</span>
                 </div>

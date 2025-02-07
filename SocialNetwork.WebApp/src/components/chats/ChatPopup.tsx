@@ -67,7 +67,18 @@ const ChatPopup: FC<ChatPopupProps> = ({
     const fetchMessages = async (page: number, size: number) => {
         const response = await messageService.getAllMessagesByChatRoomId(room.id, page, size);
         if (response.isSuccess) {
-            setMessages(prevMessages => [...response.data, ...prevMessages])
+            const normalizeMessage = response.data.map(msg => {
+                if(msg.senderId === user?.id) {
+                    let seen = (msg?.reads?.filter(r => r.userId !== user.id)?.length ?? 0) === 0
+                    msg.seen = seen;
+
+                    return msg;
+                }
+
+                return msg;
+            })
+
+            setMessages(prevMessages => [...normalizeMessage, ...prevMessages])
             setPagination(response.pagination)
         }
     }
@@ -104,7 +115,14 @@ const ChatPopup: FC<ChatPopupProps> = ({
                     );
 
                     setMessages((prev) => {
-                        const updatedMessages = [...prev, message];
+                        const updatedMessages = [...prev];
+                        if(message.senderId === user?.id) {
+                            const normalizeMessage = {...message}
+                            normalizeMessage.seen = (message.reads?.filter(msg => msg.userId !== user.id).length ?? 0) > 0
+                            updatedMessages.push(normalizeMessage)
+                        } else {
+                            updatedMessages.push(message)
+                        }
 
                         if (message.senderId !== user?.id) {
                             const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === message.senderId));
@@ -133,6 +151,8 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
                     setMessages((prevMessages) => {
                         const updatedMessages = [...prevMessages];
+
+                        
 
                         if (userId !== user?.id) {
                             const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === userId));
@@ -217,7 +237,8 @@ const ChatPopup: FC<ChatPopupProps> = ({
             sentAt: new Date(),
             status: 'sending',
             medias: [],
-            sender: user!
+            sender: user!,
+            seen: false,
         };
 
         setPendingMessages(prev => [...prev, tempMessage]);
@@ -310,11 +331,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
             </Popover>
 
             <div className={cn("flex gap-x-1 items-center", isRead && 'text-sky-500')}>
-                {/* {room.isPrivate && <Tooltip title="Gọi điện">
-                    <button onClick={() => onCalling?.()} className="p-2 bg-transparent border-none">
-                        <PhoneOutlined className="rotate-90" />
-                    </button>
-                </Tooltip>} */}
                 <Tooltip title="Thu nhỏ đoạn chat">
                     <button onClick={() => onMinimize?.()} className="p-2 bg-transparent border-none">
                         <MinusOutlined />

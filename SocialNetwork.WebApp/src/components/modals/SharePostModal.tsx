@@ -80,9 +80,9 @@ const SharePostModal: FC<SharePostModalProps> = ({
 
     return <div className="flex flex-col gap-y-4">
         <div className="flex items-center gap-x-2">
-            <Avatar className="flex-shrink-0" size='large' src={images.user} />
+            <Avatar className="flex-shrink-0" size='large' src={user?.avatar ?? images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
-                <div className="text-[16px] font-semibold">
+                <div className="text-[15px] font-bold">
                     {user?.fullName}
                     {tags.length > 0 &&
                         (() => {
@@ -104,14 +104,19 @@ const SharePostModal: FC<SharePostModalProps> = ({
                             );
                         })()}
                 </div>
-                <Popover trigger='click' content={<PostPrivacryOption
-                    onChange={value => setPostRequest({
-                        ...postRequest,
-                        privacy: value
-                    })}
-                />}>
-                    {getButtonPrivacyContent(postRequest.privacy)}
-                </Popover>
+                <div className="flex items-center gap-x-2">
+                    <button className="flex items-center gap-x-1 font-semibold text-gray-700 py-[1px] px-1 bg-gray-100 rounded-md">
+                        <span className="text-[12px]">Bảng feed</span>
+                    </button>
+                    <Popover trigger='click' content={<PostPrivacryOption
+                        onChange={value => setPostRequest({
+                            ...postRequest,
+                            privacy: value
+                        })}
+                    />}>
+                        {getButtonPrivacyContent(postRequest.privacy)}
+                    </Popover>
+                </div>
             </div>
         </div>
         <div className="flex flex-col gap-y-2">
@@ -119,7 +124,7 @@ const SharePostModal: FC<SharePostModalProps> = ({
                 <textarea value={postRequest.content} onChange={e => setPostRequest({
                     ...postRequest,
                     content: e.target.value
-                })} className="text-xl outline-none border-none w-full" rows={4} placeholder="Long ơi, bạn đang nghĩ gì thế" />
+                })} className="text-lg outline-none border-none w-full" rows={4} placeholder="Hãy nói gì đó về nội dung này ..." />
             </div>
 
             <div className="p-2 rounded-md border-[1px] border-gray-200 flex justify-between items-center">

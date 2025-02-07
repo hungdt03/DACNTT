@@ -12,11 +12,15 @@ import { inititalValues } from "../utils/pagination";
 import StoryWrapper from "../components/story/StoryWrapper";
 import PostGroup from "../components/posts/PostGroup";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
+import { PrivacyType } from "../enums/privacy";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../features/slices/auth-slice";
 
 const HomePage: FC = () => {
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [posts, setPosts] = useState<PostResource[]>([]);
+    const { user } = useSelector(selectAuth)
 
     const { containerRef } = useInfiniteScroll({
         fetchMore: () => void fetchNewPosts(),
@@ -95,12 +99,12 @@ const HomePage: FC = () => {
 
             {posts.map(post => {
                 if (post.postType === PostType.SHARE_POST) {
-                    return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
+                    return <SharePost allowShare={post.privacy === PrivacyType.PUBLIC} onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
                 } else if (post.isGroupPost) {
-                    return <PostGroup key={post.id} post={post} />;
+                    return <PostGroup allowShare={post.privacy === PrivacyType.GROUP_PUBLIC} key={post.id} post={post} />;
                 }
 
-                return <Post onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
+                return <Post allowShare={post.privacy === PrivacyType.PUBLIC && post.user.id !== user?.id} onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
             })}
 
             {loading && <PostSkeletonList />}

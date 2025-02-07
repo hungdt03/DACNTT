@@ -43,6 +43,8 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
 
             if(friendShip != null)
             {
+                var notifications = await _unitOfWork.NotificationRepository.GetAllNotificationsByFriendShipId(friendShip.Id);
+                _unitOfWork.NotificationRepository.RemoveRange(notifications);
                 _unitOfWork.FriendShipRepository.DeleteFriendShip(friendShip);
             }
 
@@ -51,6 +53,8 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
                 BlockeeId = request.UserId,
                 BlockerId = userId,
             };
+
+            await _unitOfWork.BlockListRepository.CreateNewBlockAsync(newBlock);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

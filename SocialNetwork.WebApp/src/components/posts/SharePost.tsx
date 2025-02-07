@@ -31,11 +31,13 @@ import PostNotFound from "./PostNotFound";
 type SharePostProps = {
     post: PostResource;
     onFetch?: (data: PostResource) => void;
-    onRemovePost?: (postId: string) => void
+    onRemovePost?: (postId: string) => void;
+    allowShare?: boolean;
 }
 
 const SharePost: FC<SharePostProps> = ({
     post: postParam,
+    allowShare = true,
     onFetch,
     onRemovePost
 }) => {
@@ -148,7 +150,7 @@ const SharePost: FC<SharePostProps> = ({
                 <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
                 <div className="flex flex-col gap-y-[1px]">
                     <div className="flex items-center gap-x-1">
-                        <div className="font-semibold text-[15px] text-gray-600">
+                        <div className="font-bold text-[14px] text-gray-600">
                             <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
                             {post.tags.length > 0 &&
                                 (() => {
@@ -173,7 +175,7 @@ const SharePost: FC<SharePostProps> = ({
                                     );
                                 })()}
                         </div>
-                        <p className="text-gray-400">đã chia sẻ bài viết</p>
+                        <p className="text-gray-400 text-[14px]">đã chia sẻ bài viết</p>
                     </div>
                     <div className="flex items-center gap-x-2">
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
@@ -190,7 +192,7 @@ const SharePost: FC<SharePostProps> = ({
                 isMine={post.user.id === user?.id}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
-                    <MoreHorizontal className="text-gray-400" />
+                    <MoreHorizontal size={16} className="text-gray-400" />
                 </button>
             </Popover>
         </div>
@@ -222,7 +224,7 @@ const SharePost: FC<SharePostProps> = ({
                 <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-           {post.originalPostId &&  <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+           {post.originalPostId || allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
                 <ShareIcon className="h-5 w-5 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>}

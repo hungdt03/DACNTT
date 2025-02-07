@@ -79,9 +79,15 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             foreach (var item in takePosts)
             {
                 var mapPost = ApplicationMapper.MapToPost(item);
+                
                 var haveStory = await unitOfWork.StoryRepository
-                .IsUserHaveStoryAsync(item.UserId);
+                 .IsUserHaveStoryAsync(item.UserId);
                 mapPost.User.HaveStory = haveStory;
+
+                var savedPost = await unitOfWork.SavedPostRepository
+                    .GetSavedPostByPostIdAndUserId(item.Id, userId);
+
+                mapPost.IsSaved = savedPost != null;
 
                 response.Add(mapPost);
 

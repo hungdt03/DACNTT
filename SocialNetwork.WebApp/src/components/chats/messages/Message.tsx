@@ -21,10 +21,10 @@ const Message: FC<MessageProps> = ({
 }) => {
     const { user } = useSelector(selectAuth)
     return <div className="flex flex-col gap-y-1">
-        {isMe ? <MessageFromMe message={message} /> : <MessageFromOther chatRoom={chatRoom} message={message} />}
-        <div className="flex justify-end gap-x-1 px-2">
+        {isMe ? <MessageFromMe isShowCheck={!message.seen} message={message} /> : <MessageFromOther chatRoom={chatRoom} message={message} />}
+        <div className="flex justify-end gap-x-1">
             {message?.reads?.filter(read => read.userId !== user?.id).map(read => 
-                <Tooltip  key={read?.user?.id} title={read?.user?.fullName ?? 'Anonymous user'}>
+                <Tooltip key={read?.user?.id} title={read?.user?.fullName ?? 'Anonymous user'}>
                     <Avatar className="w-4 h-4" src={read?.user?.avatar ?? images.user} />
                 </Tooltip>
             )}

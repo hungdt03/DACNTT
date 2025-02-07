@@ -41,6 +41,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                  .Include(p => p.SharePost)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags)
                  .ToListAsync();
 
             return posts;     
@@ -66,10 +68,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.Comments)
                 .Include(p => p.Medias)
                 .Include(p => p.SharePost)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.User)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.Medias)
+                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags)
                 .ToListAsync();
 
             return (posts, totalCount);
@@ -118,10 +120,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.Comments)
                 .Include(p => p.Group)
                 .Include(p => p.SharePost)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.User)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.Medias)
+                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags)
                 .SingleOrDefaultAsync(p => p.Id == id);
         }
 
@@ -144,10 +146,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.Comments)
                 .Include(p => p.Medias)
                 .Include(p => p.SharePost)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.User)
-                .Include(p => p.OriginalPost)
-                    .ThenInclude(p => p.Medias)
+                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags)
                 .ToListAsync();
 
             return (posts, totalCount);

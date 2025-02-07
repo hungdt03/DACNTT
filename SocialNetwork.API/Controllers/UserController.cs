@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
+using SocialNetwork.Application.Features.BlockList.Commands;
 using SocialNetwork.Application.Features.BlockList.Queries;
 using SocialNetwork.Application.Features.Story.Commands;
 using SocialNetwork.Application.Features.User.Commands;
@@ -179,6 +180,28 @@ namespace SocialNetwork.API.Controllers
         {
             var userId = HttpContext.User.GetUserId();
             var response = await mediator.Send(new GetUserLocationByUserIdQuery(userId));
+            return Ok(response);
+        }
+
+        [HttpPost("block")]
+        public async Task<IActionResult> BlockUser([FromBody] AddBlockUserCommand command)
+        {
+            var response = await mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpPut("unblock/{userId}")]
+        public async Task<IActionResult> UnblockUser([FromRoute] string userId)
+        {
+            var response = await mediator.Send(new RemoveBlockUserCommand(userId));
+            return Ok(response);
+        }
+
+
+        [HttpGet("block/{userId}")]
+        public async Task<IActionResult> CheckIsBlockUser([FromRoute] string userId)
+        {
+            var response = await mediator.Send(new CheckIsBlockUserQuery(userId));
             return Ok(response);
         }
 

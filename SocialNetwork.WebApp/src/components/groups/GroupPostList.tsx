@@ -95,10 +95,6 @@ const GroupPostList: FC<GroupPostListProps> = ({
         <div ref={containerRef} className="flex flex-col gap-y-4">
             <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} group={group} />
             {posts.map(post => {
-                if (post.postType === PostType.SHARE_POST) {
-                    return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
-                }
-
                 return <Post group={group} key={post.id} post={post} allowShare={group.privacy === GroupPrivacy.PUBLIC} />
             })}
 

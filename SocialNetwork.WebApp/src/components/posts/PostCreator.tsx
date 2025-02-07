@@ -26,9 +26,7 @@ const PostCreator: FC<PostCreatorProps> = ({
         handleOk()
 
         try {
-            console.log('Create post')
             const response = await postService.createPost(values);
-            console.log(response)
             if (response.isSuccess) {
                 onSuccess?.(toastId, response.message, response.data)
                 return true;

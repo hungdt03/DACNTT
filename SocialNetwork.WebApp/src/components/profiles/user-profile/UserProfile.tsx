@@ -22,15 +22,15 @@ const UserProfile: FC<UserProfileProps> = ({
     const [friendRequest, setFriendRequest] = useState<FriendRequestResource | null>(null)
     const [user, setUser] = useState<UserResource | null>(null)
     const [loading, setLoading] = useState(false)
-    const [friends, setFriends] = useState<FriendResource[]>([])
-
-
+    const [friends, setFriends] = useState<FriendResource[]>([]);
+   
     const fetchFriends = async (userId: string) => {
         const response = await friendService.getTopNineOfUserFriends(userId);
         if (response.isSuccess) {
             setFriends(response.data)
         }
     }
+
 
     useEffect(() => {
         fetchFriends(userId)

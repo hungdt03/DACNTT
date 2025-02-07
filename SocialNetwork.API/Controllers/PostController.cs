@@ -31,6 +31,14 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("change-privacy")]
+        public async Task<IActionResult> ChangePostPrivacy([FromBody] ChangePostPrivacyCommand command)
+        {
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
         // SAVED POSTS
 
         [HttpGet("saved-posts")]

@@ -72,10 +72,7 @@ const MainLeftSidebar: FC = () => {
                     <img alt="Nhóm" className="w-8 h-8" src={images.group} />
                     <span className="text-[15px] font-semibold text-gray-500">Nhóm</span>
                 </Link>
-                <Link to='/settings' className="flex items-center gap-x-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer">
-                    <img alt="Cài đặt" className="w-8 h-8" src={images.settings} />
-                    <span className="text-[15px] font-semibold text-gray-500">Cài đặt</span>
-                </Link>
+              
             </div>
         </div>
     </div>
