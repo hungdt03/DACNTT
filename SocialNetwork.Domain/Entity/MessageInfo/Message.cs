@@ -11,15 +11,6 @@ namespace SocialNetwork.Domain.Entity.MessageInfo
         public string MessageType { get; set; }
         public bool IsRemove { get; set; }
 
-        public Guid? ForwardedMessageId { get; set; }
-        public Message? ForwardedMessage { get; set; }
-
-        public Guid? ReplyMessageId { get; set; }
-        public Message? ReplyMessage { get; set; }
-
-        public Guid? StoryId { get; set; }
-        public Story? Story { get; set; }
-
         public string? SenderId { get; set; }
         public User? Sender { get; set; }
 

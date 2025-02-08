@@ -1,7 +1,6 @@
 ﻿
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
@@ -9,8 +8,6 @@ using SocialNetwork.Application.Features.Post.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using System.Drawing;
 using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.Post.Handlers
@@ -79,7 +76,13 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             foreach (var item in takePosts)
             {
                 var mapPost = ApplicationMapper.MapToPost(item);
-                
+
+                if (item.PostType == PostType.ORIGINAL_POST)
+                {
+                    var shares = await unitOfWork.PostRepository.CountSharesByPostIdAsync(item.Id);
+                    mapPost.Shares = shares;
+                };
+
                 var haveStory = await unitOfWork.StoryRepository
                  .IsUserHaveStoryAsync(item.UserId);
                 mapPost.User.HaveStory = haveStory;

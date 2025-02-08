@@ -10,6 +10,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Application.Utils;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
 using SocialNetwork.Domain.Entity.System;
@@ -36,10 +37,6 @@ namespace SocialNetwork.Infrastructure.SignalR
         public override async Task OnConnectedAsync()
         {
             var userId = Context.User.GetUserId();
-            logger.LogInformation("============NEW CONNECTED=============");
-            logger.LogInformation(userId);
-            logger.LogInformation(Context.ConnectionId);
-
             await userStatusService.AddConnectionAsync(userId, Context.ConnectionId);
 
             var chatRooms = await unitOfWork.ChatRoomRepository.GetAllChatRoomsByUserIdAsync(userId);
@@ -62,10 +59,42 @@ namespace SocialNetwork.Infrastructure.SignalR
             User senderUser = await userManager.FindByIdAsync(userId)
                 ?? throw new AppException("Thông tin người gửi không tồn tại");
 
-            ChatRoom chatRoom = await unitOfWork.ChatRoomRepository.GetChatRoomByUniqueNameAsync(messageRequest.ChatRoomName)
-                ?? throw new AppException("Nhóm chat không tồn tại");
+            ChatRoom chatRoom = await unitOfWork.ChatRoomRepository.GetChatRoomByUniqueNameAsync(messageRequest.ChatRoomName);
 
             await unitOfWork.BeginTransactionAsync();
+            bool isNoti = true;
+
+            if (chatRoom == null && messageRequest.ReceiverId != null)
+            {
+                var ids = new List<string>() { userId, messageRequest.ReceiverId };
+
+                var receiver = await userManager.FindByIdAsync(messageRequest.ReceiverId)
+                    ?? throw new AppException("ID của người nhận không đúng");
+
+                var firstMember = new ChatRoomMember()
+                {
+                    UserId = userId,
+                    IsAccepted = true,
+                };
+
+                var secondMember = new ChatRoomMember()
+                {
+                    UserId = receiver.Id,
+                    IsAccepted = false,
+                };
+
+                var members = new List<ChatRoomMember>() { firstMember, secondMember };
+
+                chatRoom = new ChatRoom()
+                {
+                    UniqueName = ChatUtils.GenerateChatRoomName(ids),
+                    IsPrivate = true,
+                    Members = members
+                };
+
+                await unitOfWork.ChatRoomRepository.CreateChatRoom(chatRoom);
+                isNoti = false;
+            }
 
             var recentReadStatus = await unitOfWork.MessageReadStatusRepository.GetMessageReadStatusByUserAndChatRoomId(userId, chatRoom.Id);
 
@@ -105,7 +134,7 @@ namespace SocialNetwork.Infrastructure.SignalR
 
             await unitOfWork.CommitTransactionAsync();
 
-            await Clients.Group(chatRoom.UniqueName).SendAsync("NewMessage", ApplicationMapper.MapToMessage(message));
+            if(isNoti) await Clients.Group(chatRoom.UniqueName).SendAsync("NewMessage", ApplicationMapper.MapToMessage(message));
         }
 
         public async Task TypingMessage(string groupName, string fullName)
@@ -147,9 +176,6 @@ namespace SocialNetwork.Infrastructure.SignalR
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var userId = Context.User.GetUserId();
-            logger.LogInformation("============DISCONNECTED=============");
-            logger.LogInformation(userId);
-            logger.LogInformation(Context.ConnectionId);
             await userStatusService.RemoveConnectionAsync(userId, Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);
         }

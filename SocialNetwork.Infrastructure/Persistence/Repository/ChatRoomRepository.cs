@@ -25,7 +25,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             var chatRooms = await _context.ChatRooms
                 .Include(c => c.Members)
                     .ThenInclude(c => c.User)
-                .Where(c => c.Members.Any(s => s.UserId.Equals(userId)))
+                .Where(c => c.Members.Any(s => (s.IsAccepted || !c.IsPrivate) && s.UserId.Equals(userId)))
                 .OrderByDescending(c => c.LastMessageDate)
                 .ToListAsync();
 

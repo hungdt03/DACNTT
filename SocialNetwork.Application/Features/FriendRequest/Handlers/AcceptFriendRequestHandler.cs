@@ -73,6 +73,16 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 };
 
                 await _unitOfWork.ChatRoomRepository.CreateChatRoom(chatRoom);
+
+                var message = new Domain.Entity.MessageInfo.Message()
+                {
+                    MessageType = MessageType.SYSTEM,
+                    ChatRoomId = chatRoom.Id,
+                    Content = "Các bạn hiện đã được kết nối với nhau",
+                    SentAt = DateTimeOffset.UtcNow,
+                };
+
+                await _unitOfWork.MessageRepository.CreateMessageAsync(message);
             }
 
             var notification = new Domain.Entity.System.Notification()

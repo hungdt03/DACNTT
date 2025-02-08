@@ -24,17 +24,10 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
             var reactions = await _unitOfWork.ReactionRepository.GetAllReactionsByPostIdAsync(request.PostId);
             var comments = await _unitOfWork.CommentRepository.GetAllCommentsByPostIdAsync(request.PostId);
-            var notifications = await _unitOfWork.NotificationRepository.GetAllNotificationsByPostIdAsync(request.PostId);
             var sharePosts = await _unitOfWork.PostRepository.GetAllSharePostsByOriginalPostId(request.PostId);
-
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             _unitOfWork.ReactionRepository.RemoveRange(reactions);
-
-            notifications.ForEach(noti =>
-            {
-                noti.PostId = null;
-            });
 
             sharePosts.ForEach(p =>
             {

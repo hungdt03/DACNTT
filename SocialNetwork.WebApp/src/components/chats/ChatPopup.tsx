@@ -25,21 +25,20 @@ export type MessageRequest = {
     chatRoomName: string;
     sentAt?: Date;
     images?: UploadFile[]
-    videos?: UploadFile[]
+    videos?: UploadFile[];
+    receiverId?: string;
 }
 
 type ChatPopupProps = {
     room: ChatRoomResource;
     onClose?: () => void;
     onMinimize?: () => void;
-    onCalling?: () => void;
 }
 
 const ChatPopup: FC<ChatPopupProps> = ({
     room,
     onClose,
     onMinimize,
-    onCalling
 }) => {
 
     const { user } = useSelector(selectAuth);

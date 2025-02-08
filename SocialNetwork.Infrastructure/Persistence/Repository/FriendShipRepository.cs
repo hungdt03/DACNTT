@@ -84,5 +84,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                     && (string.IsNullOrEmpty(status) || s.Status.Equals(status))
            );
         }
+
+        public async Task<FriendShip?> GetFriendShipByUserIdAndFriendIdAsync(string userId, string friendId)
+        {
+            return await _context.FriendShips
+               .Include(f => f.User)
+               .Include(f => f.Friend)
+               .SingleOrDefaultAsync(s =>
+                    ((s.UserId == userId && s.FriendId == friendId)
+                    || (s.UserId == friendId && s.FriendId == userId))
+           );
+        }
     }
 }

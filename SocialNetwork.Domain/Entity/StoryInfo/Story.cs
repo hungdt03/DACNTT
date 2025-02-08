@@ -15,6 +15,5 @@ namespace SocialNetwork.Domain.Entity.StoryInfo
         public string Type { get; set; }
         public User User { get; set; }
         public ICollection<Viewer> Viewers { get; set; }
-        public ICollection<Message> ReplyMessages { get; set; }
     }
 }

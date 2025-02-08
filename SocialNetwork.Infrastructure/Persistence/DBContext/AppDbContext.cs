@@ -1,6 +1,8 @@
 ﻿
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using SocialNetwork.Domain.Abstractions;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
 using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Domain.Entity.MessageInfo;
@@ -8,6 +10,7 @@ using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Domain.Entity.StoryInfo;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Domain.Entity.UserInfo;
+using System.Linq.Expressions;
 
 namespace SocialNetwork.Infrastructure.DBContext
 {
@@ -20,7 +23,25 @@ namespace SocialNetwork.Infrastructure.DBContext
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
+                {
+                    modelBuilder.Entity(entityType.ClrType)
+                        .HasQueryFilter(ConvertFilterExpression(entityType.ClrType));
+                }
+            }
+
             base.OnModelCreating(modelBuilder);
+        }
+
+        private static LambdaExpression ConvertFilterExpression(Type type)
+        {
+            var parameter = Expression.Parameter(type, "e");
+            var property = Expression.Property(parameter, "IsDeleted");
+            var condition = Expression.Equal(property, Expression.Constant(false));
+            return Expression.Lambda(condition, parameter);
         }
 
         // USER ROOT
@@ -63,7 +84,6 @@ namespace SocialNetwork.Infrastructure.DBContext
 
         // SYSTEM
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<Privacy> Privacies { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<OTP> OTPs { get; set; }
         public DbSet<Location> Locations { get; set; }

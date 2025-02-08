@@ -36,9 +36,9 @@ namespace SocialNetwork.Application.Features.FriendRequest.Handlers
             foreach(var user in allUsers)
             {
                 if(userId == user.Id) continue;
-                var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id, FriendShipStatus.ACCEPTED);
+                var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id);
 
-                if (friendShip != null) continue;
+                if (friendShip != null && friendShip.Status == FriendShipStatus.NONE) continue;
 
                 var blockUser = await _unitOfWork.BlockListRepository.GetBlockListByBlockeeIdAndBlockerIdAsync(userId, user.Id);
                 var reverseBlock = await _unitOfWork.BlockListRepository.GetBlockListByBlockeeIdAndBlockerIdAsync(user.Id, userId);

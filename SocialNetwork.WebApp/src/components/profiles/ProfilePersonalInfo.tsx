@@ -172,10 +172,7 @@ const ProfilePersonalInfo: FC<ProfilePersonalInfoProps> = ({
                     <Edit3 onClick={showModal} size={22} className="inline cursor-pointer hover:bg-gray-100 rounded-full p-1" />
                 </span>
             </div> : <div className="flex items-center justify-between">
-                <div className="flex items-center gap-x-2">
-                    <School size={20} />
-                    <span className="font-bold">Nơi sống hiện tại</span>
-                </div>
+                <span className="font-bold">Nơi sống hiện tại</span>
                 <button onClick={showModal} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                     <Plus size={16} className="text-white" />
                 </button>
@@ -189,10 +186,7 @@ const ProfilePersonalInfo: FC<ProfilePersonalInfoProps> = ({
                     <Edit3 onClick={showHometown} size={12} className="inline cursor-pointer" />
                 </span>
             </div> : <div className="flex items-center justify-between">
-                <div className="flex items-center gap-x-2">
-                    <School size={20} />
-                    <span>Quê quán</span>
-                </div>
+                <span className="font-bold">Quê quán</span>
                 <button onClick={showHometown} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                     <Plus size={16} className="text-white" />
                 </button>

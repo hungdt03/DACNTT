@@ -22,8 +22,8 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            var viewers = await _unitOfWork.ViewerRepository.GetAllViewerByStoryIdAsync(story.Id);
-            _unitOfWork.ViewerRepository.RemoveRange(viewers);
+            //var viewers = await _unitOfWork.ViewerRepository.GetAllViewerByStoryIdAsync(story.Id);
+            //_unitOfWork.ViewerRepository.RemoveRange(viewers);
             _unitOfWork.StoryRepository.DeleteStory(story);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

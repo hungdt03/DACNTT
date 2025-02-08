@@ -195,7 +195,8 @@ const ChatArea: FC<ChatAreaProps> = ({
             sentAt: new Date(),
             status: 'sending',
             medias: [],
-            sender: user!
+            sender: user!,
+            seen: true
         };
 
         setPendingMessages(prev => [...prev, tempMessage]);

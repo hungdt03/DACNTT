@@ -20,33 +20,45 @@ namespace SocialNetwork.Infrastructure.Persistence.Interceptors
             InterceptionResult<int> result,
             CancellationToken cancellationToken = default)
         {
-            AddAuditInfo(eventData.Context);
+            ProcessEntities(eventData.Context);
             return new ValueTask<InterceptionResult<int>>(result);
         }
 
-        private static void AddAuditInfo(DbContext? context)
+        private static void ProcessEntities(DbContext? context)
         {
             if (context == null) return;
 
-            var entries = context.ChangeTracker.Entries()
-                .Where(e => e.Entity is BaseAuditableEntity &&
-                            (e.State == EntityState.Added || e.State == EntityState.Modified));
+            var now = DateTimeOffset.UtcNow;
 
-            foreach (var entry in entries)
+            foreach (var entry in context.ChangeTracker.Entries())
             {
-                var entity = (BaseAuditableEntity)entry.Entity;
-                var now = DateTimeOffset.UtcNow;
-
-                if (entry.State == EntityState.Added)
+                switch (entry.State)
                 {
-                    entity.DateCreated = now;
-                }
+                    case EntityState.Added:
+                        if (entry.Entity is BaseAuditableEntity auditableEntity)
+                        {
+                            auditableEntity.DateCreated = now;
+                        }
+                        break;
 
-                if (entry.State == EntityState.Modified)
-                {
-                    entity.DateUpdated = now;
+                    case EntityState.Modified:
+                        if (entry.Entity is BaseAuditableEntity modifiedEntity)
+                        {
+                            modifiedEntity.DateUpdated = now;
+                        }
+                        break;
+
+                    case EntityState.Deleted:
+                        if (entry.Entity is ISoftDelete softDeleteEntity)
+                        {
+                            entry.State = EntityState.Modified; // Chuyển sang Modified để không bị xóa cứng
+                            softDeleteEntity.IsDeleted = true;
+                            softDeleteEntity.DeletedAt = now;
+                        }
+                        break;
                 }
             }
         }
+
     }
 }

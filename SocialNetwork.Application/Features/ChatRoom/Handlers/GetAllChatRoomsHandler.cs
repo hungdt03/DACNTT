@@ -36,7 +36,6 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             var onlineUsers = await _userStatusService.GetAllActiveUsersAsync();
             foreach (var chatRoom in chatRooms)
             {
-               
                 var friend = chatRoom.Members.Count == 2 ? chatRoom.Members.SingleOrDefault(m => m.UserId != userId) : null;
                 var item = ApplicationMapper.MapToChatRoom(chatRoom);
 

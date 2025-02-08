@@ -36,7 +36,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     LastMessage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastMessageDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -50,7 +52,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,7 +76,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     RequirePostApproval = table.Column<bool>(type: "bit", nullable: false),
                     CoverImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -86,7 +92,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -100,7 +108,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -114,26 +124,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Positions", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Privacies",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PrivacyType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PrivacyFor = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Privacies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -143,7 +140,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -157,7 +156,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -201,6 +202,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     DateJoined = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     HometownId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -323,7 +326,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     BlockerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     BlockeeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -350,7 +355,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     IsAccepted = table.Column<bool>(type: "bit", nullable: false),
                     IsLeader = table.Column<bool>(type: "bit", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -378,7 +385,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     FolloweeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -404,7 +413,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FriendId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -431,7 +442,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     InviteeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -464,7 +477,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     JoinDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -493,7 +508,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     InviteeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -524,7 +541,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -544,6 +563,38 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MessageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsRemove = table.Column<bool>(type: "bit", nullable: false),
+                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ChatRoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SentAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_AspNetUsers_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Messages_ChatRooms_ChatRoomId",
+                        column: x => x.ChatRoomId,
+                        principalTable: "ChatRooms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OTPs",
                 columns: table => new
                 {
@@ -553,7 +604,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -583,7 +636,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     SharePostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     OriginalPostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -621,7 +676,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     IsUsed = table.Column<bool>(type: "bit", nullable: false),
                     IssuedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     ExpiredAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -644,7 +701,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     SearchGroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     SearchUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -679,7 +738,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -703,7 +764,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     StartYear = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -736,7 +799,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SocialMediaLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -760,7 +825,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     IsCurrent = table.Column<bool>(type: "bit", nullable: false),
                     StartYear = table.Column<int>(type: "int", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -785,6 +852,61 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MessageMedias",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MediaUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MediaType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageMedias", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MessageMedias_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MessageReadStatuses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    ReadAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageReadStatuses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MessageReadStatuses_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MessageReadStatuses_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Comments",
                 columns: table => new
                 {
@@ -799,7 +921,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     SentAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -832,7 +956,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     MediaType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -854,7 +980,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -879,7 +1007,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -904,7 +1034,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PostId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -923,54 +1055,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messages",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MessageType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsRemove = table.Column<bool>(type: "bit", nullable: false),
-                    ForwardedMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ReplyMessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ChatRoomId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SentAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Messages_AspNetUsers_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Messages_ChatRooms_ChatRoomId",
-                        column: x => x.ChatRoomId,
-                        principalTable: "ChatRooms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Messages_Messages_ForwardedMessageId",
-                        column: x => x.ForwardedMessageId,
-                        principalTable: "Messages",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Messages_Messages_ReplyMessageId",
-                        column: x => x.ReplyMessageId,
-                        principalTable: "Messages",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Messages_Stories_StoryId",
-                        column: x => x.StoryId,
-                        principalTable: "Stories",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Viewers",
                 columns: table => new
                 {
@@ -979,7 +1063,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Reaction = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1014,7 +1100,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ResolvedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1053,57 +1141,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MessageMedias",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MediaUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MediaType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MessageMedias", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MessageMedias_Messages_MessageId",
-                        column: x => x.MessageId,
-                        principalTable: "Messages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MessageReadStatuses",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    MessageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    ReadAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MessageReadStatuses", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MessageReadStatuses_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MessageReadStatuses_Messages_MessageId",
-                        column: x => x.MessageId,
-                        principalTable: "Messages",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Notifications",
                 columns: table => new
                 {
@@ -1125,7 +1162,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     ReportId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DateSent = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1375,24 +1414,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 column: "ChatRoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_ForwardedMessageId",
-                table: "Messages",
-                column: "ForwardedMessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Messages_ReplyMessageId",
-                table: "Messages",
-                column: "ReplyMessageId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Messages_SenderId",
                 table: "Messages",
                 column: "SenderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Messages_StoryId",
-                table: "Messages",
-                column: "StoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_CommentId",
@@ -1675,9 +1699,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "PostMedias");
 
             migrationBuilder.DropTable(
-                name: "Privacies");
-
-            migrationBuilder.DropTable(
                 name: "Professions");
 
             migrationBuilder.DropTable(
@@ -1735,10 +1756,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "Positions");
 
             migrationBuilder.DropTable(
-                name: "ChatRooms");
+                name: "Stories");
 
             migrationBuilder.DropTable(
-                name: "Stories");
+                name: "ChatRooms");
 
             migrationBuilder.DropTable(
                 name: "Comments");

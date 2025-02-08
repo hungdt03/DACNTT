@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Domain.Abstractions;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
 using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Domain.Entity.MessageInfo;
@@ -8,7 +9,7 @@ using SocialNetwork.Domain.Entity.UserInfo;
 
 namespace SocialNetwork.Domain.Entity.System
 {
-    public class User : IdentityUser
+    public class User : IdentityUser, ISoftDelete
     {
         public string FullName { get; set; }
         public string? Bio { get; set; }
@@ -50,5 +51,7 @@ namespace SocialNetwork.Domain.Entity.System
         public ICollection<Story> Stories { get; set; }
         public ICollection<OTP> OTPs { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset DeletedAt { get; set; }
     }
 }

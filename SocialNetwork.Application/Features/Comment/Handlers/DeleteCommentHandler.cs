@@ -23,6 +23,13 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 ?? throw new NotFoundException("Không tìm thấy bình luận");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            var replies = await _unitOfWork.CommentRepository.GetAllRepliesByCommentIdAsync(comment.Id);
+            foreach (var commentItem in replies)
+            {
+                commentItem.ParentCommentId = comment.ParentCommentId;
+            }
+
             _unitOfWork.CommentRepository.DeleteComment(comment);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

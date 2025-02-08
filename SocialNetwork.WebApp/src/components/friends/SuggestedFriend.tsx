@@ -5,11 +5,15 @@ import { Avatar, Button } from "antd";
 import { PlusOutlined } from '@ant-design/icons'
 
 type SuggestedFriendProps = {
-    suggest: SuggestedFriendResource
+    suggest: SuggestedFriendResource;
+    onAddFriend: () => void;
+    onCancel: () => void;
 }
 
 const SuggestedFriend: FC<SuggestedFriendProps> = ({
-    suggest
+    suggest,
+    onAddFriend,
+    onCancel
 }) => {
     return <div className="flex flex-col rounded-lg overflow-hidden shadow border-[1px] border-gray-100 bg-white">
         <div className="w-full">
@@ -24,7 +28,7 @@ const SuggestedFriend: FC<SuggestedFriendProps> = ({
             <Avatar.Group>
                 {suggest.mutualFriends.map(friend => <Avatar src={friend.avatar} key={friend.id} />)}
             </Avatar.Group>
-            <Button icon={<PlusOutlined />} type="primary">Thêm bạn bè</Button>
+            {suggest.isAdd ? <button onClick={onCancel} className="w-full text-center py-[5px] bg-gray-100 hover:bg-gray-200">Hủy lời mời</button> : <Button onClick={onAddFriend} icon={<PlusOutlined />} type="primary">Thêm bạn bè</Button>}
         </div>
     </div>
 };
