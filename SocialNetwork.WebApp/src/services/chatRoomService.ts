@@ -24,6 +24,10 @@ class ChatRoomService {
         return axiosInterceptor.get('/api/chatRooms/')
     }
 
+    getAllPendingChatRooms() : Promise<DataResponse<ChatRoomResource[]>> {
+        return axiosInterceptor.get('/api/chatRooms/pending')
+    }
+
     getChatRoomById(chatRoomId: string) : Promise<DataResponse<ChatRoomResource>> {
         return axiosInterceptor.get('/api/chatRooms/' + chatRoomId)
     }
@@ -42,6 +46,12 @@ class ChatRoomService {
                 page: page,  
                 size: size  
             }
+        })
+    }
+
+    getOrCreateChatRoom(receiverId: string) : Promise<DataResponse<ChatRoomResource>> {
+        return axiosInterceptor.post('/api/chatRooms/get-or-create', {
+            receiverId
         })
     }
  

@@ -39,12 +39,10 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var friendShip = await _unitOfWork
-                .FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(request.UserId, userId, FriendShipStatus.ACCEPTED);
+                .FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(request.UserId, userId);
 
             if(friendShip != null)
             {
-                var notifications = await _unitOfWork.NotificationRepository.GetAllNotificationsByFriendShipId(friendShip.Id);
-                _unitOfWork.NotificationRepository.RemoveRange(notifications);
                 _unitOfWork.FriendShipRepository.DeleteFriendShip(friendShip);
             }
 

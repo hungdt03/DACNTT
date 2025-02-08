@@ -14,6 +14,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             _context = context;
         }
+
+        public async Task<bool> CheckIsBlockAsync(string blockeeId, string blockerId)
+        {
+            return await _context.BlockLists
+                .AnyAsync(b => (b.BlockerId == blockerId && b.BlockeeId == blockeeId) || (b.BlockerId == blockeeId && b.BlockeeId == blockerId));
+        }
+
         public async Task CreateNewBlockAsync(BlockList block)
         {
             await _context.BlockLists.AddAsync(block);

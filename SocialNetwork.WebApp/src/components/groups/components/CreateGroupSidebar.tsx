@@ -1,11 +1,9 @@
 import { Avatar, Button, Divider, Dropdown, MenuProps, Upload, UploadFile, UploadProps, message } from "antd";
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import images from "../../../assets";
 import { CloseOutlined } from '@ant-design/icons'
 import { Link } from "react-router-dom";
 import { GroupPrivacy } from "../../../enums/group-privacy";
-import { FriendResource } from "../../../types/friend";
-import friendService from "../../../services/friendService";
 import UploadButton from "../../uploads/UploadButton";
 import { getBase64, isValidImage } from "../../../utils/file";
 import { RcFile } from "antd/es/upload";
@@ -18,7 +16,6 @@ export type CreateGroupForm = {
     name: string;
     description: string;
     privacy: GroupPrivacy;
-    inviteFriends: FriendResource[];
     coverImage?: UploadFile;
     coverUrl: string;
 }
@@ -30,7 +27,6 @@ type CreateGroupSidebarProps = {
 const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
     onChange
 }) => {
-    const [friends, setFriends] = useState<FriendResource[]>([]);
     const [disabled, setDisabled] = useState<boolean>(true);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -38,7 +34,6 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
 
     const [values, setValues] = useState<CreateGroupForm>({
         description: '',
-        inviteFriends: [],
         name: '',
         privacy: GroupPrivacy.PUBLIC,
         coverUrl: ''
@@ -54,38 +49,6 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
         onChange?.(updateValues);
         setDisabled(false)
     };
-
-    const handleInviteFriendsChange = (friend: FriendResource) => {
-        const findIndex = values.inviteFriends.findIndex(fr => fr.id === friend.id);
-        if (findIndex === -1) {
-            const updateValues = {
-                ...values,
-                'inviteFriends': [...values.inviteFriends, friend],
-            }
-
-            setFriends(prev => ([
-                ...prev.filter(item => item.id !== friend.id)
-            ]))
-
-            setValues(updateValues);
-            onChange?.(updateValues)
-        }
-    }
-
-    const handleRemoveInviteFriendsChange = (friend: FriendResource) => {
-        const updateValues = {
-            ...values,
-            'inviteFriends': [...values.inviteFriends.filter(v => v.id !== friend.id)],
-        }
-
-        setFriends(prev => ([
-            friend,
-            ...prev,
-        ]))
-
-        setValues(updateValues);
-        onChange?.(updateValues)
-    }
 
     const handleUploadChange: UploadProps['onChange'] = async (info) => {
         if (!isValidImage(info.file as RcFile)) {
@@ -112,16 +75,6 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
         onChange?.(updateValues);
     };
 
-    const fetchFriends = async () => {
-        const response = await friendService.getAllMyFriends();
-        if (response.isSuccess) {
-            setFriends(response.data)
-        }
-    }
-
-    useEffect(() => {
-        fetchFriends()
-    }, [])
 
     const handleSubmit = async () => {
         const formData = new FormData();
@@ -137,7 +90,6 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
             message.success(response.message)
             setValues({
                 description: '',
-                inviteFriends: [],
                 name: '',
                 privacy: GroupPrivacy.PUBLIC,
                 coverUrl: ''
@@ -161,17 +113,6 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
             ),
         },
     ];
-
-    const menuFriends: MenuProps['items'] = friends.map(friend => ({
-        key: friend.id,
-        label: (
-            <button onClick={() => handleInviteFriendsChange(friend)} className="py-1 text-[16px] flex items-center gap-x-2">
-                <Avatar src={friend.avatar} />
-                <span>{friend.fullName}</span>
-            </button>
-        ),
-    }))
-
 
     return <div className="relative h-full col-span-3 shadow overflow-hidden">
         <div className="flex items-center gap-x-2 p-3">
@@ -227,21 +168,7 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
                         <span className="font-bold">{getGroupPrivacyTitle(values.privacy)}</span>
                     </div>}
                 </div>
-                <div className="flex flex-col gap-y-1">
-                    <span className="font-semibold pl-1 text-gray-700">Mời bạn bè (Không bắt buộc)</span>
-                    <Dropdown menu={{ items: menuFriends }} placement="bottom">
-                        <button className="w-full py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold">Chọn bạn bè</button>
-                    </Dropdown>
-                    {values.inviteFriends.length > 0 && <div className="flex flex-col gap-y-2 w-full">
-                        <span className="text-xs font-semibold text-gray-500 px-1">Đã chọn</span>
-                        <div className="flex items-center gap-2 flex-wrap w-full p-2 rounded-md border-[1px] border-gray-200 max-h-[250px] overflow-y-auto custom-scrollbar">
-                            {values.inviteFriends.map(friend => <button key={friend.id} className="flex gap-x-2 items-center p-1 px-2 rounded-md bg-sky-100 text-primary font-semibold">
-                                <span>{friend.fullName}</span>
-                                <CloseOutlined onClick={() => handleRemoveInviteFriendsChange(friend)} className="text-xs font-bold" />
-                            </button>)}
-                        </div>
-                    </div>}
-                </div>
+                
             </div>
         </div>
 

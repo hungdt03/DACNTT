@@ -8,5 +8,6 @@ namespace SocialNetwork.Application.Interfaces.Services
         Task SendNotificationToSpecificUser(string username, NotificationResponse notification);
         Task SendMessageToSpecificGroup(string groupName, MessageResponse message);
         Task SendReadStatusToSpecificGroup(string groupName, MessageResponse message, string userId);
+        Task JoinGroup(string userId, string groupName);
     }
 }

@@ -32,6 +32,13 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("pending")]
+        public async Task<IActionResult> GetAllPendingChatRooms()
+        {
+            var response = await mediator.Send(new GetAllPendingChatRoomQuery());
+            return Ok(response);
+        }
+
         [HttpGet("search")]
         public async Task<IActionResult> SearchChatRoomsByName([FromQuery] string name = "")
         {
@@ -50,6 +57,13 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> GetChatRoomById([FromRoute] Guid chatRoomId)
         {
             var response = await mediator.Send(new GetChatRoomByIdQuery(chatRoomId));
+            return Ok(response);
+        }
+
+        [HttpPost("get-or-create")]
+        public async Task<IActionResult> GetOrCreateChatRoom([FromBody] GetOrCreatePrivateChatCommand command)
+        {
+            var response = await mediator.Send(command);
             return Ok(response);
         }
     }

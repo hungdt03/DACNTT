@@ -1,6 +1,7 @@
 import { FC } from "react";
 import images from "../../assets";
 import { SearchUserSuggestResource } from "../../types/search/search-user-suggest";
+import { Link } from "react-router-dom";
 
 type SearchUserItemProps = {
     suggestUser: SearchUserSuggestResource
@@ -9,7 +10,7 @@ type SearchUserItemProps = {
 const SearchUserItem: FC<SearchUserItemProps> = ({
     suggestUser
 }) => {
-    return <div className="flex items-center justify-between p-4 bg-white shadow rounded-lg">
+    return <Link to={`/profile/${suggestUser.user.id}`} className="flex items-center justify-between p-4 bg-white border-[1px] rounded-lg">
         <div className="flex items-center gap-x-3">
             <img src={suggestUser.user.avatar ?? images.cover} className="w-[55px] h-[55px] rounded-full border-[1px] border-gray-100" />
             <div className="flex flex-col">
@@ -19,8 +20,7 @@ const SearchUserItem: FC<SearchUserItemProps> = ({
                 </span>
             </div>
         </div>
-        {suggestUser.isFriend ? <button className="px-2 text-sm py-1 rounded-md bg-sky-50 font-semibold text-primary hover:bg-sky-100">Nhắn tin</button> : <button className="px-2 text-sm py-1 rounded-md bg-sky-50 font-semibold text-primary hover:bg-sky-100">Thêm bạn bè</button>}
-    </div>
+    </Link>
 };
 
 export default SearchUserItem;

@@ -55,6 +55,7 @@ const chatPopupSlice = createSlice({
                 // Đặt trạng thái của chat room thành 'open'
                 state.chatRooms[index].state = 'open';
             }
+
         },
         remove: (state, action: PayloadAction<string>) => {
             if (state.chatRooms.some(s => s.chatRoom.id === action.payload)) {

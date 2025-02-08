@@ -25,7 +25,19 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             var chatRooms = await _context.ChatRooms
                 .Include(c => c.Members)
                     .ThenInclude(c => c.User)
-                .Where(c => c.Members.Any(s => (s.IsAccepted || !c.IsPrivate) && s.UserId.Equals(userId)))
+                .Where(c => !c.IsPrivate || c.Members.Any(s => s.IsAccepted && s.UserId.Equals(userId)))
+                .OrderByDescending(c => c.LastMessageDate)
+                .ToListAsync();
+
+            return chatRooms;
+        }
+
+        public async Task<List<ChatRoom>> GetAllPrivateChatRoomsByUserIdAsync(string userId)
+        {
+            var chatRooms = await _context.ChatRooms
+                .Include(c => c.Members)
+                    .ThenInclude(c => c.User)
+                .Where(c => c.IsPrivate && c.Members.Any(s => s.UserId.Equals(userId)))
                 .OrderByDescending(c => c.LastMessageDate)
                 .ToListAsync();
 
@@ -70,6 +82,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.ChatRooms
                  .Include(c => c.Members)
+                    .ThenInclude(c => c.User)
                  .SingleOrDefaultAsync(c => c.IsPrivate && c.Members.All(s => memberIds.Contains(s.UserId)));
         }
     }

@@ -1,7 +1,7 @@
 import { Check, MessageSquareText, MoreHorizontal, Plus, User, UserCheckIcon, X } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import { selectAuth } from "../../features/slices/auth-slice";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import images from "../../assets";
 import { Avatar, Button, Divider, Modal, Popover, Tabs, TabsProps, Tooltip, message } from "antd";
 import ProfilePostList from "./ProfilePostList";
@@ -20,8 +20,11 @@ import UserProfileMoreAction from "./user-profile/UserProfileMoreAction";
 import useModal from "../../hooks/useModal";
 import ReportPostModal from "../modals/reports/ReportPostModal";
 import reportService from "../../services/reportService";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import userService from "../../services/userService";
+import chatRoomService from "../../services/chatRoomService";
+import { AppDispatch } from "../../app/store";
+import { add } from "../../features/slices/chat-popup-slice";
 
 
 type ProfileUserContentProps = {
@@ -41,11 +44,13 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
     const [isFollow, setIsFollow] = useState(false);
     const [activeKey, setActiveKey] = useState<string>('1');
     const [reason, setReason] = useState('');
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+
+    const dispatch = useDispatch<AppDispatch>()
 
     const { isModalOpen, handleCancel, handleOk, showModal } = useModal()
     const { isModalOpen: openReport, handleCancel: cancelReport, handleOk: okReport, showModal: showReport } = useModal()
- 
+
     const handleSendFriendRequest = async () => {
         const response = await friendRequestService.createFriendRequest(targetUser.id)
         if (response.isSuccess) {
@@ -111,7 +116,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
     const handleBlockUser = async () => {
         const response = await userService.blockUser(targetUser.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
             navigate('/')
         } else {
@@ -121,7 +126,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
     const handleReportPost = async (reason: string) => {
         const response = await reportService.reportUser(targetUser.id, reason);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message)
         } else {
             message.error(response.message)
@@ -137,6 +142,16 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
         checkIsFollow()
     }, [targetUser])
+
+    const handleGetOrCreateChatRoom = async () => {
+        const response = await chatRoomService.getOrCreateChatRoom(targetUser.id);
+        console.log(response)
+        if (response.isSuccess) {
+            dispatch(add(response.data))
+        } else {
+            message.error(response.message)
+        }
+    }
 
     const items: TabsProps['items'] = [
         {
@@ -159,7 +174,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
             label: 'Đang theo dõi',
             children: <ProfileFolloweeList userId={targetUser.id} />,
         },
-      
+
     ];
 
 
@@ -171,7 +186,16 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                 </div>
 
                 <div className="flex flex-col lg:flex-row items-center lg:items-end -mt-20 gap-x-6 lg:-mt-12 px-8">
-                    <img alt="Ảnh đại diện" className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[1px] border-primary z-30" src={targetUser?.avatar ?? images.user} />
+                    <div className="relative">
+                        {targetUser?.haveStory ?
+                            <Link className="lg:w-32 lg:h-32 w-28 h-28 aspect-square rounded-full border-[3px] p-[2px] border-primary z-30 flex items-center justify-center" to={`/stories/${targetUser.id}`}>
+                                <img alt="Ảnh đại diện" className="rounded-full object-cover aspect-square" src={targetUser?.avatar ?? images.user} />
+                            </Link>
+                            : <img alt="Ảnh đại diện" className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[1px] border-primary z-30" src={targetUser?.avatar ?? images.user} />
+                        }
+                        
+                        {user?.isOnline && <div className="absolute bottom-0 right-0 p-4 rounded-full border-[2px] border-white bg-green-500"></div>}
+                    </div>
                     <div className="lg:py-6 py-3 flex flex-col lg:flex-row items-center gap-y-4 lg:gap-y-0 lg:items-end justify-between w-full">
                         <div className="flex flex-col items-center lg:items-start gap-y-1">
                             <span className="font-bold text-2xl">{targetUser?.fullName}</span>
@@ -203,7 +227,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                             </div>
                         }
 
-                        {(!friendRequest || friendRequest.status === FriendRequestStatus.NONE) && <Button onClick={handleSendFriendRequest} icon={<Plus size={16} />} type='primary'>Thêm bạn bè</Button>}
+                        {(!friendRequest) && <Button onClick={handleSendFriendRequest} icon={<Plus size={16} />} type='primary'>Thêm bạn bè</Button>}
 
                         {friendRequest?.status === FriendRequestStatus.PENDING && friendRequest?.sender?.id !== user?.id && <div className="flex items-center gap-x-2">
                             <Button onClick={handleAcceptFriendRequest} icon={<Check size={16} />} type='primary'>Chấp nhận</Button>
@@ -230,7 +254,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
                         }
 
-                        <Button type="primary" icon={<MessageSquareText className="mb-1" size={16} />}>
+                        <Button onClick={handleGetOrCreateChatRoom} type="primary" icon={<MessageSquareText className="mb-1" size={16} />}>
                             Nhắn tin
                         </Button>
 

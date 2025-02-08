@@ -50,6 +50,9 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
                     item.Friend.HaveStory = haveStory;
 
+                    item.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId)?.IsAccepted ?? false;
+                    item.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;
+
                     if (!isOnline)
                     {
                         var recentOnlineTime = await _userStatusService.GetLastActiveTimeAsync(userId);
@@ -84,8 +87,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                             item.RecentOnlineTime = mostRecentOnlineTime.Value;
                     }
                 }
-                
 
+              
                 var lastMessage = await _unitOfWork.MessageRepository.GetLastMessageByGroupIdAsync(chatRoom.Id);
 
                 if (lastMessage != null)
@@ -94,8 +97,6 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     var isRead = readUsers.Any(s => s.UserId == userId);
                     item.IsRead = isRead;
                 }
-
-              
 
                 response.Add(item);
             }

@@ -25,7 +25,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            friendRequest.Status = FriendShipStatus.NONE;
+            _unitOfWork.FriendShipRepository.DeleteFriendShip(friendRequest);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

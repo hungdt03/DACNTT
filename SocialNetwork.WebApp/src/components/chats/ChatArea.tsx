@@ -52,14 +52,14 @@ const ChatArea: FC<ChatAreaProps> = ({
     const fetchMessages = async (page: number, size: number) => {
         setLoading(true)
         const response = await messageService.getAllMessagesByChatRoomId(chatRoom.id, page, size);
-        setTimeout(() =>  setLoading(false), 1000)
+        setTimeout(() => setLoading(false), 1000)
         if (response.isSuccess) {
             setMessages(prevMessages => [...response.data, ...prevMessages])
             setPagination(response.pagination)
 
-                    
+
             if (containerRef.current) {
-                containerRef.current.scrollBy({ top: 50, behavior: 'instant' }); 
+                containerRef.current.scrollBy({ top: 50, behavior: 'instant' });
             }
         }
     }
@@ -196,7 +196,6 @@ const ChatArea: FC<ChatAreaProps> = ({
             status: 'sending',
             medias: [],
             sender: user!,
-            seen: true
         };
 
         setPendingMessages(prev => [...prev, tempMessage]);
@@ -265,7 +264,7 @@ const ChatArea: FC<ChatAreaProps> = ({
             entries => {
                 if (entries[0].isIntersecting) {
                     pagination.hasMore && !loading && fetchMessages(pagination.page + 1, pagination.size)
-               
+
                 }
             },
             { root: containerRef.current, rootMargin: '0px' }
@@ -299,11 +298,6 @@ const ChatArea: FC<ChatAreaProps> = ({
             </div>
 
             <div className="flex gap-x-1 items-center">
-                <Tooltip title="Gọi điện">
-                    <button onClick={() => { }} className="p-2 bg-transparent border-none">
-                        <PhoneOutlined className="rotate-90" />
-                    </button>
-                </Tooltip>
                 <Tooltip placement="left" title="Thông tin cuộc trò chuyện">
                     <button onClick={() => onToggleChatDetails()} className="p-2 bg-transparent border-none">
                         <MinusOutlined />
@@ -313,9 +307,10 @@ const ChatArea: FC<ChatAreaProps> = ({
         </div>
 
         <div ref={containerRef} className="flex flex-col h-full gap-y-3 w-full overflow-y-auto custom-scrollbar p-4">
-            {!pagination.hasMore && !loading && (
-                <p className="text-center text-gray-500 text-sm">Không còn tin nhắn nào để tải.</p>
-            )}
+            {!pagination.hasMore && chatRoom.isPrivate && chatRoom.friend && <div className="flex flex-col gap-y-1 items-center">
+                <Avatar src={chatRoom.friend.avatar} className="w-[80px] h-[80px]" />
+                <span className="text-sm text-gray-600 font-bold">{chatRoom.friend.fullName}</span>
+            </div>}
             {loading && <p className="text-center text-gray-500 text-sm">Đang tải tin nhắn ...</p>}
             <div id="messenger-scroll-trigger" className="w-full h-1" />
 

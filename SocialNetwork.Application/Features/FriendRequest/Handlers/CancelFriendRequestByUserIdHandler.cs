@@ -30,7 +30,7 @@ namespace SocialNetwork.Application.Features.FriendRequest.Handlers
             if (friendRequest == null) throw new AppException("Chưa có lời mời kết bạn giữa 2 bạn");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            friendRequest.Status = FriendShipStatus.NONE;
+            _unitOfWork.FriendShipRepository.DeleteFriendShip(friendRequest);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             return new BaseResponse()

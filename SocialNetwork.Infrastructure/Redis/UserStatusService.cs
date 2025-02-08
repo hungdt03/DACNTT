@@ -86,5 +86,14 @@ namespace SocialNetwork.Infrastructure.Redis
 
             return activeUsers.Select(user => user.ToString());
         }
+
+        public async Task<List<string>> GetAllConnections(string userId)
+        {
+            var db = _redis.GetDatabase();
+            var connections = await db.SetMembersAsync($"user_connections:{userId}");
+
+            return connections.Select(conn => conn.ToString()).ToList();
+        }
+
     }
 }

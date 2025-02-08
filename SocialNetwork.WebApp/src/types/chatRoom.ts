@@ -12,4 +12,6 @@ export type ChatRoomResource  = {
     isRead: boolean;
     isOnline: boolean;
     recentOnlineTime: Date;
+    isAccept: boolean;
+    isRecipientAccepted: boolean;
 }

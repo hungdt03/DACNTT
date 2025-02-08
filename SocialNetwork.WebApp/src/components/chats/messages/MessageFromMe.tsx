@@ -18,7 +18,7 @@ const MessageFromMe: FC<MessageFromMeProps> = ({
         <div className="flex flex-col items-end gap-y-1 max-w-[70%] w-full">
             <Tooltip placement="left" title={<span className="text-[12px]">{message.status === 'sending' ? 'Đang gửi' : `${formatTimeMessage(new Date(message.sentAt))}`}</span>}>
                 {message.medias && <MessageMedia medias={message.medias} />}
-                {message.content && <p className="bg-sky-500 text-white p-2 rounded-lg text-sm break-words max-w-full">
+                {message.content && <p className="bg-sky-500 text-[13px] text-white p-2 rounded-lg break-words max-w-full">
                     {message.content}
                 </p>}
             </Tooltip>

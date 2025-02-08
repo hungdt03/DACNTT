@@ -38,6 +38,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             friendRequest.Status = FriendShipStatus.ACCEPTED;
+            friendRequest.IsConnect = true;
 
             var memberIds = new List<string>
             {

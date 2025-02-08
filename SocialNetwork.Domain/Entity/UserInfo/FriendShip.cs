@@ -10,5 +10,6 @@ namespace SocialNetwork.Domain.Entity.UserInfo
         public User User { get; set; }
         public string FriendId { get; set; }
         public User Friend { get; set; }
+        public bool IsConnect {  get; set; }
     }
 }

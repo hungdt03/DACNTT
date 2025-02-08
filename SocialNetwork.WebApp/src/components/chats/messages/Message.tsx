@@ -7,6 +7,7 @@ import images from "../../../assets";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../../features/slices/auth-slice";
 import { ChatRoomResource } from "../../../types/chatRoom";
+import MessageSystem from "./MessageSystem";
 
 type MessageProps = {
     isMe?: boolean;
@@ -21,9 +22,9 @@ const Message: FC<MessageProps> = ({
 }) => {
     const { user } = useSelector(selectAuth)
     return <div className="flex flex-col gap-y-1">
-        {isMe ? <MessageFromMe isShowCheck={!message.seen} message={message} /> : <MessageFromOther chatRoom={chatRoom} message={message} />}
+        {isMe ? <MessageFromMe isShowCheck={false} message={message} /> : message.sender ? <MessageFromOther chatRoom={chatRoom} message={message} /> : <MessageSystem message={message} />}
         <div className="flex justify-end gap-x-1">
-            {message?.reads?.filter(read => read.userId !== user?.id).map(read => 
+            {((chatRoom.isRecipientAccepted && chatRoom.isPrivate) || !chatRoom.isPrivate) && message?.reads?.filter(read => read.userId !== user?.id).map(read => 
                 <Tooltip key={read?.user?.id} title={read?.user?.fullName ?? 'Anonymous user'}>
                     <Avatar className="w-4 h-4" src={read?.user?.avatar ?? images.user} />
                 </Tooltip>

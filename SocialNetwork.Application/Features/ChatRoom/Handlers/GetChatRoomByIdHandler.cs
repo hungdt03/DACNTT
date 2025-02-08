@@ -44,7 +44,9 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                        .IsUserHaveStoryAsync(friend.UserId);
 
                 response.Friend.HaveStory = haveStory;
-
+                response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId)?.IsAccepted ?? false;
+                response.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;
+                
                 if (!isOnline)
                 {
                     var recentOnlineTime = await _userStatusService.GetLastActiveTimeAsync(userId);

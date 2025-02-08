@@ -41,7 +41,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
             var existedRequest = await _unitOfWork.FriendShipRepository
                 .GetFriendShipByUserIdAndFriendIdAsync(userId, request.ReceiverId);
 
-            if (existedRequest != null && !existedRequest.Status.Equals(FriendShipStatus.NONE)) throw new AppException("Đã tồn tại lời mời kết bạn giữa hai người này");
+            if (existedRequest != null) throw new AppException("Đã tồn tại lời mời kết bạn hoặc đã là bạn bè");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 

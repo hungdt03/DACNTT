@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { CloseOutlined, MinusOutlined, PhoneOutlined, DownOutlined } from '@ant-design/icons'
+import { CloseOutlined, MinusOutlined, DownOutlined } from '@ant-design/icons'
 import images from "../../assets";
 import Message from "./messages/Message";
 import { ChatRoomResource } from "../../types/chatRoom";
@@ -9,7 +9,7 @@ import messageService from "../../services/messageService";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import BoxSendMessage, { BoxMessageType } from "./BoxSendMessage";
-import { Popover, Tooltip, UploadFile } from "antd";
+import { Avatar, Popover, Tooltip, UploadFile } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
 import { formatTime } from "../../utils/date";
@@ -66,18 +66,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
     const fetchMessages = async (page: number, size: number) => {
         const response = await messageService.getAllMessagesByChatRoomId(room.id, page, size);
         if (response.isSuccess) {
-            const normalizeMessage = response.data.map(msg => {
-                if(msg.senderId === user?.id) {
-                    let seen = (msg?.reads?.filter(r => r.userId !== user.id)?.length ?? 0) === 0
-                    msg.seen = seen;
-
-                    return msg;
-                }
-
-                return msg;
-            })
-
-            setMessages(prevMessages => [...normalizeMessage, ...prevMessages])
+            setMessages(prevMessages => [...response.data, ...prevMessages])
             setPagination(response.pagination)
         }
     }
@@ -93,7 +82,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
     useEffect(() => {
         fetchMessages(pagination.page, pagination.size);
-        
+
 
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
@@ -115,9 +104,9 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
                     setMessages((prev) => {
                         const updatedMessages = [...prev];
-                        if(message.senderId === user?.id) {
-                            const normalizeMessage = {...message}
-                            normalizeMessage.seen = (message.reads?.filter(msg => msg.userId !== user.id).length ?? 0) > 0
+                        if (message.senderId === user?.id) {
+                            const normalizeMessage = { ...message }
+                            // normalizeMessage.seen = (message.reads?.filter(msg => msg.userId !== user.id).length ?? 0) > 0
                             updatedMessages.push(normalizeMessage)
                         } else {
                             updatedMessages.push(message)
@@ -144,14 +133,14 @@ const ChatPopup: FC<ChatPopupProps> = ({
             // ON READ STATUS RECEIVE
             (message, userId) => {
                 if (message.chatRoomId === room.id) {
-                    if(message.senderId !== user?.id) {
+                    if (message.senderId !== user?.id) {
                         setIsRead(true)
                     }
 
                     setMessages((prevMessages) => {
                         const updatedMessages = [...prevMessages];
 
-                        
+
 
                         if (userId !== user?.id) {
                             const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === userId));
@@ -237,7 +226,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
             status: 'sending',
             medias: [],
             sender: user!,
-            seen: false,
         };
 
         setPendingMessages(prev => [...prev, tempMessage]);
@@ -297,13 +285,13 @@ const ChatPopup: FC<ChatPopupProps> = ({
     }
 
     const handleReadMessage = async () => {
-        const response = await messageService.readMessage(room.id);
+        await messageService.readMessage(room.id);
         dispatch(setChatRoomRead(room.id));
         setIsRead(true)
     }
 
-    return <div className="w-[320px] z-[200] h-[450px] relative bg-white rounded-t-xl overflow-hidden shadow-md">
-        <div className={cn("z-[200] text-white absolute top-0 left-0 right-0 shadow-md flex items-center justify-between border-[1px] border-gray-200 p-[2px]", isRead ? ' bg-white' : 'bg-sky-500')}>
+    return <div className="w-[320px] z-[200] relative bg-white rounded-t-xl overflow-hidden shadow-md">
+        <div className={cn("z-[200] text-white shadow-md flex items-center justify-between border-[1px] border-gray-200 p-[2px]", isRead ? ' bg-white' : 'bg-sky-500')}>
             <Popover trigger='click' content={<div className="flex flex-col gap-y-2">
                 {room.isPrivate && <Link to={`/profile/${room.friend?.id}`} className="px-2 py-1 rounded-md hover:bg-gray-100 w-full hover:text-black">Trang cá nhân</Link>}
                 <Link to={`/chat/${room.id}`} className="px-2 py-1 rounded-md hover:bg-gray-100 w-full hover:text-black">Mở trong messenger</Link>
@@ -344,13 +332,24 @@ const ChatPopup: FC<ChatPopupProps> = ({
             </div>
         </div>
 
-        <div className="overflow-y-auto absolute left-0 right-0 top-14 bottom-14 px-2 py-3 scrollbar-w-2 scrollbar-h-4 custom-scrollbar flex flex-col gap-y-3">
+        <div className={cn("overflow-y-auto px-2 py-3 custom-scrollbar flex flex-col gap-y-3", room.isPrivate && !room.isAccept ? 'h-[220px]' : 'h-[330px]')}>
+            {!pagination.hasMore && room.isPrivate && room.friend && <div className="flex flex-col gap-y-1 items-center">
+                <Avatar src={room.friend.avatar} size={'large'} />
+                <span className="text-sm text-gray-600 font-bold">{room.friend.fullName}</span>
+            </div>}
             {pagination.hasMore && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-primary my-2 text-xs">Tải thêm tin nhắn</button>}
             {[...messages, ...pendingMessages].map(message => <Message chatRoom={room} key={message.id} message={message} isMe={message.senderId === user?.id} />)}
             <div ref={messagesEndRef}></div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0">
+        <div className="sticky bottom-0">
+            {room.isPrivate && !room.isAccept && <div className="flex flex-col gap-y-2 p-3 bg-white border-b-[1px] border-t-[1px] border-gray-300">
+                <p className="text-[12px] text-gray-400 text-center">Nếu bạn trả lời, {room.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.</p>
+
+                <div className="flex justify-center">
+                    <button className="py-2 px-5 rounded-md text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200">Chặn</button>
+                </div>
+            </div>}
             {typing && <div key={room.id} className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
                 {typing}
             </div>}

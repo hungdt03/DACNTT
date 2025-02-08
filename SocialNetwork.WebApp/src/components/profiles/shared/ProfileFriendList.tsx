@@ -36,9 +36,6 @@ const ProfileFriendList: FC<ProfileFriendListProps> = ({
                     <span className="text-xs text-gray-500">{friend.mutualFriends} bạn chung</span>
                 </div>
             </Link>
-            <button>
-                <MoreHorizontal className="text-gray-600" size={16} />
-            </button>
         </div>
     ))}
     

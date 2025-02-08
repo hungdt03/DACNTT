@@ -15,6 +15,7 @@ using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.SignalR.Payload;
+using System.Runtime.InteropServices;
 
 namespace SocialNetwork.Infrastructure.SignalR
 {
@@ -59,42 +60,10 @@ namespace SocialNetwork.Infrastructure.SignalR
             User senderUser = await userManager.FindByIdAsync(userId)
                 ?? throw new AppException("Thông tin người gửi không tồn tại");
 
-            ChatRoom chatRoom = await unitOfWork.ChatRoomRepository.GetChatRoomByUniqueNameAsync(messageRequest.ChatRoomName);
-
+            ChatRoom chatRoom = await unitOfWork.ChatRoomRepository.GetChatRoomByUniqueNameAsync(messageRequest.ChatRoomName)
+                ?? throw new NotFoundException("Hội thoại không tồn tại");
+            
             await unitOfWork.BeginTransactionAsync();
-            bool isNoti = true;
-
-            if (chatRoom == null && messageRequest.ReceiverId != null)
-            {
-                var ids = new List<string>() { userId, messageRequest.ReceiverId };
-
-                var receiver = await userManager.FindByIdAsync(messageRequest.ReceiverId)
-                    ?? throw new AppException("ID của người nhận không đúng");
-
-                var firstMember = new ChatRoomMember()
-                {
-                    UserId = userId,
-                    IsAccepted = true,
-                };
-
-                var secondMember = new ChatRoomMember()
-                {
-                    UserId = receiver.Id,
-                    IsAccepted = false,
-                };
-
-                var members = new List<ChatRoomMember>() { firstMember, secondMember };
-
-                chatRoom = new ChatRoom()
-                {
-                    UniqueName = ChatUtils.GenerateChatRoomName(ids),
-                    IsPrivate = true,
-                    Members = members
-                };
-
-                await unitOfWork.ChatRoomRepository.CreateChatRoom(chatRoom);
-                isNoti = false;
-            }
 
             var recentReadStatus = await unitOfWork.MessageReadStatusRepository.GetMessageReadStatusByUserAndChatRoomId(userId, chatRoom.Id);
 
@@ -132,9 +101,48 @@ namespace SocialNetwork.Infrastructure.SignalR
             chatRoom.LastMessage = message.Content;
             chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
 
+            Domain.Entity.MessageInfo.Message systemMessage = null;
+
+            if (chatRoom.IsPrivate)
+            {
+                var senderMember = chatRoom.Members.FirstOrDefault(x => x.UserId == userId);
+                var recipientMember = chatRoom.Members.FirstOrDefault(x => x.UserId != userId);
+                if (senderMember != null && !senderMember.IsAccepted)
+                {
+                    string content = "Giờ đây, các bạn có thể nhắn tin cho nhau, xem những thông tin như Trạng thái hoạt động và thời điểm đọc tin nhắn.";
+
+                    systemMessage = new Domain.Entity.MessageInfo.Message()
+                    {
+                        ChatRoomId = chatRoom.Id,
+                        Content = content,
+                        MessageType = MessageType.SYSTEM,
+                        SentAt = DateTimeOffset.UtcNow,
+                    };
+
+                    await unitOfWork.MessageRepository.CreateMessageAsync(systemMessage);
+
+                    senderMember.IsAccepted = true;
+
+                    chatRoom.LastMessage = content;
+                    chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
+
+                    var connections = await userStatusService.GetAllConnections(userId);
+                    connections.ForEach(async connection =>
+                    {
+                        await Groups.AddToGroupAsync(Context.ConnectionId, chatRoom.UniqueName);
+                    });
+                }
+            }
+
             await unitOfWork.CommitTransactionAsync();
 
-            if(isNoti) await Clients.Group(chatRoom.UniqueName).SendAsync("NewMessage", ApplicationMapper.MapToMessage(message));
+            await Clients.Group(chatRoom.UniqueName).SendAsync("NewMessage", ApplicationMapper.MapToMessage(message));
+            
+            if(systemMessage != null)
+            {
+                await Clients.Group(chatRoom.UniqueName).SendAsync("NewMessage", ApplicationMapper.MapToMessage(systemMessage));
+            }
+           
         }
 
         public async Task TypingMessage(string groupName, string fullName)

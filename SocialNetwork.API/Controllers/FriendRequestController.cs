@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Features.FriendRequest.Commands;
+using SocialNetwork.Application.Features.FriendRequest.Queries;
 using SocialNetwork.Application.Features.FriendShip.Commands;
 using SocialNetwork.Application.Features.FriendShip.Queries;
 using SocialNetwork.Application.Features.User.Queries;
@@ -60,7 +61,7 @@ namespace SocialNetwork.API.Controllers
         [HttpGet("get-allrequest/{userId}")]
         public async Task<IActionResult> GetAllFriendRequestByUserId([FromRoute] string userId)
         {
-            var response = await mediator.Send(new GetFriendRequestByUserIdQuery(userId));
+            var response = await mediator.Send(new GetAllFriendRequestByUserIdQuery(userId));
             return Ok(response);
         }
     }

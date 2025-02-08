@@ -1,6 +1,4 @@
 ﻿
-using SocialNetwork.Domain.Entity;
-
 namespace SocialNetwork.Application.DTOs
 {
     public class ChatRoomResponse
@@ -9,6 +7,8 @@ namespace SocialNetwork.Application.DTOs
         public string Name { get; set; }
         public string UniqueName { get; set; }
         public bool IsPrivate { get; set; }
+        public bool IsAccept { get; set; }
+        public bool IsRecipientAccepted { get; set; }
         public string LastMessage { get; set; }
         public DateTimeOffset? LastMessageDate { get; set; }
         public ICollection<UserResponse> Members { get; set; }

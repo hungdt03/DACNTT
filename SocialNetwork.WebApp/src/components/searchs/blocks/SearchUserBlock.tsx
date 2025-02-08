@@ -1,5 +1,4 @@
 import { FC } from "react";
-import images from "../../../assets";
 import { SearchUserSuggestResource } from "../../../types/search/search-user-suggest";
 import SearchUserItem from "../SearchUserItem";
 

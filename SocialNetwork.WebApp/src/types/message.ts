@@ -11,7 +11,6 @@ export type MessageResource = {
     chatRoomId: string;
     status: string;
     reads?: ReadStatusResource[];
-    seen: boolean;
 }
 
 export type ReadStatusResource = {

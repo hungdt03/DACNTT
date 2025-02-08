@@ -75,6 +75,14 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var response = new List<PostResponse>();
             foreach (var item in takePosts)
             {
+                if(item.UserId != userId)
+                {
+                    var checkIsBlock = await unitOfWork.BlockListRepository
+                        .CheckIsBlockAsync(item.UserId, userId);
+
+                    if (checkIsBlock) continue;
+                }
+
                 var mapPost = ApplicationMapper.MapToPost(item);
 
                 if (item.PostType == PostType.ORIGINAL_POST)

@@ -14,22 +14,7 @@ const SearchGroupItem: FC<SearchGroupItemProps> = ({
     suggestGroup
 }) => {
 
-    const [isApproval, setIsApproval] = useState<boolean>(false);
-    const [isSubmit, setIsSubmit] = useState(false)
-
-    const handleJoinGroup = async (groupId: string) => {
-        const response = await groupService.createRequestJoinGroup(groupId);
-        if (response.isSuccess) {
-            setIsApproval(response.data.isApproval)
-            setIsSubmit(true)
-            message.success(response.message)
-        } else {
-            message.error(response.message)
-        }
-
-
-    }
-    return <div className="p-4 rounded-md bg-white flex items-center justify-between shadow">
+    return <Link to={`/groups/${suggestGroup.group.id}`} className="p-4 rounded-md bg-white flex items-center justify-between shadow">
         <div className="flex items-center gap-x-3">
             <img src={suggestGroup.group.coverImage ?? images.cover} className="w-[55px] h-[55px] rounded-md border-[1px] border-gray-100" />
             <div className="flex flex-col">
@@ -55,13 +40,7 @@ const SearchGroupItem: FC<SearchGroupItemProps> = ({
                 </div>}
             </div>
         </div>
-
-        {suggestGroup.isMember || isApproval
-            ? <Link className="px-3 py-1 rounded-md bg-sky-50 font-semibold text-primary hover:bg-sky-100" to={`/groups/${suggestGroup.group.id}`}>Truy cập</Link>
-            : (isSubmit && !isApproval ? <button className="px-3 py-1 text-sm rounded-md bg-sky-50 font-semibold text-primary">Đang chờ</button>
-                : <button onClick={() => handleJoinGroup(suggestGroup.group.id)} className="px-3 py-1 rounded-md bg-sky-50 font-semibold text-primary hover:bg-sky-100">Tham gia</button>)
-        }
-    </div>
+    </Link>
 };
 
 export default SearchGroupItem;

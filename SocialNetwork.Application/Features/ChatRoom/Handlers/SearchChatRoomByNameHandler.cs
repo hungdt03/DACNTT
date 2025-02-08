@@ -38,6 +38,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
                 var friend = chatRoom.Members.Count == 2 ? chatRoom.Members.SingleOrDefault(m => m.UserId != userId) : null;
                 var item = ApplicationMapper.MapToChatRoom(chatRoom);
+                item.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId)?.IsAccepted ?? false;
+                item.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;
 
                 if (friend != null)
                 {
