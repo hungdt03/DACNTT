@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
 import { Avatar, Button, Divider, Drawer, Form, FormProps, Input, Modal, Radio, Select, Switch, Tooltip, message } from "antd";
-import { DeleteOutlined, SettingOutlined } from '@ant-design/icons'
+import { SettingOutlined } from '@ant-design/icons'
 import { Plus } from "lucide-react";
 import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
 import useModal from "../../hooks/useModal";
@@ -10,8 +10,10 @@ import { Link, useLocation } from "react-router-dom";
 import groupService from "../../services/groupService";
 import { getGroupPrivacyTitle } from "../../utils/privacy";
 import { GroupPrivacy } from "../../enums/group-privacy";
-import { JoinGroupRequestResource } from "../../types/join-group";
+import { JoinGroupRequestResource, JoinGroupResource } from "../../types/join-group";
 import cn from "../../utils/cn";
+import { GroupRoleInvitationResource } from "../../types/group-role-invitation";
+import NotificationLabel from "../NotificationLabel";
 
 export type InviteFriendsRequest = {
     inviteeIds: string[];
@@ -32,24 +34,25 @@ export type EditGroupRequest = {
 type GroupHeaderProps = {
     group: GroupResource;
     requestJoin?: JoinGroupRequestResource;
-    onFetch: () => void
+    onFetch: () => void;
+    onFetchRequest: () => void
 }
 
 const GroupHeader: FC<GroupHeaderProps> = ({
     group,
     requestJoin,
-    onFetch
+    onFetch,
+    onFetchRequest
 }) => {
     const location = useLocation()
     const { handleCancel, handleOk, showModal, isModalOpen } = useModal();
     const [openSetting, setOpenSetting] = useState(false);
-
     const [loadingUpdate, setLoadingUpdate] = useState(false)
 
-    const [isApproval, setIsApproval] = useState<boolean>(false);
-    const [isSubmit, setIsSubmit] = useState(false);
+    const [roleInvitation, setRoleInvitation] = useState<GroupRoleInvitationResource>();
+
     const [isDisabled, setIsDisabled] = useState(false);
-    const [isChange, setIsChange] = useState(false)
+    const [isChange, setIsChange] = useState(false);
 
     const [form] = Form.useForm<EditGroupRequest>();
 
@@ -58,6 +61,15 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         groupId: group.id,
         inviteeIds: []
     });
+
+    const handleGetRoleInvitation = async () => {
+        const response = await groupService.getRoleInvitation(group.id);
+        if(response.isSuccess) {
+            setRoleInvitation(response.data)
+        } else {
+            setRoleInvitation(undefined)
+        }
+    }
 
     const handleInviteFriends = async () => {
         setLoading(true)
@@ -74,8 +86,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     const handleJoinGroup = async (groupId: string) => {
         const response = await groupService.createRequestJoinGroup(groupId);
         if (response.isSuccess) {
-            setIsApproval(response.data.isApproval)
-            setIsSubmit(true)
+            onFetchRequest()
             message.success(response.message)
         } else {
             message.error(response.message)
@@ -83,7 +94,8 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     }
 
     useEffect(() => {
-        if(group.privacy === GroupPrivacy.PUBLIC) setIsDisabled(true)
+        if(group.privacy === GroupPrivacy.PUBLIC) setIsDisabled(true);
+        handleGetRoleInvitation()
     }, [group])
 
     const onFinish: FormProps<EditGroupRequest>['onFinish'] = async (values) => {
@@ -97,6 +109,36 @@ const GroupHeader: FC<GroupHeaderProps> = ({
             form.resetFields()
         } else message.error(response.message)
     };
+
+    const handleAcceptRoleInvitation = async (invitationId: string) => {
+        const response = await groupService.acceptRoleInvitation(invitationId);
+        if(response.isSuccess) {
+            message.success(response.message)
+            handleGetRoleInvitation()
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleRejectRoleInvitation = async (invitationId: string) => {
+        const response = await groupService.rejectRoleInvitation(invitationId);
+        if(response.isSuccess) {
+            message.success(response.message)
+            handleGetRoleInvitation()
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleCancelJoinGroupRequest = async (userId: string) => {
+        const response = await groupService.cancelRequestJoinGroup(userId);
+        if(response.isSuccess) {
+            onFetchRequest()
+            message.success(response.message)
+        } else {
+            message.error(response.message);
+        }
+    }
 
     return <div className="bg-white w-full shadow">
         <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto overflow-hidden">
@@ -132,9 +174,9 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 </Button>
                                 <button className="bg-sky-50 text-primary px-3 py-1 rounded-md">Đã tham gia</button>
                             </>
-                        ) : (isSubmit && !isApproval) || requestJoin ? (
+                        ) : requestJoin ? (
                             <>
-                                <button className="px-3 py-[6px] text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold" >Hủy</button>
+                               <button onClick={() => handleCancelJoinGroupRequest(requestJoin.id)} className="px-3 py-[6px] text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold">Hủy</button>
                                 <Button className="cursor-text" type="primary">Chờ phê duyệt</Button>
                             </>
                         ) : (
@@ -144,6 +186,12 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                         )}
                     </div>
                 </div>
+
+                {roleInvitation && <NotificationLabel
+                    invitation={roleInvitation}
+                    onAccept={() => handleAcceptRoleInvitation(roleInvitation.id)}
+                    onReject={() => handleRejectRoleInvitation(roleInvitation.id)}
+                />}
 
                 <Divider className="my-3" />
 

@@ -1,6 +1,7 @@
 import { UserResource } from "./user";
 
 export type JoinGroupResource = {
+    id: string;
     isApproval: boolean;
 }
 

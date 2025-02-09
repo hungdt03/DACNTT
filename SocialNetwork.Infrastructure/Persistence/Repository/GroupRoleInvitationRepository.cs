@@ -48,6 +48,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<GroupRoleInvitation?> GetInvitationByInviteeAndGroupIdAsync(string userId, Guid groupId)
         {
             return await _context.GroupRoleInvitations
+                   .Include(g => g.Invitee)
+                   .Include(g => g.Inviter)
+                   .Include(g => g.Group)
                 .SingleOrDefaultAsync(g => g.InviteeId == userId && g.GroupId == groupId);
         }
 

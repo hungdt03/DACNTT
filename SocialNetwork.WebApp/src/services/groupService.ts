@@ -4,6 +4,7 @@ import axiosInterceptor from '../configurations/axiosInterceptor'
 import { GroupResource } from '../types/group';
 import { GroupApprovalSummaryResource } from '../types/group-approval-summary';
 import { GroupMemberResource } from '../types/group-member';
+import { GroupRoleInvitationResource } from '../types/group-role-invitation';
 import { JoinGroupRequestResource, JoinGroupResource } from '../types/join-group';
 import { PostMediaResource } from '../types/post';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
@@ -155,6 +156,15 @@ class GroupService {
             }
         })
     }
+
+    getRoleInvitation(groupId: string) : Promise<DataResponse<GroupRoleInvitationResource>> {
+        return axiosInterceptor.get('/api/groups/role-invitation/' + groupId)
+    }
+
+    revokeMemberPermission(memberId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/revoke-role/' + memberId)
+    }
+
 }
 
 export default GroupService.getInstance();

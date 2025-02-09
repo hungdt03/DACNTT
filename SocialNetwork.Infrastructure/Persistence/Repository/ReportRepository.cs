@@ -58,5 +58,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.Reports
                  .SingleOrDefaultAsync(r => r.Id == id);
         }
+
+        public void RemoveReport(Report report)
+        {
+            _context.Reports.Remove(report);
+        }
     }
 }

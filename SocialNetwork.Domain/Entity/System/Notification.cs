@@ -19,11 +19,11 @@ namespace SocialNetwork.Domain.Entity.System
 
         // Đối tượng mà thông báo liên quan đến (ví dụ: bài viết, bạn bè, bình luận)
         public Guid? JoinGroupRequestId { get; set; }
-        public Group? JoinGroupRequest { get; set; }
+        public JoinGroupRequest? JoinGroupRequest { get; set; }
         public Guid? GroupId { get; set; }
         public Group? Group { get; set; }
         public Guid? GroupRoleInvitationId { get; set; }
-        public Group? GroupRoleInvitation { get; set; }
+        public GroupRoleInvitation? GroupRoleInvitation { get; set; }
         public Guid? GroupInvitationId { get; set; }
         public GroupInvitation? GroupInvitation { get; set; }
         public Guid? PostId { get; set; }

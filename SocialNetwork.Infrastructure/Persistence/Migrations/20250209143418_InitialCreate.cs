@@ -1191,19 +1191,19 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         principalTable: "GroupInvitations",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_Notifications_GroupRoleInvitations_GroupRoleInvitationId",
+                        column: x => x.GroupRoleInvitationId,
+                        principalTable: "GroupRoleInvitations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Notifications_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Notifications_Groups_GroupRoleInvitationId",
-                        column: x => x.GroupRoleInvitationId,
-                        principalTable: "Groups",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_Groups_JoinGroupRequestId",
+                        name: "FK_Notifications_JoinGroupRequests_JoinGroupRequestId",
                         column: x => x.JoinGroupRequestId,
-                        principalTable: "Groups",
+                        principalTable: "JoinGroupRequests",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Notifications_Posts_PostId",
@@ -1679,12 +1679,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 name: "GroupMembers");
 
             migrationBuilder.DropTable(
-                name: "GroupRoleInvitations");
-
-            migrationBuilder.DropTable(
-                name: "JoinGroupRequests");
-
-            migrationBuilder.DropTable(
                 name: "MessageMedias");
 
             migrationBuilder.DropTable(
@@ -1740,6 +1734,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "GroupInvitations");
+
+            migrationBuilder.DropTable(
+                name: "GroupRoleInvitations");
+
+            migrationBuilder.DropTable(
+                name: "JoinGroupRequests");
 
             migrationBuilder.DropTable(
                 name: "Reports");

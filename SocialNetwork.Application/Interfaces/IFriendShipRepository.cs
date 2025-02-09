@@ -16,6 +16,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<(IEnumerable<FriendShip> FriendShips, int TotalCount)> GetAllFriendShipsAsyncByUserId(string userId, int page, int size, string status = "");
         Task<IEnumerable<FriendShip>> GetAllFriendShipsAsyncByUserId(string userId, string status = "");
         Task<int> CountFriendsByUserIdAsync(string userId);
-        Task<IEnumerable<FriendShip?>> GetAllFriendRequestByUserId(string userId, string status = FriendShipStatus.PENDING);
+        Task<(IEnumerable<FriendShip> FriendRequests, int TotalCount)> GetAllPendingFriendRequestByUserId(string userId, int page, int size);
     }
 }

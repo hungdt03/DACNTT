@@ -225,5 +225,18 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("role-invitation/{groupId}")]
+        public async Task<IActionResult> GetRoleInvitationByCurrentUserAndGroupId([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new GetRoleInvitationByGroupIdQuery(groupId));
+            return Ok(response);
+        }
+
+        [HttpPut("revoke-role/{memberId}")]
+        public async Task<IActionResult> RevokeMemberRole([FromRoute] Guid memberId)
+        {
+            var response = await mediator.Send(new RevokeUserPermissionCommand(memberId));
+            return Ok(response);
+        }
     }
 }

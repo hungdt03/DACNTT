@@ -5,8 +5,6 @@ import { PostResource } from "../../types/post";
 import postService from "../../services/postService";
 import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";
-import SharePost from "../posts/SharePost";
-import { PostType } from "../../enums/post-type";
 import PostSkeletonList from "../skeletons/PostSkeletonList";
 import Post from "../posts/Post";
 import { GroupResource } from "../../types/group";
@@ -95,7 +93,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
         <div ref={containerRef} className="flex flex-col gap-y-4">
             <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} group={group} />
             {posts.map(post => {
-                return <Post group={group} key={post.id} post={post} allowShare={group.privacy === GroupPrivacy.PUBLIC} />
+                return <Post onRemovePost={() => handleRemovePost(post.id)} group={group} key={post.id} post={post} allowShare={group.privacy === GroupPrivacy.PUBLIC} />
             })}
 
             {loading && <PostSkeletonList />}

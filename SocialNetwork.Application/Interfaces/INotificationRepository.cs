@@ -10,6 +10,7 @@ namespace SocialNetwork.Application.Interfaces
         void DeleteNotification(Notification notification);
         Task<List<Notification>> GetAllNotificationsByPostIdAsync(Guid postId);
         Task<List<Notification>> GetAllNotificationsByFriendShipId(Guid friendShipId);
+        Task<List<Notification>> GetAllNotificationsByJoinGroupRequestId(Guid joinGroupRequestId);
         void RemoveRange(IEnumerable<Notification> notifications);
     }
 }

@@ -38,6 +38,22 @@ class ReportService {
             }
         })
     }
+
+    handleReportGroupComment(reportId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/reports/group/comment/' + reportId)
+    }
+
+    handleReportGroupPost(reportId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/reports/group/post/' + reportId)
+    }
+
+    handleReportGroupMember(reportId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/reports/group/member/' + reportId)
+    }
+
+    removeGroupReport(reportId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/reports/group/' + reportId)
+    }
 }
 
 export default ReportService.getInstance();

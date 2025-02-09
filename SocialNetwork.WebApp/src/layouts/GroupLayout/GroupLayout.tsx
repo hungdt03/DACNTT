@@ -39,7 +39,7 @@ const GroupLayout: FC = () => {
     return <div className="grid grid-cols-12 w-full h-full overflow-hidden">
         {group?.isMine && <MyGroupManageSidebar group={group} />}
         <div id="group-layout" className={cn("w-full flex flex-col h-full bg-slate-100 overflow-y-auto", group?.isMine ? 'col-span-9' : 'col-span-12')}>
-            {group && <GroupHeader onFetch={fetchGroup} requestJoin={requestJoin} group={group} />}
+            {group && <GroupHeader onFetchRequest={fetchRequestJoin} onFetch={fetchGroup} requestJoin={requestJoin} group={group} />}
             <Outlet />
         </div>
     </div>

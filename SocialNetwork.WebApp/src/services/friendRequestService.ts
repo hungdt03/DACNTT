@@ -1,7 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { FriendRequestResource } from '../types/friendRequest';
-import { BaseResponse, DataResponse } from '../types/response';
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
 
 class FriendRequestService {
@@ -35,8 +35,13 @@ class FriendRequestService {
     getFriendRequestByUserId(userId: string) : Promise<DataResponse<FriendRequestResource>> {
         return axiosInterceptor.get('/api/friend-requests/'+ userId)
     }
-    getAllFriendRequestByUserId(userId: string) : Promise<DataResponse<FriendRequestResource[]>> {
-        return axiosInterceptor.get('/api/friend-requests/get-allrequest/'+ userId)
+    getAllFriendRequestByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<FriendRequestResource[]>> {
+        return axiosInterceptor.get('/api/friend-requests/get-allrequest/'+ userId, {
+            params: {
+                page,
+                size
+            }
+        })
     }
  
 }

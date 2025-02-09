@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250208215123_InitialCreate")]
+    [Migration("20250209143418_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -2119,11 +2119,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasForeignKey("GroupInvitationId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "GroupRoleInvitation")
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.GroupRoleInvitation", "GroupRoleInvitation")
                         .WithMany()
                         .HasForeignKey("GroupRoleInvitationId");
 
-                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "JoinGroupRequest")
+                    b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.JoinGroupRequest", "JoinGroupRequest")
                         .WithMany()
                         .HasForeignKey("JoinGroupRequestId");
 

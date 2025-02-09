@@ -8,10 +8,14 @@ import { formatTime, formatVietnamDate } from "../../utils/date";
 
 type ReportCommentProps = {
     report: ReportResource;
+    onKeep: () => void;
+    onRemove: () => void;
 }
 
 const ReportComment: FC<ReportCommentProps> = ({
-    report
+    report,
+    onKeep,
+    onRemove
 }) => {
     return <div className="p-4 rounded-md shadow bg-white flex flex-col gap-y-4">
         <span className="text-gray-500 border-[1px] p-2">
@@ -40,8 +44,8 @@ const ReportComment: FC<ReportCommentProps> = ({
         <Divider className="my-0" />
 
         <div className="flex items-center justify-end gap-x-3">
-            <Button type="primary">Giữ lại</Button>
-            <button className="py-[6px] text-sm px-4 rounded-md hover:bg-gray-200 bg-gray-100">Gỡ bình luận</button>
+            <Button onClick={onKeep} type="primary">Giữ lại</Button>
+            <button onClick={onRemove} className="py-[6px] text-sm px-4 rounded-md hover:bg-gray-200 bg-gray-100">Gỡ bình luận</button>
         </div>
     </div>
 };

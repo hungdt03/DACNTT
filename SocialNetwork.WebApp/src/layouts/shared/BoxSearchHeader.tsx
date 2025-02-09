@@ -8,6 +8,7 @@ import { SearchAllSuggestResource } from "../../types/search/search-all-suggest"
 import SearchSuggestionList from "../../components/searchs/SearchSuggestionList";
 import SearchTextPlain from "../../components/searchs/suggest/SearchTextPlain";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import LoadingIndicator from "../../components/LoadingIndicator";
 
 const BoxSearchHeader: FC = () => {
     const [searchValue, setSearchValue] = useState('');
@@ -47,25 +48,26 @@ const BoxSearchHeader: FC = () => {
     const handleSearchSuggestion = async (value: string) => {
         setLoading(true)
         const response = await searchService.searchAllSuggestion(value);
-        setLoading(false)
-        if (response.isSuccess) {
-            setSearchSuggestions(response.data)
-        }
+        setTimeout(() => {
+            setLoading(false)
+            if (response.isSuccess) {
+                setSearchSuggestions(response.data)
+            }
+        }, 1000)
 
     }
 
-     const handleClickSuggestText = async (value: string) => {
-            const response = await searchService.addSearchTextPlain(value);
-            if (response.isSuccess) {
-                navigate(`/search/?q=${encodeURIComponent(value)}`)
-            }
+    const handleClickSuggestText = async (value: string) => {
+        const response = await searchService.addSearchTextPlain(value);
+        if (response.isSuccess) {
+            navigate(`/search/?q=${encodeURIComponent(value)}`)
         }
+    }
 
     return <Popover placement="bottomLeft" arrow={false} open={openPopover} content={<div className="w-[380px]" ref={searchResultRef}>
         {
             loading ? <div className="w-full flex justify-center gap-x-4 items-center">
-                <Spin size="small" />
-                <span className="text-gray-500">Đang tìm kiếm</span>
+                <LoadingIndicator />
             </div>
                 : searchValue.trim() && !searchSuggestions?.groups.length && !searchSuggestions.users.length
                     ? <SearchTextPlain onClick={() => handleClickSuggestText(searchValue)} searchValue={searchValue} />

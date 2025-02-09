@@ -130,6 +130,18 @@ namespace SocialNetwork.Application.Mappers
             };
         }
 
+        public static GroupRoleInvitationResponse MapToGroupRoleInvitation(GroupRoleInvitation groupRoleInvitation)
+        {
+            return new GroupRoleInvitationResponse()
+            {
+                Id = groupRoleInvitation.Id,
+                Group = groupRoleInvitation.Group != null ? MapToGroup(groupRoleInvitation.Group) : null,
+                Invitee = groupRoleInvitation.Invitee != null ? MapToUser(groupRoleInvitation.Invitee) : null,
+                Inviter = groupRoleInvitation.Inviter != null ? MapToUser(groupRoleInvitation.Inviter) : null,
+                Role = groupRoleInvitation.Role
+            };
+        }
+
         public static JoinGroupRequestResponse MapToJoinGroupRequest(JoinGroupRequest joinGroupRequest)
         {
             return new JoinGroupRequestResponse()

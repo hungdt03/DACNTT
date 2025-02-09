@@ -2,7 +2,7 @@ import { Avatar, Button, Divider, Dropdown, MenuProps, Upload, UploadFile, Uploa
 import { FC, useState } from "react";
 import images from "../../../assets";
 import { CloseOutlined } from '@ant-design/icons'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GroupPrivacy } from "../../../enums/group-privacy";
 import UploadButton from "../../uploads/UploadButton";
 import { getBase64, isValidImage } from "../../../utils/file";
@@ -29,6 +29,7 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
 }) => {
     const [disabled, setDisabled] = useState<boolean>(true);
     const [loading, setLoading] = useState<boolean>(false);
+    const navigate = useNavigate()
 
     const { user } = useSelector(selectAuth)
 
@@ -94,6 +95,8 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
                 privacy: GroupPrivacy.PUBLIC,
                 coverUrl: ''
             })
+
+            navigate(`/groups/${response.data}`)
         } else {
             message.error(response.message)
         }

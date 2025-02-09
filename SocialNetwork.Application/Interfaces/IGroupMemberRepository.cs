@@ -13,5 +13,6 @@ namespace SocialNetwork.Application.Interfaces
         void RemoveGroupMember(GroupMember groupMember);
         Task<int> CountGroupMembersByGroupIdAsync(Guid groupId);
         Task<int> CountAdminsByGroupIdAsync(Guid groupId);
+        Task<List<GroupMember>> GetAllAdminAndModeratoInGroupAsync(Guid groupId);
     }
 }

@@ -14,5 +14,7 @@ namespace SocialNetwork.Domain.Constants
         public const string VIEW_STORY = "VIEW_STORY";
         public const string REACT_STORY = "REACT_STORY";
         public const string INVITE_JOIN_GROUP = "INVITE_JOIN_GROUP";
+        public const string JOIN_GROUP_REQUEST = "JOIN_GROUP_REQUEST";
+        public const string INVITE_ROLE_GROUP = "INVITE_ROLE_GROUP";
     }
 }

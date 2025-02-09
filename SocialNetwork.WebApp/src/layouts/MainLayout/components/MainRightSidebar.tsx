@@ -1,7 +1,7 @@
-import { Avatar, Tabs, TabsProps } from "antd";
+import { Avatar, Empty, message, Tabs, TabsProps, Tooltip } from "antd";
 import { FC, useEffect, useState } from "react";
 import images from "../../../assets";
-import { Plus, X } from "lucide-react";
+import { Check, CircleMinus, Plus, X } from "lucide-react";
 import { ChatRoomResource } from "../../../types/chatRoom";
 import chatRoomService from "../../../services/chatRoomService";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,12 +12,14 @@ import friendRequestService from "../../../services/friendRequestService";
 import { selectAuth } from "../../../features/slices/auth-slice";
 import { FriendRequestResource } from "../../../types/friendRequest";
 import { toast } from "react-toastify";
+import { SuggestedFriendResource } from "../../../types/suggested-friend";
+import friendService from "../../../services/friendService";
+import LoadingIndicator from "../../../components/LoadingIndicator";
 
 const MainRightSidebar: FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector(selectAuth);
     const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
-    const [listFriendRequests, setListFriendRequests] = useState<FriendRequestResource[]>([]);
 
     useEffect(() => {
         const fetchChatRooms = async () => {
@@ -27,104 +29,18 @@ const MainRightSidebar: FC = () => {
             }
         };
         fetchChatRooms();
-
-        loadFriendRequests();
     }, []);
-    const loadFriendRequests = async () => {
-        const response = await friendRequestService.getAllFriendRequestByUserId(user?.id ?? "");
-        if (response.isSuccess) {
-            setListFriendRequests(response.data);
-        }
-    };
-    
 
-    // // Dữ liệu giả định 
-    const friendSuggestions = [
-        { id: 4, name: "Phạm Văn C", avatar: images.user },
-        { id: 5, name: "Hoàng Thị D", avatar: images.user },
-        { id: 6, name: "Đặng Văn E", avatar: images.user },
-    ];
-    const handleCancelFriendRequest = async (requestId: string) => {
-        const response = await friendRequestService.cancelFriendRequest(requestId);
-        if (response.isSuccess) {
-            toast.success(response.message);
-            loadFriendRequests();
-        } else {
-            toast.error(response.message);
-        }
-    };
-
-    const handleAcceptFriendRequest = async (requestId: string) => {
-        const response = await friendRequestService.acceptFriendRequest(requestId);
-        if (response.isSuccess) {
-            toast.success(response.message);
-            loadFriendRequests();
-        } else {
-            toast.error(response.message);
-        }
-    };
-
-    // Nội dung của tab "Lời mời kết bạn"
-    const FriendRequestsTab = () => (
-        <div className="flex flex-col gap-y-4">
-            <div className="flex flex-col gap-y-2">
-                {listFriendRequests.map((request) => (
-                   <div key={request.sender.id} className="flex items-center justify-between hover:bg-gray-100 px-2 py-2 rounded-md">
-                   <Link to={`/profile/${request.sender.id}`} className="flex items-center gap-x-3 cursor-pointer">
-                       <Avatar size="default" src={request.sender.avatar} />
-                       <span className="font-semibold text-sm">{request.sender.fullName}</span>
-                   </Link>
-                   <div className="flex items-center gap-x-2">
-                       <button className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100" onClick={() => handleCancelFriendRequest(request.id)}>
-                           <X size={16} className="text-gray-600" />
-                       </button>
-                       <button className="w-7 h-7 flex items-center justify-center rounded-full bg-sky-100"onClick={() => handleAcceptFriendRequest(request.id)}>
-                           <Plus size={16} className="text-sky-500" />
-                       </button>
-                   </div>
-               </div>                     
-                ))}
-            </div>
-            <Link to='/friends/requests' className="text-center bg-sky-100 text-sky-500 py-[6px] rounded-md text-sm">Xem thêm</Link>
-        </div>
-    );
-
-    // Nội dung của tab "Gợi ý kết bạn"
-    const FriendSuggestionsTab = () => (
-        <div className="flex flex-col gap-y-4">
-            <div className="flex flex-col gap-y-2">
-                {friendSuggestions.map((suggestion) => (
-                    <div key={suggestion.id} className="flex items-center justify-between hover:bg-gray-100 px-2 py-2 rounded-md">
-                        <div className="flex items-center gap-x-3">
-                            <Avatar size="default" src={suggestion.avatar} />
-                            <span className="font-semibold text-sm">{suggestion.name}</span>
-                        </div>
-                        <div className="flex items-center gap-x-2">
-                            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100">
-                                <X size={16} className="text-gray-600" />
-                            </button>
-                            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-sky-100">
-                                <Plus size={16} className="text-sky-500" />
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-            <Link to='/friends/suggests' className="text-center bg-sky-100 text-sky-500 py-[6px] rounded-md text-sm">Xem thêm</Link>
-        </div>
-    );
-
-    // Cấu hình các tab
     const items: TabsProps["items"] = [
         {
             key: "1",
             label: "Lời mời kết bạn",
-            children: <FriendRequestsTab />,
+            children: user ? <FriendRequestsTab userId={user.id} /> : <LoadingIndicator />,
         },
         {
             key: "2",
             label: "Gợi ý kết bạn",
-            children: <FriendSuggestionsTab />,
+            children: user ? <FriendSuggestionsTab userId={user.id} /> : <LoadingIndicator />,
         },
     ];
 
@@ -169,3 +85,141 @@ const MainRightSidebar: FC = () => {
 };
 
 export default MainRightSidebar;
+
+
+type FriendRequestsTabProps = {
+    userId: string;
+}
+
+const FriendRequestsTab: FC<FriendRequestsTabProps> = ({
+    userId
+}) => {
+    const [listFriendRequests, setListFriendRequests] = useState<FriendRequestResource[]>([]);
+    const [hasNext, setHasNext] = useState(false);
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        loadFriendRequests();
+    }, [userId])
+
+    const loadFriendRequests = async () => {
+        setLoading(true)
+        const response = await friendRequestService.getAllFriendRequestByUserId(userId, 1, 6);
+        setLoading(false)
+        if (response.isSuccess) {
+            setListFriendRequests(response.data);
+            setHasNext(response.pagination.hasMore)
+        }
+    };
+
+    const handleCancelFriendRequest = async (requestId: string) => {
+        const response = await friendRequestService.cancelFriendRequest(requestId);
+        if (response.isSuccess) {
+            message.success(response.message);
+            loadFriendRequests();
+        } else {
+            message.error(response.message);
+        }
+    };
+
+    const handleAcceptFriendRequest = async (requestId: string) => {
+        const response = await friendRequestService.acceptFriendRequest(requestId);
+        if (response.isSuccess) {
+            message.success(response.message);
+            loadFriendRequests();
+        } else {
+            message.error(response.message);
+        }
+    };
+
+    return <div className="flex flex-col gap-y-4">
+        <div className="flex flex-col gap-y-2">
+            {listFriendRequests.map((request) => (
+                <div key={request.sender.id} className="flex items-center justify-between hover:bg-gray-100 px-2 py-2 rounded-md">
+                    <Link to={`/profile/${request.sender.id}`} className="flex items-center gap-x-3 cursor-pointer hover:text-black">
+                        <Avatar size="default" src={request.sender.avatar} />
+                        <span className="font-semibold text-sm">{request.sender.fullName}</span>
+                    </Link>
+                    <div className="flex items-center gap-x-2">
+                        <Tooltip title='Gỡ lời mời'>
+                            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-red-100" onClick={() => handleCancelFriendRequest(request.id)}>
+                                <CircleMinus size={16} className="text-red-600" />
+                            </button>
+                        </Tooltip>
+                        <Tooltip title='Chấp nhận'>
+                            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-sky-100" onClick={() => handleAcceptFriendRequest(request.id)}>
+                                <Check size={16} className="text-sky-500" />
+                            </button>
+                        </Tooltip>
+                    </div>
+                </div>
+            ))}
+
+            {!loading && listFriendRequests.length === 0 && <Empty description='Không có lời mời kết bạn nào' />}
+            {loading && <LoadingIndicator />}
+        </div>
+        {!loading && hasNext && <Link to='/friends/requests' className="text-center bg-sky-100 text-sky-500 py-[6px] rounded-md text-sm">Xem thêm</Link>}
+    </div>
+}
+
+
+type FriendSuggestionsTabProps = {
+    userId: string;
+}
+
+const FriendSuggestionsTab: FC<FriendSuggestionsTabProps> = ({
+    userId
+}) => {
+    const [friendSuggestions, setFriendSuggestions] = useState<SuggestedFriendResource[]>([]);
+    const [hasNext, setHasNext] = useState(false);
+    const [loading, setLoading] = useState(false)
+
+    const fetchSuggestedFriends = async () => {
+        setLoading(true)
+        const response = await friendService.getSuggestedFriends(1, 6);
+        setLoading(false)
+        if (response.isSuccess) {
+            setHasNext(response.pagination.hasMore);
+            setFriendSuggestions(response.data)
+        }
+    }
+
+    const handleSendRequest = async (userId: string) => {
+        const response = await friendRequestService.createFriendRequest(userId);
+        if (response.isSuccess) {
+            message.success(response.message);
+            fetchSuggestedFriends()
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    useEffect(() => {
+        fetchSuggestedFriends()
+    }, [userId])
+
+    return <div className="flex flex-col gap-y-4">
+        <div className="flex flex-col gap-y-2">
+            {friendSuggestions.map((suggestion) => (
+                <div key={suggestion.user.id} className="flex items-center justify-between hover:bg-gray-100 px-2 py-2 rounded-md">
+                    <div className="flex items-center gap-x-3">
+                        <Avatar size="default" src={suggestion.user.avatar} />
+                        <Link to={`/profile/${suggestion.user.id}`} className="hover:underline hover:text-black font-semibold text-sm">{suggestion.user.fullName}</Link>
+                    </div>
+                    <div className="flex items-center gap-x-2">
+                        <Tooltip title='Thêm bạn bè'>
+                            <button onClick={() => handleSendRequest(suggestion.user.id)} className="w-7 h-7 flex items-center justify-center rounded-full bg-sky-100">
+                                <Plus size={16} className="text-sky-500" />
+                            </button>
+                        </Tooltip>
+                    </div>
+                </div>
+            ))}
+
+            {!loading && friendSuggestions.length === 0 && <Empty description='Không có gợi ý kết bạn nào phù hợp' />}
+
+            {loading && <LoadingIndicator />}
+        </div>
+        {!loading && hasNext && <Link to='/friends/suggests' className="text-center bg-sky-100 text-sky-500 py-[6px] rounded-md text-sm">Xem thêm</Link>}
+    </div>
+}

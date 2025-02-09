@@ -197,8 +197,8 @@ const MyProfileContent: FC<MyProfileContentProps> = ({
             <div className="flex flex-col lg:flex-row items-center lg:items-end -mt-20 gap-x-6 lg:-mt-12 px-8">
                 <div className="relative z-30 flex-shrink-0">
                     {user?.haveStory ?
-                        <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[3px] p-[2px] border-primary flex items-center justify-center aspect-square" to={`/stories/${user.id}`}>
-                            <img alt="Ảnh đại diện" className="object-cover" src={user?.avatar ?? images.user} />
+                        <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[4px] p-1 border-primary flex items-center justify-center aspect-square" to={`/stories/${user.id}`}>
+                            <img alt="Ảnh đại diện" className="object-cover w-full h-full rounded-full" src={user?.avatar ?? images.user} />
                         </Link>
                         : <img
                             alt="Ảnh đại diện"

@@ -10,5 +10,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<(List<Report> Reports, int TotalCount)> GetAllPendingReportsByGroupIdAsync(Guid groupId, int page, int size);
         Task<Report?> GetReportByIdAsync(Guid id);
         Task<int> CountPendingReportsByGroupIdAsync(Guid groupId);
+        void RemoveReport(Report report);
     }
 }

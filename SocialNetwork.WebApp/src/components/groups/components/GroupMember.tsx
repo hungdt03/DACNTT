@@ -15,6 +15,7 @@ type GroupMemberProps = {
     countMember: number;
     onKickMember?: () => void;
     onChooseNewAdmin?: () => void;
+    onRevokeRole?: () => void;
     onLeaveGroup?: () => void;
     onInviteAsAdmin?: () => void;
     onInviteAsModerator?: () => void;
@@ -33,7 +34,8 @@ const GroupMember: FC<GroupMemberProps> = ({
     onInviteAsAdmin,
     onInviteAsModerator,
     onCancelInviteAsAdmin,
-    onCancelInviteAsModerator
+    onCancelInviteAsModerator,
+    onRevokeRole
 }) => {
     const { user } = useSelector(selectAuth)
     return <div className="relative p-4 rounded-lg shadow border-[1px] bg-white border-gray-100 w-full flex flex-col">
@@ -55,7 +57,7 @@ const GroupMember: FC<GroupMemberProps> = ({
 
         <div className="flex justify-end items-center gap-x-2">
 
-            {isMine && member.user.id !== user?.id && member.role !== MemberRole.MEMBER && <Button size="small" type="primary">Gỡ quyền</Button>}
+            {isMine && member.user.id !== user?.id && member.role !== MemberRole.MEMBER && <Button onClick={onRevokeRole} size="small" type="primary">Gỡ quyền</Button>}
             {user?.id === member.user.id ? (
                 isMine && adminCount === 1 && countMember > 1 ? <button onClick={onChooseNewAdmin} className="px-3 py-[3px] hover:bg-gray-200 rounded-md font-semibold text-sm bg-gray-100">
                     Rời nhóm
@@ -72,7 +74,7 @@ const GroupMember: FC<GroupMemberProps> = ({
             </Popconfirm>}
         </div>
 
-        {member.user.id !== user?.id && isMine && (
+        {member.user.id !== user?.id && isMine && member.role !== MemberRole.ADMIN && (
             <Popover
                 trigger="click"
                 content={
@@ -103,7 +105,7 @@ const GroupMember: FC<GroupMemberProps> = ({
                             >
                                 Gỡ lời mời làm Người kiểm duyệt
                             </button>
-                        ) : member.isInvitedAsAdmin ? null : (
+                        ) : member.isInvitedAsAdmin ? null :  member.role === MemberRole.MEMBER && (
                             // Nếu chưa có lời mời nào → Hiển thị nút "Mời làm Người kiểm duyệt"
                             <button
                                 onClick={onInviteAsModerator}

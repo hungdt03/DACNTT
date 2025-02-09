@@ -317,7 +317,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
         {/* REPORT TO ADMIN OF GROUP */}
         <Modal
-            title={<p className="text-center font-bold text-lg">Báo cáo {targetUser.fullName} tới quản trị viên nhóm</p>}
+            title={<p className="text-center font-bold text-lg">Báo cáo {targetUser.fullName} tới quản trị hệ thống</p>}
             centered
             open={openReport}
             onOk={okReport}

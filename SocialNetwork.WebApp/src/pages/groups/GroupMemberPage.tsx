@@ -12,6 +12,7 @@ import { GroupResource } from "../../types/group";
 import { message, Modal } from "antd";
 import ChooseNewAdminModal from "../../components/modals/ChooseNewAdminModal";
 import useModal from "../../hooks/useModal";
+import { MemberRole } from "../../enums/member-role";
 
 const GroupMemberPage: FC = () => {
     const { id } = useParams()
@@ -85,11 +86,11 @@ const GroupMemberPage: FC = () => {
 
     const handleInviteAsAdmin = async (memberId: string) => {
         const response = await groupService.inviteAsAdmin(memberId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setMembers(prevMembers => {
                 const updateMembers = [...prevMembers];
                 const findIndex = updateMembers.findIndex(m => m.id === memberId);
-                if(findIndex > 0) {
+                if (findIndex > 0) {
                     updateMembers[findIndex].isInvitedAsAdmin = true;
                     updateMembers[findIndex].isInvitedAsModerator = false;
                 }
@@ -104,11 +105,11 @@ const GroupMemberPage: FC = () => {
 
     const handleInviteAsModerator = async (memberId: string) => {
         const response = await groupService.inviteAsModerator(memberId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setMembers(prevMembers => {
                 const updateMembers = [...prevMembers];
                 const findIndex = updateMembers.findIndex(m => m.id === memberId);
-                if(findIndex > 0) {
+                if (findIndex > 0) {
                     updateMembers[findIndex].isInvitedAsModerator = true;
                     updateMembers[findIndex].isInvitedAsAdmin = false;
                 }
@@ -123,13 +124,34 @@ const GroupMemberPage: FC = () => {
 
     const handleCancelInvitation = async (memberId: string) => {
         const response = await groupService.cancelRoleInvitation(memberId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setMembers(prevMembers => {
                 const updateMembers = [...prevMembers];
                 const findIndex = updateMembers.findIndex(m => m.id === memberId);
-                if(findIndex > 0) {
+                if (findIndex > 0) {
                     updateMembers[findIndex].isInvitedAsModerator = false;
                     updateMembers[findIndex].isInvitedAsAdmin = false;
+                }
+
+                return updateMembers
+            })
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleRevokeRole = async (memberId: string) => {
+        const response = await groupService.revokeMemberPermission(memberId);
+
+        if (response.isSuccess) {
+            setMembers(prevMembers => {
+                const updateMembers = [...prevMembers];
+                const findIndex = updateMembers.findIndex(m => m.id === memberId);
+                if (findIndex > 0) {
+                    updateMembers[findIndex].isInvitedAsModerator = false;
+                    updateMembers[findIndex].isInvitedAsAdmin = false;
+                    updateMembers[findIndex].role = MemberRole.MEMBER;
                 }
 
                 return updateMembers
@@ -177,6 +199,7 @@ const GroupMemberPage: FC = () => {
                     onCancelInviteAsModerator={() => handleCancelInvitation(member.id)}
                     onInviteAsAdmin={() => handleInviteAsAdmin(member.id)}
                     onInviteAsModerator={() => handleInviteAsModerator(member.id)}
+                    onRevokeRole={() => handleRevokeRole(member.id)}
                 />)}
             </div>
 

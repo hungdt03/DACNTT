@@ -1,12 +1,11 @@
 ﻿
-using CloudinaryDotNet.Actions;
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Domain.Entity.UserInfo;
 using SocialNetwork.Infrastructure.DBContext;
-using System.Drawing;
+
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -36,12 +35,21 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context.FriendShips.Remove(request);
         }
 
-        public async Task<IEnumerable<FriendShip?>> GetAllFriendRequestByUserId(string userId, string status = "PENDING")
+        public async Task<(IEnumerable<FriendShip> FriendRequests, int TotalCount)> GetAllPendingFriendRequestByUserId(string userId, int page, int size)
         {
-            return await _context.FriendShips
-                .Include(fr => fr.User)
-                .Include(fr => fr.Friend)
-                .Where(x => x.FriendId == userId && (string.IsNullOrEmpty(status) || x.Status.Equals(status))).ToListAsync();
+            var queryable = _context.FriendShips.Where(s => s.FriendId == userId && s.Status.Equals(FriendShipStatus.PENDING));
+
+            var totalCount = await queryable.CountAsync();
+
+            var friendShips = await queryable
+                     .OrderByDescending(f => f.DateCreated)
+                     .Skip((page - 1) * size)
+                     .Take(size)
+                        .Include(f => f.User)
+                        .Include(f => f.Friend)
+                        .ToListAsync();
+
+            return (friendShips, totalCount);
         }
 
         public async Task<IEnumerable<User>> GetAllFriendsByName(string userId, string fullName)
@@ -65,7 +73,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
             var totalCount = await queryable.CountAsync();
 
-            var friendShips = await _context.FriendShips
+            var friendShips = await queryable
                      .OrderByDescending(f => f.DateCreated)
                      .Skip((page - 1) * size)
                      .Take(size)

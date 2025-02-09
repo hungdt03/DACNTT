@@ -7,6 +7,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Group.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.GroupInfo;
 
@@ -40,9 +41,10 @@ namespace SocialNetwork.Application.Features.Group.Handlers
 
             string message = "Yêu cầu xin tham gia nhóm của bạn đã được gửi đi";
 
-            if(group.RequireApproval)
+            JoinGroupRequest joinGroupRequest = null;
+            if (group.RequireApproval)
             {
-                var joinGroupRequest = new JoinGroupRequest()
+                joinGroupRequest = new JoinGroupRequest()
                 {
                     GroupId = request.GroupId,
                     Status = false,
@@ -51,7 +53,31 @@ namespace SocialNetwork.Application.Features.Group.Handlers
 
                 await _unitOfWork.JoinGroupRequestRepository.CreateJoinGroupRequestAsync(joinGroupRequest);
 
-            } else
+                var userAvatar = _contextAccessor.HttpContext.User.GetAvatar();
+                var userFullname = _contextAccessor.HttpContext.User.GetFullName();
+
+                var adminAndModerators = await _unitOfWork.GroupMemberRepository
+                 .GetAllAdminAndModeratoInGroupAsync(group.Id);
+
+                foreach (var member in adminAndModerators)
+                {
+                    var newNotification = new Domain.Entity.System.Notification()
+                    {
+                        JoinGroupRequestId = joinGroupRequest.Id,
+                        IsRead = false,
+                        ImageUrl = userAvatar,
+                        Content = $"{userFullname} đã yêu cầu tham gia nhóm {group.Name}",
+                        Title = "Yêu cầu tham gia nhóm",
+                        DateSent = DateTimeOffset.UtcNow,
+                        Type = NotificationType.JOIN_GROUP_REQUEST,
+                        RecipientId = member.UserId // Gán ID tại đây
+                    };
+
+                    await _unitOfWork.NotificationRepository.CreateNotificationAsync(newNotification);
+                }
+
+            }
+            else
             {
                 var newGroupMember = new GroupMember()
                 {
@@ -66,6 +92,18 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             }
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            if (joinGroupRequest != null)
+            {
+                var notifications = await _unitOfWork.NotificationRepository.GetAllNotificationsByJoinGroupRequestId(joinGroupRequest.Id);
+
+                var tasks = notifications.Select(notification =>
+                    _signalService.SendNotificationToSpecificUser(notification.Recipient.UserName,
+                        ApplicationMapper.MapToNotification(notification))
+                ).ToList();
+
+                await Task.WhenAll(tasks); 
+            }
 
             return new DataResponse<JoinGroupResponse>()
             {

@@ -1,7 +1,7 @@
 import { Avatar, Divider } from "antd";
 import { FC } from "react";
 import { GroupResource } from "../../../types/group";
-import { BookA, Calendar, Eye, Group, Lock, Users2Icon, UsersRoundIcon } from "lucide-react";
+import { BookA, Calendar, Eye, Lock, Users2Icon, UsersRoundIcon } from "lucide-react";
 
 type GroupPendingProps = {
     group: GroupResource

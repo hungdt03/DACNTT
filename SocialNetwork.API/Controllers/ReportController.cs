@@ -58,5 +58,33 @@ namespace SocialNetwork.API.Controllers
             var response = await _mediator.Send(new GetAllPendingReportsByGroupIdQuery(groupId, page, size));
             return Ok(response);
         }
+
+        [HttpPut("group/comment/{reportId}")]
+        public async Task<IActionResult> RemoveCommentByGroupAdmin([FromRoute] Guid reportId)
+        {
+            var response = await _mediator.Send(new RemoveCommentByGroupAdminCommand(reportId));
+            return Ok(response);
+        }
+
+        [HttpPut("group/post/{reportId}")]
+        public async Task<IActionResult> RemovePostByGroupAdmin([FromRoute] Guid reportId)
+        {
+            var response = await _mediator.Send(new RemovePostByGroupAdminCommand(reportId));
+            return Ok(response);
+        }
+
+        [HttpPut("group/member/{reportId}")]
+        public async Task<IActionResult> RemoveMemberByGroupAdmin([FromRoute] Guid reportId)
+        {
+            var response = await _mediator.Send(new RemoveMemberByGroupAdminCommand(reportId));
+            return Ok(response);
+        }
+
+        [HttpPut("group/{reportId}")]
+        public async Task<IActionResult> RemoveGroupReportById([FromRoute] Guid reportId)
+        {
+            var response = await _mediator.Send(new RemoveGroupReportCommand(reportId));
+            return Ok(response);
+        }
     }
 }

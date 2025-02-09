@@ -7,6 +7,8 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Group.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.GroupInfo;
 
@@ -16,11 +18,13 @@ namespace SocialNetwork.Application.Features.Group.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly ISignalRService _signalRService;
 
-        public InviteUserAsAdminHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public InviteUserAsAdminHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, ISignalRService signalRService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
+            _signalRService = signalRService;
         }
 
         public async Task<BaseResponse> Handle(InviteUserAsAdminCommand request, CancellationToken cancellationToken)
@@ -57,7 +61,28 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             };
 
             await _unitOfWork.GroupRoleInvitationRepository.CreateNewInvitationAsync(inviteAdmin);
+
+            var notification = new Domain.Entity.System.Notification()
+            {
+                GroupRoleInvitationId = inviteAdmin.Id,
+                Title = "Mời làm quản trị viên",
+                Content = $"{member.User.FullName} đã mời bạn làm quản trị viên của nhóm {member.Group.Name}",
+                IsRead = false,
+                ImageUrl = member.Group.Name,
+                RecipientId = memberAsAdmin.UserId,
+                Type = NotificationType.INVITE_ROLE_GROUP,
+                DateSent = DateTimeOffset.UtcNow,
+            };
+
+            await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            var savedNotification = await _unitOfWork.NotificationRepository.GetNotificationByIdAsync(notification.Id);
+            if(savedNotification != null)
+            {
+                await _signalRService.SendNotificationToSpecificUser(memberAsAdmin.User.UserName, ApplicationMapper.MapToNotification(savedNotification));
+            }
 
             return new BaseResponse()
             {

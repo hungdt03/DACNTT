@@ -94,7 +94,7 @@ const TagFriendModal: FC<TagFriendModalProps> = ({
             }
         };
 
-        debouncedSearchTerm.trim().length > 1 || debouncedSearchTerm.trim().length === 0 && searchFriends();
+        debouncedSearchTerm.trim().length > 1 && searchFriends();
     }, [debouncedSearchTerm]);
 
 

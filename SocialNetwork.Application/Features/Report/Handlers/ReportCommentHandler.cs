@@ -69,7 +69,6 @@ namespace SocialNetwork.Application.Features.Report.Handlers
                 newReport.GroupId = findGroup.Id;
             }
 
-
             await _unitOfWork.ReportRepository.CreateNewReportAsync(newReport);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
