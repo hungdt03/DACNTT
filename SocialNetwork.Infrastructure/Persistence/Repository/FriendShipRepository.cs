@@ -1,10 +1,12 @@
 ﻿
+using CloudinaryDotNet.Actions;
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Domain.Entity.UserInfo;
 using SocialNetwork.Infrastructure.DBContext;
+using System.Drawing;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -57,12 +59,30 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<FriendShip>> GetAllFriendShipsAsyncByUserId(string userId, string status = "PENDING")
+        public async Task<(IEnumerable<FriendShip> FriendShips, int TotalCount)> GetAllFriendShipsAsyncByUserId(string userId, int page, int size, string status = "PENDING")
+        {
+            var queryable = _context.FriendShips.Where(s => (s.UserId == userId || s.FriendId == userId) && (string.IsNullOrEmpty(status) || s.Status.Equals(status)));
+
+            var totalCount = await queryable.CountAsync();
+
+            var friendShips = await _context.FriendShips
+                     .OrderByDescending(f => f.DateCreated)
+                     .Skip((page - 1) * size)
+                     .Take(size)
+                        .Include(f => f.User)
+                        .Include(f => f.Friend)
+                        .ToListAsync();
+
+            return (friendShips, totalCount);
+        }
+
+        public async Task<IEnumerable<FriendShip>> GetAllFriendShipsAsyncByUserId(string userId, string status = "")
         {
             return await _context.FriendShips
-                 .Include(f => f.User)
-                    .Include(f => f.Friend)
-                    .Where(s => (s.UserId == userId || s.FriendId == userId) && (string.IsNullOrEmpty(status) || s.Status.Equals(status))).ToListAsync();
+                     .Where(s => (s.UserId == userId || s.FriendId == userId) && (string.IsNullOrEmpty(status) || s.Status.Equals(status)))
+                        .Include(f => f.User)
+                        .Include(f => f.Friend)
+                        .ToListAsync();
         }
 
         public async Task<FriendShip?> GetFriendShipByIdAsync(Guid id, string status = "PENDING")

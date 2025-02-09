@@ -9,7 +9,7 @@ import { NotificationResource } from "../../../types/notification";
 import userService from "../../../services/userService";
 import friendRequestService from "../../../services/friendRequestService";
 import Loading from "../../Loading";
-import ProfileUserContent from "../ProfileUserContent";
+import UserProfileContent from "./UserProfileContent";
 import UserProfileSide from "./UserProfileSide";
 
 type UserProfileProps = {
@@ -25,7 +25,7 @@ const UserProfile: FC<UserProfileProps> = ({
     const [friends, setFriends] = useState<FriendResource[]>([]);
    
     const fetchFriends = async (userId: string) => {
-        const response = await friendService.getTopNineOfUserFriends(userId);
+        const response = await friendService.getAllFriendsByUserId(userId, 1, 9);
         if (response.isSuccess) {
             setFriends(response.data)
         }
@@ -80,7 +80,6 @@ const UserProfile: FC<UserProfileProps> = ({
     const fetchFriendRequestData = async (userId: string) => {
         try {
             const friendRequestResponse = await friendRequestService.getFriendRequestByUserId(userId);
-            console.log(friendRequestResponse)
             if (friendRequestResponse.isSuccess) {
                 setFriendRequest(friendRequestResponse.data);
             } else {
@@ -94,7 +93,7 @@ const UserProfile: FC<UserProfileProps> = ({
     return <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto w-full grid grid-cols-12 gap-4 h-full lg:h-[90vh] bg-slate-100">
         {loading && <Loading />}
         {user && <UserProfileSide user={user} friends={friends} />}
-        {user && <ProfileUserContent friends={friends} onRefresh={() => fetchFriendRequestData(userId)} user={user} friendRequest={friendRequest} />}
+        {user && <UserProfileContent friends={friends} onRefresh={() => fetchFriendRequestData(userId)} user={user} friendRequest={friendRequest} />}
     </div>
 };
 

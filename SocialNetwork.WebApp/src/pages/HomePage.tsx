@@ -13,14 +13,11 @@ import StoryWrapper from "../components/story/StoryWrapper";
 import PostGroup from "../components/posts/PostGroup";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { PrivacyType } from "../enums/privacy";
-import { useSelector } from "react-redux";
-import { selectAuth } from "../features/slices/auth-slice";
 
 const HomePage: FC = () => {
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [posts, setPosts] = useState<PostResource[]>([]);
-    const { user } = useSelector(selectAuth)
 
     const { containerRef } = useInfiniteScroll({
         fetchMore: () => void fetchNewPosts(),

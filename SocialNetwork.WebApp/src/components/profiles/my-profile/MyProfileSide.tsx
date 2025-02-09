@@ -9,6 +9,8 @@ import BoxModifyBio from "../components/BoxModifyBio";
 import images from "../../../assets";
 import { Link } from "react-router-dom";
 import MyPersonalInfo from "./MyPersonalInfo";
+import ProfileImage from "../shared/media/ProfileImage";
+import ProfileVideo from "../shared/media/ProfileVideo";
 
 type MyProfileSideProps = {
     friends: FriendResource[]
@@ -18,9 +20,10 @@ const MyProfileSide: FC<MyProfileSideProps> = ({
     friends
 }) => {
     const { user } = useSelector(selectAuth);
+    const dispatch = useDispatch<AppDispatch>()
+
     const [modifyBio, setModifyBio] = useState(false);
     const [loading, setLoading] = useState(false);
-    const dispatch = useDispatch<AppDispatch>()
 
     const handleModifyBio = async (bioValue: string) => {
         setLoading(true)
@@ -71,23 +74,25 @@ const MyProfileSide: FC<MyProfileSideProps> = ({
                 <Empty description='Chưa có bạn bè nào' />
             </div> :
                 <div className="grid grid-cols-3 gap-2">
-                {friends.map(friend => (
-                    <Link to={`/profile/${friend.id}`} key={friend.id} className="flex flex-col items-start gap-1 cursor-pointer">
-                        <Image
-                            preview={false}
-                            src={friend.avatar ?? images.cover}
-                            style={{ height: '100%', width: '100%' }}
-                            className="border-[1px] w-full h-full object-cover border-primary rounded-md"
-                        />
-                        <span className="text-sm font-semibold line-clamp-1">{friend.fullName}</span>
-                        {user?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}
-                    </Link>
-                ))}
-            </div>            
+                    {friends.map(friend => (
+                        <Link to={`/profile/${friend.id}`} key={friend.id} className="flex flex-col items-start gap-1 cursor-pointer">
+                            <Image
+                                preview={false}
+                                src={friend.avatar ?? images.cover}
+                                style={{ height: '100%', width: '100%' }}
+                                className="border-[1px] w-full h-full object-cover border-primary rounded-md aspect-square"
+                            />
+                            <span className="text-sm font-semibold line-clamp-1">{friend.fullName}</span>
+                            {user?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}
+                        </Link>
+                    ))}
+                </div>
             }
             {friends.length > 9 && <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button>}
-
         </div>
+
+        {user && <ProfileImage userId={user.id} isMe />}
+        {user && <ProfileVideo userId={user.id} isMe />}
 
     </div>
 };

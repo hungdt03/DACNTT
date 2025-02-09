@@ -230,6 +230,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 name="isPublic"
                             >
                                 <Switch
+                                    disabled={group.privacy === GroupPrivacy.PRIVATE}
                                     onChange={e => setIsDisabled(e)}
                                  />
                             </Form.Item>

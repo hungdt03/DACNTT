@@ -7,9 +7,7 @@ using SocialNetwork.Application.Features.BlockList.Commands;
 using SocialNetwork.Application.Features.BlockList.Queries;
 using SocialNetwork.Application.Features.Story.Commands;
 using SocialNetwork.Application.Features.User.Commands;
-using SocialNetwork.Application.Features.User.Handlers;
 using SocialNetwork.Application.Features.User.Queries;
-using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -57,6 +55,36 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> ModifyBio([FromBody] ModifyBioCommand command)
         {
             var response = await mediator.Send(command);
+            return Ok(response);
+        }
+
+        // GET FILE MEDIA
+
+        [HttpGet("images/{userId}")]
+        public async Task<IActionResult> GetPostImagessByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetPostImagesByUserIdQuery(userId, page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("images")]
+        public async Task<IActionResult> GetPostImages([FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetPostImagesByCurrentUserQuery(page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("videos/{userId}")]
+        public async Task<IActionResult> GetPostVideosByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetPostVideosByUserIdQuery(userId, page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("videos")]
+        public async Task<IActionResult> GetPostVideos([FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetPostVideosByCurrentUserQuery(page, size));
             return Ok(response);
         }
 

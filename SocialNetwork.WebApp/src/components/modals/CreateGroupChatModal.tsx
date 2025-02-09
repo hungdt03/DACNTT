@@ -1,4 +1,4 @@
-import { Avatar, Button, message } from "antd";
+import { Avatar, Button, Empty, message } from "antd";
 import { FC, useEffect, useState } from "react";
 import { PlusOutlined, CloseOutlined } from '@ant-design/icons'
 import images from "../../assets";
@@ -6,6 +6,9 @@ import { FriendResource } from "../../types/friend";
 import friendService from "../../services/friendService";
 import { CheckIcon } from "lucide-react";
 import chatRoomService from "../../services/chatRoomService";
+import { inititalValues } from "../../utils/pagination";
+import { useElementInfinityScroll } from "../../hooks/useElementInfinityScroll";
+import LoadingIndicator from "../LoadingIndicator";
 
 export type CreateChatRoomRequest = {
     memberIds: string[];
@@ -21,14 +24,35 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
 }) => {
     const [friends, setFriends] = useState<FriendResource[]>([]);
     const [addFriends, setAddFriends] = useState<FriendResource[]>([]);
-    const [groupName, setGroupName] = useState<string>('')
+    const [groupName, setGroupName] = useState<string>('');
+    const [pagination, setPagination] = useState(inititalValues);
+    const [loading, setLoading] = useState(false)
 
-    const fetchFriends = async () => {
-        const response = await friendService.getAllMyFriends();
+    const fetchFriends = async (page: number, size: number) => {
+        setLoading(true)
+        const response = await friendService.getAllMyFriends(page, size);
+        setLoading(false)
         if (response.isSuccess) {
-            setFriends(response.data)
+            setFriends(prev => {
+                const existingIds = new Set(prev.map(item => item.id));
+                const news = response.data.filter(item => !existingIds.has(item.id));
+                return [...prev, ...news];
+            });
+            setPagination(response.pagination)
         }
     }
+
+    const fetchNextPage = () => {
+        if (!pagination.hasMore || loading) return;
+        fetchFriends(pagination.page + 1, pagination.size)
+    }
+
+    useElementInfinityScroll({
+        elementId: "group-layout",
+        onLoadMore: fetchNextPage,
+        isLoading: loading,
+        hasMore: pagination.hasMore,
+    });
 
     const handleAddFriend = (friend: FriendResource) => {
         const isExisted = addFriends.some(f => f.id === friend.id);
@@ -51,7 +75,7 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
         }
 
         const response = await chatRoomService.createChatRoom(payload);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
             setAddFriends([]);
             setGroupName('');
@@ -62,7 +86,7 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
     }
 
     useEffect(() => {
-        fetchFriends()
+        fetchFriends(pagination.page, pagination.size)
     }, [])
 
     return <div className="flex flex-col gap-y-4">
@@ -79,7 +103,7 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
             <div className="flex items-center gap-2 flex-wrap w-full p-2 rounded-md border-[1px] border-gray-200 max-h-[100px] overflow-y-auto custom-scrollbar">
                 {addFriends.map(friend => <button key={friend.id} className="flex gap-x-2 items-center p-1 px-2 rounded-md bg-sky-100 text-primary font-semibold">
                     <span>{friend.fullName}</span>
-                    <CloseOutlined onClick={() => handleRemove(friend)}  className="text-xs font-bold" />
+                    <CloseOutlined onClick={() => handleRemove(friend)} className="text-xs font-bold" />
                 </button>)}
             </div>
         </div>}
@@ -95,6 +119,9 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
 
                     {addFriends.some(fr => fr.id === friend.id) ? <Button onClick={() => handleRemove(friend)} icon={<CloseOutlined />} danger type="primary">Hủy bỏ</Button> : <Button onClick={() => handleAddFriend(friend)} icon={<PlusOutlined />} type="primary">Thêm</Button>}
                 </div>)}
+
+                {friends.length === 0 && !loading && <Empty description='Bạn chưa có bạn bè nào' />}
+                {loading && <LoadingIndicator />}
             </div>
         </div>
     </div>

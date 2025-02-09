@@ -104,7 +104,6 @@ const MediaGallery: FC<MediaGalleryProps> = ({
 
         <div className="relative w-full">
             <Swiper
-                spaceBetween={0}
                 slidesPerView={1}
                 className="w-full"
                 direction="horizontal"
@@ -118,13 +117,21 @@ const MediaGallery: FC<MediaGalleryProps> = ({
                             {item.mediaType === MediaType.VIDEO ? (
                                 <video
                                     src={item.mediaUrl}
-                                    className="w-full h-full object-contain bg-black"
+                                    className="w-full h-full object-contain"
+                                    style={{
+                                        backgroundColor: 'rgba(0, 0, 0, 0.0)'
+                                    }}
                                     controls
+                                    draggable
                                 />
                             ) : (
                                 <img
                                     src={item.mediaUrl}
-                                    className="w-full h-full object-contain bg-black"
+                                    className="w-full h-full object-contain"
+                                    style={{
+                                        backgroundColor: 'rgba(0, 0, 0, 0.0)'
+                                    }}
+                                    draggable
                                 />
                             )}
                         </div>
@@ -136,16 +143,22 @@ const MediaGallery: FC<MediaGalleryProps> = ({
             {showNav && (
                 <>
                     <button
-                        className={`custom-prev z-10 bg-white w-10 h-10 flex items-center justify-center absolute top-1/2 -left-5 transform -translate-y-1/2 shadow border-[1px] border-gray-100 p-2 rounded-full ${isAtStart ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`custom-prev z-10 w-10 h-10 text-white flex items-center justify-center fixed top-1/2 left-5 transform -translate-y-1/2 p-2 rounded-full ${isAtStart ? "opacity-50 cursor-not-allowed" : ""}`}
                         onClick={handlePrevClick}
                         disabled={isAtStart}
+                        style={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)'
+                        }}
                     >
                         <LeftOutlined />
                     </button>
                     <button
-                        className={`custom-next z-10 bg-white w-10 h-10 flex items-center justify-center absolute top-1/2 -right-5 transform -translate-y-1/2 shadow border-[1px] border-gray-100 p-2 rounded-full ${isAtEnd ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`custom-next z-10 w-10 h-10 text-white flex items-center justify-center fixed top-1/2 right-5 transform -translate-y-1/2 p-2 rounded-full ${isAtEnd ? "opacity-50 cursor-not-allowed" : ""}`}
                         onClick={handleNextClick}
                         disabled={isAtEnd}
+                        style={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)'
+                        }}
                     >
                         <RightOutlined />
                     </button>

@@ -1,6 +1,5 @@
 import { FC, useState } from "react";
 import { MixMediaProps } from "./MixMediaProps";
-import { isVideo } from "../utils";
 import { CloseOutlined } from '@ant-design/icons'                  
 import { Modal } from "antd";
 import MediaGallery from "../../MediaGallery";
@@ -25,7 +24,7 @@ const FiveMedia: FC<MixMediaProps> = ({
                     <video
                         key={item.id}
                         src={item.mediaUrl}
-                        className="w-full min-h-[200px] object-cover"
+                        className="w-full min-h-[200px] object-cover aspect-square"
                         onClick={() => handlePreview(index)}
                         controls
                     />
@@ -43,7 +42,7 @@ const FiveMedia: FC<MixMediaProps> = ({
                     <video
                         key={item.id}
                         src={item.mediaUrl}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover aspect-square"
                         onClick={() => handlePreview(index + 3)}
                         controls
                     />

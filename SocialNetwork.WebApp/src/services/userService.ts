@@ -5,6 +5,7 @@ import { ModifyUserLocationRequest } from '../components/modals/ModifyUserLocati
 import { ModifyUserWorkPlaceRequest } from '../components/modals/ModifyUserWorkPlace';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { LocationResource } from '../types/location';
+import { PostMediaResource } from '../types/post';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 import { UserResource } from '../types/user';
 import { UserSchoolResource } from '../types/userSchool';
@@ -35,6 +36,44 @@ class UserService {
 
     modifyBio(bio: string) : Promise<DataResponse<string>> {
         return axiosInterceptor.post('/api/users/modify-bio', { bio })
+    }
+
+    // File Media
+    getPostImagesByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<PostMediaResource[]>> {
+        return axiosInterceptor.get('/api/users/images/' + userId, {
+            params: {
+                page, 
+                size
+            }
+        })
+    }
+
+    getPostImages( page: number, size: number) : Promise<PaginationResponse<PostMediaResource[]>> {
+        return axiosInterceptor.get('/api/users/images', {
+            params: {
+                page, 
+                size
+            }
+        })
+    }
+
+
+    getPostVideosByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<PostMediaResource[]>> {
+        return axiosInterceptor.get('/api/users/videos/' + userId, {
+            params: {
+                page, 
+                size
+            }
+        })
+    }
+
+    getPostVideos( page: number, size: number) : Promise<PaginationResponse<PostMediaResource[]>> {
+        return axiosInterceptor.get('/api/users/videos', {
+            params: {
+                page, 
+                size
+            }
+        })
     }
 
     // Education

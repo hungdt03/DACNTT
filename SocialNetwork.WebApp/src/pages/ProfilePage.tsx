@@ -16,7 +16,6 @@ const ProfilePage: FC = () => {
     const fetchIsBlockUser = async (userId: string) => {
         setLoading(true)
         const response = await userService.checkBlockUser(userId);
-        console.log(response)
         setLoading(false)
         if(response.isSuccess) {
             setIsBlockUser(response.data)

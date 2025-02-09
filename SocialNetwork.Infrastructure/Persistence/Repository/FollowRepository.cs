@@ -1,10 +1,9 @@
 ﻿
-
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
-using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Domain.Entity.UserInfo;
 using SocialNetwork.Infrastructure.DBContext;
+
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -42,18 +41,32 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context.Follows.Remove(follow);
         }
 
-        public async Task<IEnumerable<Follow>> GetAllFolloweesByUserIdAsync(string userId)
+        public async Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFolloweesByUserIdAsync(string userId, int page, int size)
         {
-            return await _context.Follows
-                  .Include(f => f.Followee)
-                .Where(s => s.FollowerId == userId).ToListAsync();
+            var queryable = _context.Follows.Where(s => s.FollowerId == userId);
+            var totalCount = await queryable.CountAsync();
+
+            var follows = await queryable
+                .Skip((page - 1) * size)
+                .Take(size)
+                 .Include(f => f.Followee)
+                .ToListAsync();
+
+            return (follows, totalCount);
         }
 
-        public async Task<IEnumerable<Follow>> GetAllFollowersByUserIdAsync(string userId)
+        public async Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFollowersByUserIdAsync(string userId, int page, int size)
         {
-            return await _context.Follows
-                .Include(f => f.Follower)
-                .Where(s => s.FolloweeId == userId).ToListAsync();
+            var queryable = _context.Follows.Where(s => s.FolloweeId == userId);
+            var totalCount = await queryable.CountAsync();
+
+            var follows = await queryable
+                .Skip((page - 1) * size)
+                .Take(size)
+                 .Include(f => f.Follower)
+                .ToListAsync();
+
+            return (follows, totalCount);
         }
 
         public async Task<Follow?> GetFollowByFollowerIdAndFolloweeIdAsync(string followerId, string followeeId)

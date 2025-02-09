@@ -23,7 +23,7 @@ const TwoMedia: FC<MixMediaProps> = ({
                     <video
                         key={item.id}
                         src={item.mediaUrl}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover aspect-square"
                         onClick={() => handlePreview(index)}
                         controls
                     />

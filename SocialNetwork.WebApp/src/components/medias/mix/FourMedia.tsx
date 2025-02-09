@@ -22,7 +22,7 @@ const FourMedia: FC<MixMediaProps> = ({
             {items.map((item, index) => item.mediaType === MediaType.VIDEO ? (
                 <video key={item.id}
                     src={item.mediaUrl}
-                    className="w-full object-cover h-full"
+                    className="w-full object-cover h-full aspect-square"
                     onClick={() => handlePreview(index)}
                     controls
                 />

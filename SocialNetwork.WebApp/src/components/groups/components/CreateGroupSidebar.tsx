@@ -163,12 +163,17 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
                     <Dropdown menu={{ items }} placement="bottom">
                         <button className="w-full py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold">Chọn quyền riêng tư</button>
                     </Dropdown>
-                    {values.privacy && <div className="flex items-center gap-x-1 text-sm">
-                        <span>Đã chọn:</span>
-                        <span className="font-bold">{getGroupPrivacyTitle(values.privacy)}</span>
+                    {values.privacy && <div className="flex flex-col gap-y-1">
+                        <div className="flex items-center gap-x-1 text-sm">
+                            <span>Đã chọn:</span>
+                            <span className="font-bold">{getGroupPrivacyTitle(values.privacy)}</span>
+                        </div>
+                        <p className="text-sm text-gray-400">
+                            {values.privacy === GroupPrivacy.PUBLIC ? 'Sau này bạn có thể chuyển từ Công khai sang Riêng tư' : 'Sau này bạn không thể chuyển từ Riêng tư sang Công khai vì để đảm bảo cho quyền riêng tư cho các thành viên khác'}
+                        </p>
                     </div>}
                 </div>
-                
+
             </div>
         </div>
 

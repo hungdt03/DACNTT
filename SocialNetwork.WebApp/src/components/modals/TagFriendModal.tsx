@@ -7,6 +7,9 @@ import { FriendResource } from "../../types/friend";
 import friendService from "../../services/friendService";
 import { TagResource } from "../../types/tag";
 import useDebounce from "../../hooks/useDebounce";
+import { inititalValues } from "../../utils/pagination";
+import { useElementInfinityScroll } from "../../hooks/useElementInfinityScroll";
+import LoadingIndicator from "../LoadingIndicator";
 
 type TagFriendModalProps = {
     onChange?: (tags: FriendResource[]) => void;
@@ -25,20 +28,43 @@ const TagFriendModal: FC<TagFriendModalProps> = ({
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const [friends, setFriends] = useState<FriendResource[]>([]);
     const [selectFriends, setSelectFriends] = useState<FriendResource[]>(tags?.map(tag => tag.user) ?? [])
+    const [pagination, setPagination] = useState(inititalValues);
+    const [loading, setLoading] = useState(false)
 
-    const fetchFriends = async () => {
-        const repsonse = await friendService.getAllMyFriends();
-        if (repsonse.isSuccess) {
-            if(tags && tags.length > 0) {
-                setFriends([...repsonse.data.filter(item => !tags?.some(tag => tag.user.id === item.id))])
-            } else {
-                setFriends(repsonse.data)
+    const fetchFriends = async (page: number, size: number) => {
+        setLoading(true)
+        const repsonse = await friendService.getAllMyFriends(page, size);
+
+        setTimeout(() => {
+            setLoading(false)
+            if (repsonse.isSuccess) {
+                const newFriends = repsonse.data.filter(item => !friends.some(f => f.id === item.id));
+                const filteredFriends = tags?.length
+                    ? newFriends.filter(item => !tags.some(tag => tag.user.id === item.id))
+                    : newFriends;
+
+                setFriends(prev => [...prev, ...filteredFriends]);
+                setPagination(repsonse.pagination)
             }
-        }
+        }, 3000)
     }
 
+
+    const fetchNextPage = () => {
+        if (!pagination.hasMore || loading) return;
+        fetchFriends(pagination.page, pagination.size)
+    }
+
+    useElementInfinityScroll({
+        elementId: "tag-friend-element",
+        onLoadMore: fetchNextPage,
+        isLoading: loading,
+        hasMore: pagination.hasMore,
+    });
+
+
     useEffect(() => {
-        fetchFriends()
+        fetchFriends(pagination.page, pagination.size)
     }, [])
 
     const handleSelectFriend = (friend: FriendResource) => {
@@ -68,7 +94,7 @@ const TagFriendModal: FC<TagFriendModalProps> = ({
             }
         };
 
-        searchFriends();
+        debouncedSearchTerm.trim().length > 1 || debouncedSearchTerm.trim().length === 0 && searchFriends();
     }, [debouncedSearchTerm]);
 
 
@@ -91,12 +117,14 @@ const TagFriendModal: FC<TagFriendModalProps> = ({
                 </div>
             </div>}
             <span className="text-xs font-semibold text-gray-500 px-1">GỢI Ý</span>
-            <div className="flex flex-col gap-y-2">
-                {friends.map(friend => <div onClick={() => handleSelectFriend(friend)} key={friend.id} className="cursor-pointer flex items-center gap-x-3 px-2 py-[6px] rounded-xl hover:bg-gray-100">
+            <div id="tag-friend-element" className="flex flex-col gap-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
+                {friends.length > 0 && !loading && friends.map(friend => <div onClick={() => handleSelectFriend(friend)} key={friend.id} className="cursor-pointer flex items-center gap-x-3 px-2 py-[6px] rounded-xl hover:bg-gray-100">
                     <Avatar size='large' src={friend.avatar ?? images.user} />
                     <span>{friend.fullName}</span>
                 </div>
                 )}
+
+                {loading && <LoadingIndicator />}
 
             </div>
         </div>

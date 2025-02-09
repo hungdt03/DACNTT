@@ -21,19 +21,6 @@ namespace SocialNetwork.API.Controllers
             this.mediator = mediator;
         }
 
-        [HttpGet("top-nine-user-friend/{userId}")]
-        public async Task<IActionResult> GetTopNineOfUserFriends([FromRoute] string userId)
-        {
-            var response = await mediator.Send(new GetTopNineOfUserFriendsQuery(userId));
-            return Ok(response);    
-        }
-
-        [HttpGet("top-nine-my-friend")]
-        public async Task<IActionResult> GetTopNineOfMyFriends()
-        {
-            var response = await mediator.Send(new GetTopNineOfMyFriendsQuery());
-            return Ok(response);
-        }
 
         [HttpDelete("{friendId}")]
         public async Task<IActionResult> DeleteFriend([FromRoute] string friendId)
@@ -43,10 +30,9 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllFriends()
+        public async Task<IActionResult> GetAllFriends([FromQuery] int page = 1, [FromQuery] int size = 6)
         {
-            var userId = HttpContext.User.GetUserId();
-            var response = await mediator.Send(new GetAllFriendsQuery(userId));
+            var response = await mediator.Send(new GetAllMyFriendsFullInfoQuery(page, size));
             return Ok(response);
         }
 
@@ -58,9 +44,9 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<IActionResult> GetAllFriendsByUserId([FromRoute] string userId)
+        public async Task<IActionResult> GetAllFriendsByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 6)
         {
-            var response = await mediator.Send(new GetAllFriendsFullInfoQuery(userId));
+            var response = await mediator.Send(new GetAllUserFriendsFullInfoQuery(userId, page, size));
             return Ok(response);
         }
 

@@ -20,16 +20,16 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet("followers/{userId}")]
-        public async Task<IActionResult> GetAllFollowersByUserId([FromRoute] string userId)
+        public async Task<IActionResult> GetAllFollowersByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            var response = await _mediator.Send(new GetAllFollowerByUserIdQuery(userId));
+            var response = await _mediator.Send(new GetAllFollowerByUserIdQuery(userId, page, size));
             return Ok(response);
         }
 
         [HttpGet("followees/{userId}")]
-        public async Task<IActionResult> GetAllFolloweesByUserId([FromRoute] string userId)
+        public async Task<IActionResult> GetAllFolloweesByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 10)
         {
-            var response = await _mediator.Send(new GetAllFolloweesByUserIdQuery(userId));
+            var response = await _mediator.Send(new GetAllFolloweesByUserIdQuery(userId, page, size));
             return Ok(response);
         }
 

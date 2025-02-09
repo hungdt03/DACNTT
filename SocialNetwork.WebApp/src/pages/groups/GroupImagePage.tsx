@@ -5,6 +5,7 @@ import { inititalValues } from "../../utils/pagination";
 import groupService from "../../services/groupService";
 import { Empty, Image } from "antd";
 import LoadingIndicator from "../../components/LoadingIndicator";
+import { useElementInfinityScroll } from "../../hooks/useElementInfinityScroll";
 
 const GroupImagePage: FC = () => {
     const { id } = useParams()
@@ -16,17 +17,15 @@ const GroupImagePage: FC = () => {
         if (id) {
             setLoading(true)
             const response = await groupService.getAllGroupImagesByGroupId(id, page, size);
-            setTimeout(() => {
-                setLoading(false)
-                if (response.isSuccess) {
-                    setImages(prevImages => {
-                        const existingIds = new Set(prevImages.map(image => image.id));
-                        const newImages = response.data.filter(image => !existingIds.has(image.id));
-                        return [...prevImages, ...newImages];
-                    });
-                    setPagination(response.pagination)
-                }
-            }, 2000)
+            setLoading(false)
+            if (response.isSuccess) {
+                setImages(prevImages => {
+                    const existingIds = new Set(prevImages.map(image => image.id));
+                    const newImages = response.data.filter(image => !existingIds.has(image.id));
+                    return [...prevImages, ...newImages];
+                });
+                setPagination(response.pagination)
+            }
         }
     }
 
@@ -34,25 +33,12 @@ const GroupImagePage: FC = () => {
         fetchImages(pagination.page + 1, pagination.size)
     }
 
-    useEffect(() => {
-        const handleScroll = () => {
-            const groupLayoutElement = document.getElementById('group-layout');
-            if (!groupLayoutElement || loading || !pagination.hasMore) return;
-
-            const { scrollTop, scrollHeight, clientHeight } = groupLayoutElement;
-
-            console.log(`scrollTop: ${scrollTop}, clientHeight: ${clientHeight}, scrollHeight: ${scrollHeight}`);
-
-            if (scrollTop + clientHeight >= scrollHeight - 150) {
-                fetchNextPage();
-            }
-        };
-
-        const groupLayoutElement = document.getElementById('group-layout');
-        groupLayoutElement?.addEventListener("scroll", handleScroll);
-
-        return () => groupLayoutElement?.removeEventListener("scroll", handleScroll);
-    }, [loading, pagination.hasMore]);
+    useElementInfinityScroll({
+        elementId: "group-layout",
+        onLoadMore: fetchNextPage,
+        isLoading: loading,
+        hasMore: pagination.hasMore,
+    });
 
     useEffect(() => {
         fetchImages(pagination.page, pagination.size)

@@ -1,39 +1,42 @@
 import { Camera, CheckIcon, Upload as LucideUpload, Plus } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import ImgCrop from 'antd-img-crop';
-import images from "../../assets";
+import images from "../../../assets";
 import { Avatar, Button, Divider, message, Tabs, TabsProps, Tooltip, Upload, UploadFile, UploadProps } from "antd";
-import ProfilePostList from "./ProfilePostList";
-import { FriendResource } from "../../types/friend";
-import { UserResource } from "../../types/user";
-import { getBase64, isValidImage } from "../../utils/file";
-import userService from "../../services/userService";
+import ProfilePostList from "../shared/ProfilePostList";
+import { FriendResource } from "../../../types/friend";
+import { UserResource } from "../../../types/user";
+import { getBase64, isValidImage } from "../../../utils/file";
+import userService from "../../../services/userService";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../app/store";
-import { setUserDetails } from "../../features/slices/auth-slice";
-import Loading from "../Loading";
+import { AppDispatch } from "../../../app/store";
+import { setUserDetails } from "../../../features/slices/auth-slice";
+import Loading from "../../Loading";
 import { RcFile } from "antd/es/upload";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import ProfileFriendList from "./shared/ProfileFriendList";
-import ProfileFollowerList from "./shared/ProfileFollowerList";
-import ProfileFolloweeList from "./shared/ProfileFolloweesList";
-import ProfileSavedPost from "./shared/ProfileSavedPost";
+import ProfileFriendList from "../shared/ProfileFriendList";
+import ProfileFollowerList from "../shared/ProfileFollowerList";
+import ProfileFolloweeList from "../shared/ProfileFolloweesList";
+import ProfileSavedPost from "../shared/ProfileSavedPost";
+import ProfileImageList from "../shared/ProfileImageList";
+import ProfileVideoList from "../shared/ProfileVideoList";
 
-type ProfileContentProps = {
+type MyProfileContentProps = {
     user: UserResource;
     friends: FriendResource[]
 }
 
-const VALID_TABS = ["friends", "followers", "followees", "saved-posts"];
+const VALID_TABS = ["friends", "followers", "followees", "saved-posts", "images", "videos"];
 
-const ProfileContent: FC<ProfileContentProps> = ({
+const MyProfileContent: FC<MyProfileContentProps> = ({
     user,
     friends
 }) => {
-    
+
     const dispatch = useDispatch<AppDispatch>();
     const [loading, setLoading] = useState(false);
+    const [coverLoading, setCoverLoading] = useState(false)
     const [tempCoverImage, setTempCoverImage] = useState<string>('')
     const [fileCoverImage, setFileCoverImage] = useState<UploadFile>();
 
@@ -107,9 +110,9 @@ const ProfileContent: FC<ProfileContentProps> = ({
             const formData = new FormData();
             formData.append('file', file as RcFile);
 
-            setLoading(true)
+            setCoverLoading(true)
             const response = await userService.uploadCoverImage(formData);
-            setLoading(false)
+            setCoverLoading(false)
 
             if (response.isSuccess) {
                 toast.success(response.message);
@@ -127,12 +130,22 @@ const ProfileContent: FC<ProfileContentProps> = ({
         {
             key: '',
             label: 'Bài viết',
-            children: <ProfilePostList user={user} isShowPostCreator={true} />,
+            children: <ProfilePostList user={user} />,
         },
         {
             key: 'friends',
             label: 'Bạn bè',
             children: <ProfileFriendList userId={user.id} />,
+        },
+        {
+            key: 'images',
+            label: 'Ảnh',
+            children: <ProfileImageList userId={user.id} isMe={true} />,
+        },
+        {
+            key: 'videos',
+            label: 'Video',
+            children: <ProfileVideoList userId={user.id} isMe={true} />,
         },
         {
             key: 'followers',
@@ -155,7 +168,7 @@ const ProfileContent: FC<ProfileContentProps> = ({
         navigate(`/profile/${id}/${key}`);
     };
 
-    return <div className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
+    return <div id="my-profile-page" className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
         <div className="flex flex-col gap-y-4 overflow-y-auto bg-white p-4">
             <div className="w-full h-full relative z-10">
                 <img alt="Ảnh bìa" className="w-full border-[1px] object-cover max-h-[25vh] h-full md:max-h-[30vh] rounded-lg" src={tempCoverImage || user.coverImage || images.cover} />
@@ -168,14 +181,14 @@ const ProfileContent: FC<ProfileContentProps> = ({
                         className="cursor-pointer w-full"
                         disabled={loading}
                     >
-                        <div className="shadow bg-white text-primary flex items-center gap-x-2 px-3 py-2 rounded-md cursor-pointer">
+                        <button disabled={coverLoading} className="shadow bg-white text-primary flex items-center gap-x-2 px-3 py-2 rounded-md cursor-pointer">
                             <LucideUpload size={18} />
                             <span className="text-sm font-semibold">
                                 {tempCoverImage ? 'Chọn ảnh khác' : 'Thêm ảnh bìa'}
                             </span>
-                        </div>
+                        </button>
                     </Upload>
-                    {tempCoverImage && <Button loading={loading} onClick={() => uploadCoverImage(fileCoverImage)} type="primary" className="cursor-pointer" icon={<CheckIcon />}>
+                    {tempCoverImage && <Button loading={coverLoading} onClick={() => uploadCoverImage(fileCoverImage)} type="primary" className="cursor-pointer" icon={<CheckIcon />}>
                         Lưu lại
                     </Button>}
                 </div>
@@ -183,7 +196,18 @@ const ProfileContent: FC<ProfileContentProps> = ({
 
             <div className="flex flex-col lg:flex-row items-center lg:items-end -mt-20 gap-x-6 lg:-mt-12 px-8">
                 <div className="relative z-30 flex-shrink-0">
-                    <img alt="Ảnh đại diện" className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[1px] border-primary object-cover" src={user?.avatar} />
+                    {user?.haveStory ?
+                        <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[3px] p-[2px] border-primary flex items-center justify-center aspect-square" to={`/stories/${user.id}`}>
+                            <img alt="Ảnh đại diện" className="object-cover" src={user?.avatar ?? images.user} />
+                        </Link>
+                        : <img
+                            alt="Ảnh đại diện"
+                            className="lg:w-32 lg:h-32 w-28 h-28 rounded-full z-30 object-cover"
+                            src={user?.avatar ?? images.user}
+                        />
+                    }
+
+                    {user?.isOnline && <div className="absolute bottom-2 right-3 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
                     <ImgCrop modalOk="Lưu lại" modalCancel="Hủy bỏ" modalTitle="Ảnh đại diện" showGrid showReset resetText="Bắt đầu lại" rotationSlider>
                         <Upload
                             multiple={false}
@@ -228,7 +252,7 @@ const ProfileContent: FC<ProfileContentProps> = ({
             {loading && <Loading />}
 
         </div>
-    </div>
+    </div >
 };
 
-export default ProfileContent;
+export default MyProfileContent;

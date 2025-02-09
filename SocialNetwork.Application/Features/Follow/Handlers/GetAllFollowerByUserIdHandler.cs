@@ -18,15 +18,21 @@ namespace SocialNetwork.Application.Features.Follow.Handlers
 
         public async Task<BaseResponse> Handle(GetAllFollowerByUserIdQuery request, CancellationToken cancellationToken)
         {
-            var followers = await _unitOfWork.FollowRepository.GetAllFollowersByUserIdAsync(request.UserId);
+            var (followers, totalCount) = await _unitOfWork.FollowRepository.GetAllFollowersByUserIdAsync(request.UserId, request.Page, request.Size);
             var response = followers.Select(f => ApplicationMapper.MapToUser(f.Follower)).ToList();
 
-            return new DataResponse<List<UserResponse>>
+            return new PaginationResponse<List<UserResponse>>
             {
                 Data = response,
                 IsSuccess = true,
                 Message = "Lấy danh sách người theo dõi thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
+                Pagination = new Pagination()
+                {
+                    Size = request.Size,
+                    Page = request.Page,
+                    HasMore = request.Page * request.Size < totalCount
+                }
             };
         }
     }

@@ -32,6 +32,10 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             if (groupMember.Role != MemberRole.ADMIN)
                 throw new AppException("Bạn không có quyền cập nhật thông tin chung của nhóm");
 
+
+            if (group.Privacy == GroupPrivacy.PRIVATE && request.Group.IsPublic)
+                throw new AppException("Không thể thay đổi từ nhóm riêng từ thành công khai");
+
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             group.Name = request.Group.Name;

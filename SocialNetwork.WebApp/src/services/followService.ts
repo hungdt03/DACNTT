@@ -1,6 +1,6 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
-import { BaseResponse, DataResponse } from '../types/response';
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 import { UserResource } from '../types/user';
 
 
@@ -15,12 +15,22 @@ class FollowService {
         return FollowService.instance;
     }
 
-    getAllFollowersByUserId(userId: string) : Promise<DataResponse<UserResource[]>> {
-        return axiosInterceptor.get('/api/follows/followers/' + userId)
+    getAllFollowersByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<UserResource[]>> {
+        return axiosInterceptor.get('/api/follows/followers/' + userId, {
+            params: {
+                page, 
+                size
+            }
+        })
     }
 
-    getAllFolloweesByUserId(userId: string) : Promise<DataResponse<UserResource[]>> {
-        return axiosInterceptor.get('/api/follows/followees/' + userId)
+    getAllFolloweesByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<UserResource[]>> {
+        return axiosInterceptor.get('/api/follows/followees/' + userId, {
+            params: {
+                page, 
+                size
+            }
+        })
     }
 
 

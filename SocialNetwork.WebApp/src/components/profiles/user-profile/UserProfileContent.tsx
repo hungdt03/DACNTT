@@ -1,30 +1,32 @@
 import { Check, MessageSquareText, MoreHorizontal, Plus, User, UserCheckIcon, X } from "lucide-react";
 import { FC, useEffect, useState } from "react";
-import { selectAuth } from "../../features/slices/auth-slice";
+import { selectAuth } from "../../../features/slices/auth-slice";
 import { useDispatch, useSelector } from "react-redux";
-import images from "../../assets";
+import images from "../../../assets";
 import { Avatar, Button, Divider, Modal, Popover, Tabs, TabsProps, Tooltip, message } from "antd";
-import ProfilePostList from "./ProfilePostList";
-import { FriendRequestResource } from "../../types/friendRequest";
-import { UserResource } from "../../types/user";
-import friendRequestService from "../../services/friendRequestService";
+import ProfilePostList from "../shared/ProfilePostList";
+import { FriendRequestResource } from "../../../types/friendRequest";
+import { UserResource } from "../../../types/user";
+import friendRequestService from "../../../services/friendRequestService";
 import { toast } from "react-toastify";
-import friendService from "../../services/friendService";
-import { FriendRequestStatus } from "../../enums/friend-request";
-import followService from "../../services/followService";
-import { FriendResource } from "../../types/friend";
-import ProfileFriendList from "./shared/ProfileFriendList";
-import ProfileFollowerList from "./shared/ProfileFollowerList";
-import ProfileFolloweeList from "./shared/ProfileFolloweesList";
-import UserProfileMoreAction from "./user-profile/UserProfileMoreAction";
-import useModal from "../../hooks/useModal";
-import ReportPostModal from "../modals/reports/ReportPostModal";
-import reportService from "../../services/reportService";
+import friendService from "../../../services/friendService";
+import { FriendRequestStatus } from "../../../enums/friend-request";
+import followService from "../../../services/followService";
+import { FriendResource } from "../../../types/friend";
+import ProfileFriendList from "../shared/ProfileFriendList";
+import ProfileFollowerList from "../shared/ProfileFollowerList";
+import ProfileFolloweeList from "../shared/ProfileFolloweesList";
+import UserProfileMoreAction from "./UserProfileMoreAction";
+import useModal from "../../../hooks/useModal";
+import ReportPostModal from "../../modals/reports/ReportPostModal";
+import reportService from "../../../services/reportService";
 import { Link, useNavigate } from "react-router-dom";
-import userService from "../../services/userService";
-import chatRoomService from "../../services/chatRoomService";
-import { AppDispatch } from "../../app/store";
-import { add } from "../../features/slices/chat-popup-slice";
+import userService from "../../../services/userService";
+import chatRoomService from "../../../services/chatRoomService";
+import { AppDispatch } from "../../../app/store";
+import { add } from "../../../features/slices/chat-popup-slice";
+import ProfileImageList from "../shared/ProfileImageList";
+import ProfileVideoList from "../shared/ProfileVideoList";
 
 
 type ProfileUserContentProps = {
@@ -145,7 +147,6 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
     const handleGetOrCreateChatRoom = async () => {
         const response = await chatRoomService.getOrCreateChatRoom(targetUser.id);
-        console.log(response)
         if (response.isSuccess) {
             dispatch(add(response.data))
         } else {
@@ -157,7 +158,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
         {
             key: '1',
             label: 'Bài viết',
-            children: <ProfilePostList user={targetUser} isShowPostCreator={false} />,
+            children: <ProfilePostList user={targetUser} />,
         },
         {
             key: '2',
@@ -166,11 +167,21 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
         },
         {
             key: '3',
+            label: 'Ảnh',
+            children: <ProfileImageList userId={targetUser.id} isMe={false} />,
+        },
+        {
+            key: '4',
+            label: 'Video',
+            children: <ProfileVideoList userId={targetUser.id} isMe={false}  />,
+        },
+        {
+            key: '5',
             label: 'Người theo dõi',
             children: <ProfileFollowerList userId={targetUser.id} />,
         },
         {
-            key: '4',
+            key: '6',
             label: 'Đang theo dõi',
             children: <ProfileFolloweeList userId={targetUser.id} />,
         },
@@ -186,15 +197,19 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                 </div>
 
                 <div className="flex flex-col lg:flex-row items-center lg:items-end -mt-20 gap-x-6 lg:-mt-12 px-8">
-                    <div className="relative">
+                    <div className="relative flex-shrink-0 z-30">
                         {targetUser?.haveStory ?
-                            <Link className="lg:w-32 lg:h-32 w-28 h-28 aspect-square rounded-full border-[3px] p-[2px] border-primary z-30 flex items-center justify-center" to={`/stories/${targetUser.id}`}>
-                                <img alt="Ảnh đại diện" className="rounded-full object-cover aspect-square" src={targetUser?.avatar ?? images.user} />
+                            <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[3px] p-[2px] border-primary flex items-center justify-center aspect-square" to={`/stories/${targetUser.id}`}>
+                                <img alt="Ảnh đại diện" className="object-cover aspect-square"  src={targetUser?.avatar ?? images.user} />
                             </Link>
-                            : <img alt="Ảnh đại diện" className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[1px] border-primary z-30" src={targetUser?.avatar ?? images.user} />
+                            : <img
+                                alt="Ảnh đại diện"
+                                className="z-30 lg:w-32 lg:h-32 w-28 h-28 rounded-full object-cover aspect-square"
+                                src={targetUser?.avatar ?? images.user}
+                            />
                         }
-                        
-                        {user?.isOnline && <div className="absolute bottom-0 right-0 p-4 rounded-full border-[2px] border-white bg-green-500"></div>}
+
+                        {user?.isOnline && <div className="absolute bottom-2 right-3 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
                     </div>
                     <div className="lg:py-6 py-3 flex flex-col lg:flex-row items-center gap-y-4 lg:gap-y-0 lg:items-end justify-between w-full">
                         <div className="flex flex-col items-center lg:items-start gap-y-1">
@@ -209,6 +224,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
                         </div>
                     </div>
                 </div>
+                
                 <div className="w-full flex justify-between">
                     <Avatar.Group>
                         {friends.map(friend => <Tooltip key={friend.id} title={friend.fullName}>

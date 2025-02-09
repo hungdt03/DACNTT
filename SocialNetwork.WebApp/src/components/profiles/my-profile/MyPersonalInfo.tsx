@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { BriefcaseBusiness, Delete, DotSquareIcon, Edit3, GraduationCap, Home, MapPin, Plus, School, Workflow } from "lucide-react";
+import { BriefcaseBusiness, Delete, Edit3, GraduationCap, Home, MapPin, Plus, School } from "lucide-react";
 import useModal from "../../../hooks/useModal";
 import { Modal, message } from "antd";
 import ModifyUserEducation from "../../modals/ModifyUserEducation";

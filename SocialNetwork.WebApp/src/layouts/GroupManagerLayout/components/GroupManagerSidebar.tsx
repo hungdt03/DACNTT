@@ -30,15 +30,7 @@ const GroupManagerSidebar: FC = () => {
     }, [])
 
     return <div className="relative h-full col-span-3 overflow-y-auto custom-scrollbar">
-        <div className="sticky top-0 flex flex-col gap-y-2 bg-white z-10 p-4 shadow">
-            <span className="font-bold text-xl">Nhóm</span>
-
-            <div className="flex items-center gap-x-2 rounded-3xl bg-gray-100 px-3">
-                <Search size={16} />
-                <input placeholder="Tìm kiếm nhóm" className="text-sm w-full px-2 py-2 border-none outline-none bg-gray-100" />
-            </div>
-        </div>
-        <div className="px-4 py-2">
+        <div className="px-4 py-4">
             <div className="flex flex-col">
                 <Link to='/groups/feeds' className="flex items-center gap-x-2 py-3 px-2 rounded-md w-full hover:bg-gray-100">
                     <img alt="Bảng tin" className="w-6 h-6" src={images.feed} />

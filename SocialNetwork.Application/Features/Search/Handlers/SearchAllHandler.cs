@@ -65,8 +65,8 @@ namespace SocialNetwork.Application.Features.Search.Handlers
 
                 var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id, FriendShipStatus.ACCEPTED);
                 var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(user.Id, FriendShipStatus.ACCEPTED);
-                var mutualFriendsCount = userFriends.Count(f => myFriendsIds.Contains(f.UserId == user.Id ? f.FriendId : user.Id));
-                var top3MutualFriends = userFriends.Where(f => myFriendsIds.Contains(f.UserId == user.Id ? f.FriendId : user.Id)).Select(f => f.UserId == user.Id ? f.Friend : user).Take(3);
+                var mutualFriendsCount = userFriends.Count(f => myFriendsIds.Contains(f.UserId == user.Id ? f.FriendId : f.UserId));
+                var top3MutualFriends = userFriends.Where(f => myFriendsIds.Contains(f.UserId == user.Id ? f.FriendId : f.UserId)).Select(f => f.UserId == user.Id ? f.Friend : f.User).Take(3);
                 var follower = await _unitOfWork.FollowRepository.GetFollowByFollowerIdAndFolloweeIdAsync(userId, user.Id);
 
                 var item = new SearchUserSuggestResponse()

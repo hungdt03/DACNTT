@@ -23,7 +23,7 @@ const ThreeMedia: FC<MixMediaProps> = ({
                 {items[0].mediaType === MediaType.VIDEO ? (
                     <video
                         src={items[0].mediaUrl}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover aspect-square"
                         onClick={() => handlePreview(0)}
                         controls
                     />
@@ -42,7 +42,7 @@ const ThreeMedia: FC<MixMediaProps> = ({
                         <video
                             src={item.mediaUrl}
                             key={item.id}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover aspect-square"
                             onClick={() => handlePreview(index + 1)}
                             controls
                         />

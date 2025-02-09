@@ -1,15 +1,16 @@
-﻿using MediatR;
+﻿
+using MediatR;
 using SocialNetwork.Application.Contracts.Responses;
 
-namespace SocialNetwork.Application.Features.Follow.Queries
+namespace SocialNetwork.Application.Features.Friend.Queries
 {
-    public class GetAllFollowerByUserIdQuery : IRequest<BaseResponse>
+    public class GetAllUserFriendsFullInfoQuery : IRequest<BaseResponse>
     {
         public string UserId { get; set; }
         public int Page {  get; set; }
         public int Size { get; set; }
 
-        public GetAllFollowerByUserIdQuery(string userId, int page, int size)
+        public GetAllUserFriendsFullInfoQuery(string userId, int page, int size)
         {
             UserId = userId;
             Page = page;

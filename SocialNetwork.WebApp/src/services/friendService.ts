@@ -16,25 +16,35 @@ class FriendService {
         return FriendService.instance;
     }
 
-    getAllMyFriends() : Promise<DataResponse<FriendResource[]>> {
-        return axiosInterceptor.get('/api/friends/')
+    getAllMyFriends(page: number, size: number) : Promise<PaginationResponse<FriendResource[]>> {
+        return axiosInterceptor.get('/api/friends/', {
+            params: {
+                page,
+                size
+            }
+        })
     }
 
-    getAllFriendsByUserId(userId: string) : Promise<DataResponse<FriendResource[]>> {
-        return axiosInterceptor.get('/api/friends/' + userId)
+    getAllFriendsByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<FriendResource[]>> {
+        return axiosInterceptor.get('/api/friends/' + userId, {
+            params: {
+                page,
+                size
+            }
+        })
     }
 
     getInvitableFriends(groupId: string) : Promise<DataResponse<InvitableFriendResource[]>> {
         return axiosInterceptor.get('/api/friends/invitable/' + groupId)
     }
 
-    getTopNineOfUserFriends(friendId: string) : Promise<DataResponse<FriendResource[]>> {
-        return axiosInterceptor.get('/api/friends/top-nine-user-friend/'+ friendId)
-    }
+    // getTopNineOfUserFriends(friendId: string) : Promise<DataResponse<FriendResource[]>> {
+    //     return axiosInterceptor.get('/api/friends/top-nine-user-friend/'+ friendId)
+    // }
 
-    getTopNineOfMyFriends() : Promise<DataResponse<FriendResource[]>> {
-        return axiosInterceptor.get('/api/friends/top-nine-my-friend/')
-    }
+    // getTopNineOfMyFriends() : Promise<DataResponse<FriendResource[]>> {
+    //     return axiosInterceptor.get('/api/friends/top-nine-my-friend/')
+    // }
 
 
     deleteFriend(friendId: string) : Promise<BaseResponse> {

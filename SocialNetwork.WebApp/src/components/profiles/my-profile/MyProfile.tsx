@@ -3,15 +3,15 @@ import { FriendResource } from "../../../types/friend";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../../features/slices/auth-slice";
 import friendService from "../../../services/friendService";
-import ProfileContent from "../ProfileContent";
-import ProfileLeftSide from "../ProfileLeftSide";
+import MyProfileContent from "./MyProfileContent";
+import MyProfileSide from "./MyProfileSide";
 
 const MyProfile: FC = () => {
     const { user } = useSelector(selectAuth);
     const [friends, setFriends] = useState<FriendResource[]>([])
 
     const fetchFriends = async () => {
-        const response = await friendService.getTopNineOfMyFriends();
+        const response = await friendService.getAllMyFriends(1, 9);
         if (response.isSuccess) {
             setFriends(response.data)
         }
@@ -22,8 +22,8 @@ const MyProfile: FC = () => {
     }, [])
     
     return <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:px-0 md:max-w-screen-md max-w-screen-sm px-4 mx-auto w-full grid grid-cols-12 gap-4 h-full lg:h-[90vh] bg-slate-100">
-        {user && <ProfileContent friends={friends} user={user} />}
-        {user && <ProfileLeftSide friends={friends} />}
+        {user && <MyProfileContent friends={friends} user={user} />}
+        {user && <MyProfileSide friends={friends} />}
     </div>
 };
 

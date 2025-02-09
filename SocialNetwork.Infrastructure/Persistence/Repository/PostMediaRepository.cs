@@ -57,7 +57,39 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             var query = _context.PostMedias
                 .Include(s => s.Post)
                 .Where(s => s.Post.GroupId == groupId && s.MediaType == MediaType.VIDEO)  
-                .Where(s => s.Post.GroupId == groupId).AsQueryable();
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var medias = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (medias, totalCount);
+        }
+
+        public async Task<(List<PostMedia> Images, int TotalCount)> GetAllPostImagesByUserId(string userId, int page, int size)
+        {
+            var query = _context.PostMedias
+               .Include(s => s.Post)
+               .Where(s => s.Post.UserId == userId && s.MediaType == MediaType.IMAGE)
+               .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var medias = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (medias, totalCount);
+        }
+
+        public async Task<(List<PostMedia> Videos, int TotalCount)> GetAllPostVideosByUserId(string userId, int page, int size)
+        {
+            var query = _context.PostMedias
+              .Include(s => s.Post)
+              .Where(s => s.Post.UserId == userId && s.MediaType == MediaType.VIDEO)
+              .AsQueryable();
 
             var totalCount = await query.CountAsync();
             var medias = await query
@@ -73,5 +105,68 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.PostMedias.SingleOrDefaultAsync(post => post.Id == postId);
         }
 
+        public async Task<(List<PostMedia> Images, int TotalCount)> GetPublicAndFriendPostImagesByUserId(string userId, int page, int size)
+        {
+            var query = _context.PostMedias
+              .Include(s => s.Post)
+              .Where(s => (s.Post.Privacy == PrivacyConstant.PUBLIC || s.Post.Privacy == PrivacyConstant.FRIENDS) && s.Post.UserId == userId && s.MediaType == MediaType.IMAGE)
+              .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var medias = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (medias, totalCount);
+        }
+
+        public async Task<(List<PostMedia> Videos, int TotalCount)> GetPublicAndFriendPostVideosByUserId(string userId, int page, int size)
+        {
+            var query = _context.PostMedias
+              .Include(s => s.Post)
+              .Where(s => (s.Post.Privacy == PrivacyConstant.PUBLIC || s.Post.Privacy == PrivacyConstant.FRIENDS) && s.Post.UserId == userId && s.MediaType == MediaType.VIDEO)
+              .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var medias = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (medias, totalCount);
+        }
+
+        public async Task<(List<PostMedia> Images, int TotalCount)> GetPublicPostImagesByUserId(string userId, int page, int size)
+        {
+            var query = _context.PostMedias
+              .Include(s => s.Post)
+              .Where(s => s.Post.Privacy == PrivacyConstant.PUBLIC && s.Post.UserId == userId && s.MediaType == MediaType.IMAGE)
+              .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var medias = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (medias, totalCount);
+        }
+
+        public async Task<(List<PostMedia> Videos, int TotalCount)> GetPublicPostVideosByUserId(string userId, int page, int size)
+        {
+            var query = _context.PostMedias
+             .Include(s => s.Post)
+             .Where(s => s.Post.Privacy == PrivacyConstant.PUBLIC && s.Post.UserId == userId && s.MediaType == MediaType.VIDEO)
+             .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var medias = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (medias, totalCount);
+        }
     }
 }
