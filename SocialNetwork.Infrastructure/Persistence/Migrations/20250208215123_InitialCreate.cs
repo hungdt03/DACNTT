@@ -412,6 +412,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FriendId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsConnect = table.Column<bool>(type: "bit", nullable: false),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),

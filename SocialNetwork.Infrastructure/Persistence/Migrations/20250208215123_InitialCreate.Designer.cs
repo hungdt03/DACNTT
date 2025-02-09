@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250208041752_InitialCreate")]
+    [Migration("20250208215123_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -1525,6 +1525,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<string>("FriendId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsConnect")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
