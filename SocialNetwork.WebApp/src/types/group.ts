@@ -20,7 +20,6 @@ export type GroupResource = {
     requireApprovalPost: boolean;
     onlyAdminCanApprovalMember: boolean;
     adminCount: number;
-    dateCreated: Date;
     isDeleted: boolean;
     
 }
