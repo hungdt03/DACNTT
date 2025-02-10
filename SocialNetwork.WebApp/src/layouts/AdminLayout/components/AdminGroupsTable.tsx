@@ -26,10 +26,10 @@ const AdminGroupsTable: React.FC<GroupTableProps> = ({ groups }) => {
                                 <b>STT</b>
                             </TableCell>
                             <TableCell sx={{ flexGrow: 1, minWidth: 150 }}>
-                                <b>Nội dung </b>
+                                <b>Tên nhóm </b>
                             </TableCell>
                             <TableCell sx={{ flexGrow: 1, minWidth: 150 }}>
-                                <b>Người đăng</b>
+                                <b>Mô tả</b>
                             </TableCell>
                             <TableCell sx={{ flexGrow: 1, minWidth: 100 }}>
                                 <b>Ngày tạo</b>
