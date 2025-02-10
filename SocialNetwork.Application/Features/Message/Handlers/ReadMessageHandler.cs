@@ -9,6 +9,7 @@ using SocialNetwork.Application.Features.Message.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.Message.Handlers
 {
@@ -30,6 +31,8 @@ namespace SocialNetwork.Application.Features.Message.Handlers
         {
             var message = await _unitOfWork.MessageRepository.GetLastMessageByGroupIdAsync(request.ChatRoomId)
                 ?? throw new NotFoundException("Không tìm thấy tin nhắn");
+
+            if (message.MessageType == MessageType.SYSTEM) throw new AppException("Bỏ qua tin nhắn hệ thống");
 
             var userId = _contextAccessor.HttpContext.User.GetUserId();
             if (message.SenderId == userId) throw new AppException("Tin nhắn đã được đọc lúc gửi");

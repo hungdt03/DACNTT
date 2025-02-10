@@ -35,8 +35,9 @@ class FriendRequestService {
     getFriendRequestByUserId(userId: string) : Promise<DataResponse<FriendRequestResource>> {
         return axiosInterceptor.get('/api/friend-requests/'+ userId)
     }
-    getAllFriendRequestByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<FriendRequestResource[]>> {
-        return axiosInterceptor.get('/api/friend-requests/get-allrequest/'+ userId, {
+
+    getAllFriendRequestByUserId(page: number, size: number) : Promise<PaginationResponse<FriendRequestResource[]>> {
+        return axiosInterceptor.get('/api/friend-requests/get-allrequest', {
             params: {
                 page,
                 size

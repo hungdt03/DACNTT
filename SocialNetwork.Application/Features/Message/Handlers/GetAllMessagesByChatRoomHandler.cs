@@ -33,6 +33,7 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                 {
                     message.Reads = message.Reads.Where(r => r.User.Id != userId).ToList();
                 }
+
                 var item = ApplicationMapper.MapToMessage(message);
               
                 response.Add(item);

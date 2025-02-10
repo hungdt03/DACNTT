@@ -5,6 +5,7 @@ import { inititalValues } from "../../utils/pagination";
 import { useParams } from "react-router-dom";
 import groupService from "../../services/groupService";
 import { message } from "antd";
+import LoadingIndicator from "../../components/LoadingIndicator";
 
 const GroupPendingMembers: FC = () => {
     const { id } = useParams()
@@ -13,11 +14,11 @@ const GroupPendingMembers: FC = () => {
     const [pagination, setPagination] = useState(inititalValues)
 
     const fetchPendingRequests = async (page: number, size: number) => {
-        if(id) {
+        if (id) {
             setLoading(true)
             const response = await groupService.getAllJoinGroupRequestByGroupId(id, page, size);
             setLoading(false)
-            if(response.isSuccess) {
+            if (response.isSuccess) {
                 setPendingRequests(response.data)
                 setPagination(response.pagination)
             }
@@ -30,7 +31,7 @@ const GroupPendingMembers: FC = () => {
 
     const handleRejectRequest = async (requestId: string) => {
         const response = await groupService.rejectRequestJoinGroup(requestId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message)
             fetchPendingRequests(1, 6)
         } else {
@@ -40,7 +41,7 @@ const GroupPendingMembers: FC = () => {
 
     const handleApprovalRequest = async (requestId: string) => {
         const response = await groupService.approvalRequestJoinGroup(requestId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
             fetchPendingRequests(1, 6)
         } else {
@@ -49,17 +50,16 @@ const GroupPendingMembers: FC = () => {
     }
 
     return <div className="w-full">
-        <div className="w-full h-40 bg-white shadow">
-        </div>
-
         <div className="grid grid-cols-2 gap-4 py-4 px-8">
-            {pendingRequests?.map(request => <PendingMember 
-                onApproval={() => handleApprovalRequest(request.id)} 
-                onReject={() => handleRejectRequest(request.id)} 
-                key={request.id} 
+            {pendingRequests?.map(request => <PendingMember
+                onApproval={() => handleApprovalRequest(request.id)}
+                onReject={() => handleRejectRequest(request.id)}
+                key={request.id}
                 request={request}
             />)}
         </div>
+
+        {loading && <LoadingIndicator />}
     </div>
 };
 

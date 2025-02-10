@@ -1,6 +1,7 @@
 
 import { CreateChatRoomRequest } from '../components/modals/CreateGroupChatModal';
 import axiosInterceptor from '../configurations/axiosInterceptor'
+import { ChatRoomMemberResource } from '../types/chat-room-member';
 import { ChatRoomResource } from '../types/chatRoom';
 import { MessageMediaResource } from '../types/message';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
@@ -54,6 +55,35 @@ class ChatRoomService {
             receiverId
         })
     }
+
+    addMember(chatRoomId: string, userIds: string[]) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/chatRooms/members/add', { chatRoomId, userIds })
+    }
+
+    kickMember(memberId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/chatRooms/members/kick/' + memberId)
+    }
+
+    uploadRoomImage(form: FormData) : Promise<BaseResponse> {
+        return axiosInterceptor.post("/api/chatRooms/upload-image", form);
+    }
+
+    changeRoomName(chatRoomId: string, name: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post("/api/chatRooms/upload-name", { chatRoomId, name });
+    }
+
+    chooseNewLeader(memberId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put("/api/chatRooms/members/add-leader/" + memberId   );
+    }
+
+    leaveGroup(chatRoomId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/chatRooms/members/leave/' + chatRoomId)
+    }
+
+    getMembersByChatRoomId(chatRoomId: string) : Promise<DataResponse<ChatRoomMemberResource[]>> {
+        return axiosInterceptor.get('/api/chatRooms/members/' + chatRoomId);
+    }
+ 
  
 }
 

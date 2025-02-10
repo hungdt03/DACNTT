@@ -54,11 +54,13 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 var firstMember = new ChatRoomMember()
                 {
                     UserId = friendRequest.FriendId,
+                    IsAccepted = true,
                 };
 
                 var secondMember = new ChatRoomMember()
                 {
                     UserId = friendRequest.UserId,
+                    IsAccepted = true,
                 };
 
                 var members = new List<ChatRoomMember>() { firstMember, secondMember };

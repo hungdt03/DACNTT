@@ -1,0 +1,101 @@
+﻿
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Application.Configuration;
+using SocialNetwork.Application.Contracts.Responses;
+using SocialNetwork.Application.Exceptions;
+using SocialNetwork.Application.Features.ChatRoom.Commands;
+using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.ChatRoomInfo;
+using SocialNetwork.Domain.Entity.System;
+
+namespace SocialNetwork.Application.Features.ChatRoom.Handlers
+{
+    public class AddMembersToChatRoomHandler : IRequestHandler<AddMembersToChatRoomCommand, BaseResponse>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
+        private readonly ISignalRService _signalRService;
+
+        public AddMembersToChatRoomHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager, ISignalRService signalRService)
+        {
+            _unitOfWork = unitOfWork;
+            _contextAccessor = contextAccessor;
+            _userManager = userManager;
+            _signalRService = signalRService;
+        }
+
+        public async Task<BaseResponse> Handle(AddMembersToChatRoomCommand request, CancellationToken cancellationToken)
+        {
+            var userId = _contextAccessor.HttpContext.User.GetUserId();
+            var userFullname = _contextAccessor.HttpContext.User.GetFullName();
+
+            var chatRoom = await _unitOfWork
+                .ChatRoomRepository
+                .GetChatRoomByIdAsync(request.ChatRoomId)
+                ?? throw new NotFoundException("Nhóm chat không tồn tại");
+
+            var userInChatRoom = await _unitOfWork.ChatRoomMemberRepository
+                .GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId);
+
+
+            if (userInChatRoom == null || !userInChatRoom.IsLeader)
+                throw new AppException("Chỉ nhóm trưởng mới được thêm thành viên vào nhóm");
+
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            var allMembers = await _unitOfWork.ChatRoomMemberRepository.GetAllMembersByChatRoomIdAsync(chatRoom.Id);
+            var messages = new List<Domain.Entity.MessageInfo.Message>();
+            foreach(var memberId in request.UserIds)
+            {
+                if (allMembers.Any(m => m.UserId == memberId))
+                    continue;
+
+                var memberUser = await _userManager.FindByIdAsync(memberId)
+                    ?? throw new AppException("Vui lòng kiểm tra lại danh sách userIds");
+
+                var member = new ChatRoomMember()
+                {
+                    IsLeader = false,
+                    UserId = memberId,
+                    User = memberUser,
+                    ChatRoomId = chatRoom.Id,
+                    IsAccepted = true,
+                };
+
+                var message = new Domain.Entity.MessageInfo
+                    .Message()
+                {
+                    Content = $"{userFullname} đã thêm {memberUser.FullName} vào nhóm",
+                    ChatRoomId = chatRoom.Id,
+                    MessageType = MessageType.SYSTEM,
+                    SentAt = DateTimeOffset.UtcNow,
+                };
+
+                await _unitOfWork.MessageRepository.CreateMessageAsync(message);
+                await _unitOfWork.ChatRoomMemberRepository.CreateChatRoomMember(member);
+                await _signalRService.JoinGroup(memberId, chatRoom.UniqueName);
+                messages.Add(message);
+            }
+           
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            foreach (var message in messages)
+            {
+                await _signalRService.SendMessageToSpecificGroup(chatRoom.UniqueName, ApplicationMapper.MapToMessage(message));
+            }
+
+            return new BaseResponse()
+            {
+                Message = "Thêm thành viên vào nhóm chat thành công",
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+            };
+        }
+    }
+}

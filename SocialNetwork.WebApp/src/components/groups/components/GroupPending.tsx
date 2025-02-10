@@ -1,7 +1,8 @@
-import { Avatar, Divider } from "antd";
+import { Avatar, Divider, Tooltip } from "antd";
 import { FC } from "react";
 import { GroupResource } from "../../../types/group";
 import { BookA, Calendar, Eye, Lock, Users2Icon, UsersRoundIcon } from "lucide-react";
+import { formatTime } from "../../../utils/date";
 
 type GroupPendingProps = {
     group: GroupResource
@@ -40,12 +41,12 @@ const GroupPending: FC<GroupPendingProps> = ({
             <div className="flex flex-col gap-y-2">
                 <div className="flex items-center gap-x-4">
                     <BookA size={16} className="text-gray-500" />
-                    <p className="break-words text-[15px]">Hôm nay có 7 bài viết mới</p>
+                    <p className="break-words text-[15px]">Hôm nay có {group.countTodayPosts} bài viết mới</p>
                 </div>
 
                 <div className="flex items-center gap-x-4">
                     <Users2Icon size={16} className="text-gray-500" />
-                    <p className="break-words text-[15px]">Tổng cộng 58.571 thành viên</p>
+                    <p className="break-words text-[15px]">Tổng cộng {group.members.length} thành viên</p>
                 </div>
 
                 <div className="flex items-center gap-x-4">
@@ -53,13 +54,11 @@ const GroupPending: FC<GroupPendingProps> = ({
                     <div>
                         <p className="break-words text-[15px]">Bạn bè: </p>
                         <Avatar.Group>
-                            <Avatar size={'small'} />
-                            <Avatar size={'small'} />
-                            <Avatar size={'small'} />
-                            <Avatar size={'small'} />
-                            <Avatar size={'small'} />
-                            <Avatar size={'small'} />
-                            <Avatar size={'small'} />
+                            {group.friendMembers.map(member =>
+                                <Tooltip key={member.id} title={member.fullName}>
+                                    <Avatar  src={member.avatar} size={'small'} />
+                                </Tooltip>
+                            )}
                         </Avatar.Group>
                     </div>
                 </div>
@@ -67,7 +66,7 @@ const GroupPending: FC<GroupPendingProps> = ({
 
                 <div className="flex items-center gap-x-4">
                     <Calendar size={16} className="text-gray-500" />
-                    <p className="break-words text-[15px]">Ngày tạo: 4 năm trước</p>
+                    <p className="break-words text-[15px]">Ngày tạo: {formatTime(new Date(group.dateCreated))}</p>
                 </div>
 
             </div>

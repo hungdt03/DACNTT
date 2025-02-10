@@ -31,7 +31,23 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             response.AdminCount = await _unitOfWork.GroupMemberRepository
                 .CountAdminsByGroupIdAsync(request.GroupId);
 
-            if(groupMember != null)
+            var todayPosts = await _unitOfWork.PostRepository
+                .CountTodayPostsByGroupIdAsync(request.GroupId);
+
+            response.CountTodayPosts = todayPosts;
+            response.CountMembers = await _unitOfWork.GroupMemberRepository.CountGroupMembersByGroupIdAsync(request.GroupId);
+
+            response.FriendMembers = new List<UserResponse>();
+            foreach (var friend in group.Members)
+            {
+                if (friend.UserId == userId) continue;
+                var friendShip = await _unitOfWork.FriendShipRepository
+                    .GetFriendShipByUserIdAndFriendIdAsync(friend.UserId, userId, FriendShipStatus.ACCEPTED);
+
+                response.FriendMembers.Add(ApplicationMapper.MapToUser(friend.User));
+            }
+            
+            if (groupMember != null)
             {
                 response.IsMine = groupMember.Role == MemberRole.ADMIN;
                 response.IsMember = true;

@@ -281,5 +281,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Posts.Where(p => p.OriginalPostId != null && p.UserId == userId).CountAsync();
         }
+
+        public async Task<int> CountTodayPostsByGroupIdAsync(Guid groupId)
+        {
+            return await _context.Posts
+                .Where(p => p.IsGroupPost && p.GroupId == groupId && p.DateCreated.Date == DateTimeOffset.UtcNow.Date).CountAsync();
+        }
     }
 }

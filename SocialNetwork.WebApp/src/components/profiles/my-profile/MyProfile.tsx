@@ -12,6 +12,7 @@ const MyProfile: FC = () => {
 
     const fetchFriends = async () => {
         const response = await friendService.getAllMyFriends(1, 9);
+        console.log(response)
         if (response.isSuccess) {
             setFriends(response.data)
         }
