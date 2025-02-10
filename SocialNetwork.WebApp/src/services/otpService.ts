@@ -1,6 +1,6 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
-import { BaseResponse, DataResponse } from '../types/response';
+import { AuthResponse, BaseResponse, DataResponse } from '../types/response';
 
 
 class OtpService {
@@ -36,6 +36,20 @@ class OtpService {
 
     resendOtpVerifyForgotPassword(email: string) :Promise<BaseResponse> {
         return axiosInterceptor.post('/api/otps/resend-verify-forgot-password', {
+            email
+        })
+    }
+
+    
+    verifyChangeEmail(otpCode: string, email: string) : Promise<DataResponse<AuthResponse>> {
+        return axiosInterceptor.post('/api/otps/verify-change-email', {
+            otpCode,
+            email
+        })
+    }
+
+    resendOtpVerifyChangeEmail(email: string) :Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/otps/resend-change-email', {
             email
         })
     }

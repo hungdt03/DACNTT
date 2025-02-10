@@ -57,5 +57,22 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(command);
             return Ok(response);
         }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
+        {
+            var response = await mediator.Send(command);
+            return Ok(response);
+        }
+
+        [Authorize]
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("change-email")]
+        public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailCommand command)
+        {
+            var response = await mediator.Send(command);
+            return Ok(response);
+        }
     }
 }

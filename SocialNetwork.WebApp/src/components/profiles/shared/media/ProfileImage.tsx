@@ -41,7 +41,7 @@ const ProfileImage: FC<ProfileImageProps> = ({
     return <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
         <span className="font-bold text-lg text-gray-700">File ảnh</span>
 
-        {images.length === 0 && !loading ? <Empty description='Không có file ảnh nào' /> : <div className="grid grid-cols-2 gap-1">
+        {!loading && <div className="grid grid-cols-2 gap-1">
             {images.map(image => <Image
                 className="object-cover"
                 style={{

@@ -3,6 +3,7 @@ import { ModifyEducationRequest } from '../components/modals/ModifyUserEducation
 import { ModifyUserHometownRequest } from '../components/modals/ModifyUserHometown';
 import { ModifyUserLocationRequest } from '../components/modals/ModifyUserLocation';
 import { ModifyUserWorkPlaceRequest } from '../components/modals/ModifyUserWorkPlace';
+import { UpdateUserInfo } from '../components/modals/UpdateUserInfoModal';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { LocationResource } from '../types/location';
 import { PostMediaResource } from '../types/post';
@@ -167,6 +168,12 @@ class UserService {
 
     checkBlockUser(userId: string) : Promise<DataResponse<boolean>> {
         return axiosInterceptor.get('/api/users/block/' + userId)
+    }
+
+    // BASIC INFO
+
+    updateUserBasicInfo(payload: UpdateUserInfo) : Promise<DataResponse<UserResource>> {
+        return axiosInterceptor.post('/api/users/basic-info', payload)
     }
 }
 

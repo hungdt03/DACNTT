@@ -1,11 +1,12 @@
 ﻿
+
 using MediatR;
 using SocialNetwork.Application.Contracts.Responses;
 using System.ComponentModel.DataAnnotations;
 
 namespace SocialNetwork.Application.Features.Otp.Commands
 {
-    public class ResendOtpForrgotPasswordCommand : IRequest<BaseResponse>
+    public class ResendOtpChangeEmailCommand : IRequest<BaseResponse>
     {
         [Required(ErrorMessage = "Địa chỉ email không được để trống")]
         public string Email { get; set; }

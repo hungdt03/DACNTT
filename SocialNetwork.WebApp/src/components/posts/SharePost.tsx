@@ -28,6 +28,8 @@ import ListSharePostModal from "../modals/ListSharePostModal";
 import PostOtherTags from "./PostOtherTags";
 import PostNotFound from "./PostNotFound";
 import ExpandableText from "../ExpandableText";
+import ChangePostPrivacyModal from "../modals/ChangePostPrivacyModal";
+import { PrivacyType } from "../../enums/privacy";
 
 type SharePostProps = {
     post: PostResource;
@@ -47,11 +49,13 @@ const SharePost: FC<SharePostProps> = ({
     const { handleCancel: editPostCancel, isModalOpen: isEditPostOpen, handleOk: handleEditPostOk, showModal: showEditPostModal } = useModal();
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
     const { handleCancel: cancelListShare, isModalOpen: openListShare, handleOk: okListShare, showModal: showListShare } = useModal();
+    const { handleCancel: cancelPrivacy, isModalOpen: openPrivacy, handleOk: okPrivacy, showModal: showPrivacy } = useModal();
 
     const [reactions, setReactions] = useState<ReactionResource[]>();
     const { user } = useSelector(selectAuth)
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
+    const [privacy, setPrivacy] = useState<PrivacyType>(postParam.privacy)
 
     const [post, setPost] = useState<PostResource>(postParam)
 
@@ -145,6 +149,21 @@ const SharePost: FC<SharePostProps> = ({
         }
     }
 
+    const handleChangePrivacy = async (postId: string, privacy: PrivacyType) => {
+        const response = await postService.changePrivacy(postId, privacy);
+        if (response.isSuccess) {
+            message.success(response.message)
+            setPost(prev => ({
+                ...prev,
+                privacy: privacy
+            }))
+
+            okPrivacy()
+        } else {
+            message.error(response.message)
+        }
+    }
+
     return <div className="flex flex-col gap-y-3 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -182,7 +201,7 @@ const SharePost: FC<SharePostProps> = ({
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
                             <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
-                        {getPrivacyPost(post.privacy)}
+                        <button onClick={post.isGroupPost || post.user.id !== user?.id ? undefined : showPrivacy}>{getPrivacyPost(post.privacy)}</button>
                     </div>
                 </div>
             </div>
@@ -232,24 +251,24 @@ const SharePost: FC<SharePostProps> = ({
         </div>
         <Divider className='mt-0 mb-2' />
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của {post.user.fullName}</p>} width='700px' footer={[
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Bài viết của {post.user.fullName}</p>} width='700px' footer={[
 
         ]} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <PostModal post={post} />
         </Modal>
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
             <PostReactionModal reactions={reactions} />
         </Modal>
 
-        <Modal title={<p className="text-center font-semibold text-xl">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
+        <Modal title={<p className="text-center font-bold text-lg">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
             <EditSharePostModal
                 onSubmit={handleEditSharePostAsync}
                 post={post}
             />
         </Modal>
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
             <SharePostModal
                 post={post}
                 onSuccess={(data, msg) => {
@@ -265,7 +284,7 @@ const SharePost: FC<SharePostProps> = ({
 
         <Modal
             style={{ top: 20 }}
-            title={<p className="text-center font-semibold text-xl">Những người đã chia sẻ bài viết</p>}
+            title={<p className="text-center font-bold text-lg">Những người đã chia sẻ bài viết</p>}
             width='500px'
             centered
             open={openListShare}
@@ -276,6 +295,27 @@ const SharePost: FC<SharePostProps> = ({
             }}
         >
             <ListSharePostModal post={post} />
+        </Modal>
+
+
+        {/* MODAL CHANGE PRIVACY*/}
+        <Modal
+            title={<p className="text-center font-bold text-lg">Chọn đối tượng</p>}
+            centered
+            open={openPrivacy}
+            onOk={okPrivacy}
+            onCancel={cancelPrivacy}
+            okText='Lưu lại'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => void handleChangePrivacy(post.id, privacy),
+                disabled: privacy === post.privacy
+            }}
+        >
+            <ChangePostPrivacyModal
+                privacy={privacy}
+                onChange={(newPrivacy) => setPrivacy(newPrivacy)}
+            />
         </Modal>
     </div>
 };

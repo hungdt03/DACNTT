@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { BriefcaseBusiness, Delete, Edit3, GraduationCap, Home, MapPin, Plus, School } from "lucide-react";
+import { BriefcaseBusiness, Cake, Delete, Edit3, GraduationCap, Home, MapPin, Plus } from "lucide-react";
 import useModal from "../../../hooks/useModal";
 import { Modal, message } from "antd";
 import ModifyUserEducation from "../../modals/ModifyUserEducation";
@@ -12,6 +12,11 @@ import ModifyUserLocation from "../../modals/ModifyUserLocation";
 import ModifyUserHometown from "../../modals/ModifyUserHometown";
 import { UserWorkPlaceResource } from "../../../types/userWorkPlace";
 import ModifyUserWorkPlace from "../../modals/ModifyUserWorkPlace";
+import { Gender } from "../../../enums/gender";
+import { getGenderTitle } from "../../../utils/gender";
+import { formatDateStandard } from "../../../utils/date";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMars, faMarsAndVenus, faVenus } from "@fortawesome/free-solid-svg-icons";
 
 type MyPersonalInfoProps = {
     user: UserResource
@@ -102,6 +107,24 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
     return <>
         <div className="flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-3">
+                <div className="flex items-center gap-x-3">
+                    <Cake className="flex-shrink-0 text-gray-400" size={20} />
+                    <span>{formatDateStandard(new Date(user.dateOfBirth))}</span>
+                </div>
+            </div>
+            {user.gender && <div className="flex flex-col gap-y-3">
+                <div className="flex items-center gap-x-3">
+                    <FontAwesomeIcon
+                        icon={user.gender === Gender.MALE ? faMars : user.gender === Gender.FEMALE ? faVenus : faMarsAndVenus}
+                        className="text-gray-400"
+                        size="lg"
+                    />
+                    <span>
+                        {getGenderTitle(user.gender as Gender)}
+                    </span>
+                </div>
+            </div>}
+            <div className="flex flex-col gap-y-3">
                 <div className="flex items-center justify-between">
                     <span className="font-bold">Học vấn</span>
                     <button onClick={() => handleSelectUserSchool(undefined)} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
@@ -173,7 +196,6 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
                 </span>
             </div> : <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2">
-                    <School size={20} />
                     <span className="font-bold">Nơi sống hiện tại</span>
                 </div>
                 <button onClick={showModal} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
@@ -190,8 +212,7 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
                 </span>
             </div> : <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2">
-                    <School size={20} />
-                    <span>Quê quán</span>
+                    <span className="font-bold">Quê quán</span>
                 </div>
                 <button onClick={showHometown} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                     <Plus size={16} className="text-white" />

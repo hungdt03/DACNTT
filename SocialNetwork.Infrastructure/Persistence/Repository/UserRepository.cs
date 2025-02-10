@@ -14,6 +14,20 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context = context;
         }
 
+        public async Task DeleteUserPermanentlyByEmail(string email)
+        {
+            await _context.Database.ExecuteSqlRawAsync("DELETE FROM AspNetUsers WHERE Email = {0}", email);
+        }
+
+        public async Task<User?> GetUserByEmailIgnoreQuery(string email)
+        {
+            return await _context
+                .Users
+                .IgnoreQueryFilters()   
+                .SingleOrDefaultAsync(u => u.Email == email);
+        }
+
+
         public async Task<List<User>> GetAllUsers()
         {
             return await _context.Users

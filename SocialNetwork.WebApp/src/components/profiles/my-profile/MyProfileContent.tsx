@@ -2,7 +2,7 @@ import { Camera, CheckIcon, Upload as LucideUpload, Plus } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import ImgCrop from 'antd-img-crop';
 import images from "../../../assets";
-import { Avatar, Button, Divider, message, Tabs, TabsProps, Tooltip, Upload, UploadFile, UploadProps } from "antd";
+import { Avatar, Button, Divider, message, Modal, Tabs, TabsProps, Tooltip, Upload, UploadFile, UploadProps } from "antd";
 import ProfilePostList from "../shared/ProfilePostList";
 import { FriendResource } from "../../../types/friend";
 import { UserResource } from "../../../types/user";
@@ -21,6 +21,8 @@ import ProfileFolloweeList from "../shared/ProfileFolloweesList";
 import ProfileSavedPost from "../shared/ProfileSavedPost";
 import ProfileImageList from "../shared/ProfileImageList";
 import ProfileVideoList from "../shared/ProfileVideoList";
+import useModal from "../../../hooks/useModal";
+import UpdateUserInfoModal from "../../modals/UpdateUserInfoModal";
 
 type MyProfileContentProps = {
     user: UserResource;
@@ -42,11 +44,14 @@ const MyProfileContent: FC<MyProfileContentProps> = ({
 
     const { id, tab } = useParams();
     const navigate = useNavigate();
+    const { isModalOpen, handleCancel, handleOk, showModal } = useModal()
 
     useEffect(() => {
         if (id && tab && !VALID_TABS.includes(tab)) {
             navigate(`/profile/${id}`, { replace: true });
         }
+
+        console.log(user)
     }, [tab, id, navigate]);
 
     const onAvatarChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
@@ -168,6 +173,7 @@ const MyProfileContent: FC<MyProfileContentProps> = ({
         navigate(`/profile/${id}/${key}`);
     };
 
+
     return <div id="my-profile-page" className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
         <div className="flex flex-col gap-y-4 overflow-y-auto bg-white p-4">
             <div className="w-full h-full relative z-10">
@@ -242,6 +248,7 @@ const MyProfileContent: FC<MyProfileContentProps> = ({
                     </Tooltip>)}
                 </Avatar.Group>
                 <div className="flex items-center gap-x-2">
+                    <Button onClick={showModal} icon={<Plus size={16} />} type='primary'>Thông tin cá nhân</Button>
                     <Link to='/stories/create'>
                         <Button icon={<Plus size={16} />} type='primary'>Thêm vào tin</Button>
                     </Link>
@@ -252,6 +259,24 @@ const MyProfileContent: FC<MyProfileContentProps> = ({
             {loading && <Loading />}
 
         </div>
+
+        <Modal
+            style={{ top: 50 }}
+            title={<p className="text-center font-bold text-[16px]">Cập nhật thông tin cá nhân</p>}
+            width='500px'
+            open={isModalOpen}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            classNames={{
+                footer: 'hidden'
+            }}
+        >
+            <UpdateUserInfoModal
+                onSuccess={handleOk}
+                user={user}
+            />
+        </Modal>
+
     </div >
 };
 

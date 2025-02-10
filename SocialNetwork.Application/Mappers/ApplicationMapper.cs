@@ -22,6 +22,8 @@ namespace SocialNetwork.Application.Mappers
                 Bio = user.Bio,
                 Email = user.Email,
                 FullName = user.FullName,
+                DateOfBirth = user.DateOfBirth,
+                Gender = user.Gender    
             };
         } 
 

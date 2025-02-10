@@ -227,6 +227,8 @@ const Post: FC<PostProps> = ({
                 ...prev,
                 privacy: privacy
             }))
+
+            okPrivacy()
         } else {
             message.error(response.message)
         }

@@ -12,6 +12,7 @@ import VerifyOTP from "../../components/VerifyOTP";
 import { Field, Form, Formik } from "formik";
 import forgotPasswordSchema from "../../schemas/forgotPasswordSchema";
 import otpService from "../../services/otpService";
+import OTPVerification from "../../components/OTPVerification";
 
 export type ForgotPasswordFormik = {
     email: string;
@@ -25,11 +26,13 @@ const ForgotPasswordPage: FC = () => {
     const [resendLoading, setResendLoading] = useState(false)
 
     const [email, setEmail] = useState('')
+    const [errorOtp, setErrorOtp] = useState('')
+    const [otp, setOtp] = useState('')
     const [verifyOtp, setVerifyOtp] = useState(false);
     const [resetPasswordToken, setResetPasswordToken] = useState('');
 
     const navigate = useNavigate();
-    const verifyOtpRef = useRef<{ startCountdown: (seconds: number) => void } | null>(null);
+    const verifyOtpRef = useRef<{ startCountdown: (seconds: number) => void, clearCountdown: () => void } | null>(null);
 
     const handleSendEmail = async (values: ForgotPasswordFormik) => {
         setEmail(values.email)
@@ -44,15 +47,20 @@ const ForgotPasswordPage: FC = () => {
         }
     }
 
-    const handleVerifyOTP = async (otpCode: string) => {
+    const handleVerifyOTP = async () => {
         setOtpLoading(true)
-        const response = await otpService.verifyForgotPassword(otpCode, email);
+        const response = await otpService.verifyForgotPassword(otp, email);
+        console.log(response)
         setOtpLoading(false)
         if (response.isSuccess) {
+            setOtp('')
+            setErrorOtp('')
             setVerifyOtp(true)
+            verifyOtpRef?.current?.clearCountdown();
             setResetPasswordToken(response.data)
+        } else {
+            setErrorOtp(response.message)
         }
-        return response
     }
 
     const handleResetPassword = async (password: string) => {
@@ -121,16 +129,34 @@ const ForgotPasswordPage: FC = () => {
         </div>
 
         <Modal
-            centered
-            title={<p className="text-center font-semibold text-xl">Khôi phục mật khẩu</p>}
-            width='600px'
-            footer={[]}
+             style={{
+                top: 20
+            }}
+            title={<p className="text-center font-bold text-lg">Khôi phục mật khẩu</p>}
             open={isModalOpen}
             onOk={handleOk}
             onCancel={handleCancel}
             maskClosable={false}
+            classNames={{
+                footer: verifyOtp ? 'hidden' : ''
+            }}
+            okText='Xác thực'
+            cancelText='Hủy bỏ'
+            okButtonProps={{
+                disabled: otp.length !== 6,
+                loading: otpLoading,
+                onClick: () => verifyOtpRef.current && void handleVerifyOTP()
+            }}
         >
-            {!verifyOtp ? <VerifyOTP ref={verifyOtpRef} resendLoading={resendLoading} email={email} onResend={handleResendOTP} loading={otpLoading} onSubmit={handleVerifyOTP} /> :
+            {!verifyOtp ? <OTPVerification
+                 otp={otp}
+                 otpError={errorOtp}
+                 onOtpChange={(value) => setOtp(value)}
+                 ref={verifyOtpRef}
+                 email={email}
+                 resendLoading={resendLoading}
+                 onResend={handleResendOTP}
+             /> :
                 <ResetPassword loading={false} onSubmit={handleResetPassword} />
             }
         </Modal>

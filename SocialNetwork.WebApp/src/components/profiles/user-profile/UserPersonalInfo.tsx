@@ -1,11 +1,16 @@
 import { FC, useEffect, useState } from "react";
-import { BriefcaseBusiness, DotSquareIcon, GraduationCap, Home, MapPin, School, Workflow } from "lucide-react";
+import { BriefcaseBusiness, Cake, DotSquareIcon, GraduationCap, Home, MapPin, School, Workflow } from "lucide-react";
 import { UserResource } from "../../../types/user";
 import { UserSchoolResource } from "../../../types/userSchool";
 import userService from "../../../services/userService";
 import { EducationStatus } from "../../../enums/education-status";
 import { LocationResource } from "../../../types/location";
 import { UserWorkPlaceResource } from "../../../types/userWorkPlace";
+import { formatDateStandard } from "../../../utils/date";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Gender } from "../../../enums/gender";
+import { faMars, faMarsAndVenus, faVenus } from "@fortawesome/free-solid-svg-icons";
+import { getGenderTitle } from "../../../utils/gender";
 
 type UserPersonalInfoProps = {
     user: UserResource
@@ -56,9 +61,27 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
     }, [user])
 
     return <div className="flex flex-col gap-y-4">
-        <div className="flex flex-col gap-y-3">
+        {user.dateOfBirth && <div className="flex flex-col gap-y-3">
+            <div className="flex items-center gap-x-3">
+                <Cake className="flex-shrink-0 text-gray-400" size={20} />
+                <span>{formatDateStandard(new Date(user.dateOfBirth))}</span>
+            </div>
+        </div>}
+        {user.gender && <div className="flex flex-col gap-y-3">
+            <div className="flex items-center gap-x-3">
+                <FontAwesomeIcon
+                    icon={user.gender === Gender.MALE ? faMars : user.gender === Gender.FEMALE ? faVenus : faMarsAndVenus}
+                    className="text-gray-400"
+                    size="lg"
+                />
+                <span>
+                    {getGenderTitle(user.gender as Gender)}
+                </span>
+            </div>
+        </div>}
+        {userSchools.length > 0 && <div className="flex flex-col gap-y-3">
             <span className="font-bold">Học vấn</span>
-            {userSchools.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
+            <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
                 {userSchools.map(userSchool => <div key={userSchool.id} className="flex items-center gap-x-3">
                     <GraduationCap className="flex-shrink-0 text-gray-400" size={16} />
                     <div>
@@ -78,13 +101,13 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
                     </div>
 
                 </div>)}
-            </div>}
-        </div>
+            </div>
+        </div>}
 
-        <div className="flex flex-col gap-y-3">
+        {userWorkPlaces.length > 0 && <div className="flex flex-col gap-y-3">
             <span className="font-bold">Làm việc</span>
 
-            {userWorkPlaces.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
+            <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
                 {userWorkPlaces.map(workPlace => <div key={workPlace.id} className="flex items-center gap-x-3">
                     <BriefcaseBusiness className="flex-shrink-0 text-gray-400" size={16} />
                     <div>
@@ -102,27 +125,22 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
                         </span>
                     </div>
                 </div>)}
-            </div>}
-        </div>
+            </div>
+        </div>}
 
-        {currentLocation ? <div className="flex items-center gap-x-3 text-gray-700">
+        {currentLocation && <div className="flex items-center gap-x-3 text-gray-700">
             <Home size={20} className="text-gray-400" />
             <span>
                 <span>{' Sống tại '}</span>
                 <span className="font-bold">{currentLocation.address + ' '}</span>
             </span>
-        </div> : <div className="flex items-center gap-x-2">
-            <span className="font-bold">Nơi sống hiện tại</span>
         </div>}
-
-        {userHometown ? <div className="flex items-center gap-x-3 text-gray-700">
+        {userHometown && <div className="flex items-center gap-x-3 text-gray-700">
             <MapPin className="text-gray-400" size={20} />
             <span>
                 <span>{' Đến từ '}</span>
                 <span className="font-bold">{userHometown.address + ' '}</span>
             </span>
-        </div> : <div className="flex items-center gap-x-2">
-            <span className="font-bold">Quê quán</span>
         </div>}
     </div>
 };

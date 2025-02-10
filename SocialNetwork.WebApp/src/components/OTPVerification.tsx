@@ -1,24 +1,25 @@
-import { Button, Input } from "antd"
+import { OTPProps } from "antd/es/input/OTP";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { BaseResponse } from "../types/response";
 
-type VerifyOTPProps = {
-    onSubmit: (otp: string) => Promise<BaseResponse>;
-    loading: boolean;
+import { Button, Input } from "antd";
+
+type OTPVerificationProps = {
     email: string;
     resendLoading: boolean;
-    onResend: () => void
+    otp: string;
+    otpError: string;
+    onResend: () => void;
+    onOtpChange: (value: string) => void
 }
 
-const VerifyOTP = forwardRef(({
-    onSubmit,
-    loading,
+const OTPVerification = forwardRef(({
+    otp,
     resendLoading,
+    email,
+    otpError,
+    onOtpChange,
     onResend,
-    email
-}: VerifyOTPProps, ref) => {
-    const [otp, setOtp] = useState<string>('')
-    const [error, setError] = useState<string>('');
+}: OTPVerificationProps, ref) => {
 
     const [timer, setTimer] = useState<string>("05:00");
     const [countdown, setCountdown] = useState<NodeJS.Timeout | null>(null);
@@ -44,49 +45,38 @@ const VerifyOTP = forwardRef(({
         setCountdown(interval);
     };
 
-    
-    const handleVerifyOTP = async () => {
-        const response = await onSubmit(otp);
-        if(!response.isSuccess) {
-            setError(response.message)
-        } else {
-            setError('')
-            if(countdown) {
-                clearInterval(countdown)
-            }
+    const clearCountdown = () => {
+        if (countdown) {
+            clearInterval(countdown)
         }
     }
 
-
     useImperativeHandle(ref, () => ({
-        startCountdown
+        startCountdown,
+        clearCountdown
     }));
 
     useEffect(() => {
-        return () => {
-            if(countdown) {
-                clearInterval(countdown)
-            }
-        }
+        console.log('Rerender')
+        return () => clearCountdown()
     }, [])
 
+    const onChange: OTPProps['onChange'] = (value) => {
+        onOtpChange(value)
+    };
 
     return <div className="w-full flex flex-col items-center gap-y-2 p-4">
-          <div className="flex items-center gap-x-1">
+        <div className="w-full flex flex-col items-center">
             <span>Vui lòng nhập mã OTP chúng tôi đã gửi tới</span>
-            <span className="font-semibold italic">{email}</span>
+            <span className="italic font-semibold">{email}</span>
         </div>
 
         <Input.OTP length={6}
             value={otp}
-            onChange={setOtp}
+            onChange={onChange}
         />
-       
-        {error && <p className="text-sm text-red-600 pl-2">{error}</p>}
 
-        <div className="flex justify-end my-2">
-            <Button loading={loading} disabled={otp.length !== 6} onClick={handleVerifyOTP} type="primary" >Xác thực</Button>
-        </div>
+        {otpError && <p className="text-sm text-red-600 pl-2">{otpError}</p>}
 
         <div className="flex justify-between">
             <p>Thời gian còn lại: {timer}</p>
@@ -97,8 +87,7 @@ const VerifyOTP = forwardRef(({
             <Button loading={resendLoading} type="link" onClick={onResend}>Gửi lại</Button>
         </div>
 
-      
     </div>
 })
 
-export default VerifyOTP;
+export default OTPVerification;

@@ -2,16 +2,18 @@ import { Avatar, Divider, Modal, Popconfirm } from "antd";
 import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAuth, signOut } from "../../features/slices/auth-slice";
-import { Blocks, LogOut } from "lucide-react";
+import { CircleUserRound, LogOut, ShieldBan } from "lucide-react";
 import { AppDispatch } from "../../app/store";
 import { Link } from "react-router-dom";
 import useModal from "../../hooks/useModal";
 import BlockListModal from "../modals/BlockListModal";
+import AccountSettingModal from "../modals/AccountSettingModal";
 
 const AccountDialog: FC = () => {
     const { user } = useSelector(selectAuth);
     const dispatch = useDispatch<AppDispatch>();
     const { handleCancel, handleOk, isModalOpen, showModal } = useModal()
+    const { handleCancel:cancelSetting, handleOk:okSetting, isModalOpen:openSetting, showModal:showSetting } = useModal()
 
     const handleLogout = () => dispatch(signOut())
 
@@ -27,9 +29,16 @@ const AccountDialog: FC = () => {
                     <span className="px-2 py-1 rounded-md bg-gray-200 text-gray-800 font-semibold w-full">Xem trang cá nhân</span>
                 </Link>
             </div>
+            <div onClick={showSetting} className="px-2 py-2 rounded-md hover:bg-gray-100 flex items-center gap-x-2 cursor-pointer">
+                <div className="p-1 rounded-full bg-gray-200 border-[1px] border-gray-300">
+                    <CircleUserRound className="font-semibold" size={15} />
+                </div>
+                <span className="font-semibold text-[15px]">Tài khoản</span>
+            </div>
+
             <div onClick={showModal} className="px-2 py-2 rounded-md hover:bg-gray-100 flex items-center gap-x-2 cursor-pointer">
                 <div className="p-1 rounded-full bg-gray-200 border-[1px] border-gray-300">
-                    <Blocks className="font-semibold" size={15} />
+                    <ShieldBan className="font-semibold" size={15} />
                 </div>
                 <span className="font-semibold text-[15px]">Danh sách chặn</span>
             </div>
@@ -44,7 +53,7 @@ const AccountDialog: FC = () => {
             </Popconfirm>
         </div>
 
-        {/* REPORT TO ADMIN OF GROUP */}
+        {/* BLOCK LIST */}
         <Modal
             style={{
                 top: 20
@@ -58,6 +67,20 @@ const AccountDialog: FC = () => {
             }}
         >
             <BlockListModal />
+        </Modal>
+
+        {/* ACCOUNT SETTING */}
+        <Modal
+           centered
+            title={<p className="text-center font-bold text-lg">Tài khoản</p>}
+            open={openSetting}
+            onOk={okSetting}
+            onCancel={cancelSetting}
+            classNames={{
+                footer: 'hidden'
+            }}
+        >
+            <AccountSettingModal />
         </Modal>
     </>
 };

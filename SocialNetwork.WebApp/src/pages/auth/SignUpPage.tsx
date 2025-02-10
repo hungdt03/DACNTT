@@ -9,7 +9,7 @@ import signUpSchema from "../../schemas/signUpSchema";
 import { Button, Modal } from "antd";
 import useModal from "../../hooks/useModal";
 import otpService from "../../services/otpService";
-import VerifyOTP from "../../components/VerifyOTP";
+import OTPVerification from "../../components/OTPVerification";
 
 export type SignUpRequest = {
     fullName: string;
@@ -28,8 +28,10 @@ const SignUpPage: FC = () => {
 
     const { isModalOpen, showModal, handleCancel, handleOk } = useModal();
 
+    const [otp, setOtp] = useState('')
+    const [errorOtp, setErrorOtp] = useState('')
     const [email, setEmail] = useState('')
-    const verifyOtpRef = useRef<{ startCountdown: (seconds: number) => void } | null>(null);
+    const verifyOtpRef = useRef<{ startCountdown: (seconds: number) => void, clearCountdown: () => void } | null>(null);
 
 
     const handleSignUpAsync = async (values: SignUpRequest) => {
@@ -44,15 +46,21 @@ const SignUpPage: FC = () => {
         }
     }
 
-    const handleVerifyOTP = async (otp: string) => {
+    const handleVerifyOTP = async () => {
         setOtpLoading(true)
         const response = await otpService.verifyAccount(otp, email);
         setOtpLoading(false)
 
         if (response.isSuccess) {
             toast.success(response.message)
+            setOtp('')
+            setErrorOtp('')
+            verifyOtpRef?.current?.clearCountdown();
+            handleOk();
             navigate('/sign-in')
-        } 
+        } else {
+            setErrorOtp(response.message)
+        }
 
         return response;
        
@@ -137,22 +145,30 @@ const SignUpPage: FC = () => {
         </Formik>
 
         <Modal
-            centered
+            style={{
+                top: 20
+            }}
             title={<p className="text-center font-semibold text-xl">Xác thực tài khoản</p>}
-            width='600px'
-            footer={[]}
             open={isModalOpen}
             onOk={handleOk}
             onCancel={handleCancel}
             maskClosable={false}
+            okText='Xác thực'
+            cancelText='Hủy bỏ'
+            okButtonProps={{
+                disabled: otp.length !== 6,
+                loading: otpLoading,
+                onClick: () => verifyOtpRef.current && void handleVerifyOTP()
+            }}
         >
-           {email && <VerifyOTP 
-                ref={verifyOtpRef} 
-                loading={otpLoading} 
-                email={email} 
-                onSubmit={handleVerifyOTP}
-                resendLoading={resendLoading}
-                onResend={handleResendOTP}
+           {email && <OTPVerification 
+                 otp={otp}
+                 otpError={errorOtp}
+                 onOtpChange={(value) => setOtp(value)}
+                 ref={verifyOtpRef}
+                 email={email}
+                 resendLoading={resendLoading}
+                 onResend={handleResendOTP}
 
             />}
         </Modal>

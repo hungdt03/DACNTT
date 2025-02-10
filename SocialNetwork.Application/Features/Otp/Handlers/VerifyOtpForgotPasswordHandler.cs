@@ -23,8 +23,10 @@ namespace SocialNetwork.Application.Features.Otp.Handlers
 
         public async Task<BaseResponse> Handle(VerifyOtpForgotPasswordCommand request, CancellationToken cancellationToken)
         {
-            var otp = await _unitOfWork.OTPRepository.GetOtpByCodeAndEmailAndTypeAsync(request.OtpCode, request.Email, OTPType.FORGOT_PASSWORD)
+            var otp = await _unitOfWork.OTPRepository.GetLastOtpByEmailAndTypeAsync(request.Email, OTPType.FORGOT_PASSWORD)
                ?? throw new AppException("Mã OTP không hợp lệ");
+
+            if(otp.Code != request.OtpCode) throw new AppException("Mã OTP không hợp lệ");
 
             var user = await _userManager.FindByIdAsync(otp.UserId)
                 ?? throw new NotFoundException("User không tồn tại");

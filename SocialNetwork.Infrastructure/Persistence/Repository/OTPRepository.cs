@@ -32,6 +32,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .FirstOrDefaultAsync(o => o.ExpiresAt > DateTimeOffset.UtcNow && o.User.Email == email && o.Type == type);
         }
 
+        public async Task<OTP?> GetLastOtpByUserIdAndTypeAsync(string userId, string type)
+        {
+            return await _context.OTPs
+               .OrderByDescending(o => o.DateCreated)
+               .FirstOrDefaultAsync(o => o.ExpiresAt > DateTimeOffset.UtcNow && o.UserId == userId && o.Type == type);
+        }
+
         public async Task<OTP?> GetOtpByCodeAndEmailAndTypeAsync(string optCode, string email, string type)
         {
             return await _context.OTPs

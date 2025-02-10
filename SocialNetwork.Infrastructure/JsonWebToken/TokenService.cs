@@ -36,6 +36,7 @@ namespace SocialNetwork.Infrastructure.JsonWebToken
 
             var claims = new List<Claim> {
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim(ClaimTypes.Sid, user.Id),
                 new Claim("Avatar", user.Avatar),

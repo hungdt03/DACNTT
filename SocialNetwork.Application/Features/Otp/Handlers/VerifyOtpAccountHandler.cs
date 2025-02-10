@@ -24,8 +24,10 @@ namespace SocialNetwork.Application.Features.Otp.Handlers
 
         public async Task<BaseResponse> Handle(VerifyOtpAccountCommand request, CancellationToken cancellationToken)
         {
-            var otp = await _unitOfWork.OTPRepository.GetOtpByCodeAndEmailAndTypeAsync(request.OtpCode, request.Email, OTPType.ACCOUNT_VERIFICATION)
+            var otp = await _unitOfWork.OTPRepository.GetLastOtpByEmailAndTypeAsync(request.Email, OTPType.ACCOUNT_VERIFICATION)
                 ?? throw new AppException("Mã OTP không hợp lệ");
+
+            if (otp.Code != request.OtpCode) throw new AppException("Mã OTP không hợp lệ");
 
             var user = await _userManager.FindByEmailAsync(request.Email)
                 ?? throw new NotFoundException("Địa chỉ email chưa tồn tại");

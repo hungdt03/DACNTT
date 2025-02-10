@@ -22,7 +22,7 @@ const formatTime = (date: Date): string => {
     }
 }
 
-const formatVietnamDate = (date: Date) : string => {
+const formatVietnamDate = (date: Date): string => {
     const optionsDate: Intl.DateTimeFormatOptions = {
         weekday: 'long',
         day: '2-digit',
@@ -43,8 +43,16 @@ const formatVietnamDate = (date: Date) : string => {
     return `${datePart} lúc ${timePart}`;
 }
 
-const formatTimeMessage = (date: Date) : string => {
+const formatTimeMessage = (date: Date): string => {
     return date.toTimeString().split(" ")[0];
 }
 
-export { formatTime, formatVietnamDate, formatTimeMessage };
+const formatDateStandard = (date: Date): string => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear().toString();
+
+    return `${day}/${month}/${year}`;
+};
+
+export { formatTime, formatVietnamDate, formatTimeMessage, formatDateStandard };

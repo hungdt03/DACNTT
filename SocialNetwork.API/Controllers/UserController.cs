@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Features.BlockList.Commands;
@@ -230,6 +231,14 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> CheckIsBlockUser([FromRoute] string userId)
         {
             var response = await mediator.Send(new CheckIsBlockUserQuery(userId));
+            return Ok(response);
+        }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPost("basic-info")]
+        public async Task<IActionResult> UpdateUserBasicInfo([FromBody] UpdateUserBasicInfoCommand command)
+        {
+            var response = await mediator.Send(command);
             return Ok(response);
         }
 

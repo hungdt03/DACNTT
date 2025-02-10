@@ -80,7 +80,7 @@ const MyProfileSide: FC<MyProfileSideProps> = ({
                                 preview={false}
                                 src={friend.avatar ?? images.cover}
                                 style={{ height: '100%', width: '100%' }}
-                                className="border-[1px] w-full h-full object-cover border-primary rounded-md aspect-square"
+                                className="border-[1px] w-full h-full object-cover border-gray-200 rounded-md aspect-square"
                             />
                             <span className="text-sm font-semibold line-clamp-1">{friend.fullName}</span>
                             {user?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}

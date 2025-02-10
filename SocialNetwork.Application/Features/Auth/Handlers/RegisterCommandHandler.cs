@@ -32,17 +32,16 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
 
         public async Task<BaseResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            var checkUser = await userManager.FindByNameAsync(request.Email);
-
+            var checkUser = await unitOfWork.UserRepository.GetUserByEmailIgnoreQuery(request.Email);
+            
             if (checkUser != null && checkUser.IsVerification)
                 throw new AppException("Thông tin email đã tồn tại");
-
+            
+            await unitOfWork.BeginTransactionAsync(cancellationToken);
             if (checkUser != null && !checkUser.IsVerification)
             {
-                var deleteResult = await userManager.DeleteAsync(checkUser);
-                if (!deleteResult.Succeeded) throw new AppException("Có lỗi xảy ra trong quá trình đăng kí");
+                await unitOfWork.UserRepository.DeleteUserPermanentlyByEmail(request.Email);
             }
-                
 
             var user = new Domain.Entity.System.User();
             user.FullName = request.FullName;
@@ -74,7 +73,7 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
                 UserId = user.Id,
             };
 
-            await unitOfWork.BeginTransactionAsync(cancellationToken);
+            
             await unitOfWork.OTPRepository.CreateNewOTPAsync(otp);
             await unitOfWork.CommitTransactionAsync(cancellationToken);
 

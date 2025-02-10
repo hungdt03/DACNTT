@@ -37,6 +37,14 @@ class AuthService {
     resetPassword(email: string, resetPasswordToken: string, newPassword: string) : Promise<BaseResponse> {
         return axiosInterceptor.post('/api/auth/reset-password', { email, resetPasswordToken, newPassword })
     }
+
+    changePassword(oldPassword: string, newPassword: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/auth/change-password', { oldPassword, newPassword })
+    }
+
+    changeEmail(email: string, password: string) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/auth/change-email', { email, password })
+    }
 }
 
 export default AuthService.getInstance();
