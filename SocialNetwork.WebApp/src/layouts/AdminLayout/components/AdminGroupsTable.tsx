@@ -4,17 +4,17 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit } from '@fortawesome/free-solid-svg-icons'
 import CustomTablePagination from './TablePagination'
-import { PostResource } from '../../../types/post'
+import { GroupResource } from '../../../types/group'
 
-type PostTableProps = {
-    posts: PostResource[]
+type GroupTableProps = {
+    groups: GroupResource[]
 }
 
-const AdminPostsTable: React.FC<PostTableProps> = ({ posts }) => {
+const AdminGroupsTable: React.FC<GroupTableProps> = ({ groups }) => {
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
 
-    const paginatedPosts = posts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    const paginatedGroups = groups.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 
     return (
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -35,7 +35,7 @@ const AdminPostsTable: React.FC<PostTableProps> = ({ posts }) => {
                                 <b>Ngày tạo</b>
                             </TableCell>
                             <TableCell sx={{ flexGrow: 1, minWidth: 120 }}>
-                                <b>Kiểu bài viết</b>
+                                <b>Số lượng thành viên</b>
                             </TableCell>
                             <TableCell sx={{ flexGrow: 1, minWidth: 150 }}>
                                 <b>Quyền bài viết</b>
@@ -46,16 +46,24 @@ const AdminPostsTable: React.FC<PostTableProps> = ({ posts }) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paginatedPosts.map((post, index) => (
-                            <TableRow key={post.id} sx={{ height: 50 }}>
+                        {paginatedGroups.map((group, index) => (
+                            <TableRow key={group.id} sx={{ height: 50 }}>
                                 <TableCell sx={{ textAlign: 'center' }}>{page * rowsPerPage + index + 1}</TableCell>
-                                <TableCell>{post.content}</TableCell>
-                                <TableCell>{post.user.fullName}</TableCell>
+                                <TableCell>{group.name}</TableCell>
+                                <TableCell>{group.description}</TableCell>
                                 <TableCell>
-                                    {post.createdAt ? dayjs(post.createdAt).format('DD/MM/YYYY') : '-'}
+                                    {group.dateCreated ? dayjs(group.dateCreated).format('DD/MM/YYYY') : '-'}
                                 </TableCell>
-                                <TableCell>{post.postType}</TableCell>
-                                <TableCell>{post.privacy}</TableCell>
+                                <TableCell>{group.countMembers}</TableCell>
+                                <TableCell>
+                                    {group.privacy === null
+                                        ? 'Khác'
+                                        : group.privacy === 'PUBLIC'
+                                          ? 'Công khai'
+                                          : group.privacy === 'PRIVATE'
+                                            ? 'Riêng tư'
+                                            : 'Khác'}
+                                </TableCell>
                                 <TableCell sx={{ textAlign: 'left' }}>
                                     <IconButton color='primary' size='small'>
                                         <FontAwesomeIcon icon={faEdit} />
@@ -69,7 +77,7 @@ const AdminPostsTable: React.FC<PostTableProps> = ({ posts }) => {
             </TableContainer>
 
             <CustomTablePagination
-                count={posts.length}
+                count={groups.length}
                 page={page}
                 rowsPerPage={rowsPerPage}
                 onPageChange={(_, newPage) => setPage(newPage)}
@@ -82,4 +90,4 @@ const AdminPostsTable: React.FC<PostTableProps> = ({ posts }) => {
     )
 }
 
-export default AdminPostsTable
+export default AdminGroupsTable

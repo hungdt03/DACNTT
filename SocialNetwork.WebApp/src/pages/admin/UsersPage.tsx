@@ -1,40 +1,48 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { Toolbar, Button, InputAdornment, TextField, Box } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faFileExport, faFilter, faSearch } from '@fortawesome/free-solid-svg-icons'
 import AdminUsersTable from '../../layouts/AdminLayout/components/AdminUserTable'
-
-const users = [
-    { id: 1, name: 'Leanne Graham', email: 'leanne@example.com' },
-    { id: 2, name: 'Ervin Howell', email: 'ervin@example.com' },
-    { id: 3, name: 'Clementine Bauch', email: 'clementine@example.com' },
-    { id: 4, name: 'Patricia Lebsack', email: 'patricia@example.com' },
-    { id: 1, name: 'Leanne Graham', email: 'leanne@example.com' },
-    { id: 2, name: 'Ervin Howell', email: 'ervin@example.com' },
-    { id: 3, name: 'Clementine Bauch', email: 'clementine@example.com' },
-    { id: 4, name: 'Patricia Lebsack', email: 'patricia@example.com' },
-    { id: 1, name: 'Leanne Graham', email: 'leanne@example.com' },
-    { id: 2, name: 'Ervin Howell', email: 'ervin@example.com' },
-    { id: 3, name: 'Clementine Bauch', email: 'clementine@example.com' },
-    { id: 4, name: 'Patricia Lebsack', email: 'patricia@example.com' }
-]
+import { UserResource } from '../../types/user'
+import adminService from '../../services/adminService'
 
 const UsersPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('')
+    const [allUser, setAllUser] = useState<UserResource[]>([])
 
-    const filteredUsers = users.filter(
-        (user) =>
-            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    useEffect(() => {
+        const fetchUsers = async () => {
+            const response = await adminService.getAllUser()
+            if (response.isSuccess) {
+                setAllUser(response.data)
+            }
+        }
+        fetchUsers()
+    }, [])
+    const removeDiacritics = (str: string) => {
+        return str
+            ?.normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+    }
+
+    const filteredUsers = useMemo(() => {
+        const normalizedSearchTerm = removeDiacritics(searchTerm)
+
+        return allUser.filter((user) =>
+            [user.fullName, user.email, user.phoneNumber].some((field) =>
+                removeDiacritics(field || '').includes(normalizedSearchTerm)
+            )
+        )
+    }, [searchTerm, allUser])
 
     return (
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', padding: 2 }}>
+        <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                 <TextField
                     variant='outlined'
                     size='small'
-                    placeholder='Search'
+                    placeholder='Tìm kiếm'
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     sx={{
@@ -53,18 +61,18 @@ const UsersPage: React.FC = () => {
 
                 <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button variant='contained' color='primary' sx={{ marginRight: 1 }}>
-                        <FontAwesomeIcon icon={faFilter} style={{ marginRight: 5 }} /> Add Filter
+                        <FontAwesomeIcon icon={faFilter} style={{ marginRight: 5 }} /> Lọc
                     </Button>
                     <Button variant='contained' sx={{ marginRight: 1 }}>
-                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: 5 }} /> Create
+                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: 5 }} /> Thêm người dùng
                     </Button>
                     <Button variant='contained' color='secondary'>
-                        <FontAwesomeIcon icon={faFileExport} style={{ marginRight: 5 }} /> Export
+                        <FontAwesomeIcon icon={faFileExport} style={{ marginRight: 5 }} /> Xuất file
                     </Button>
                 </Toolbar>
             </Box>
 
-            <Box sx={{ flex: 1, overflow: 'auto' }}>
+            <Box sx={{ overflow: 'auto', height: '100%' }}>
                 <AdminUsersTable users={filteredUsers} />
             </Box>
         </Box>

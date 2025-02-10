@@ -1,9 +1,6 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SocialNetwork.API.Filters;
-using SocialNetwork.Application.Features.Auth.Commands;
-using SocialNetwork.Application.Features.Auth.Queries;
+using SocialNetwork.Application.Features.Admin.Queries;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -16,23 +13,25 @@ namespace SocialNetwork.API.Controllers
         {
             this.mediator = mediator;
         }
-
-        [HttpPost("admin-users")]
-        public async Task<IActionResult> GetALlUsers()
+        [HttpGet("get-all-user")]
+        public async Task<IActionResult> GetAllUser()
         {
-            return Ok();
+            var response = await mediator.Send(new GetAllUserQuery());
+            return Ok(response);
         }
 
-        [HttpPost("admin-posts")]
+        [HttpGet("get-all-post")]
         public async Task<IActionResult> GetALlPosts()
         {
-            return Ok();
+            var response = await mediator.Send(new GetAllPostQuery());
+            return Ok(response);
         }
 
-        [HttpGet("admin-statistical")]
-        public async Task<IActionResult> GetStatistical()
+        [HttpGet("get-all-group")]
+        public async Task<IActionResult> GetAllGroup()
         {
-            return Ok();
+            var response = await mediator.Send(new GetAllGroupQuery());
+            return Ok(response);
         }
 
     }

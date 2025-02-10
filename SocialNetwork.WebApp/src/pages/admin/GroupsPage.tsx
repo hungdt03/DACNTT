@@ -3,24 +3,21 @@ import { Toolbar, Button, InputAdornment, TextField, Box } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faFileExport, faFilter, faSearch } from '@fortawesome/free-solid-svg-icons'
 import adminService from '../../services/adminService'
-import { PostResource } from '../../types/post'
-import AdminPostTable from '../../layouts/AdminLayout/components/AdminPostTable'
+import { GroupResource } from '../../types/group'
+import AdminGroupsTable from '../../layouts/AdminLayout/components/AdminGroupsTable'
 
-const PostsPage: React.FC = () => {
+const GroupsPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('')
-    const [allPost, setAllPost] = useState<PostResource[]>([])
+    const [allGroup, setAllGroup] = useState<GroupResource[]>([])
 
     useEffect(() => {
-        const fetchPosts = async () => {
-            const response = await adminService.getAllPost()
+        const fetchUsers = async () => {
+            const response = await adminService.getAllGroup()
             if (response.isSuccess) {
-                setAllPost(response.data)
-                console.log(response.data + 'sssss')
-            } else {
-                console.log(response.data)
+                setAllGroup(response.data)
             }
         }
-        fetchPosts()
+        fetchUsers()
     }, [])
     const removeDiacritics = (str: string) => {
         return str
@@ -29,15 +26,15 @@ const PostsPage: React.FC = () => {
             .toLowerCase()
     }
 
-    const filteredPosts = useMemo(() => {
+    const filteredGroup = useMemo(() => {
         const normalizedSearchTerm = removeDiacritics(searchTerm)
 
-        return allPost.filter((post) =>
-            [post.id, post.content, post.postType].some((field) =>
+        return allGroup.filter((group) =>
+            [group.name, group.description, group.id].some((field) =>
                 removeDiacritics(field || '').includes(normalizedSearchTerm)
             )
         )
-    }, [searchTerm, allPost])
+    }, [searchTerm, allGroup])
 
     return (
         <Box>
@@ -67,7 +64,7 @@ const PostsPage: React.FC = () => {
                         <FontAwesomeIcon icon={faFilter} style={{ marginRight: 5 }} /> Lọc
                     </Button>
                     <Button variant='contained' sx={{ marginRight: 1 }}>
-                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: 5 }} /> Thêm bài viết
+                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: 5 }} /> Thêm nhóm
                     </Button>
                     <Button variant='contained' color='secondary'>
                         <FontAwesomeIcon icon={faFileExport} style={{ marginRight: 5 }} /> Xuất file
@@ -76,10 +73,10 @@ const PostsPage: React.FC = () => {
             </Box>
 
             <Box sx={{ overflow: 'auto', height: '100%' }}>
-                <AdminPostTable posts={filteredPosts} />
+                <AdminGroupsTable groups={filteredGroup} />
             </Box>
         </Box>
     )
 }
 
-export default PostsPage
+export default GroupsPage

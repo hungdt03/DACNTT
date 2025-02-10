@@ -30,8 +30,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<List<User>> GetAllUsers()
         {
-            return await _context.Users
-                .ToListAsync();
+            return await _context.Users.ToListAsync();
         }
 
         public async Task<(IEnumerable<User> Users, int TotalCount)> GetAllUsersContainsKeyAsync(string key, int page, int size)

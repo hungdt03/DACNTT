@@ -14,4 +14,5 @@ export interface UserResource {
     followingCount: number;
     friendCount: number;
     haveStory: boolean;
+    isDeleted: boolean;
 }

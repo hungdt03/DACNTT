@@ -1,7 +1,7 @@
 import React from 'react'
 import { AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material'
 
-interface HeaderProps {
+type HeaderProps = {
     title: string
 }
 

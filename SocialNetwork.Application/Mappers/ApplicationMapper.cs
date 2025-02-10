@@ -25,7 +25,23 @@ namespace SocialNetwork.Application.Mappers
                 DateOfBirth = user.DateOfBirth,
                 Gender = user.Gender    
             };
-        } 
+        }
+        public static List<UserResponse> MapToListUser(List<User> users)
+        {
+            return users.Select(user => new UserResponse
+            {
+                Id = user.Id,
+                Avatar = user.Avatar,
+                CoverImage = user.CoverImage,
+                Bio = user.Bio,
+                Email = user.Email,
+                FullName = user.FullName,
+                DateOfBirth = user.DateOfBirth,
+                Gender = user.Gender,
+                PhoneNumber = user.PhoneNumber,
+                IsDeleted = user.IsDeleted,
+            }).ToList();
+        }
 
         public static TagResponse MapToTag(Tag tag)
         {
@@ -52,6 +68,25 @@ namespace SocialNetwork.Application.Mappers
                 RequireApprovalPost = group.RequirePostApproval,
                 Members = group.Members != null ? group.Members.Select(m => m.User != null ? MapToUser(m.User) : null).ToList() : new(),
             };
+        }
+        public static List<GroupResponse> MapToListGroup(IEnumerable<Group> groups)
+        {
+            return groups.Select(group => new GroupResponse()
+            {
+                Id = group.Id,
+                Name = group.Name,
+                Description = group.Description,
+                CoverImage = group.CoverImage,
+                Privacy = group.Privacy,
+                IsHidden = group.IsHidden,
+                OnlyAdminCanApprovalMember = group.OnlyAdminCanApprovalMember,
+                OnlyAdminCanPost = group.OnlyAdminCanPost,
+                RequireApproval = group.RequireApproval,
+                RequireApprovalPost = group.RequirePostApproval,
+                Members = group.Members != null ? group.Members.Select(m => m.User != null ? MapToUser(m.User) : null).ToList() : new(),
+                DateCreated = group.DateCreated,
+                IsDeleted = group.IsDeleted,
+            }).ToList();
         }
 
         public static GroupMemberResponse MapToGroupMember(GroupMember member)
@@ -177,6 +212,30 @@ namespace SocialNetwork.Application.Mappers
                 OriginalPost = post.OriginalPost != null ? MapToPost(post.OriginalPost) : null,
                 Group = post.Group != null ? MapToGroup(post.Group) : null,
             };
+        }
+        public static List<PostResponse> MapToListPost(List<Post> posts)
+        {
+            if (posts == null) return null;
+            return posts.Select(post => new PostResponse
+            {
+                Id = post.Id,
+                Content = post.Content,
+                Background = post.Background,
+                Privacy = post.Privacy,
+                SharePostId = post.SharePostId,
+                OriginalPostId = post.OriginalPostId,
+                CreatedAt = post.DateCreated,
+                PostType = post.PostType,
+                IsGroupPost = post.IsGroupPost,
+                Medias = post.Medias != null ? post.Medias.Select(MapToPostMedia).ToList() : new(),
+                User = post.User != null ? MapToUser(post.User) : null,
+                Tags = post.Tags != null ? post.Tags.Select(MapToTag).ToList() : new(),
+                Comments = post.Comments != null ? post.Comments.Count : 0,
+                Shares = post.Shares != null ? post.Shares.Count : 0,
+                SharePost = post.SharePost != null ? MapToPost(post.SharePost) : null,
+                OriginalPost = post.OriginalPost != null ? MapToPost(post.OriginalPost) : null,
+                Group = post.Group != null ? MapToGroup(post.Group) : null,
+            }).ToList();
         }
 
         public static MediaResponse MapToPostMedia(PostMedia media) {

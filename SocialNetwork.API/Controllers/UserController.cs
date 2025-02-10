@@ -241,6 +241,5 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(command);
             return Ok(response);
         }
-
     }
 }
