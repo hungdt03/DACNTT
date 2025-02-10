@@ -43,6 +43,17 @@ namespace SocialNetwork.Application.Mappers
             }).ToList();
         }
 
+        public static ChatRoomMemberResponse MapToChatRoomMember(ChatRoomMember chatRoomMember)
+        {
+            return new ChatRoomMemberResponse()
+            {
+                User = chatRoomMember.User != null ? MapToUser(chatRoomMember.User) : null,
+                Id = chatRoomMember.Id,
+                IsAccepted = chatRoomMember.IsAccepted,
+                IsLeader = chatRoomMember.IsLeader,
+            };
+        }
+
         public static TagResponse MapToTag(Tag tag)
         {
             return new TagResponse
@@ -66,6 +77,7 @@ namespace SocialNetwork.Application.Mappers
                 OnlyAdminCanPost = group.OnlyAdminCanPost,
                 RequireApproval = group.RequireApproval,
                 RequireApprovalPost = group.RequirePostApproval,
+                DateCreated = group.DateCreated,
                 Members = group.Members != null ? group.Members.Select(m => m.User != null ? MapToUser(m.User) : null).ToList() : new(),
             };
         }
@@ -88,6 +100,17 @@ namespace SocialNetwork.Application.Mappers
                 IsDeleted = group.IsDeleted,
             }).ToList();
         }
+
+        public static GroupInvitationRespone MapToGroupInvitation(GroupInvitation groupInvitation)
+        {
+            return new GroupInvitationRespone()
+            {
+                Id = groupInvitation.Id,
+                Invitee = groupInvitation.Invitee != null ? MapToUser(groupInvitation.Invitee) : null,
+                Inviter = groupInvitation.Inviter != null ? MapToUser(groupInvitation.Inviter) : null,
+                Status = groupInvitation.Status,
+            };
+        } 
 
         public static GroupMemberResponse MapToGroupMember(GroupMember member)
         {
@@ -160,6 +183,7 @@ namespace SocialNetwork.Application.Mappers
                 IsPrivate = chatRoom.IsPrivate,
                 UniqueName = chatRoom.UniqueName,
                 Name = chatRoom.Name,
+                ImageUrl = chatRoom.ImageUrl,
                 LastMessage = chatRoom.LastMessage,
                 LastMessageDate = chatRoom.LastMessageDate,
                 Members = chatRoom.Members.Any() ? chatRoom.Members.Select(member => MapToUser(member.User)).ToList() : new(),

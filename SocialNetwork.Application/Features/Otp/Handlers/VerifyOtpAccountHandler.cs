@@ -1,8 +1,6 @@
 ﻿
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Otp.Commands;

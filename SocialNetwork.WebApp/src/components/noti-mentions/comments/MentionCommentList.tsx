@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { CommentResource } from "../../../types/comment";
 import { CommentMentionPagination } from "../../../utils/pagination";
 import { BoxReplyCommentType } from "../../comments/BoxReplyComment";
@@ -26,22 +26,30 @@ export const MentionCommentList: React.FC<MentionCommentListProps> = ({
     onFetchPrevPage
 }) => {
 
-    const mentionCommentRef = useRef<HTMLDivElement | null>(null);
-
     useEffect(() => {
-        if (mentionCommentRef.current) {
-            mentionCommentRef.current.scrollIntoView({ behavior: 'smooth' });
+        const observer = new MutationObserver(() => {
+            const commentElement = document.getElementById('comment-id-' + activeCommentId);
+            if (commentElement) {
+                commentElement.scrollIntoView({ behavior: 'smooth' });
+                observer.disconnect(); // Ngừng theo dõi sau khi đã scroll
+            }
+        });
+    
+        const commentList = document.getElementById('comment-list');
+        if (commentList) {
+            observer.observe(commentList, { childList: true, subtree: true });
         }
-            
-    }, [activeCommentId])
+    
+        return () => observer.disconnect(); // Cleanup khi component unmount
+    }, [activeCommentId]);
+    
 
     return (
-        <div className="flex flex-col gap-y-3 py-4">
+        <div id='comment-list' className="flex flex-col gap-y-3 py-4">
             {pagination.havePrevPage && <button onClick={() => onFetchPrevPage(null, pagination.prevPage - 1)} className="text-xs font-semibold text-center pl-6 mb-2">Xem các bình luận trước đó...</button>}
             
             {comments.map((comment) => (
                 <MentionCommentItem
-                    ref={mentionCommentRef}
                     parentComment={null}
                     key={comment.id}
                     comment={comment}

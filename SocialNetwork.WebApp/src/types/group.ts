@@ -7,8 +7,11 @@ export type GroupResource = {
     description: string;
     coverImage: string;
     privacy: GroupPrivacy;
+    dateCreated: Date,
     members: UserResource[];
+    friendMembers: UserResource[];
     countMembers: number;
+    countTodayPosts: number;
     isHidden: boolean;
     isMine: boolean;
     isMember: boolean;

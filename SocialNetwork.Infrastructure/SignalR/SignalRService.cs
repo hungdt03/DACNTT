@@ -44,5 +44,15 @@ namespace SocialNetwork.Infrastructure.SignalR
             });
             
         }
+
+        public async Task LeaveGroup(string userId, string groupName)
+        {
+            var connections = await userStatusService.GetAllConnections(userId);
+            connections.ForEach(async connection =>
+            {
+                logger.LogInformation($"ConnectionID: {connection}");
+                await hubContext.Groups.RemoveFromGroupAsync(connection, groupName);
+            });
+        }
     }
 }

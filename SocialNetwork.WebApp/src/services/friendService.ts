@@ -38,14 +38,6 @@ class FriendService {
         return axiosInterceptor.get('/api/friends/invitable/' + groupId)
     }
 
-    // getTopNineOfUserFriends(friendId: string) : Promise<DataResponse<FriendResource[]>> {
-    //     return axiosInterceptor.get('/api/friends/top-nine-user-friend/'+ friendId)
-    // }
-
-    // getTopNineOfMyFriends() : Promise<DataResponse<FriendResource[]>> {
-    //     return axiosInterceptor.get('/api/friends/top-nine-my-friend/')
-    // }
-
 
     deleteFriend(friendId: string) : Promise<BaseResponse> {
         return axiosInterceptor.delete('/api/friends/'+ friendId)

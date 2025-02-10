@@ -6,6 +6,7 @@ namespace SocialNetwork.Application.DTOs
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string UniqueName { get; set; }
+        public string ImageUrl { get; set; }
         public bool IsPrivate { get; set; }
         public bool IsAccept { get; set; }
         public bool IsRecipientAccepted { get; set; }

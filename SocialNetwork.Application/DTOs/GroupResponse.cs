@@ -9,7 +9,9 @@ namespace SocialNetwork.Application.DTOs
         public string CoverImage { get; set; }
         public string Privacy { get; set; }
         public List<UserResponse> Members { get; set; }
+        public List<UserResponse> FriendMembers { get; set; }
         public int CountMembers { get; set; }
+        public int CountTodayPosts { get; set; }
         public bool IsMine { get; set; }
         public bool IsMember { get; set; }
         public bool OnlyAdminCanPost { get; set; }
@@ -18,7 +20,5 @@ namespace SocialNetwork.Application.DTOs
         public bool OnlyAdminCanApprovalMember { get; set; }
         public bool IsHidden { get; set; }
         public int AdminCount { get; set; }
-        public DateTimeOffset DateCreated { get; set; }
-        public bool IsDeleted { get; set; }
     }
 }

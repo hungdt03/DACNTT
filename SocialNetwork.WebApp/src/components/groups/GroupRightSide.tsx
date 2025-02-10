@@ -73,11 +73,11 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
             <div className="flex flex-col gap-y-2">
                 <div className="flex items-center gap-x-2 text-gray-600">
                     <Newspaper size={20} />
-                    <p>Hôm nay có 2 bài viết mới</p>
+                    <p>Hôm nay có {group.countTodayPosts} bài viết mới</p>
                 </div>
                 <div className="flex items-center gap-x-2 text-gray-600">
                     <UserGroupIcon className="w-5" />
-                    <p>Tổng cộng {group.members.length} thành viên</p>
+                    <p>Tổng cộng {group.countMembers} thành viên</p>
                 </div>
             </div>
         </div>

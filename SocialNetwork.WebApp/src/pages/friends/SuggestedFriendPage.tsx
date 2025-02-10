@@ -65,6 +65,9 @@ const SuggestedFriendPage: FC = () => {
             {suggestFriends.map(suggest => <SuggestedFriend onCancel={() => handleCancelRequest(suggest.user.id)} onAddFriend={() => handleAddFriend(suggest.user.id)} key={suggest.user.id} suggest={suggest} />)}
         </div>
         {loading && <LoadingIndicator />}
+        {suggestFriends.length === 0 && !loading && <div className="flex items-center justify-center w-full h-full">
+            <p className="text-center text-gray-500">Không có gợi ý kết bạn phù hợp</p>    
+        </div>}
     </div>
 };
 

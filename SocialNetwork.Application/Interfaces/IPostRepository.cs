@@ -18,6 +18,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<List<Post>> GetAllSharePostsByOriginalPostId(Guid postId);
         Task<(List<Post> Posts, int TotalCount)> GetAllPendingPostsByGroupIdAsync(Guid groupId, int page, int size, string sortOrder, string query, string? userId, string contentType, DateTimeOffset? date);
         Task<int> CountPendingPostsByGroupIdAsync(Guid groupId);
+        Task<int> CountTodayPostsByGroupIdAsync(Guid groupId);
         Task<(List<Post> Posts, int TotalCount)> GetAllPostsContainsKey(string key, int page, int size);
     }
 }
