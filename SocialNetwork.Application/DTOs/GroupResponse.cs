@@ -20,5 +20,7 @@ namespace SocialNetwork.Application.DTOs
         public bool OnlyAdminCanApprovalMember { get; set; }
         public bool IsHidden { get; set; }
         public int AdminCount { get; set; }
+        public DateTimeOffset DateCreated { get; set; }
+        public bool IsDeleted { get; set;}
     }
 }
