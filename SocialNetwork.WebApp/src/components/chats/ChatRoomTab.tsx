@@ -32,19 +32,20 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const { user } = useSelector(selectAuth)
 
-    const { handleCancel, handleOk, isModalOpen, showModal } = useModal()
+    const { handleCancel, handleOk, isModalOpen, showModal } = useModal();
 
-    useEffect(() => {
-        const fetchChatRooms = async () => {
-            setLoading(true)
-            const response = await chatRoomService.getAllChatRooms();
-            console.log(response)
-            setLoading(false)
-            onCountChatRoom(response.data.filter(chatRoom => !chatRoom.isRead).length)
-            if (response.isSuccess) {
-                setChatRooms(response.data)
-            }
+    const fetchChatRooms = async () => {
+        setLoading(true)
+        const response = await chatRoomService.getAllChatRooms();
+        console.log(response)
+        setLoading(false)
+        onCountChatRoom(response.data.filter(chatRoom => !chatRoom.isRead).length)
+        if (response.isSuccess) {
+            setChatRooms(response.data)
         }
+    }
+
+    useEffect(() => { 
 
         fetchChatRooms()
 
@@ -164,7 +165,10 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
             }}
         >
             <CreateGroupChatModal
-                onSuccess={handleOk}
+                onSuccess={() => {
+                    fetchChatRooms()
+                    handleOk()
+                }}
             />
         </Modal>
     </>

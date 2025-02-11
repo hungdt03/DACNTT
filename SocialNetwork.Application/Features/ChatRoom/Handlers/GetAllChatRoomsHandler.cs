@@ -44,6 +44,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     var isOnline = onlineUsers.Any(s => s == friend.UserId);
                     item.Friend = ApplicationMapper.MapToUser(friend.User);
                     item.Friend.IsOnline = item.IsOnline = isOnline;
+                    item.IsMember = true;
 
                     var haveStory = await _unitOfWork.StoryRepository
                         .IsUserHaveStoryAsync(friend.UserId);
@@ -61,6 +62,12 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     }
                 } else
                 {
+                    var chatRoomMember = await _unitOfWork.ChatRoomMemberRepository
+                        .GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId);
+
+                    item.IsMember = chatRoomMember != null;
+                    item.IsAdmin = chatRoomMember != null && chatRoomMember.IsLeader;
+
                     var offlineMembers = chatRoom.Members.Where(s => !onlineUsers.Any(m => m == s.UserId)).ToList();
                     var isOnline = offlineMembers.Count < item.Members.Count;
                     item.IsOnline = isOnline;

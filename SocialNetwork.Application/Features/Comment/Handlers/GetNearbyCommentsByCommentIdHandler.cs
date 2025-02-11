@@ -26,7 +26,9 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
 
             var comment = await _unitOfWork.CommentRepository
                 .GetCommentByIdAsync(request.CommentId)
-                    ?? throw new NotFoundException("Bình luận không tồn tại");
+                    ?? await _unitOfWork.CommentRepository
+                .GetFirstCommentByPostId(request.PostId)
+                    ?? throw new AppException("Bình luận không tồn tại");
 
             var response = new List<CommentResponse>();
 

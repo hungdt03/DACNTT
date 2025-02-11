@@ -6,6 +6,8 @@ export type ChatRoomResource  = {
     name: string;
     members: UserResource[];
     imageUrl: string;
+    isMember: boolean;
+    isLeader: boolean;
     lastMessage: string;
     lastMessageDate: Date;
     isPrivate: boolean;

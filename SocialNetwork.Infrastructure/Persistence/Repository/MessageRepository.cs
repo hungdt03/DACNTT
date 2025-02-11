@@ -26,11 +26,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                .Include(m => m.Medias)
                .Include(m => m.Sender)
                .Include(m => m.Reads)
-                    .ThenInclude(m => m.User);
+               .ThenInclude(m => m.User);
 
             int totalCount = await query.CountAsync();
             var messages = await query
                 .OrderByDescending(s => s.DateCreated)
+                .ThenByDescending(s => s.SentAt)
                 .Skip((page - 1)  * size).Take(size).ToListAsync();
 
             messages.Reverse();

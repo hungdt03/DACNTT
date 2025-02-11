@@ -7,6 +7,8 @@ namespace SocialNetwork.Application.DTOs
         public string Name { get; set; }
         public string UniqueName { get; set; }
         public string ImageUrl { get; set; }
+        public bool IsMember { get; set; }
+        public bool IsAdmin { get; set; }
         public bool IsPrivate { get; set; }
         public bool IsAccept { get; set; }
         public bool IsRecipientAccepted { get; set; }

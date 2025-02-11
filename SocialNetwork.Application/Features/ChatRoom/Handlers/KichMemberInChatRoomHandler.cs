@@ -61,7 +61,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             await _signalRService.SendMessageToSpecificGroup(chatRoomMember.ChatRoom.UniqueName, ApplicationMapper.MapToMessage(message));
-            await _signalRService.LeaveGroup(userId, chatRoomMember.ChatRoom.UniqueName);
+            await _signalRService.LeaveGroup(chatRoomMember.UserId, chatRoomMember.ChatRoom.UniqueName);
 
             return new BaseResponse()
             {

@@ -72,6 +72,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 RecipientId = memberAsModerator.UserId,
                 Type = NotificationType.INVITE_ROLE_GROUP,
                 DateSent = DateTimeOffset.UtcNow,
+                GroupId = inviteModerator.GroupId,
             };
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);

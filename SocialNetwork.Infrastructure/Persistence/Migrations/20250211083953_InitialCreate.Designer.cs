@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250210185753_InitialCreate")]
+    [Migration("20250211083953_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -173,6 +173,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("DeletedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -180,7 +184,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LastMessage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("LastMessageDate")

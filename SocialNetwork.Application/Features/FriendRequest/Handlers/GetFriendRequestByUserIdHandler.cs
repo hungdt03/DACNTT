@@ -8,6 +8,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.FriendShip.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.FriendShip.Handlers
 {
@@ -27,6 +28,11 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
 
             var friendRequest = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, request.UserId)
                 ?? throw new AppException("Không tìm thấy lời mời kết bạn nào");
+
+            if(friendRequest.Status == FriendShipStatus.NONE)
+            {
+                throw new AppException("Không tìm thấy lời mời kết bạn nào");
+            }
 
             return new DataResponse<FriendRequestResponse>
             {

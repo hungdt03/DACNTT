@@ -116,7 +116,6 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 foreach (var username in distinctUserIds)
                 {
                     if (username == request.ReplyToUserName) continue;
-
                    
                     var user = await userManager.FindByIdAsync(username);
 

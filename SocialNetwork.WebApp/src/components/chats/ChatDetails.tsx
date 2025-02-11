@@ -25,12 +25,10 @@ const ChatDetails: FC<ChatDetailsProps> = ({
     const { user } = useSelector(selectAuth);
     const { isModalOpen, handleCancel, handleOk, showModal } = useModal();
     const [members, setMembers] = useState<ChatRoomMemberResource[]>([]);
-    const [isLeader, setIsLeader] = useState(false)
 
     const fetchChatRoomMembers = async () => {
         const response = await chatRoomService.getMembersByChatRoomId(chatRoom.id);
         if (response.isSuccess) {
-            user && setIsLeader(members.some(m => m.user.id === user.id && m.isLeader))
             setMembers(response.data)
         }
     }
@@ -45,7 +43,7 @@ const ChatDetails: FC<ChatDetailsProps> = ({
             key: '1',
             label: 'Thành viên',
             className: 'bg-white border-none',
-            children: user && <MemberCollapse onFetch={fetchChatRoomMembers} isLeader={isLeader} members={members} user={user} />,
+            children: user && <MemberCollapse onFetch={fetchChatRoomMembers} isLeader={chatRoom.isLeader} members={members} user={user} />,
 
         },
         {
@@ -82,7 +80,7 @@ const ChatDetails: FC<ChatDetailsProps> = ({
                     </div>
                 </div>
 
-                <Collapse className="overflow-y-auto" items={items} defaultActiveKey={['1']} />
+                 {(chatRoom.isPrivate && chatRoom.isAccept) || !chatRoom.isPrivate && <Collapse className="overflow-y-auto" items={items} defaultActiveKey={['1']} />}
             </div>
         </div>
 
@@ -141,7 +139,7 @@ const MemberCollapse: FC<MemberCollapseProps> = ({
     }
 
     const handleAddLeader = async (memberId: string) => {
-        const response = await chatRoomService.kickMember(memberId);
+        const response = await chatRoomService.chooseNewLeader(memberId);
         if (response.isSuccess) {
             message.success(response.message)
             onFetch()
@@ -163,7 +161,7 @@ const MemberCollapse: FC<MemberCollapseProps> = ({
                         </div>
                     </div>
 
-                    {member.user.id !== user.id && <Popover placement="right" content={<MemberMoreOption
+                    {member.user.id !== user.id && <Popover placement="bottomLeft" content={<MemberMoreOption
                         member={member}
                         isLeader={isLeader}
                         onAddLeader={() => handleAddLeader(member.id)}

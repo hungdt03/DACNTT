@@ -8,7 +8,7 @@ import { ChatRoomResource } from "../../types/chatRoom";
 import { formatTime } from "../../utils/date";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
-import { MinusOutlined, PhoneOutlined } from '@ant-design/icons'
+import { MinusOutlined } from '@ant-design/icons'
 import { MessageMediaResource, MessageResource } from "../../types/message";
 import { MessageRequest } from "./ChatPopup";
 import messageService from "../../services/messageService";
@@ -16,6 +16,7 @@ import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
 import { Pagination } from "../../types/response";
 import cn from "../../utils/cn";
+import LoadingIndicator from "../LoadingIndicator";
 
 type ChatAreaProps = {
     chatRoom: ChatRoomResource;
@@ -30,6 +31,8 @@ const ChatArea: FC<ChatAreaProps> = ({
 }) => {
     const { user } = useSelector(selectAuth);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [isShowPrevent, setIsShowPrevent] = useState(false)
+
     const [messages, setMessages] = useState<MessageResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
@@ -128,6 +131,7 @@ const ChatArea: FC<ChatAreaProps> = ({
             },
             // ON TYPING MESSAGE
             (groupName, content) => {
+                
                 groupName === chatRoom.uniqueName && setTyping(content)
             },
 
@@ -150,6 +154,11 @@ const ChatArea: FC<ChatAreaProps> = ({
             SignalRConnector.unsubscribeEvents()
         }
     }, [chatRoom]);
+
+    useEffect(() => {
+        
+        setIsShowPrevent(chatRoom.isPrivate && !chatRoom.isAccept && !!chatRoom.lastMessage)
+    }, [chatRoom])
 
     const handleBoxChange = (value: BoxMessageType) => {
 
@@ -174,11 +183,12 @@ const ChatArea: FC<ChatAreaProps> = ({
 
         setMsgPayload(updateState);
 
+        if(isShowPrevent) return;
+
         user && SignalRConnector.startTypingMessage(chatRoom.uniqueName, user?.fullName)
         if (typingTimeoutRef.current) {
             clearTimeout(typingTimeoutRef.current);
         }
-
 
         typingTimeoutRef.current = setTimeout(() => {
             SignalRConnector.stopTypingMessage(chatRoom.uniqueName)
@@ -235,11 +245,19 @@ const ChatArea: FC<ChatAreaProps> = ({
             formData.append('sentAt', sentAt);
 
             const response = await messageService.sendMessage(formData);
-            console.log(response)
+            if(response.isSuccess) {
+                if(isShowPrevent) {
+                    setIsShowPrevent(false)
+                }
+            }
         } else {
             msgPayload.sentAt = tempMessage.sentAt
             try {
-                SignalRConnector.sendMessage(msgPayload)
+                await SignalRConnector.sendMessage(msgPayload);
+
+                if(isShowPrevent) {
+                    setIsShowPrevent(false)
+                }
             } catch (error) {
                 alert(error)
             }
@@ -311,7 +329,11 @@ const ChatArea: FC<ChatAreaProps> = ({
                 <Avatar src={chatRoom.friend.avatar} className="w-[80px] h-[80px]" />
                 <span className="text-sm text-gray-600 font-bold">{chatRoom.friend.fullName}</span>
             </div>}
-            {loading && <p className="text-center text-gray-500 text-sm">Đang tải tin nhắn ...</p>}
+            {!pagination.hasMore && !chatRoom.isPrivate && <div className="flex flex-col gap-y-1 items-center">
+                <Avatar src={chatRoom.imageUrl ?? images.group} className="w-[80px] h-[80px]" />
+                <span className="text-sm text-gray-600 font-bold">{chatRoom.name}</span>
+            </div>}
+            {loading && <LoadingIndicator />}
             <div id="messenger-scroll-trigger" className="w-full h-1" />
 
             {[...messages, ...pendingMessages].map(message => <Message chatRoom={chatRoom} key={message.id} message={message} isMe={message.senderId === user?.id} />)}
@@ -319,6 +341,13 @@ const ChatArea: FC<ChatAreaProps> = ({
         </div>
 
         <div className="w-full px-4 py-4 shadow">
+            {isShowPrevent && <div className="flex flex-col gap-y-2 p-2 bg-white border-t-[1px] border-gray-500">
+                <p className="text-[12px] text-gray-400 text-center">Nếu bạn trả lời, {chatRoom.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.</p>
+
+                <div className="flex justify-center">
+                    <button className="py-2 px-5 rounded-md text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200">Chặn</button>
+                </div>
+            </div>}
             {typing && <div key={chatRoom.id} className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
                 {typing}
             </div>}

@@ -72,6 +72,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 RecipientId = memberAsAdmin.UserId,
                 Type = NotificationType.INVITE_ROLE_GROUP,
                 DateSent = DateTimeOffset.UtcNow,
+                GroupId = inviteAdmin.GroupId,  
             };
 
             await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);

@@ -1,4 +1,4 @@
-import { Avatar, Button, Popover } from "antd";
+import { Avatar, Button, message, Popover } from "antd";
 import { FC, useState } from "react";
 import images from "../assets";
 import { Check, Delete, MoreHorizontal } from "lucide-react";
@@ -45,6 +45,8 @@ type NotificationProps = {
     onStoryNotification: () => void;
     onRequestFriendNotification: () => void;
     onAcceptRequestFriendNotification: () => void;
+    onPostReactionNotification: () => void;
+    onGroupNotification: () => void;
 }
 
 const Notification: FC<NotificationProps> = ({
@@ -55,12 +57,17 @@ const Notification: FC<NotificationProps> = ({
     onShareNotification,
     onStoryNotification,
     onRequestFriendNotification,
-    onAcceptRequestFriendNotification
+    onAcceptRequestFriendNotification,
+    onPostReactionNotification,
+    onGroupNotification,
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false);
     const [acceptedFriendRequest, setAcceptedFriendRequest] = useState<'accepted' | 'cancel' | 'none'>('none');
     const [acceptedJoinGroup, setAcceptedJoinGroup] = useState<'accepted' | 'cancel' | 'none'>('none');
+    const [acceptedRole, setAcceptedRole] = useState<'accepted' | 'cancel' | 'none'>('none');
 
+
+    // FRIEND REQUEST
     const handleCancelFriendRequest = async (requestId: string) => {
         const response = await friendRequestService.cancelFriendRequest(requestId)
         if (response.isSuccess) {
@@ -77,22 +84,24 @@ const Notification: FC<NotificationProps> = ({
         const response = await friendRequestService.acceptFriendRequest(requestId)
         if (response.isSuccess) {
             setAcceptedFriendRequest('accepted')
-            toast.success(response.message)
+            message.success(response.message)
             handleDeleteNotification(notification.id)
         } else {
-            toast.error(response.message)
+            message.error(response.message)
             handleDeleteNotification(notification.id)
         }
     };
+
+    // JOIN GROUP
 
     const handleRejectJoinGroup = async (inviteId: string) => {
         const response = await groupService.rejectInviteFriend(inviteId)
         if (response.isSuccess) {
             setAcceptedJoinGroup('cancel')
-            toast.success(response.message)
+            message.success(response.message)
             handleDeleteNotification(notification.id)
         } else {
-            toast.error(response.message);
+            message.error(response.message);
             handleDeleteNotification(notification.id)
         }
     };
@@ -101,13 +110,40 @@ const Notification: FC<NotificationProps> = ({
         const response = await groupService.acceptInviteFriend(inviteId)
         if (response.isSuccess) {
             setAcceptedJoinGroup('accepted')
-            toast.success(response.message)
+            message.success(response.message)
             handleDeleteNotification(notification.id)
         } else {
-            toast.error(response.message)
+            message.error(response.message)
             handleDeleteNotification(notification.id)
         }
     };
+
+    // INVITE ROLE GROUP
+
+    const handleAcceptRoleInvitation = async (invitationId: string) => {
+        const response = await groupService.acceptRoleInvitation(invitationId);
+        if (response.isSuccess) {
+            message.success(response.message)
+            setAcceptedRole('accepted')
+        } else {
+            message.error(response.message)
+        }
+
+        handleDeleteNotification(notification.id)
+    }
+
+    const handleRejectRoleInvitation = async (invitationId: string) => {
+        const response = await groupService.rejectRoleInvitation(invitationId);
+        if (response.isSuccess) {
+            message.success(response.message)
+            setAcceptedRole('cancel')
+        } else {
+            message.error(response.message)
+        }
+
+        handleDeleteNotification(notification.id)
+    }
+
 
     const handleDeleteNotification = async (notificationId: string) => {
         await notificationService.deleteNotification(notificationId);
@@ -124,6 +160,10 @@ const Notification: FC<NotificationProps> = ({
             onRequestFriendNotification()
         } else if (notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
             onAcceptRequestFriendNotification()
+        } else if (notification.type === NotificationType.ASSIGN_POST_TAG || notification.type === NotificationType.POST_REACTION) {
+            onPostReactionNotification()
+        } else if (notification.type === NotificationType.INVITE_JOIN_GROUP || notification.type === NotificationType.INVITE_ROLE_GROUP) {
+            onGroupNotification()
         }
     }
 
@@ -133,10 +173,10 @@ const Notification: FC<NotificationProps> = ({
             <img className="absolute -right-[6px] -bottom-[4px] w-6 h-6" src={
                 notification.type.includes('COMMENT') ? notis.commentNoti
                     : (notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED || notification.type === NotificationType.FRIEND_REQUEST_SENT) ? notis.userNoti
-                    : notification.type === NotificationType.POST_SHARED ? notis.notiShare 
-                    : notification.type === NotificationType.VIEW_STORY ? notis.viewStory
-                    : notification.type === NotificationType.REACT_STORY ? notis.notiReaction
-                    : images.group
+                        : notification.type === NotificationType.POST_SHARED ? notis.notiShare
+                            : notification.type === NotificationType.VIEW_STORY ? notis.viewStory
+                                : (notification.type === NotificationType.REACT_STORY || notification.type === NotificationType.POST_REACTION) ? notis.notiReaction
+                                    : notification.type === NotificationType.ASSIGN_POST_TAG ? notis.notiTag : notis.userNoti
             } />
         </div>
         <div className="flex flex-col gap-y-3 items-start">
@@ -198,6 +238,32 @@ const Notification: FC<NotificationProps> = ({
                     )}
                 </>
             )}
+
+            {notification.type === NotificationType.INVITE_ROLE_GROUP && (
+                <>
+                    {acceptedFriendRequest === 'accepted' ? (
+                        <span className="text-xs text-gray-600">Đã chấp nhận lời mời</span>
+                    ) : acceptedFriendRequest === 'cancel' ? (
+                        <span className="text-xs text-gray-600">Đã gỡ lời mời</span>
+                    ) : (
+                        <div className="flex items-center gap-x-2">
+                            <button
+                                className="px-3 py-[1px] rounded-md bg-gray-200 text-gray-600"
+                                onClick={() => handleRejectRoleInvitation(notification.groupRoleInvitationId)}
+                            >
+                                Gỡ
+                            </button>
+                            <Button
+                                size="small"
+                                type="primary"
+                                onClick={() => handleAcceptFriendRequest(notification.groupRoleInvitationId)}
+                            >
+                                Chấp nhận
+                            </Button>
+                        </div>
+                    )}
+                </>
+            )}
         </div>
 
         {!notification.isRead && <div className="absolute top-1/2 -translate-y-1/2 right-0 w-3 h-3 rounded-full bg-primary">
@@ -207,7 +273,7 @@ const Notification: FC<NotificationProps> = ({
             isRead={notification.isRead}
             onDelete={onDelete}
             onMarkAsRead={onMarkAsRead}
-            
+
         />}>
             <button className="z-[200] absolute top-1/2 -translate-y-1/2 right-6 bg-white shadow transition-all ease-linear duration-100 border-[1px] border-gray-200 w-6 h-6 flex items-center justify-center rounded-full">
                 <MoreHorizontal className="text-gray-400" size={16} />

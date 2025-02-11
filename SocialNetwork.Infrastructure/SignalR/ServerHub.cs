@@ -64,7 +64,6 @@ namespace SocialNetwork.Infrastructure.SignalR
                 ?? throw new NotFoundException("Hội thoại không tồn tại");
             
             await unitOfWork.BeginTransactionAsync();
-
             var recentReadStatus = await unitOfWork.MessageReadStatusRepository.GetMessageReadStatusByUserAndChatRoomId(userId, chatRoom.Id);
 
             var message = new Domain.Entity.MessageInfo.Message()
@@ -107,24 +106,44 @@ namespace SocialNetwork.Infrastructure.SignalR
             {
                 var senderMember = chatRoom.Members.FirstOrDefault(x => x.UserId == userId);
                 var recipientMember = chatRoom.Members.FirstOrDefault(x => x.UserId != userId);
-                if (senderMember != null && !senderMember.IsAccepted)
+
+                if (senderMember != null && recipientMember != null && !senderMember.IsAccepted)
                 {
-                    string content = "Giờ đây, các bạn có thể nhắn tin cho nhau, xem những thông tin như Trạng thái hoạt động và thời điểm đọc tin nhắn.";
-
-                    systemMessage = new Domain.Entity.MessageInfo.Message()
+                    if(recipientMember.IsAccepted)
                     {
-                        ChatRoomId = chatRoom.Id,
-                        Content = content,
-                        MessageType = MessageType.SYSTEM,
-                        SentAt = DateTimeOffset.UtcNow,
-                    };
+                        string content = "Giờ đây, các bạn có thể nhắn tin cho nhau, xem những thông tin như Trạng thái hoạt động và thời điểm đọc tin nhắn.";
 
-                    await unitOfWork.MessageRepository.CreateMessageAsync(systemMessage);
+                        systemMessage = new Domain.Entity.MessageInfo.Message()
+                        {
+                            ChatRoomId = chatRoom.Id,
+                            Content = content,
+                            MessageType = MessageType.SYSTEM,
+                            SentAt = DateTimeOffset.UtcNow,
+                        };
 
+                        var friendShip = await unitOfWork.FriendShipRepository
+                            .GetFriendShipByUserIdAndFriendIdAsync(senderMember.UserId, recipientMember.UserId);
+
+                        if(friendShip != null)
+                        {
+                            friendShip.IsConnect = true;
+                        } else
+                        {
+                            friendShip = new Domain.Entity.UserInfo.FriendShip()
+                            {
+                                UserId = userId,
+                                FriendId = recipientMember.UserId,
+                                Status = FriendShipStatus.NONE,
+                                IsConnect = true
+                            };
+
+                            await unitOfWork.FriendShipRepository.CreateFriendShipAsync(friendShip);
+                        }
+
+                        await unitOfWork.MessageRepository.CreateMessageAsync(systemMessage);
+                    }
+                    
                     senderMember.IsAccepted = true;
-
-                    chatRoom.LastMessage = content;
-                    chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
 
                     var connections = await userStatusService.GetAllConnections(userId);
                     connections.ForEach(async connection =>

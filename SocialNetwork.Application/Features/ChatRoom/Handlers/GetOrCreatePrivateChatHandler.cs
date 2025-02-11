@@ -45,17 +45,19 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             var chatRoom = await _unitOfWork.ChatRoomRepository
                 .GetPrivateChatRoomByMemberIds(memberIds);
 
+           
             if(chatRoom == null)
             {
                 chatRoom = new Domain.Entity.ChatRoomInfo.ChatRoom();
                 chatRoom.IsPrivate = true;
                 chatRoom.UniqueName = ChatUtils.GenerateChatRoomName(memberIds);
                 chatRoom.Name = "Private chat";
+                chatRoom.ImageUrl = "NONE";
 
                 var me = new ChatRoomMember()
                 {
                     UserId = userId,
-                    IsAccepted = true,
+                    IsAccepted = false,
                 };
 
                 var user = new ChatRoomMember()
@@ -64,6 +66,16 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     User = receiver,
                     IsAccepted = false,
                 };
+
+                var friendShip = await _unitOfWork.FriendShipRepository
+                   .GetFriendShipByUserIdAndFriendIdAsync(userId, receiver.Id, FriendShipStatus.ACCEPTED);
+
+                if (friendShip != null)
+                {
+                    user.IsAccepted = true;
+                    me.IsAccepted = true;
+                }
+
 
                 var members = new List<ChatRoomMember>
                 {
@@ -78,7 +90,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
                 await _signalRService.JoinGroup(userId, chatRoom.UniqueName);
                 chatRoom = await _unitOfWork.ChatRoomRepository.GetChatRoomByIdAsync(chatRoom.Id);
-            }
+            } 
 
             var response = ApplicationMapper.MapToChatRoom(chatRoom);
             response.Friend = ApplicationMapper.MapToUser(receiver);

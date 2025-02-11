@@ -21,7 +21,7 @@ export type BoxCommendStateType = {
 
 type MentionPostModalProps = {
     postId: string;
-    commentId: string
+    commentId?: string
 }
 
 const MentionPostModal: FC<MentionPostModalProps> = ({
@@ -91,7 +91,6 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
 
     const fetchComments = async () => {
         const response = await commentService.getNearbyCommentsByCommentId(postId, commentId);
-        console.log(response)
         if (response.isSuccess) {
             setComments(prev => [...prev, ...response.data])
             setPagination(response.pagination)
@@ -101,7 +100,7 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
     const fetchPrevComments = async (parentCommentId: string | null, page: number) => {
         const response = await commentService.getPrevComments(postId, parentCommentId, page);
         console.log(response)
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setComments(prevComments => [...response.data, ...prevComments])
             setPagination(prevPagination => ({
                 ...prevPagination,
@@ -113,7 +112,7 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
 
     const fetchNextComment = async (parentCommentId: string | null, page: number) => {
         const response = await commentService.getNextComments(postId, parentCommentId, page);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setComments(prevComments => [...prevComments, ...response.data])
             setPagination(prevPagination => ({
                 ...prevPagination,
@@ -125,7 +124,7 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
 
     const fetchPost = async () => {
         const response = await postService.getPostById(postId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setPost(response.data)
         }
     }
@@ -152,7 +151,7 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
             mediaType: MediaType.IMAGE,
             level
         };
-       
+
         const formData = new FormData();
         formData.append('content', values.content);
         formData.append('postId', postId);
@@ -174,7 +173,7 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
         parentCommentId && handleUpdateCommentList(parentCommentId, [tempReplyComment], false)
         const response = await commentService.createComment(formData);
         if (response.isSuccess) {
-            
+
             if (response.data.parentCommentId) {
                 replaceTempCommentWithResponse(response.data)
             }
@@ -194,18 +193,18 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
                     if (comment.parentCommentId && comment.status === 'pending' && comment.sentAt.getTime() === new Date(updatedComment.sentAt).getTime()) {
                         return { ...updatedComment };
                     }
-    
+
                     if (comment.replies && comment.replies.length > 0) {
                         return {
                             ...comment,
                             replies: updateComments(comment.replies),
                         };
                     }
-    
+
                     return comment;
                 });
             };
-    
+
             return updateComments(prevComments);
         });
     };
@@ -261,7 +260,7 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
         {post && <MentionPostInner post={post} />}
-        
+
         <MentionCommentList
             activeCommentId={commentId}
             comments={[...pendingComments.filter(p => p.level === 0), ...comments]}

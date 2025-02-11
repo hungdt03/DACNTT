@@ -18,10 +18,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<int> CountViewersByStoryId(Guid storyId, string userId)
         {
-            return await _context.Stories
+            return await _context.Viewers
                 .Where(s => s.Id == storyId && s.UserId != userId)
                 .GroupBy(s => s.UserId)
-                .Select(g => g.Key) 
                 .CountAsync();
         }
 

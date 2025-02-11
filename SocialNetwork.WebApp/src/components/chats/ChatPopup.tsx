@@ -45,6 +45,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<MessageResource[]>([])
     const [isRead, setIsRead] = useState(room.isOnline);
+    const [isShowPrevent, setIsShowPrevent] = useState(false)
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         size: 10,
@@ -82,7 +83,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
     useEffect(() => {
         fetchMessages(pagination.page, pagination.size);
-
 
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
@@ -172,8 +172,11 @@ const ChatPopup: FC<ChatPopupProps> = ({
             undefined,
             undefined,
         );
-
     }, []);
+
+    useEffect(() => {
+        setIsShowPrevent(room.isPrivate && !room.isAccept && !!room.lastMessage)
+    }, [room])
 
 
     useEffect(() => {
@@ -265,11 +268,20 @@ const ChatPopup: FC<ChatPopupProps> = ({
             formData.append('sentAt', sentAt);
 
             const response = await messageService.sendMessage(formData);
-            console.log(response)
+            if(response.isSuccess) {
+                if(isShowPrevent) {
+                    setIsShowPrevent(false)
+                }
+            }
         } else {
+
             msgPayload.sentAt = tempMessage.sentAt
+
             try {
-                SignalRConnector.sendMessage(msgPayload)
+                await SignalRConnector.sendMessage(msgPayload)
+                if(isShowPrevent) {
+                    setIsShowPrevent(false)
+                }
             } catch (error) {
                 alert(error)
             }
@@ -332,7 +344,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
             </div>
         </div>
 
-        <div className={cn("overflow-y-auto px-2 py-3 custom-scrollbar flex flex-col gap-y-3", room.isPrivate && !room.isAccept ? 'h-[220px]' : 'h-[330px]')}>
+        <div className={cn("overflow-y-auto px-2 py-3 custom-scrollbar flex flex-col gap-y-3", isShowPrevent ? 'h-[220px]' : 'h-[330px]')}>
             {!pagination.hasMore && room.isPrivate && room.friend && <div className="flex flex-col gap-y-1 items-center">
                 <Avatar src={room.friend.avatar} size={'large'} />
                 <span className="text-sm text-gray-600 font-bold">{room.friend.fullName}</span>
@@ -343,7 +355,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
         </div>
 
         <div className="sticky bottom-0">
-            {room.isPrivate && !room.isAccept && <div className="flex flex-col gap-y-2 p-3 bg-white border-b-[1px] border-t-[1px] border-gray-300">
+            {isShowPrevent && <div className="flex flex-col gap-y-2 p-3 bg-white border-b-[1px] border-t-[1px] border-gray-300">
                 <p className="text-[12px] text-gray-400 text-center">Nếu bạn trả lời, {room.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.</p>
 
                 <div className="flex justify-center">

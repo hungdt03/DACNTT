@@ -1,4 +1,4 @@
-import { FC, forwardRef, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { CommentResource } from "../../../types/comment";
 import commentService from "../../../services/commentService";
 import images from "../../../assets";
@@ -13,7 +13,7 @@ import { CommentMentionPagination } from "../../../utils/pagination";
 import { Pagination } from "../../../types/response";
 
 type MentionCommentItemProps = {
-    activeCommentId: string;
+    activeCommentId?: string;
     parentComment: CommentResource | null;
     comment: CommentResource;
     level: number;

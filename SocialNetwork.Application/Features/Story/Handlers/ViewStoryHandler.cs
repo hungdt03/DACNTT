@@ -41,7 +41,6 @@ namespace SocialNetwork.Application.Features.Story.Handlers
             var isExistedViewer = await _unitOfWork.ViewerRepository.IsViewerExisted(userId, request.StoryId);
 
             if (isExistedViewer) throw new AppException("Tin này đã được xem trước đó");
-
            
             var totalViewers = await _unitOfWork
                 .ViewerRepository.CountViewersByStoryId(story.Id, userId);

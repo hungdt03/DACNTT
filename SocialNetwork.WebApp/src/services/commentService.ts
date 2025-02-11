@@ -37,7 +37,7 @@ class CommentService {
         });
     }
 
-    getNearbyCommentsByCommentId(postId: string, commentId: string) : Promise<CommentMentionPaginationResource> {
+    getNearbyCommentsByCommentId(postId: string, commentId?: string) : Promise<CommentMentionPaginationResource> {
         return axiosInterceptor.get('/api/comments/nearby/' + postId + "/" + commentId)
     }
 

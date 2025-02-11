@@ -9,8 +9,8 @@ namespace SocialNetwork.Domain.Entity.ChatRoomInfo
         public string ImageUrl { get; set; }
         public string UniqueName { get; set; }
         public bool IsPrivate { get; set; }
-        public string LastMessage { get; set; }
-        public DateTimeOffset? LastMessageDate { get; set; }
+        public string? LastMessage { get; set; } = string.Empty;
+        public DateTimeOffset? LastMessageDate { get; set; } = DateTimeOffset.MinValue;
         public ICollection<ChatRoomMember> Members { get; set; }
         public ICollection<Message> Messages { get; set; }
     }

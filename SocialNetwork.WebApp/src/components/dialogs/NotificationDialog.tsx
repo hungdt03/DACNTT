@@ -135,6 +135,11 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         navigate(`/profile/${notification.friendRequest.receiverId}`)
     }
 
+    const handleRedirectToGroupPage = async (notification: NotificationResource) => {
+        handleMarkNotificationAsRead(notification.id)
+        navigate(`/groups/${notification.groupId}`)
+    }
+
     return <>
         <div ref={containerRef} className="flex flex-col gap-y-3 pt-2 px-2 max-h-[600px] min-w-[400px] overflow-y-auto custom-scrollbar">
             <span className="font-semibold text-lg">Thông báo của bạn</span>
@@ -150,6 +155,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         notification={notification}
                         onRequestFriendNotification={() => handleRedirectToProfileSenderPage(notification)}
                         onAcceptRequestFriendNotification={() => handleRedirectToProfileReceiverPage(notification)}
+                        onPostReactionNotification={() => handleOpenMentionComment(notification)}
+                        onGroupNotification={() => handleRedirectToGroupPage(notification)}
                     />
                 ))}
 
@@ -158,10 +165,6 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                 {notifications.length === 0 && !loading && (
                     <Empty description="Chưa có thông báo nào" />
                 )}
-
-                {/* {!pagination.hasMore && !loading && notifications.length > 0 && (
-                    <p className="text-center text-gray-500">Không còn thông báo nào để tải.</p>
-                )} */}
 
                 {!isInitialLoadComplete && !loading && pagination.hasMore && (
                     <button
@@ -204,7 +207,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                 },
             }}
         >
-            {notification?.type.includes('COMMENT') && notification.postId && notification.commentId && <MentionPostModal postId={notification.postId} commentId={notification.commentId} />}
+            {(notification?.type.includes('COMMENT') || notification?.type === NotificationType.ASSIGN_POST_TAG || notification?.type === NotificationType.POST_REACTION && notification.postId) && <MentionPostModal postId={notification.postId} commentId={notification.commentId} />}
             {notification?.type === NotificationType.POST_SHARED && notification.postId && <MentionSharePostModal postId={notification.postId} />}
         </Modal>}
     </>

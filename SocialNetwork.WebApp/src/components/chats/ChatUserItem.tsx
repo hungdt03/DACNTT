@@ -1,5 +1,5 @@
 import { Avatar } from "antd";
-import { FC, useState } from "react";
+import { FC } from "react";
 import images from "../../assets";
 import { ChatRoomResource } from "../../types/chatRoom";
 import { formatTime } from "../../utils/date";
@@ -8,15 +8,17 @@ import { Link } from "react-router-dom";
 
 type ChatUserItemProps = {
     chatRoom: ChatRoomResource;
-    isActive: boolean
+    isActive: boolean;
+    onClick: () => void
 }
 
 const ChatUserItem: FC<ChatUserItemProps> = ({
     chatRoom,
-    isActive
+    isActive,
+    onClick
 }) => {
 
-    return <Link to={`/chat/${chatRoom.id}`} className={cn("flex items-center gap-x-3 px-3 py-3 rounded-sm w-full hover:bg-gray-100", isActive && 'bg-gray-100')}>
+    return <div onClick={onClick} className={cn("cursor-pointer flex items-center gap-x-3 px-3 py-3 rounded-sm w-full hover:bg-gray-100", isActive && 'bg-gray-100')}>
         <div className="relative">
             {chatRoom.isPrivate && chatRoom.friend?.haveStory
                 ? <Link to={`/stories/${chatRoom.friend.id}`} className="inline-block rounded-full p-[1px] border-[2px] border-primary"><Avatar size='default' src={chatRoom.isPrivate ? chatRoom.friend?.avatar : images.group} /></Link>
@@ -37,7 +39,7 @@ const ChatUserItem: FC<ChatUserItemProps> = ({
             <div className="w-3 h-3 bg-primary rounded-full">
             </div>
         </div>}
-    </Link>
+    </div>
 };
 
 export default ChatUserItem;

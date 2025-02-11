@@ -6,15 +6,18 @@ import { useParams } from "react-router-dom";
 import chatRoomService from "../services/chatRoomService";
 import ChatSidebar from "../components/chats/ChatSidebar";
 import cn from "../utils/cn";
+import NotAllowedComponent from "../components/NotAllowedComponent";
 
 const ChatPage: FC = () => {
     const { id } = useParams()
     const [currentChatRoom, setCurrentChatRoom] = useState<ChatRoomResource | null>(null);
-    const [showChatDetails, setShowChatDetails] = useState(true)
+    const [showChatDetails, setShowChatDetails] = useState(true);
+
 
     const fetchChatRoom = async () => {
         if (id) {
             const response = await chatRoomService.getChatRoomById(id);
+            console.log(response )
             if (response.isSuccess) {
                 setCurrentChatRoom(response.data)
             }
@@ -25,15 +28,18 @@ const ChatPage: FC = () => {
         fetchChatRoom();
     }, [id])
 
+
     return <div className="grid grid-cols-12 h-screen">
         {currentChatRoom && <ChatSidebar chatRoom={currentChatRoom} />}
         <div className="lg:col-span-8 xl:col-span-9 col-span-12 overflow-hidden">
-            <div className="grid grid-cols-12 h-full overflow-hidden">
+            {currentChatRoom?.isMember || currentChatRoom?.isPrivate ? <div className="grid grid-cols-12 h-full overflow-hidden">
                 {currentChatRoom && <ChatArea showChatDetails={showChatDetails} onToggleChatDetails={() => setShowChatDetails(!showChatDetails)} chatRoom={currentChatRoom} />}
                 <div className={cn("overflow-hidden", showChatDetails ? 'col-span-4 md:block hidden' : 'hidden')}>
                     {currentChatRoom && <ChatDetails chatRoom={currentChatRoom} />}
                 </div>
             </div>
+                : <NotAllowedComponent />
+            }
         </div>
     </div>
 };

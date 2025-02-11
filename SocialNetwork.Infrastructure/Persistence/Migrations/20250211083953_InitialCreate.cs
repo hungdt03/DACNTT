@@ -31,9 +31,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UniqueName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsPrivate = table.Column<bool>(type: "bit", nullable: false),
-                    LastMessage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastMessageDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     DateCreated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateUpdated = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),

@@ -34,7 +34,6 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
         }
         public async Task<BaseResponse> Handle(CreateChatRoomCommand request, CancellationToken cancellationToken)
         {
-           
             var userId = _contextAccessor.HttpContext.User.GetUserId();
             var userFullname = _contextAccessor.HttpContext.User.GetFullName();
             var friendShips = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(userId, FriendShipStatus.ACCEPTED);
@@ -93,7 +92,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             await _unitOfWork.MessageRepository.CreateMessageAsync(message);
 
             listMsg.Add(message);
-
+            int count = 1;
             foreach (var member in members)
             {
                 var messageItem = new Domain.Entity.MessageInfo.Message()
@@ -101,7 +100,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     MessageType = MessageType.SYSTEM,
                     Content = $"{userFullname} đã thêm {member.User.FullName} vào nhóm",
                     ChatRoomId = chatRoom.Id,
-                    SentAt = DateTimeOffset.UtcNow,
+                    SentAt = DateTimeOffset.UtcNow.AddMilliseconds(count++),
                 };
 
                 await _unitOfWork.MessageRepository.CreateMessageAsync(messageItem);

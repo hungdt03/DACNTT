@@ -12,6 +12,7 @@ export type NotificationResource = {
   
     groupId: string; 
     groupInvitationId: string; 
+    groupRoleInvitationId: string; 
     storyId: string; 
     postId: string; 
     commentId: string;

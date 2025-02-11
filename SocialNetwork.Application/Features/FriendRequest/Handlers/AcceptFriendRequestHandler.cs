@@ -69,6 +69,7 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 {
                     IsPrivate = true,
                     LastMessageDate = DateTimeOffset.UtcNow,
+                    ImageUrl = "NONE",
                     UniqueName = chatRoomName,
                     Name = chatRoomName,
                     LastMessage = "Các bạn hiện đã được kết nối với nhau",
@@ -86,6 +87,12 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
                 };
 
                 await _unitOfWork.MessageRepository.CreateMessageAsync(message);
+            } else
+            {
+                foreach(var member in chatRoom.Members)
+                {
+                    member.IsAccepted = true;
+                }
             }
 
             var notification = new Domain.Entity.System.Notification()

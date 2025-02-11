@@ -110,6 +110,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .SingleOrDefaultAsync(c => c.Id == id);
         }
 
+        public async Task<Comment?> GetFirstCommentByPostId(Guid postId)
+        {
+            return await _dbContext.Comments
+                .Where(p => p.PostId == postId).FirstOrDefaultAsync();
+        }
+
         public void RemoveRange(IEnumerable<Comment> comments)
         {
             _dbContext.Comments.RemoveRange(comments);

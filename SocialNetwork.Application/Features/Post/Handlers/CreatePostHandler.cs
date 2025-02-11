@@ -90,6 +90,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 post.Group = group;
                 post.GroupId = group.Id;
                 post.IsGroupPost = true;
+
             }
 
             var medias = new List<PostMedia>();
