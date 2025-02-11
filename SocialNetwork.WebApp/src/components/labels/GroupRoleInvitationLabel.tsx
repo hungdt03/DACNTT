@@ -1,15 +1,15 @@
 import { FC } from "react";
-import { GroupRoleInvitationResource } from "../types/group-role-invitation";
+import { GroupRoleInvitationResource } from "../../types/group-role-invitation";
 import { Avatar, Button } from "antd";
-import { MemberRole } from "../enums/member-role";
+import { MemberRole } from "../../enums/member-role";
 
-type NotificationLabelProps = {
+type GroupRoleInvitationLabelProps = {
     invitation: GroupRoleInvitationResource;
     onAccept: () => void;
     onReject: () => void;
 }
 
-const NotificationLabel: FC<NotificationLabelProps> = ({
+const GroupRoleInvitationLabel: FC<GroupRoleInvitationLabelProps> = ({
     invitation,
     onAccept,
     onReject
@@ -32,4 +32,4 @@ const NotificationLabel: FC<NotificationLabelProps> = ({
     </div>
 };
 
-export default NotificationLabel;
+export default GroupRoleInvitationLabel;

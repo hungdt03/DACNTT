@@ -47,8 +47,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     const fetchNotifications = async (page: number) => {
         setLoading(true)
         const response = await notificationService.getAllNotifications({ page, size: pagination.size });
-        setTimeout(() => setLoading(false), 500);
-
+        setLoading(false)
         if (response.isSuccess) {
             setNotifications(prev => {
                 const newNotifications = response.data.filter(
@@ -106,11 +105,13 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     }
 
     const handleOpenMentionComment = (notification: NotificationResource) => {
+        handleMarkNotificationAsRead(notification.id)
         setNotification(notification)
         showModal()
     }
 
     const handleOpenMentionShare = (notification: NotificationResource) => {
+        handleMarkNotificationAsRead(notification.id)
         setNotification(notification)
         showModal()
     }
@@ -120,7 +121,18 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         const storyId = notification.storyId;
         const userId = notification.recipient.id;
 
+        handleMarkNotificationAsRead(notification.id)
         navigate(`/stories/${userId}?noti_id=${notiId}&story_id=${storyId}`)
+    }
+
+    const handleRedirectToProfileSenderPage = async (notification: NotificationResource) => {
+        handleMarkNotificationAsRead(notification.id)
+        navigate(`/profile/${notification.friendRequest.senderId}`)
+    }
+
+    const handleRedirectToProfileReceiverPage = async (notification: NotificationResource) => {
+        handleMarkNotificationAsRead(notification.id)
+        navigate(`/profile/${notification.friendRequest.receiverId}`)
     }
 
     return <>
@@ -131,11 +143,13 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                     <Notification
                         onShareNotification={() => handleOpenMentionShare(notification)}
                         onCommentNotification={() => handleOpenMentionComment(notification)}
-                        onStoryReactionNotification={() => handleRedirectToStoryPage(notification)}
+                        onStoryNotification={() => handleRedirectToStoryPage(notification)}
                         onDelete={() => handleDeleteNotification(notification.id)}
                         onMarkAsRead={() => handleMarkNotificationAsRead(notification.id)}
                         key={notification.id}
                         notification={notification}
+                        onRequestFriendNotification={() => handleRedirectToProfileSenderPage(notification)}
+                        onAcceptRequestFriendNotification={() => handleRedirectToProfileReceiverPage(notification)}
                     />
                 ))}
 
@@ -145,13 +159,13 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                     <Empty description="Chưa có thông báo nào" />
                 )}
 
-                {!pagination.hasMore && !loading && notifications.length > 0 && (
+                {/* {!pagination.hasMore && !loading && notifications.length > 0 && (
                     <p className="text-center text-gray-500">Không còn thông báo nào để tải.</p>
-                )}
+                )} */}
 
                 {!isInitialLoadComplete && !loading && pagination.hasMore && (
                     <button
-                        className="w-full text-center text-sm"
+                        className="w-full text-center text-sm py-1 bg-gray-200 rounded-md"
                         onClick={() => {
                             fetchNotifications(pagination.page + 1);
                             setIsInitialLoadComplete(true);

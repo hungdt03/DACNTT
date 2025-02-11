@@ -29,8 +29,6 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             var groupMember = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId, userId)
                     ?? throw new AppException("Bạn không phải là thành viên của nhóm");
 
-            
-
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             if (request.MemberId.HasValue)

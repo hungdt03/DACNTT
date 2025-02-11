@@ -33,7 +33,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<GroupInvitation?> GetGroupInvitationByInviteeIdAndGroupIdAsync(string inviteeId, Guid groupId)
         {
-            return await _context.GroupInvitations.SingleOrDefaultAsync(x => x.GroupId == groupId && x.InviteeId == inviteeId && x.Status == false);
+            return await _context.GroupInvitations
+                .Include(g => g.Inviter)
+                .Include(g => g.Invitee)
+                .SingleOrDefaultAsync(x => x.GroupId == groupId && x.InviteeId == inviteeId && x.Status == false);
         }
 
         public async Task<GroupInvitation?> GetGroupInvitationByInviterIdAndInviteeIdAndGroupIdAsync(string inviterId, string inviteeId, Guid groupId)

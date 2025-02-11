@@ -17,6 +17,7 @@ namespace SocialNetwork.Application.DTOs
         public Guid? StoryId { get; set; }
         public Guid? CommentId { get; set; }
         public Guid? FriendRequestId { get; set; }
+        public FriendRequestResponse? FriendRequest { get; set; }
         public Guid? GroupId { get; set; }
         public Guid? GroupInvitationId { get; set; }
 

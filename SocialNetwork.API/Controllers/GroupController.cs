@@ -238,5 +238,12 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new RevokeUserPermissionCommand(memberId));
             return Ok(response);
         }
+
+        [HttpGet("invite-join/{groupId}")]
+        public async Task<IActionResult> GetInviteJoinGroup([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new GetInviteJoinGroupQuery(groupId));
+            return Ok(response);
+        }
     }
 }

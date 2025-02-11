@@ -340,6 +340,8 @@ namespace SocialNetwork.Application.Mappers
             return new FriendRequestResponse
             {
                 Id = friendRequest.Id,
+                SenderId = friendRequest.UserId,
+                ReceiverId = friendRequest.FriendId,
                 Sender = friendRequest.User != null ? MapToUser(friendRequest.User) : null,
                 SentAt = friendRequest.DateCreated,
                 Status = friendRequest.Status,
@@ -365,6 +367,7 @@ namespace SocialNetwork.Application.Mappers
                 Content = notification.Content,
                 DateSent = notification.DateSent,
                 FriendRequestId = notification.FriendRequestId,
+                FriendRequest = notification.FriendRequest != null ? MapToFriendRequest(notification.FriendRequest) : null,
                 ImageUrl = notification.ImageUrl,
                 IsRead = notification.IsRead,
                 PostId = notification.PostId,

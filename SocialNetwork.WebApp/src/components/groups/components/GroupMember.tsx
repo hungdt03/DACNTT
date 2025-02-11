@@ -62,7 +62,7 @@ const GroupMember: FC<GroupMemberProps> = ({
                 isMine && adminCount === 1 && countMember > 1 ? <button onClick={onChooseNewAdmin} className="px-3 py-[3px] hover:bg-gray-200 rounded-md font-semibold text-sm bg-gray-100">
                     Rời nhóm
                 </button>
-                    : <Popconfirm onConfirm={onLeaveGroup} title='Rời nhóm' cancelText='Hủy bỏ' okText='Xóa' description={countMember === 1 ? 'Bạn là thành viên cuối cùng của nhóm, nhóm sẽ bị xóa khi bạn rời đi!' : 'Bạn có chắc muốn rời nhóm không'}>
+                    : <Popconfirm onConfirm={onLeaveGroup} title='Rời nhóm' cancelText='Hủy bỏ' okText='Rời' description={countMember === 1 ? 'Bạn là thành viên cuối cùng của nhóm, nhóm sẽ bị xóa khi bạn rời đi!' : 'Bạn có chắc muốn rời nhóm không'}>
                         <button className="px-3 py-[3px] hover:bg-gray-200 rounded-md font-semibold text-sm bg-gray-100">
                             Rời nhóm
                         </button>

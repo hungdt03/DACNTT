@@ -33,6 +33,9 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             var group = await _unitOfWork.GroupRepository.GetGroupByIdAsync(request.GroupId)
                 ?? throw new NotFoundException("Nhóm không tồn tại");
 
+            if (group.IsHidden)
+                throw new NotFoundException("Bạn không thể yêu cầu tham gia nhóm riêng tư");
+
             var groupMember = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId, userId);
 
             if (groupMember != null) throw new AppException("Bạn đã là thành viên của nhóm");

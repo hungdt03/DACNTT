@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { GroupMemberResource } from "../../types/group-member";
 import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";
@@ -16,6 +16,7 @@ import { MemberRole } from "../../enums/member-role";
 
 const GroupMemberPage: FC = () => {
     const { id } = useParams()
+    const navigate = useNavigate()
 
     const [members, setMembers] = useState<GroupMemberResource[]>([]);
     const [loading, setLoading] = useState(false);
@@ -74,11 +75,11 @@ const GroupMemberPage: FC = () => {
         }
     }
 
-    const handleLeaveGroup = async (groupId: string, memberId: string) => {
+    const handleLeaveGroup = async (groupId: string, memberId?: string) => {
         const response = await groupService.leaveGroup(groupId, memberId);
         if (response.isSuccess) {
             message.success(response.message);
-            setMembers(prevMembers => [...prevMembers.filter(m => m.id !== memberId)])
+            navigate('/groups')
         } else {
             message.error(response.message)
         }
@@ -194,7 +195,7 @@ const GroupMemberPage: FC = () => {
                     key={member.id}
                     member={member}
                     onChooseNewAdmin={showModal}
-                    onLeaveGroup={() => handleLeaveGroup(group.id, member.id)}
+                    onLeaveGroup={() => handleLeaveGroup(group.id)}
                     onCancelInviteAsAdmin={() => handleCancelInvitation(member.id)}
                     onCancelInviteAsModerator={() => handleCancelInvitation(member.id)}
                     onInviteAsAdmin={() => handleInviteAsAdmin(member.id)}

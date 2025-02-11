@@ -1,19 +1,23 @@
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
-import { Avatar, Button, Divider, Drawer, Form, FormProps, Input, Modal, Radio, Select, Switch, Tooltip, message } from "antd";
+import { Avatar, Button, Divider, Drawer, Form, FormProps, Input, Modal, Popconfirm, Popover, Radio, Select, Switch, Tooltip, message } from "antd";
 import { SettingOutlined } from '@ant-design/icons'
 import { Plus } from "lucide-react";
 import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
 import useModal from "../../hooks/useModal";
 import { GroupResource } from "../../types/group";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import groupService from "../../services/groupService";
 import { getGroupPrivacyTitle } from "../../utils/privacy";
 import { GroupPrivacy } from "../../enums/group-privacy";
-import { JoinGroupRequestResource, JoinGroupResource } from "../../types/join-group";
+import { JoinGroupRequestResource } from "../../types/join-group";
 import cn from "../../utils/cn";
 import { GroupRoleInvitationResource } from "../../types/group-role-invitation";
-import NotificationLabel from "../NotificationLabel";
+import GroupRoleInvitationLabel from "../labels/GroupRoleInvitationLabel";
+import { GroupInvitationResource } from "../../types/group-invitation";
+import GroupInvitationLabel from "../labels/GroupInvitationLabel";
+import { GroupMemberResource } from "../../types/group-member";
+import ChooseNewAdminModal from "../modals/ChooseNewAdminModal";
 
 export type InviteFriendsRequest = {
     inviteeIds: string[];
@@ -34,23 +38,29 @@ export type EditGroupRequest = {
 type GroupHeaderProps = {
     group: GroupResource;
     requestJoin?: JoinGroupRequestResource;
-    onFetch: () => void;
-    onFetchRequest: () => void
+    inviteJoin?: GroupInvitationResource;
+    onFetchInvite: () => void;
+    onFetchRequest: () => void;
+    onFetchGroup: () => void;
 }
 
 const GroupHeader: FC<GroupHeaderProps> = ({
     group,
     requestJoin,
-    onFetch,
-    onFetchRequest
+    inviteJoin,
+    onFetchInvite,
+    onFetchRequest,
+    onFetchGroup
 }) => {
     const location = useLocation()
+    const navigate = useNavigate()
     const { handleCancel, handleOk, showModal, isModalOpen } = useModal();
+    const { handleCancel: cancelLeave, handleOk: okLeave, showModal: showLeave, isModalOpen: openLeave } = useModal();
+
     const [openSetting, setOpenSetting] = useState(false);
     const [loadingUpdate, setLoadingUpdate] = useState(false)
 
     const [roleInvitation, setRoleInvitation] = useState<GroupRoleInvitationResource>();
-
     const [isDisabled, setIsDisabled] = useState(false);
     const [isChange, setIsChange] = useState(false);
 
@@ -62,9 +72,11 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         inviteeIds: []
     });
 
+    const [selectMember, setSelectMember] = useState<GroupMemberResource>()
+
     const handleGetRoleInvitation = async () => {
         const response = await groupService.getRoleInvitation(group.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setRoleInvitation(response.data)
         } else {
             setRoleInvitation(undefined)
@@ -94,7 +106,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     }
 
     useEffect(() => {
-        if(group.privacy === GroupPrivacy.PUBLIC) setIsDisabled(true);
+        if (group.privacy === GroupPrivacy.PUBLIC) setIsDisabled(true);
         handleGetRoleInvitation()
     }, [group])
 
@@ -102,17 +114,42 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         setLoadingUpdate(true)
         const response = await groupService.updateGeneralInfo(group.id, values);
         setLoadingUpdate(false)
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
-            onFetch();
+            onFetchGroup();
             setOpenSetting(false)
             form.resetFields()
         } else message.error(response.message)
     };
 
+    const handleAcceptInviteJoinGroup = async (inviteId: string) => {
+        const response = await groupService.acceptInviteFriend(inviteId);
+        if (response.isSuccess) {
+            onFetchGroup();
+            onFetchRequest();
+            onFetchInvite();
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleRejectInviteJoinGroup = async (inviteId: string) => {
+        const response = await groupService.rejectInviteFriend(inviteId);
+        if (response.isSuccess) {
+            onFetchGroup();
+            onFetchRequest();
+            onFetchInvite();
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+
     const handleAcceptRoleInvitation = async (invitationId: string) => {
         const response = await groupService.acceptRoleInvitation(invitationId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message)
             handleGetRoleInvitation()
         } else {
@@ -122,7 +159,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
 
     const handleRejectRoleInvitation = async (invitationId: string) => {
         const response = await groupService.rejectRoleInvitation(invitationId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message)
             handleGetRoleInvitation()
         } else {
@@ -130,15 +167,27 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         }
     }
 
+
     const handleCancelJoinGroupRequest = async (userId: string) => {
         const response = await groupService.cancelRequestJoinGroup(userId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             onFetchRequest()
             message.success(response.message)
         } else {
             message.error(response.message);
         }
     }
+
+    const handleLeaveGroup = async (groupId: string, memberId?: string) => {
+        const response = await groupService.leaveGroup(groupId, memberId);
+        if (response.isSuccess) {
+            message.success(response.message);
+            navigate('/groups')
+        } else {
+            message.error(response.message)
+        }
+    }
+
 
     return <div className="bg-white w-full shadow">
         <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto overflow-hidden">
@@ -172,22 +221,36 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 <Button onClick={showModal} icon={<Plus size={16} />} type="primary">
                                     Mời
                                 </Button>
+                                {group.isMine && group.adminCount === 1 && group.countMembers > 1 ? <button onClick={showLeave} className="px-3 py-1 hover:bg-gray-200 rounded-md bg-gray-100">
+                                    Rời nhóm
+                                </button>
+                                : <Popconfirm onConfirm={() => handleLeaveGroup(group.id)} title='Rời nhóm' cancelText='Hủy bỏ' okText='Rời nhóm' description={group.countMembers === 1 ? 'Bạn là thành viên cuối cùng của nhóm, nhóm sẽ bị xóa khi bạn rời đi!' : 'Bạn có chắc muốn rời nhóm không'}>
+                                    <button className="px-3 py-1 hover:bg-gray-200 rounded-md bg-gray-100">
+                                        Rời nhóm
+                                    </button>
+                                </Popconfirm>}
                                 <button className="bg-sky-50 text-primary px-3 py-1 rounded-md">Đã tham gia</button>
                             </>
-                        ) : requestJoin ? (
+                        ) : !inviteJoin && (requestJoin ? (
                             <>
-                               <button onClick={() => handleCancelJoinGroupRequest(requestJoin.id)} className="px-3 py-[6px] text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold">Hủy</button>
+                                <button onClick={() => handleCancelJoinGroupRequest(requestJoin.id)} className="px-3 py-[6px] text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold">Hủy</button>
                                 <Button className="cursor-text" type="primary">Chờ phê duyệt</Button>
                             </>
                         ) : (
                             <Button onClick={() => handleJoinGroup(group.id)} icon={<Plus size={16} />} type="primary">
                                 Tham gia nhóm
                             </Button>
-                        )}
+                        ))}
                     </div>
                 </div>
 
-                {roleInvitation && <NotificationLabel
+                {inviteJoin && <GroupInvitationLabel
+                    invitation={inviteJoin}
+                    onAccept={() => handleAcceptInviteJoinGroup(inviteJoin.id)}
+                    onReject={() => handleRejectInviteJoinGroup(inviteJoin.id)}
+                />}
+
+                {roleInvitation && <GroupRoleInvitationLabel
                     invitation={roleInvitation}
                     onAccept={() => handleAcceptRoleInvitation(roleInvitation.id)}
                     onReject={() => handleRejectRoleInvitation(roleInvitation.id)}
@@ -195,11 +258,11 @@ const GroupHeader: FC<GroupHeaderProps> = ({
 
                 <Divider className="my-3" />
 
-               {group.isMember && <div className="flex gap-x-2 items-center">
-                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold")} to={`/groups/${group.id}`}>Thảo luận</Link>
-                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/members') && 'border-b-[3px] border-primary')} to={`/groups/${group.id}/members`}>Thành viên</Link>
-                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/images') && 'border-b-[3px] border-primary')} to={`/groups/${group.id}/images`}>Ảnh</Link>
-                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/videos') && 'border-b-[3px] border-primary')} to={`/groups/${group.id}/videos`}>Video</Link>
+                {group.isMember && <div className="flex gap-x-2 items-center">
+                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", ['/members', '/videos', '/images'].every(route => !location.pathname.includes(route)) && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}`}>Thảo luận</Link>
+                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/members') && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}/members`}>Thành viên</Link>
+                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/images') && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}/images`}>Ảnh</Link>
+                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/videos') && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}/videos`}>Video</Link>
                 </div>}
             </div>
         </div>
@@ -280,7 +343,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 <Switch
                                     disabled={group.privacy === GroupPrivacy.PRIVATE}
                                     onChange={e => setIsDisabled(e)}
-                                 />
+                                />
                             </Form.Item>
                         </div>
 
@@ -358,6 +421,25 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                 </Form.Item>
             </Form>
         </Drawer>
+
+        <Modal
+            title={<p className="text-center font-semibold text-xl">Rời nhóm</p>}
+            open={openLeave}
+            onOk={okLeave}
+            onCancel={cancelLeave}
+            okText='Rời nhóm'
+            cancelText='Hủy bỏ'
+            okButtonProps={{
+                disabled: !selectMember,
+                onClick: () => group && selectMember && void handleLeaveGroup(group.id, selectMember.id)
+            }}
+        >
+            <ChooseNewAdminModal
+                selectMember={selectMember}
+                onChange={(newSelect) => setSelectMember(newSelect)}
+                groupId={group.id}
+            />
+        </Modal>
 
     </div>
 };

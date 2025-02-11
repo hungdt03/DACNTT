@@ -48,16 +48,13 @@ const StoryViewers: FC<StoryViewersProps> = ({
                             </div>
                             <div className="flex flex-col">
                                 <span className="font-semibold text-xs">{viewer.user.fullName}</span>
-                                <span className="text-xs text-gray-500">{
-                                    viewer.user.isOnline ? 'Đang hoạt động' : `Hoạt động mấy phút trước`
-                                }</span>
                             </div>
                         </div>
 
                         <Avatar.Group>
                             {getTopReactions(viewer.reactions, 3).map(reaction =>
-                                <Badge count={reaction.count} key={reaction.reactionType}>
-                                    <img width={14} height={14} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="mx-[5px]" />
+                                <Badge size="small" count={reaction.count} key={reaction.reactionType}>
+                                    <img width={16} height={16} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="mx-[5px]" />
                                 </Badge>
                             )}
                         </Avatar.Group>

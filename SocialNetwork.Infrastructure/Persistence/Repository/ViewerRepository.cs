@@ -15,6 +15,17 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             _context = context;
         }
+
+        public async Task<int> CountViewersByStoryId(Guid storyId, string userId)
+        {
+            return await _context.Stories
+                .Where(s => s.Id == storyId && s.UserId != userId)
+                .GroupBy(s => s.UserId)
+                .Select(g => g.Key) 
+                .CountAsync();
+        }
+
+
         public async Task CreateViewerAsync(Viewer viewer)
         {
             await _context.Viewers.AddAsync(viewer);

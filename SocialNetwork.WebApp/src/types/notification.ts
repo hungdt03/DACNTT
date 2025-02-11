@@ -1,3 +1,4 @@
+import { FriendRequestResource } from "./friendRequest";
 import { UserResource } from "./user";
 
 export type NotificationResource = {
@@ -15,6 +16,7 @@ export type NotificationResource = {
     postId: string; 
     commentId: string;
     friendRequestId: string;
+    friendRequest: FriendRequestResource
   
     dateSent: Date; 
   }

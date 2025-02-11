@@ -33,11 +33,21 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             if (invitation.InviteeId != userId)
                 throw new AppException("Bạn không có quyền chấp nhận lời mời này");
 
+            var joinGroupRequest = await _unitOfWork
+                .JoinGroupRequestRepository
+                .GetJoinGroupRequestByUserIdAndGroupIdAsync(userId, invitation.GroupId);
+
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            invitation.Status = true;
+            if(joinGroupRequest != null)
+            {
+                _unitOfWork.JoinGroupRequestRepository.RemoveJoinGroupRequest(joinGroupRequest);
+            }
 
-            var groupInvitation = new GroupMember()
+            _unitOfWork.GroupInvitationRepository
+                .RemoveGroupInvitation(invitation);
+
+            var groupMember = new GroupMember()
             {
                 GroupId = invitation.GroupId,
                 Role = MemberRole.MEMBER,
@@ -45,7 +55,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 UserId = userId,
             };
 
-            await _unitOfWork.GroupMemberRepository.CreateGroupMemberAsync(groupInvitation);
+            await _unitOfWork.GroupMemberRepository.CreateGroupMemberAsync(groupMember);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             return new BaseResponse()

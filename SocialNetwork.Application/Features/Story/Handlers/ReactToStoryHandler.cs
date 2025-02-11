@@ -40,7 +40,6 @@ namespace SocialNetwork.Application.Features.Story.Handlers
             var userId = _contextAccessor.HttpContext.User.GetUserId();
             if (userId == story.UserId) throw new AppException("Không thể cảm xúc story của chính mình");
 
-
             var reactViewer = new Domain.Entity.StoryInfo.Viewer()
             {
                 Reaction = request.ReactionType,

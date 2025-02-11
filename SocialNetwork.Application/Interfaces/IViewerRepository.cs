@@ -13,5 +13,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<bool> IsAnViewersByStoryIdAndUserIdAsync(Guid storyId, string userId);
         Task<bool> IsAnViewersByStoryId(Guid storyId);
         void RemoveRange(IEnumerable<Viewer> viewers);
+        Task<int> CountViewersByStoryId(Guid storyId, string userId);
     }
 }

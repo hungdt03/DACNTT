@@ -117,10 +117,19 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                 {
                     if (username == request.ReplyToUserName) continue;
 
+                   
                     var user = await userManager.FindByIdAsync(username);
 
                     if (user == null)
                         continue;
+
+                    if (post.GroupId.HasValue && post.IsGroupPost && post.Group.Privacy == GroupPrivacy.PRIVATE)
+                    {
+                        var groupMember = await _unitOfWork
+                            .GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(post.GroupId.GetValueOrDefault(), user.Id);
+
+                        if (groupMember == null) continue;
+                    }
 
                     var notification = new Domain.Entity.System.Notification();
                     notification.CommentId = savedComment.Id;

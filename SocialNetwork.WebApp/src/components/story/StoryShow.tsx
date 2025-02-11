@@ -54,7 +54,9 @@ const StoryShow: FC<StoryShowProps> = ({
     }, [story])
 
     const handleViewStory = async (storyId: string) => {
+        console.log('View')
         const response = await storyService.viewStory(storyId);
+        console.log(response)
         if (response.isSuccess) {
             message.success(response.message)
         }

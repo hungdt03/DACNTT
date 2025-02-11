@@ -3,6 +3,7 @@ import { InviteFriendsRequest } from '../components/groups/GroupHeader';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { GroupResource } from '../types/group';
 import { GroupApprovalSummaryResource } from '../types/group-approval-summary';
+import { GroupInvitationResource } from '../types/group-invitation';
 import { GroupMemberResource } from '../types/group-member';
 import { GroupRoleInvitationResource } from '../types/group-role-invitation';
 import { JoinGroupRequestResource, JoinGroupResource } from '../types/join-group';
@@ -35,6 +36,10 @@ class GroupService {
 
     getGroupById(groupId: string) : Promise<DataResponse<GroupResource>> {
         return axiosInterceptor.get('/api/groups/' + groupId)
+    }
+
+    getInviteJoinGroup(groupId: string) : Promise<DataResponse<GroupInvitationResource>> {
+        return axiosInterceptor.get('/api/groups/invite-join/' + groupId)
     }
 
     inviteFriends(payload: InviteFriendsRequest) : Promise<BaseResponse> {
@@ -112,7 +117,7 @@ class GroupService {
         return axiosInterceptor.delete('/api/groups/kick/' + memberId)
     }
 
-    leaveGroup(groupId: string, memberId: string) : Promise<BaseResponse> {
+    leaveGroup(groupId: string, memberId?: string) : Promise<BaseResponse> {
         return axiosInterceptor.post('/api/groups/leave-group', {
             groupId,
             memberId

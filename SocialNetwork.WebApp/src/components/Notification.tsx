@@ -10,6 +10,7 @@ import friendRequestService from "../services/friendRequestService";
 import { toast } from "react-toastify";
 import notificationService from "../services/notificationService";
 import groupService from "../services/groupService";
+import notis from "../assets/noti";
 
 
 type NotificationMoreActionProps = {
@@ -41,7 +42,9 @@ type NotificationProps = {
     onMarkAsRead?: () => void;
     onCommentNotification: () => void;
     onShareNotification: () => void;
-    onStoryReactionNotification: () => void;
+    onStoryNotification: () => void;
+    onRequestFriendNotification: () => void;
+    onAcceptRequestFriendNotification: () => void;
 }
 
 const Notification: FC<NotificationProps> = ({
@@ -50,7 +53,9 @@ const Notification: FC<NotificationProps> = ({
     onMarkAsRead,
     onCommentNotification,
     onShareNotification,
-    onStoryReactionNotification
+    onStoryNotification,
+    onRequestFriendNotification,
+    onAcceptRequestFriendNotification
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false);
     const [acceptedFriendRequest, setAcceptedFriendRequest] = useState<'accepted' | 'cancel' | 'none'>('none');
@@ -64,7 +69,7 @@ const Notification: FC<NotificationProps> = ({
             handleDeleteNotification(notification.id)
         } else {
             toast.error(response.message);
-            onDelete?.()
+            handleDeleteNotification(notification.id)
         }
     };
 
@@ -76,7 +81,7 @@ const Notification: FC<NotificationProps> = ({
             handleDeleteNotification(notification.id)
         } else {
             toast.error(response.message)
-            onDelete?.()
+            handleDeleteNotification(notification.id)
         }
     };
 
@@ -88,12 +93,11 @@ const Notification: FC<NotificationProps> = ({
             handleDeleteNotification(notification.id)
         } else {
             toast.error(response.message);
-            onDelete?.()
+            handleDeleteNotification(notification.id)
         }
     };
 
     const handleAcceptJoinGroup = async (inviteId: string) => {
-        console.log(notification)
         const response = await groupService.acceptInviteFriend(inviteId)
         if (response.isSuccess) {
             setAcceptedJoinGroup('accepted')
@@ -101,7 +105,7 @@ const Notification: FC<NotificationProps> = ({
             handleDeleteNotification(notification.id)
         } else {
             toast.error(response.message)
-            onDelete?.()
+            handleDeleteNotification(notification.id)
         }
     };
 
@@ -114,13 +118,27 @@ const Notification: FC<NotificationProps> = ({
             onCommentNotification()
         } else if (notification.type === NotificationType.POST_SHARED) {
             onShareNotification()
-        } else if (notification.type === NotificationType.REACT_STORY) {
-            onStoryReactionNotification()
+        } else if (notification.type.includes('STORY')) {
+            onStoryNotification()
+        } else if (notification.type === NotificationType.FRIEND_REQUEST_SENT) {
+            onRequestFriendNotification()
+        } else if (notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
+            onAcceptRequestFriendNotification()
         }
     }
 
-    return <div onClick={handleSelectNotification} onMouseOver={() => setShowMoreAction(true)} onMouseLeave={() => setShowMoreAction(false)} className={cn("relative z-[100] cursor-pointer flex items-center gap-x-3 px-3 py-2 rounded-md hover:bg-gray-100 max-w-[400px]")}>
-        <Avatar className="flex-shrink-0" size='large' src={notification.imageUrl ?? images.user} />
+    return <div onClick={handleSelectNotification} onMouseOver={() => setShowMoreAction(true)} onMouseLeave={() => setShowMoreAction(false)} className={cn("relative cursor-pointer flex items-center gap-x-3 px-3 py-2 rounded-md hover:bg-gray-100 max-w-[400px]")}>
+        <div className="flex-shrink-0 relative">
+            <img className="w-[55px] h-[55px] rounded-full object-cover" src={notification.imageUrl ?? images.user} />
+            <img className="absolute -right-[6px] -bottom-[4px] w-6 h-6" src={
+                notification.type.includes('COMMENT') ? notis.commentNoti
+                    : (notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED || notification.type === NotificationType.FRIEND_REQUEST_SENT) ? notis.userNoti
+                    : notification.type === NotificationType.POST_SHARED ? notis.notiShare 
+                    : notification.type === NotificationType.VIEW_STORY ? notis.viewStory
+                    : notification.type === NotificationType.REACT_STORY ? notis.notiReaction
+                    : images.group
+            } />
+        </div>
         <div className="flex flex-col gap-y-3 items-start">
             <div className="flex flex-col items-start">
                 <div className="flex-1 line-clamp-2">
@@ -138,12 +156,13 @@ const Notification: FC<NotificationProps> = ({
                     ) : (
                         <div className="flex items-center gap-x-2">
                             <button
-                                className="px-3 py-1 rounded-md bg-gray-200 text-gray-600"
+                                className="px-3 py-[1px] rounded-md bg-gray-200 text-gray-600"
                                 onClick={() => handleRejectJoinGroup(notification.groupInvitationId)}
                             >
                                 Gỡ
                             </button>
                             <Button
+                                size="small"
                                 type="primary"
                                 onClick={() => handleAcceptJoinGroup(notification.groupInvitationId)}
                             >
@@ -163,12 +182,13 @@ const Notification: FC<NotificationProps> = ({
                     ) : (
                         <div className="flex items-center gap-x-2">
                             <button
-                                className="px-3 py-1 rounded-md bg-gray-200 text-gray-600"
+                                className="px-3 py-[1px] rounded-md bg-gray-200 text-gray-600"
                                 onClick={() => handleCancelFriendRequest(notification.friendRequestId)}
                             >
                                 Gỡ
                             </button>
                             <Button
+                                size="small"
                                 type="primary"
                                 onClick={() => handleAcceptFriendRequest(notification.friendRequestId)}
                             >
@@ -183,12 +203,13 @@ const Notification: FC<NotificationProps> = ({
         {!notification.isRead && <div className="absolute top-1/2 -translate-y-1/2 right-0 w-3 h-3 rounded-full bg-primary">
         </div>}
 
-        {showMoreAction && <Popover trigger='click' content={<NotificationMoreAction
+        {showMoreAction && <Popover trigger='click' className="z-[200]" content={<NotificationMoreAction
             isRead={notification.isRead}
             onDelete={onDelete}
             onMarkAsRead={onMarkAsRead}
+            
         />}>
-            <button className="absolute top-1/2 -translate-y-1/2 right-6 !z-[2000] bg-white shadow transition-all ease-linear duration-100 border-[1px] border-gray-200 w-6 h-6 flex items-center justify-center rounded-full">
+            <button className="z-[200] absolute top-1/2 -translate-y-1/2 right-6 bg-white shadow transition-all ease-linear duration-100 border-[1px] border-gray-200 w-6 h-6 flex items-center justify-center rounded-full">
                 <MoreHorizontal className="text-gray-400" size={16} />
             </button>
         </Popover>}

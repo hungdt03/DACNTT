@@ -8,17 +8,22 @@ import GroupHeader from "../../components/groups/GroupHeader";
 import { JoinGroupRequestResource } from "../../types/join-group";
 import Loading from "../../components/Loading";
 import NotAllowedComponent from "../../components/NotAllowedComponent";
+import { GroupInvitationResource } from "../../types/group-invitation";
 
 const NOT_ALLOWED_ROUTES = ['/pending-reports', '/pending-posts', '/pending-members']
 
 const GroupLayout: FC = () => {
     const { id } = useParams();
+    const location = useLocation();
+
     const [group, setGroup] = useState<GroupResource>();
     const [requestJoin, setRequestJoin] = useState<JoinGroupRequestResource>();
+    const [inviteJoin, setInviteJoin] = useState<GroupInvitationResource>()
+
     const [loading, setLoading] = useState(false);
-    const location = useLocation();
-    const [loadingRequest, setLoadingRequest] = useState(false)
-    
+    const [loadingRequest, setLoadingRequest] = useState(false);
+    const [loadingInvite, setLoadingInvite] = useState(false)
+
     const navigate = useNavigate();
 
     const fetchRequestJoin = async () => {
@@ -28,6 +33,21 @@ const GroupLayout: FC = () => {
             setLoadingRequest(false)
             if (response.isSuccess) {
                 setRequestJoin(response.data)
+            } else {
+                setRequestJoin(undefined)
+            }
+        }
+    }
+
+    const fetchInviteJoin = async () => {
+        if (id) {
+            setLoadingInvite(true)
+            const response = await groupService.getInviteJoinGroup(id);
+            setLoadingInvite(false)
+            if (response.isSuccess) {
+                setInviteJoin(response.data)
+            } else {
+                setInviteJoin(undefined)
             }
         }
     }
@@ -46,6 +66,7 @@ const GroupLayout: FC = () => {
     useEffect(() => {
         fetchGroup();
         fetchRequestJoin();
+        fetchInviteJoin()
     }, [id])
 
     useEffect(() => {
@@ -53,12 +74,12 @@ const GroupLayout: FC = () => {
             navigate(`/groups/${group?.id}`)
     }, [group])
 
-    if (loading || loadingRequest) return <Loading />
+    if (loading || loadingRequest || loadingInvite) return <Loading />
 
-    return group?.isHidden && !requestJoin && !group.isMember ? <NotAllowedComponent /> : <div className="grid grid-cols-12 w-full h-full overflow-hidden">
+    return group?.isHidden && !inviteJoin && !group.isMember ? <NotAllowedComponent /> : <div className="grid grid-cols-12 w-full h-full overflow-hidden">
         {group?.isMine && <MyGroupManageSidebar group={group} />}
         <div id="group-layout" className={cn("w-full flex flex-col h-full bg-slate-100 overflow-y-auto", group?.isMine ? 'col-span-9' : 'col-span-12')}>
-            {group && <GroupHeader onFetchRequest={fetchRequestJoin} onFetch={fetchGroup} requestJoin={requestJoin} group={group} />}
+            {group && !NOT_ALLOWED_ROUTES.some(route => location.pathname.includes(route)) && <GroupHeader onFetchGroup={fetchGroup} onFetchRequest={fetchRequestJoin} onFetchInvite={fetchInviteJoin} inviteJoin={inviteJoin} requestJoin={requestJoin} group={group} />}
             <Outlet />
         </div>
     </div>

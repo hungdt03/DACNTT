@@ -42,6 +42,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
             var notifications = await query
                 .Include(n => n.Recipient)
+                .Include(n => n.FriendRequest)
                 .OrderByDescending(c => c.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)

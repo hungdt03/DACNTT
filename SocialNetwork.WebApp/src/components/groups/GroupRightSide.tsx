@@ -1,6 +1,6 @@
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { Empty, Image } from "antd";
-import { Eye, Lock, LucideEarth, Newspaper } from "lucide-react";
+import { Book, Eye, Lock, LucideEarth, Newspaper } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import { GroupResource } from "../../types/group";
 import { PostMediaResource } from "../../types/post";
@@ -49,7 +49,7 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
             <div className="flex flex-col gap-y-2">
                 <p>{group.description}</p>
                 <div className="flex items-start gap-x-2">
-                    {group.privacy === GroupPrivacy.PRIVATE ? <Lock size={22} /> : <LucideEarth size={22} />}
+                    {group.privacy === GroupPrivacy.PRIVATE ? <Lock size={24} /> : <LucideEarth size={24} />}
                     <div className="flex flex-col gap-y-1">
                         <span className="font-bold">{group.privacy === GroupPrivacy.PRIVATE ? 'Riêng tư' : 'Công khai'}</span>
                         {group.privacy === GroupPrivacy.PRIVATE ? <p>Chỉ thành viên mới nhìn thấy mọi người trong nhóm và những gì họ đăng.</p> : <p>Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và những gì họ đăng.</p>}
@@ -61,6 +61,14 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
                     <div className="flex flex-col gap-y-1">
                         <span className="font-bold">Hiển thị</span>
                         {group.isHidden ? <p>Chỉ thành viên mới tìm thấy nhóm này</p> : <p>Ai cũng có thể tìm thấy nhóm này.</p>}
+                    </div>
+                </div>
+
+                <div className="flex items-start gap-x-2">
+                    <Book size={20} />
+                    <div className="flex flex-col gap-y-1">
+                        <span className="font-bold">Đăng bài</span>
+                        {group.onlyAdminCanApprovalMember ? <p>Chỉ quản trị viên và người kiểm duyệt mới đăng tải bài viết</p> : <p>Tất cả thành viên đều có đăng bài</p>}
                     </div>
                 </div>
 
