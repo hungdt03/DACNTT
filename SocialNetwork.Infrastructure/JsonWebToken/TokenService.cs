@@ -33,21 +33,30 @@ namespace SocialNetwork.Infrastructure.JsonWebToken
 
             var secretKeyBytes = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
             var credentials = new SigningCredentials(secretKeyBytes, SecurityAlgorithms.HmacSha256);
+            var roles = await userManager.GetRolesAsync(user);
+
+            var role = "USER";
+
+            if(roles != null && roles.Count == 1)
+            {
+                role = roles[0];
+            }
 
             var claims = new List<Claim> {
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Email, role),
+                new Claim(ClaimTypes.Role, role),
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim(ClaimTypes.Sid, user.Id),
                 new Claim("Avatar", user.Avatar),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
-            var userRoles = await userManager.GetRolesAsync(user);
-            foreach (var role in userRoles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            //var userRoles = await userManager.GetRolesAsync(user);
+            //foreach (var role in userRoles)
+            //{
+            //    claims.Add(new Claim(ClaimTypes.Role, role));
+            //}
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

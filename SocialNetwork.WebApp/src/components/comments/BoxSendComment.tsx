@@ -15,42 +15,9 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { $createTextNode, $getRoot, $getSelection, $isRangeSelection, EditorState, LexicalEditor, TextNode } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
-import { NodeContent } from "./BoxReplyComment";
 import { FriendResource } from "../../types/friend";
 import friendService from "../../services/friendService";
-
-
-
-export const loadContentEmpty = () =>
-    `{
-        "root": {
-        "children": [
-            {
-            "children": [
-                {
-                    "detail": 0,
-                    "format": 0,
-                    "mode": "normal",
-                    "style": "", 
-                    "text": "",
-                    "type": "text",
-                    "version": 1
-                }
-            ],
-            "direction": "ltr",
-            "format": "",
-            "indent": 0,
-            "type": "paragraph",
-            "version": 1
-            }
-        ],
-        "direction": "ltr",
-        "format": "",
-        "indent": 0,
-        "type": "root",
-        "version": 1
-        }
-    }`;
+import { extractContentAndStyle, loadContentEmpty } from "../../utils/comment";
 
 
 // Cấu hình Lexical
@@ -66,27 +33,6 @@ const editorConfig = {
     nodes: [TextNode],
 };
 
-function extractContentAndStyle(data: any): NodeContent[] {
-    return data.map((item: any) => {
-        if (item.style) {
-            const splitStyle = item.style.split(';');
-            const userIdPart = splitStyle[0].split(' ')[1];
-            const backgroundPart = splitStyle[1].split(' ')[1];
-
-            return {
-                id: userIdPart,
-                content: item.text,
-                style: backgroundPart
-            };
-        } else {
-            return {
-                id: '',
-                content: item.text,
-                style: ''
-            };
-        }
-    });
-}
 
 export type BoxCommentType = {
     file: UploadFile;
@@ -156,7 +102,7 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
                 nodeRoot.clear()
 
                 const selection = $getSelection();
-                if($isRangeSelection(selection)) {
+                if ($isRangeSelection(selection)) {
                     selection.insertNodes([$createTextNode('')])
                 }
             })

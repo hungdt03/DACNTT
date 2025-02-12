@@ -1,3 +1,5 @@
+import { Role } from "../enums/role";
+
 export interface UserResource {
     id: string;
     fullName: string;
@@ -18,4 +20,5 @@ export interface UserResource {
     isverification : boolean;
     location: string;
     dateJoined: Date;
+    role: Role
 }

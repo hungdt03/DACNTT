@@ -1,11 +1,14 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Auth.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
+using System.Data;
 
 namespace SocialNetwork.Application.Features.Auth.Handlers
 {
@@ -14,17 +17,19 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
         private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly ITokenService tokenService;
         private readonly IUnitOfWork unitOfWork;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public LoginCommandHandler(UserManager<Domain.Entity.System.User> userManager, ITokenService tokenService, IUnitOfWork unitOfWork)
+        public LoginCommandHandler(IHttpContextAccessor httpContextAccessor, UserManager<Domain.Entity.System.User> userManager, ITokenService tokenService, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
             this.tokenService = tokenService;
             this.unitOfWork = unitOfWork;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BaseResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var user = await userManager.FindByNameAsync(request.Email)
+            var user = await userManager.FindByEmailAsync(request.Email)
                 ?? throw new AppException("Sai thông tin đăng nhập");
 
             if (!user.IsVerification)
@@ -36,11 +41,17 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
                 throw new AppException("Sai thông tin đăng nhập");
 
             var tokens = await tokenService.GenerateTokenAsync(user);
-
+            var mapUser = ApplicationMapper.MapToUser(user);
+            mapUser.Role = "USER";
+            var roles = await userManager.GetRolesAsync(user);
+            if (roles != null && roles.Count == 1)
+            {
+                mapUser.Role = roles[0];
+            }
             var response = new AuthResponse
             {
                 Token = tokens,
-                User = ApplicationMapper.MapToUser(user),
+                User = mapUser,
             };
 
             var haveStory = await unitOfWork.StoryRepository

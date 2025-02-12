@@ -134,14 +134,8 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
 
         return (
             <div className={cn("relative flex flex-col pl-4", comment.parentCommentId !== null ? "gap-y-5" : "gap-y-3")}>
-                {/* LINE */}
-                {/* {comment.isHaveChildren && <div className={cn("absolute left-8 w-[2px] top-[28px] rounded-lg bg-gray-200", (comment?.replies?.length ?? 0) === 0 ? 'bottom-8' : expandLine ? 'bottom-36' : 'bottom-20')}></div>} */}
                 {/* Comment nội dung */}
                 <div id={`comment-id-${comment.id}`} className="relative flex items-start gap-x-2">
-                    {/* LINE */}
-                    {/* {comment.parentCommentId && (
-                        <div className="absolute -left-[24px] w-7 top-[0px] h-[20px] bg-transparent border-b-[2px] border-l-[2px] rounded-bl-lg border-gray-200"></div>
-                    )} */}
                     <Avatar className="flex-shrink-0" src={comment.user.avatar ?? images.user} />
                     <div className="flex flex-col gap-y-2">
                         <div
@@ -195,13 +189,9 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
                         </div>
                     </div>
 
-                    {/* LINE */}
-                    {/* {isReplying && !comment.isHaveChildren && level < 3 && <div className="absolute left-4 w-[66px] top-[31px] h-full bg-transparent border-l-[2px] border-gray-200"></div>} */}
                 </div>
 
                 {comment.isHaveChildren && (comment?.replies?.length ?? 0) === 0 && <>
-                    {/* LINE */}
-                    {/* <div className={cn("absolute left-8 border-gray-200 border-l-[2px] border-b-[2px] w-6 h-1/2", comment.parentCommentId ? "bottom-[10px] rounded-bl-lg" : "bottom-[11px] rounded-bl-xl")}></div> */}
                     <button onClick={() => {
                         setIsReplying(true)
                         handleFetchReplies(comment.id, replyPagination.page, replyPagination.size)
@@ -246,8 +236,6 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
                         {/* Box phản hồi ở cuối nếu đang reply comment này */}
                         {isReplying && (
                             <>
-                                {/* LINE */}
-                                {/* <div className="absolute left-4 w-[28px] -top-[24px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div> */}
                                 <div className={cn(level === 3 ? "pl-0" : "pl-4")}>
                                     <BoxReplyComment
                                         value={content}
@@ -265,8 +253,6 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
                 {/* Nếu không có comment con, hiển thị box reply trực tiếp dưới comment */}
                 {isReplying && !comment.isHaveChildren && level < 3 && (
                     <div className="relative">
-                        {/* LINE */}
-                        {/* <div className="absolute left-4 w-[24px] -top-[25px] h-full bg-transparent border-l-[2px] border-b-[2px] rounded-bl-lg border-gray-200"></div> */}
                         <div className={cn(level === 3 ? "pl-0" : "pl-10")}>
                             <BoxReplyComment
                                 replyToUsername={replyToUser}

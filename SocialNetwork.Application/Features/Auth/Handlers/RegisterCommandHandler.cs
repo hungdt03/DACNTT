@@ -7,16 +7,14 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Auth.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Common;
 using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.Auth.Handlers
 {
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, BaseResponse>
     {
-        private const string PREFIX_FILE_API = "/api/files/images/";
-        private const string AVATAR_FILENAME = "user.png";
-        private const string COVER_FILENAME = "image.png";
-
+       
         private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly IUnitOfWork unitOfWork;
         private readonly IMailkitService mailkitService;
@@ -47,14 +45,16 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
             user.FullName = request.FullName;
             user.Email = request.Email;
             user.UserName = request.Email;
-            user.Avatar = configuration["ServerHost"] + PREFIX_FILE_API + AVATAR_FILENAME;
-            user.CoverImage = configuration["ServerHost"] + PREFIX_FILE_API + COVER_FILENAME;
+            user.Avatar = configuration["ServerHost"] + ShareConstant.PREFIX_FILE_API + ShareConstant.AVATAR_FILENAME;
+            user.CoverImage = configuration["ServerHost"] + ShareConstant.PREFIX_FILE_API + ShareConstant.COVER_FILENAME;
             user.IsVerification = false;
 
             var result = await userManager.CreateAsync(user, request.Password);
 
             if (!result.Succeeded)
                 throw new AppException(result.Errors.First().Description);
+
+            await userManager.AddToRoleAsync(user, "USER");
 
             string otpCode;
             bool isExisted;

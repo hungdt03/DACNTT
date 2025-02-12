@@ -32,6 +32,7 @@ import FriendLayout from '../layouts/FriendLayout/FriendLayout'
 import FriendRequestsPage from '../pages/friends/FriendRequestsPage'
 import SuggestedFriendPage from '../pages/friends/SuggestedFriendPage'
 import AdminLayout from '../layouts/AdminLayout/AdminLayout'
+import AdminGuard from './adminGuard'
 
 const appRouter = createBrowserRouter([
     {
@@ -46,8 +47,9 @@ const appRouter = createBrowserRouter([
         ]
     },
     {
+        errorElement: <ErrorBoundaryPage />,
         path: '/admin',
-        element: <AuthGuard element={<AdminLayout />} />
+        element: <AdminGuard element={<AdminLayout />} />
     },
     {
         path: '/',
@@ -69,6 +71,7 @@ const appRouter = createBrowserRouter([
     },
     {
         path: '/groups',
+        errorElement: <ErrorBoundaryPage />,
         element: <AuthGuard element={<GroupManagerLayout />} />,
         children: [
             {
@@ -78,6 +81,7 @@ const appRouter = createBrowserRouter([
         ]
     },
     {
+        errorElement: <ErrorBoundaryPage />,
         path: '/groups/create',
         element: <CreateGroupPage />
     },
@@ -127,6 +131,7 @@ const appRouter = createBrowserRouter([
         ]
     },
     {
+        errorElement: <ErrorBoundaryPage />,
         path: '/friends',
         element: <AuthGuard element={<FriendLayout />} />,
         children: [
@@ -163,10 +168,12 @@ const appRouter = createBrowserRouter([
         element: <AuthGuard element={<ChatPage />} />
     },
     {
+        errorElement: <ErrorBoundaryPage />,
         path: '/stories/create',
         element: <CreateStoryPage />
     },
     {
+        errorElement: <ErrorBoundaryPage />,
         path: '/stories/:userId',
         element: <ViewStoryPage />
     },

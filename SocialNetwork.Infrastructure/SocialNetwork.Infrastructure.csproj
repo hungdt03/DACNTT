@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\SocialNetwork.Common.csproj" />
     <ProjectReference Include="..\SocialNetwork.Application\SocialNetwork.Application.csproj" />
     <ProjectReference Include="..\SocialNetwork.Domain\SocialNetwork.Domain.csproj" />
   </ItemGroup>

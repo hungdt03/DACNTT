@@ -44,17 +44,15 @@ const SearchSuggestionList: FC<SearchSuggestionListProps> = ({
         console.log('Fetching ...')
         setLoading(true)
         const response = await searchService.getUserSearchHistories(page, size);
-        setTimeout(() => {
-            setLoading(false)
-            if (response.isSuccess) {
-                setSearchHistories(prevHistories => {
-                    const existingIds = new Set(prevHistories.map(m => m.id));
-                    const newHistories = response.data.filter(m => !existingIds.has(m.id));
-                    return [...prevHistories, ...newHistories];
-                });
-                setPagination(response.pagination)
-            }
-        }, 500)
+        setLoading(false)
+        if (response.isSuccess) {
+            setSearchHistories(prevHistories => {
+                const existingIds = new Set(prevHistories.map(m => m.id));
+                const newHistories = response.data.filter(m => !existingIds.has(m.id));
+                return [...prevHistories, ...newHistories];
+            });
+            setPagination(response.pagination)
+        }
     }
 
     const fetchNext = () => {
@@ -89,7 +87,7 @@ const SearchSuggestionList: FC<SearchSuggestionListProps> = ({
 
     const handleRemoveHistory = async (historyId: string) => {
         const response = await searchService.removeSearchHistory(historyId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setSearchHistories(prevHistories => [...prevHistories.filter(p => p.id !== historyId)])
         }
     }

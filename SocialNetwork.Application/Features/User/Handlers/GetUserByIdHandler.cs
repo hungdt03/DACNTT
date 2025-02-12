@@ -1,6 +1,8 @@
 ﻿
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
@@ -15,11 +17,13 @@ namespace SocialNetwork.Application.Features.User.Handlers
     {
         private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly IUnitOfWork unitOfWork;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public GetUserByIdHandler(UserManager<Domain.Entity.System.User> userManager, IUnitOfWork unitOfWork)
+        public GetUserByIdHandler(IHttpContextAccessor httpContextAccessor, UserManager<Domain.Entity.System.User> userManager, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
             this.unitOfWork = unitOfWork;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BaseResponse> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
@@ -34,6 +38,8 @@ namespace SocialNetwork.Application.Features.User.Handlers
             var haveStory = await unitOfWork.StoryRepository
                    .IsUserHaveStoryAsync(user.Id);
             response.HaveStory = haveStory;
+            response.Role = httpContextAccessor.HttpContext.User.GetUserRole();
+
             return new DataResponse<UserResponse>()
             {
                 Data = response,

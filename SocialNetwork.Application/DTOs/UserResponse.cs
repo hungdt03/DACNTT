@@ -11,6 +11,7 @@ namespace SocialNetwork.Application.DTOs
         public DateTimeOffset DateOfBirth { get; set; }
         public string PhoneNumber { get; set; }
         public bool IsDeleted { get; set; }
+        public string Role { get; set; }
         public string Bio {  get; set; }
         public string Avatar { get; set; }
         public string CoverImage { get; set; }

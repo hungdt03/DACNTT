@@ -31,7 +31,6 @@ const HomePage: FC = () => {
         setLoading(true);
         const response = await postService.getAllPosts(page, size);
         setLoading(false)
-
         if (response.isSuccess) {
             setPagination(response.pagination);
             setPosts(prevPosts => {
@@ -82,8 +81,6 @@ const HomePage: FC = () => {
             autoClose: 3000,
         });
     };
-
-
 
     return (
         <div ref={containerRef} className="flex flex-col gap-y-4 pb-20">

@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { Formik, Form, Field } from 'formik';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import images from "../../assets";
 import signInSchema from "../../schemas/signInSchema";
 import cn from "../../utils/cn";
@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { signIn } from "../../features/slices/auth-slice";
 import { Button } from "antd";
+import { Role } from "../../enums/role";
 
 export type SignInRequest = {
     email: string;
@@ -18,7 +19,8 @@ export type SignInRequest = {
 
 const SignInPage: FC = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate()
 
     const handleLoginAsync = async (values: SignInRequest) => {
         setLoading(true)
@@ -26,6 +28,12 @@ const SignInPage: FC = () => {
         setLoading(false)
         if (response.isSuccess) {
             dispatch(signIn(response.data))
+            // if(response.data.user.role === Role.ADMIN) {
+            //     navigate('/admin')
+            // } else {
+            //     navigate('/')
+            // }
+
             toast.success(response.message)
         } else {
             toast.error(response.message)
