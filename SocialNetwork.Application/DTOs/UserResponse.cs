@@ -21,5 +21,8 @@ namespace SocialNetwork.Application.DTOs
         public bool IsOnline { get; set; }
         public DateTimeOffset RecentOnlineTime { get; set; }
         public bool HaveStory { get; set; }
+        public bool Isverification { get; set; }
+        public string Location { get; set; }
+        public DateTimeOffset DateJoined { get; set; }
     }
 }

@@ -6,13 +6,15 @@ import AdminSidebar from './components/AdminSidebar'
 import { FC, useState } from 'react'
 import { Card } from 'antd'
 import GroupsPage from '../../pages/admin/GroupsPage'
+import ReportsPage from '../../pages/admin/ReportsPage'
+import StatisticsPage from '../../pages/admin/StatisticsPage'
 
 const AdminLayout: FC = () => {
     const [currentTab, setCurrentTab] = useState('Bảng thống kê')
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false)
 
     return (
-        <Card style={{ overflow: 'hidden' }}>
+        <div className='flex flex-col w-screen h-screen overflow-y-hidden'>
             <AdminSidebar
                 isCollapsed={isSidebarCollapsed}
                 toggleSidebar={() => setSidebarCollapsed(!isSidebarCollapsed)}
@@ -27,7 +29,8 @@ const AdminLayout: FC = () => {
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    position: 'relative'
                 }}
             >
                 <AdminHeader title={currentTab} />
@@ -36,10 +39,9 @@ const AdminLayout: FC = () => {
                     sx={{
                         flex: 1,
                         padding: 2,
-                        marginTop: '50px',
+                        marginTop: '100px',
                         height: '100%',
                         width: '100%',
-                        display: 'flex',
                         flexDirection: 'column',
                         overflow: 'hidden'
                     }}
@@ -47,13 +49,13 @@ const AdminLayout: FC = () => {
                     <Container sx={{ flex: 1, width: '100%', overflow: 'hidden' }}>
                         {currentTab === 'Quản lý bài viết' && <PostsPage />}
                         {currentTab === 'Quản lý người dùng' && <UsersPage />}
-                        {currentTab === 'Quản lý báo cáo' && <h2>Quản lý báo cáo</h2>}
+                        {currentTab === 'Quản lý báo cáo' && <ReportsPage />}
                         {currentTab === 'Quản lý nhóm' && <GroupsPage />}
-                        {currentTab === 'Bảng thống kê' && <h2>Bảng thống kê</h2>}
+                        {currentTab === 'Bảng thống kê' && <StatisticsPage />}
                     </Container>
                 </Box>
             </Box>
-        </Card>
+        </div>
     )
 }
 

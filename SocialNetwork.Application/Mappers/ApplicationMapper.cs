@@ -40,6 +40,9 @@ namespace SocialNetwork.Application.Mappers
                 Gender = user.Gender,
                 PhoneNumber = user.PhoneNumber,
                 IsDeleted = user.IsDeleted,
+                DateJoined = user.DateJoined,
+                Isverification = user.IsVerification,
+                Location = user.Location != null ? user.Location.Address : null,
             }).ToList();
         }
 

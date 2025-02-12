@@ -15,4 +15,7 @@ export interface UserResource {
     friendCount: number;
     haveStory: boolean;
     isDeleted: boolean;
+    isverification : boolean;
+    location: string;
+    dateJoined: Date;
 }
