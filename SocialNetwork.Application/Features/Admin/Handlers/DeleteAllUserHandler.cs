@@ -9,7 +9,7 @@ using SocialNetwork.Application.Mappers;
 
 namespace SocialNetwork.Application.Features.Admin.Handlers
 {
-    public class DeleteAllUserHandler : IRequestHandler<AddUserQuery, BaseResponse>
+    public class DeleteAllUserHandler : IRequestHandler<DeleteAllUserQuery, BaseResponse>
     {
         private readonly IUnitOfWork unitOfWork;
 
@@ -17,7 +17,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         {
             this.unitOfWork = unitOfWork;
         }
-        public async Task<BaseResponse> Handle(AddUserQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResponse> Handle(DeleteAllUserQuery request, CancellationToken cancellationToken)
         {
             await unitOfWork.UserRepository.DeleteAllUser();
    
