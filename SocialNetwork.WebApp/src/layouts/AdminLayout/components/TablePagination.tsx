@@ -23,15 +23,13 @@ const CustomTablePagination: React.FC<PaginationProps> = ({
             page={page}
             rowsPerPage={rowsPerPage}
             onPageChange={onPageChange}
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[5, 10, 20, 50]}
             onRowsPerPageChange={onRowsPerPageChange}
             labelRowsPerPage='Số dòng mỗi trang'
             sx={{
-                position: 'sticky',
+                display: 'flex-end',
                 bottom: 0,
-                backgroundColor: 'white',
-                zIndex: 10,
-                borderTop: '1px solid #ddd'
+                backgroundColor: 'white'
             }}
         />
     )

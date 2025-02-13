@@ -25,5 +25,6 @@ namespace SocialNetwork.Application.DTOs
         public bool Isverification { get; set; }
         public string Location { get; set; }
         public DateTimeOffset DateJoined { get; set; }
+        public bool IsLock { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Identity;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
@@ -9,24 +8,23 @@ using SocialNetwork.Application.Mappers;
 
 namespace SocialNetwork.Application.Features.Admin.Handlers
 {
-    public class GetAllUserHandler : IRequestHandler<GetAllUserQuery, BaseResponse>
+    public class UnLockAndLockOneAccountHandler : IRequestHandler<UnLockAndLockOneAccountQuery, BaseResponse>
     {
         private readonly IUnitOfWork unitOfWork;
 
-        public GetAllUserHandler(IUnitOfWork unitOfWork)
+        public UnLockAndLockOneAccountHandler(IUnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
         }
-        public async Task<BaseResponse> Handle(GetAllUserQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResponse> Handle(UnLockAndLockOneAccountQuery request, CancellationToken cancellationToken)
         {
-            var users = await unitOfWork.UserRepository.GetAllRoleUser()
-               ?? throw new AppException("Không có user nào");
+            await unitOfWork.UserRepository.UnLockAndLockOneAccount(request.userId);
 
-            return new DataResponse<List<UserResponse>>()
+            return new DataResponse<String>()
             {
-                Data = ApplicationMapper.MapToListUser(users),
+                Data = "tài khoản thành công",
                 IsSuccess = true,
-                Message = "Lấy thông tin users thành công",
+                Message = "tài khoản thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
             };
         }

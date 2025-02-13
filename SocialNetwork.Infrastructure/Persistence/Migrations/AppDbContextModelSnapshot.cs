@@ -1377,6 +1377,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsLock")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsVerification")
                         .HasColumnType("bit");
 

@@ -82,7 +82,7 @@ const AdminGroupsTable: React.FC<GroupTableProps> = ({ groups }) => {
                 rowsPerPage={rowsPerPage}
                 onPageChange={(_, newPage) => setPage(newPage)}
                 onRowsPerPageChange={(event) => {
-                    setRowsPerPage(parseInt(event.target.value, 10))
+                    setRowsPerPage(parseInt(event.target.value, 5))
                     setPage(0)
                 }}
             />

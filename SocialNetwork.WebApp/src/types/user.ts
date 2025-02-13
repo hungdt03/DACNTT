@@ -21,4 +21,5 @@ export interface UserResource {
     location: string;
     dateJoined: Date;
     role: Role
+    isLock : boolean;
 }

@@ -14,7 +14,7 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, curr
     const menuItems = [
         { label: 'Bảng thống kê', icon: faTachometerAlt },
         { label: 'Quản lý bài viết', icon: faFileAlt },
-        { label: 'Quản lý người dùng', icon: faUsers },
+        { label: 'Quản lý tài khoản', icon: faUsers },
         { label: 'Quản lý nhóm', icon: faObjectGroup },
         { label: 'Quản lý báo cáo', icon: faFileAlt }
     ]

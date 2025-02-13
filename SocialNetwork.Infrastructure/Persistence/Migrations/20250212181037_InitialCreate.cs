@@ -201,6 +201,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     IsVerification = table.Column<bool>(type: "bit", nullable: false),
                     DateOfBirth = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     DateJoined = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    IsLock = table.Column<bool>(type: "bit", nullable: false),
                     LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     HometownId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),

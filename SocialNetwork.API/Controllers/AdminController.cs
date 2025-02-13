@@ -1,6 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.API.Filters;
+using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Application.Features.Admin.Queries;
+using SocialNetwork.Application.Features.Auth.Commands;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -33,6 +36,35 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetAllGroupQuery());
             return Ok(response);
         }
-
+        [HttpPut("lock-users")]
+        public async Task<IActionResult> LockAccount([FromBody] UnlockAndLockManyAccountCommand command)
+        {
+            var response = await mediator.Send(new UnLockAndLockManyAccountQuery(command.listUserId, command.number));
+            return Ok(response);
+        }
+        [HttpPut("lock-users/{userId}")]
+        public async Task<IActionResult> UnLockAccount(string userId)
+        {
+            var response = await mediator.Send(new UnLockAndLockOneAccountQuery(userId));
+            return Ok(response);
+        }
+        [HttpDelete("delete-user/{userId}")]
+        public async Task<IActionResult> DeleteOneAccount(string userId)
+        {
+            var response = await mediator.Send(new DeleteUserQuery(userId));
+            return Ok(response);
+        }
+        [HttpDelete("delete-all-user")]
+        public async Task<IActionResult> DeleteAllAccount()
+        {
+            var response = await mediator.Send(new DeleteAllUserQuery());
+            return Ok(response);
+        }
+        [HttpDelete("delete-many-user")]
+        public async Task<IActionResult> DeleteManyAccount([FromBody] List<string>listUserId)
+        {
+            var response = await mediator.Send(new DeleteManyUserQuery(listUserId));
+            return Ok(response);
+        }
     }
 }

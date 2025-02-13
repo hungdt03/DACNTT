@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250211180527_InitialCreate")]
+    [Migration("20250212181037_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -1378,6 +1378,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsLock")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsVerification")

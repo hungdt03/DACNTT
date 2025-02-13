@@ -1,8 +1,7 @@
-import { Avatar, Divider, Modal, Popconfirm } from 'antd'
+import { Avatar, Popconfirm } from 'antd'
 import { FC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { LogOut } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { AppDispatch } from '../../../app/store'
 import { selectAuth, signOut } from '../../../features/slices/auth-slice'
 
@@ -19,12 +18,6 @@ const AdminAccountDialog: FC = () => {
                         <Avatar src={user?.avatar} size={'large'} />
                         <span className='font-semibold text-[15px]'>{user?.fullName}</span>
                     </div>
-                    <Divider className='mt-2 mb-3' />
-                    <Link to={`/profile/${user?.id}`}>
-                        <span className='px-2 py-1 rounded-md bg-gray-200 text-gray-800 font-semibold w-full'>
-                            Xem trang cá nhân
-                        </span>
-                    </Link>
                 </div>
                 <Popconfirm
                     onConfirm={handleLogout}

@@ -43,6 +43,7 @@ namespace SocialNetwork.Application.Mappers
                 DateJoined = user.DateJoined,
                 Isverification = user.IsVerification,
                 Location = user.Location != null ? user.Location.Address : null,
+                IsLock = user.IsLock,
             }).ToList();
         }
 

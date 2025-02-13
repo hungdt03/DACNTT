@@ -9,24 +9,23 @@ using SocialNetwork.Application.Mappers;
 
 namespace SocialNetwork.Application.Features.Admin.Handlers
 {
-    public class GetAllUserHandler : IRequestHandler<GetAllUserQuery, BaseResponse>
+    public class DeleteManyUserHandler : IRequestHandler<DeleteManyUserQuery, BaseResponse>
     {
         private readonly IUnitOfWork unitOfWork;
 
-        public GetAllUserHandler(IUnitOfWork unitOfWork)
+        public DeleteManyUserHandler(IUnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
         }
-        public async Task<BaseResponse> Handle(GetAllUserQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResponse> Handle(DeleteManyUserQuery request, CancellationToken cancellationToken)
         {
-            var users = await unitOfWork.UserRepository.GetAllRoleUser()
-               ?? throw new AppException("Không có user nào");
-
-            return new DataResponse<List<UserResponse>>()
+            await unitOfWork.UserRepository.DeleteManyUser(request.listUserId);
+   
+            return new DataResponse<String>()
             {
-                Data = ApplicationMapper.MapToListUser(users),
+                Data = "",
                 IsSuccess = true,
-                Message = "Lấy thông tin users thành công",
+                Message = "Xóa các tài khoản thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
             };
         }
