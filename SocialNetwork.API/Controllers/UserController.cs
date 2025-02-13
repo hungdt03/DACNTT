@@ -212,6 +212,13 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("block/{userId}")]
+        public async Task<IActionResult> GetBlock([FromRoute] string userId)
+        {
+            var response = await mediator.Send(new GetBlockByUserIdQuery(userId));
+            return Ok(response);
+        }
+
         [HttpPost("block")]
         public async Task<IActionResult> BlockUser([FromBody] AddBlockUserCommand command)
         {
@@ -227,7 +234,7 @@ namespace SocialNetwork.API.Controllers
         }
 
 
-        [HttpGet("block/{userId}")]
+        [HttpGet("check-block/{userId}")]
         public async Task<IActionResult> CheckIsBlockUser([FromRoute] string userId)
         {
             var response = await mediator.Send(new CheckIsBlockUserQuery(userId));

@@ -5,6 +5,7 @@ import { ModifyUserLocationRequest } from '../components/modals/ModifyUserLocati
 import { ModifyUserWorkPlaceRequest } from '../components/modals/ModifyUserWorkPlace';
 import { UpdateUserInfo } from '../components/modals/UpdateUserInfoModal';
 import axiosInterceptor from '../configurations/axiosInterceptor'
+import { BlockResource } from '../types/block';
 import { LocationResource } from '../types/location';
 import { PostMediaResource } from '../types/post';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
@@ -158,6 +159,10 @@ class UserService {
         })
     }
 
+    getBlockUser(userId: string) : Promise<DataResponse<BlockResource>> {
+        return axiosInterceptor.get('/api/users/block/' + userId)
+    }
+
     blockUser(userId: string) : Promise<BaseResponse> {
         return axiosInterceptor.post('/api/users/block', { userId })
     }
@@ -167,7 +172,7 @@ class UserService {
     }
 
     checkBlockUser(userId: string) : Promise<DataResponse<boolean>> {
-        return axiosInterceptor.get('/api/users/block/' + userId)
+        return axiosInterceptor.get('/api/users/check-block/' + userId)
     }
 
     // BASIC INFO

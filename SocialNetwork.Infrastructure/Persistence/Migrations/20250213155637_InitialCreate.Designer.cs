@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250212181037_InitialCreate")]
+    [Migration("20250213155637_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

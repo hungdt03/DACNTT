@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
-import { MoreHorizontal, UserPlus, UserRound } from "lucide-react";
+import { LogOut, MoreHorizontal, UserPlus, UserRound } from "lucide-react";
 import { MessageMediaResource } from "../../types/message";
 import { Pagination } from "../../types/response";
 import chatRoomService from "../../services/chatRoomService";
@@ -17,10 +17,12 @@ import AddFriendToChatRoom from "../modals/AddFriendToChatRoom";
 
 type ChatDetailsProps = {
     chatRoom: ChatRoomResource;
+    onFetch: () => void
 }
 
 const ChatDetails: FC<ChatDetailsProps> = ({
-    chatRoom
+    chatRoom,
+    onFetch
 }) => {
     const { user } = useSelector(selectAuth);
     const { isModalOpen, handleCancel, handleOk, showModal } = useModal();
@@ -32,9 +34,9 @@ const ChatDetails: FC<ChatDetailsProps> = ({
             setMembers(response.data)
         }
     }
-    
+
     useEffect(() => {
-       fetchChatRoomMembers()
+        fetchChatRoomMembers()
     }, [chatRoom])
 
 
@@ -55,6 +57,16 @@ const ChatDetails: FC<ChatDetailsProps> = ({
 
     ];
 
+    const handleLeaveGroup = async () => {
+        const response = await chatRoomService.leaveGroup(chatRoom.id);
+        if(response.isSuccess) {
+            onFetch()
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
     return <>
         <div className="h-full border-l-[1px] border-gray-200 p-4">
             <div className="flex flex-col gap-y-8 h-full">
@@ -65,22 +77,28 @@ const ChatDetails: FC<ChatDetailsProps> = ({
                         <p className="text-xs text-gray-400">Hoạt động 34 phút trước</p>
                     </div>
                     <div className="flex items-center justify-center gap-x-4">
-                        <div className="flex flex-col items-center gap-y-1">
+                        {!chatRoom.isAdmin && <div className="flex flex-col items-center gap-y-1">
                             <button onClick={showModal} className="p-2 rounded-full text-black font-semibold hover:bg-gray-200 bg-gray-100 w-10 h-10 flex items-center justify-center">
                                 <UserPlus size={18} />
                             </button>
                             <span className="text-xs text-gray-700">Thêm</span>
-                        </div>
+                        </div>}
                         <Link to={`/profile/${chatRoom.friend?.id}`} className="flex flex-col items-center gap-y-1">
                             <div className="p-2 rounded-full text-black font-semibold bg-gray-100 w-10 h-10 flex items-center justify-center">
                                 <UserRound size={18} />
                             </div>
                             <span className="text-xs text-gray-700">Trang cá nhân</span>
                         </Link>
+                        {!chatRoom.isPrivate && <div className="flex flex-col items-center gap-y-1">
+                            <button onClick={handleLeaveGroup} className="p-2 rounded-full text-black font-semibold hover:bg-gray-200 bg-gray-100 w-10 h-10 flex items-center justify-center">
+                                <LogOut size={18} />
+                            </button>
+                            <span className="text-xs text-gray-700">Rời nhóm</span>
+                        </div>}
                     </div>
                 </div>
 
-                 {(chatRoom.isPrivate && chatRoom.isAccept) || !chatRoom.isPrivate && <Collapse className="overflow-y-auto" items={items} defaultActiveKey={['1']} />}
+                {!chatRoom.isPrivate &&  <Collapse className="overflow-y-auto" items={items} defaultActiveKey={['1']} />}
             </div>
         </div>
 
@@ -126,8 +144,8 @@ const MemberCollapse: FC<MemberCollapseProps> = ({
     onFetch,
     user
 }) => {
-    
-    
+
+
     const handleKickMember = async (memberId: string) => {
         const response = await chatRoomService.kickMember(memberId);
         if (response.isSuccess) {

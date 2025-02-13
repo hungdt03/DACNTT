@@ -147,6 +147,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
 
     const handleGetOrCreateChatRoom = async () => {
         const response = await chatRoomService.getOrCreateChatRoom(targetUser.id);
+        console.log(response)
         if (response.isSuccess) {
             dispatch(add(response.data))
         } else {

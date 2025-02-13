@@ -86,8 +86,6 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
                 response.IsMember = true;
                 response.IsAdmin = chatRoomMember != null && chatRoomMember.IsLeader;
-                response.HasLeftGroup = chatRoomMember != null && chatRoomMember.HasLeftGroup;
-                response.LastMessageId = chatRoomMember?.LastMessageId;
             }
             
 

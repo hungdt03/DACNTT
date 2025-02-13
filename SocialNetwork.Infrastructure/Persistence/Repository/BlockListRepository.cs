@@ -49,6 +49,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .SingleOrDefaultAsync(b => b.BlockerId == blockerId && b.BlockeeId == blockeeId);
         }
 
+        public async Task<BlockList?> GetBlockListByUserIdAndUserIdAsync(string blockeeId, string blockerId)
+        {
+            return await _context.BlockLists
+                .SingleOrDefaultAsync(b => (b.BlockerId == blockerId && b.BlockeeId == blockeeId) || (b.BlockerId == blockeeId && b.BlockeeId == blockerId));
+        }
+
         public async Task<BlockList?> GetBlockListByIdAsync(Guid id)
         {
             return await _context.BlockLists.SingleOrDefaultAsync(b => b.Id == id);

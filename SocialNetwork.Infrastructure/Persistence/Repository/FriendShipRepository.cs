@@ -127,7 +127,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<(IEnumerable<FriendShip> ConnectedUsers, int TotalCount)> GetAllConnectedUsers(string userId, int page, int size)
         {
-            var queryable = _context.FriendShips.Where(s => ((s.UserId == userId || s.FriendId == userId) && s.IsConnect) && s.Status != FriendShipStatus.BLOCKED);
+            var queryable = _context.FriendShips.Where(s => (s.UserId == userId || s.FriendId == userId) && s.IsConnect && s.Status != FriendShipStatus.BLOCKED);
 
             var totalCount = await queryable.CountAsync();
 

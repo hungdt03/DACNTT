@@ -6,7 +6,6 @@ import { ConfigProvider } from 'antd'
 import store from './app/store.ts'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import WebRtcProvider from './contexts/webrtc/WebrtcProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
     //<StrictMode>
@@ -17,10 +16,8 @@ createRoot(document.getElementById('root')!).render(
         },
     }}>
         <Provider store={store}>
-            <WebRtcProvider>
-                <App />
-                <ToastContainer />
-            </WebRtcProvider>
+            <App />
+            <ToastContainer />
         </Provider>
 
     </ConfigProvider>

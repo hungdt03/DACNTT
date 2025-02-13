@@ -36,7 +36,10 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             var countLeaders = await _unitOfWork.ChatRoomMemberRepository
                 .CountLeaderByChatRoomId(chatRoomMember.ChatRoomId);
 
-            if (countLeaders == 1)
+            var countMember = await _unitOfWork.ChatRoomMemberRepository
+                .CountMembersByChatRoomId(chatRoomMember.ChatRoomId);
+
+            if (countLeaders == 1 && countMember > 1)
                 throw new AppException("Bạn cần chọn một nhóm trưởng mới trước khi rời nhóm");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -51,11 +54,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 MessageType = MessageType.SYSTEM,
                 SentAt = DateTimeOffset.UtcNow,
             };
-            await _unitOfWork.MessageRepository.CreateMessageAsync(message);
 
-            chatRoomMember.HasLeftGroup = true;
-            chatRoomMember.LastMessageId = message.Id;
-            chatRoomMember.LastMessageDate = message.DateCreated;
+            await _unitOfWork.MessageRepository.CreateMessageAsync(message);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

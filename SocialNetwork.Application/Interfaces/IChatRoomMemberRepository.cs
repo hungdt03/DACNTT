@@ -13,5 +13,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<ChatRoomMember?> GetChatRoomMemberByRoomIdAndUserId(Guid chatRoomId, string userId);
         Task<ChatRoomMember?> GetChatRoomMemberById(Guid memberId);
         Task<int> CountLeaderByChatRoomId(Guid chatRoomId);
+        Task<int> CountMembersByChatRoomId(Guid chatRoomId);
     }
 }

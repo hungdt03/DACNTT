@@ -12,8 +12,5 @@ namespace SocialNetwork.Domain.Entity.ChatRoomInfo
         public ChatRoom ChatRoom { get; set; }
         public bool IsAccepted { get; set; }
         public bool IsLeader { get; set; }
-        public bool HasLeftGroup { get; set; }
-        public Guid? LastMessageId { get; set; }
-        public DateTimeOffset? LastMessageDate { get; set; }
     }
 }

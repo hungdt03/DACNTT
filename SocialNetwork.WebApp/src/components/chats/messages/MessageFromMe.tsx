@@ -16,14 +16,15 @@ const MessageFromMe: FC<MessageFromMeProps> = ({
 }) => {
     return <div className="flex justify-end w-full">
         <div className="flex flex-col items-end gap-y-1 max-w-[70%] w-full">
-            <Tooltip placement="left" className="w-full" title={<span className="text-[12px]">{message.status === 'sending' ? 'Đang gửi' : `${formatTimeMessage(new Date(message.sentAt))}`}</span>}>
-                {message.medias && <MessageMedia medias={message.medias} />}
-                <div className="flex justify-end w-full">
-                    {message.content && <p className="bg-sky-500 text-[13px] inline-block text-white p-2 rounded-lg break-words max-w-full">
+            <div className="flex justify-end w-full">
+                <Tooltip placement="left" title={<span className="text-[12px]">{message.status === 'sending' ? 'Đang gửi' : `${formatTimeMessage(new Date(message.sentAt))}`}</span>}>
+                    {message.medias && <MessageMedia medias={message.medias} />}
+                    {message.content && <p className="bg-sky-500 text-[13px] inline-block text-white p-2 rounded-lg break-words">
                         {message.content}
                     </p>}
-                </div>
-            </Tooltip>
+                </Tooltip>
+            </div>
+
             {message.status === 'sending'
                 ? <span className="text-xs text-gray-400 pl-1">Đang gửi</span>
                 : isShowCheck && <div className="p-[2px] rounded-full flex items-center justify-center bg-primary">
