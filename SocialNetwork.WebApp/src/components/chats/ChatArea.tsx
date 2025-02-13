@@ -31,7 +31,8 @@ const ChatArea: FC<ChatAreaProps> = ({
 }) => {
     const { user } = useSelector(selectAuth);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [isShowPrevent, setIsShowPrevent] = useState(false)
+    const [isShowPrevent, setIsShowPrevent] = useState(false);
+    const [isLeaveGroup, setIsLeaveGroup] = useState(false)
 
     const [messages, setMessages] = useState<MessageResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>({
@@ -55,7 +56,7 @@ const ChatArea: FC<ChatAreaProps> = ({
     const fetchMessages = async (page: number, size: number) => {
         setLoading(true)
         const response = await messageService.getAllMessagesByChatRoomId(chatRoom.id, page, size);
-        setTimeout(() => setLoading(false), 1000)
+        setLoading(false)
         if (response.isSuccess) {
             setMessages(prevMessages => [...response.data, ...prevMessages])
             setPagination(response.pagination)
@@ -69,6 +70,7 @@ const ChatArea: FC<ChatAreaProps> = ({
 
     const loadMessages = async (page: number, size: number, chatRoomId: string) => {
         const response = await messageService.getAllMessagesByChatRoomId(chatRoomId, page, size);
+        console.log(response)
         if (response.isSuccess) {
             setMessages(response.data)
             setPagination(response.pagination)
@@ -76,13 +78,17 @@ const ChatArea: FC<ChatAreaProps> = ({
     }
 
     useEffect(() => {
+        setIsLeaveGroup(chatRoom.hasLeftGroup)
         loadMessages(1, 10, chatRoom.id);
 
-        SignalRConnector.events(
+        !chatRoom.hasLeftGroup && SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
-                console.log('Receive message in chat area')
                 if (message.chatRoomId === chatRoom.id) {
+                    if (message.isRemoveMember && message.removeMemberId === user?.id) {
+                        setIsLeaveGroup(true)
+                    }
+
                     setPendingMessages((prev) =>
                         prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
                     );
@@ -131,7 +137,7 @@ const ChatArea: FC<ChatAreaProps> = ({
             },
             // ON TYPING MESSAGE
             (groupName, content) => {
-                
+
                 groupName === chatRoom.uniqueName && setTyping(content)
             },
 
@@ -156,7 +162,7 @@ const ChatArea: FC<ChatAreaProps> = ({
     }, [chatRoom]);
 
     useEffect(() => {
-        
+
         setIsShowPrevent(chatRoom.isPrivate && !chatRoom.isAccept && !!chatRoom.lastMessage)
     }, [chatRoom])
 
@@ -183,7 +189,7 @@ const ChatArea: FC<ChatAreaProps> = ({
 
         setMsgPayload(updateState);
 
-        if(isShowPrevent) return;
+        if (isShowPrevent) return;
 
         user && SignalRConnector.startTypingMessage(chatRoom.uniqueName, user?.fullName)
         if (typingTimeoutRef.current) {
@@ -245,8 +251,8 @@ const ChatArea: FC<ChatAreaProps> = ({
             formData.append('sentAt', sentAt);
 
             const response = await messageService.sendMessage(formData);
-            if(response.isSuccess) {
-                if(isShowPrevent) {
+            if (response.isSuccess) {
+                if (isShowPrevent) {
                     setIsShowPrevent(false)
                 }
             }
@@ -255,7 +261,7 @@ const ChatArea: FC<ChatAreaProps> = ({
             try {
                 await SignalRConnector.sendMessage(msgPayload);
 
-                if(isShowPrevent) {
+                if (isShowPrevent) {
                     setIsShowPrevent(false)
                 }
             } catch (error) {
@@ -340,7 +346,10 @@ const ChatArea: FC<ChatAreaProps> = ({
             <div ref={messagesEndRef}></div>
         </div>
 
-        <div className="w-full px-4 py-4 shadow">
+        {isLeaveGroup ? <div className="w-full px-4 py-4 shadow flex flex-col items-center gap-y-2">
+            <span className="text-[16px] font-bold">Bạn không thể nhắn tin cho nhóm này</span>
+            <p className="text-sm text-gray-500">Bạn đã rời khỏi nhóm này và không thể gửi hoặc nhận tin nhắn nữa, trừ khi có người thêm lại bạn vào nhóm.</p>
+        </div> : <div className="w-full px-4 py-4 shadow">
             {isShowPrevent && <div className="flex flex-col gap-y-2 p-2 bg-white border-t-[1px] border-gray-500">
                 <p className="text-[12px] text-gray-400 text-center">Nếu bạn trả lời, {chatRoom.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.</p>
 
@@ -357,7 +366,8 @@ const ChatArea: FC<ChatAreaProps> = ({
                 onSubmit={handleSendMessage}
                 onFocus={() => handleReadMessage()}
             />
-        </div>
+        </div>}
+
     </div>
 };
 

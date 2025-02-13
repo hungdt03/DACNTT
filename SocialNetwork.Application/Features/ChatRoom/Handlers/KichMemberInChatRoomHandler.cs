@@ -11,7 +11,6 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity.ChatRoomInfo;
 
 namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 {
@@ -46,7 +45,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 throw new AppException("Chỉ nhóm trưởng mới được xóa thành viên khác khỏi nhóm");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            _unitOfWork.ChatRoomMemberRepository.DeleteMember(chatRoomMember);
+
             var userFullname = _contextAccessor.HttpContext.User.GetFullName();
             var message = new Domain.Entity.MessageInfo
                 .Message()
@@ -58,9 +57,17 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             };
 
             await _unitOfWork.MessageRepository.CreateMessageAsync(message);
+
+            chatRoomMember.HasLeftGroup = true;
+            chatRoomMember.LastMessageId = message.Id;
+            chatRoomMember.LastMessageDate = message.DateCreated;
+
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            await _signalRService.SendMessageToSpecificGroup(chatRoomMember.ChatRoom.UniqueName, ApplicationMapper.MapToMessage(message));
+            var mapMessage = ApplicationMapper.MapToMessage(message);
+            mapMessage.IsRemoveMember = true;
+            mapMessage.RemoveMemberId = chatRoomMember.UserId;
+            await _signalRService.SendMessageToSpecificGroup(chatRoomMember.ChatRoom.UniqueName, mapMessage);
             await _signalRService.LeaveGroup(chatRoomMember.UserId, chatRoomMember.ChatRoom.UniqueName);
 
             return new BaseResponse()

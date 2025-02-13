@@ -32,7 +32,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             var response = ApplicationMapper.MapToChatRoom(chatRoom);
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var friend = chatRoom.Members.Count == 2 ? chatRoom.Members.SingleOrDefault(m => m.UserId != userId) : null;
+            var friend = chatRoom.IsPrivate ? chatRoom.Members.SingleOrDefault(m => m.UserId != userId) : null;
 
             if (friend != null)
             {
@@ -80,6 +80,14 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
                 if (mostRecentOnlineTime != null && mostRecentOnlineTime.HasValue)
                     response.RecentOnlineTime = mostRecentOnlineTime.Value;
+
+                var chatRoomMember = await _unitOfWork.ChatRoomMemberRepository
+                        .GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId);
+
+                response.IsMember = true;
+                response.IsAdmin = chatRoomMember != null && chatRoomMember.IsLeader;
+                response.HasLeftGroup = chatRoomMember != null && chatRoomMember.HasLeftGroup;
+                response.LastMessageId = chatRoomMember?.LastMessageId;
             }
             
 

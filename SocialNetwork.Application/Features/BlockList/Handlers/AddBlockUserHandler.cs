@@ -43,7 +43,8 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
 
             if(friendShip != null)
             {
-                _unitOfWork.FriendShipRepository.DeleteFriendShip(friendShip);
+                friendShip.Status = FriendShipStatus.BLOCKED;
+                friendShip.IsConnect = false;
             }
 
             var newBlock = new Domain.Entity.UserInfo.BlockList()

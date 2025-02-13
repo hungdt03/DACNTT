@@ -55,6 +55,7 @@ namespace SocialNetwork.Application.Mappers
                 Id = chatRoomMember.Id,
                 IsAccepted = chatRoomMember.IsAccepted,
                 IsLeader = chatRoomMember.IsLeader,
+                HasLeftGroup = chatRoomMember.HasLeftGroup, 
             };
         }
 

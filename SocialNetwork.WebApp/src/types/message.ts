@@ -11,6 +11,9 @@ export type MessageResource = {
     chatRoomId: string;
     status: string;
     reads?: ReadStatusResource[];
+
+    isRemoveMember?: boolean;
+    removeMemberId?: string;
 }
 
 export type ReadStatusResource = {

@@ -40,16 +40,16 @@ namespace SocialNetwork.Infrastructure.SignalR
             var userId = Context.User.GetUserId();
             await userStatusService.AddConnectionAsync(userId, Context.ConnectionId);
 
-            var chatRooms = await unitOfWork.ChatRoomRepository.GetAllChatRoomsByUserIdAsync(userId);
+            var chatRooms = await unitOfWork.ChatRoomRepository.GetAllChatRoomNamesByUserIdAsync(userId);
             await JoinChatRooms(chatRooms);
             await base.OnConnectedAsync();
         }
 
-        private async Task JoinChatRooms(List<ChatRoom> chatRooms)
+        private async Task JoinChatRooms(List<string> chatRooms)
         {
             foreach (var chatRoom in chatRooms)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, chatRoom.UniqueName);
+                await Groups.AddToGroupAsync(Context.ConnectionId, chatRoom);
             }
         }
 
@@ -62,6 +62,13 @@ namespace SocialNetwork.Infrastructure.SignalR
 
             ChatRoom chatRoom = await unitOfWork.ChatRoomRepository.GetChatRoomByUniqueNameAsync(messageRequest.ChatRoomName)
                 ?? throw new NotFoundException("Hội thoại không tồn tại");
+
+            if(!chatRoom.IsPrivate)
+            {
+                var chatRoomMember = await unitOfWork
+                    .ChatRoomMemberRepository.GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId)
+                    ?? throw new HubException("Bạn không phải là thành viên của nhóm chat");
+            }
             
             await unitOfWork.BeginTransactionAsync();
             var recentReadStatus = await unitOfWork.MessageReadStatusRepository.GetMessageReadStatusByUserAndChatRoomId(userId, chatRoom.Id);
@@ -204,7 +211,17 @@ namespace SocialNetwork.Infrastructure.SignalR
         {
             var userId = Context.User.GetUserId();
             await userStatusService.RemoveConnectionAsync(userId, Context.ConnectionId);
+            var chatRooms = await unitOfWork.ChatRoomRepository.GetAllChatRoomNamesByUserIdAsync(userId);
+            await LeaveChatRooms(chatRooms);
             await base.OnDisconnectedAsync(exception);
+        }
+
+        private async Task LeaveChatRooms(List<string> chatRooms)
+        {
+            foreach (var chatRoom in chatRooms)
+            {
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, chatRoom);
+            }
         }
     }
 }

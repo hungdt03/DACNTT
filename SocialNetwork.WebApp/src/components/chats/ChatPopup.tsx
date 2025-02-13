@@ -55,7 +55,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [typing, setTyping] = useState<string>('');
     const [pendingMessages, setPendingMessages] = useState<MessageResource[]>([]);
-    const { chatRooms } = useSelector(selectChatPopup)
 
     const [msgPayload, setMsgPayload] = useState<MessageRequest>({
         content: '',
@@ -72,30 +71,24 @@ const ChatPopup: FC<ChatPopupProps> = ({
         }
     }
 
-    const getChatRoomById = async (chatRoomId: string): Promise<ChatRoomResource | undefined> => {
-        const response = await chatRoomService.getChatRoomById(chatRoomId);
-        if (response.isSuccess) {
-            return response.data;
-        }
-
-        return undefined;
-    }
-
     useEffect(() => {
         fetchMessages(pagination.page, pagination.size);
 
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
-                if (message.senderId !== user?.id) {
-                    const chatRoom = chatRooms.find(item => item.chatRoom.id === message.chatRoomId);
-                    if (!chatRoom) {
-                        getChatRoomById(message.chatRoomId)
-                            .then(data => {
-                                if (data) dispatch(add(data));
-                            });
-                    }
-                }
+                // if (message.senderId !== user?.id) {
+                //     const chatRoom = chatRooms.find(item => item.chatRoom.id === message.chatRoomId);
+                //     console.log('MESSAGE CCOMMING ......')
+                //     if (!chatRoom) {
+                //         getChatRoomById(message.chatRoomId)
+                //             .then(data => {
+                //                 if (data) dispatch(add(data));
+                //             });
+                //     }
+                // }
+
+                console.log('MESSAGE COMING IN CHAT POPUP')
 
                 if (message.chatRoomId === room.id) {
                     setPendingMessages((prev) =>
@@ -348,6 +341,10 @@ const ChatPopup: FC<ChatPopupProps> = ({
             {!pagination.hasMore && room.isPrivate && room.friend && <div className="flex flex-col gap-y-1 items-center">
                 <Avatar src={room.friend.avatar} size={'large'} />
                 <span className="text-sm text-gray-600 font-bold">{room.friend.fullName}</span>
+            </div>}
+            {!pagination.hasMore && !room.isPrivate && <div className="flex flex-col gap-y-1 items-center">
+                <Avatar src={room.imageUrl} size={'large'} />
+                <span className="text-sm text-gray-600 font-bold">{room.name}</span>
             </div>}
             {pagination.hasMore && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-primary my-2 text-xs">Tải thêm tin nhắn</button>}
             {[...messages, ...pendingMessages].map(message => <Message chatRoom={room} key={message.id} message={message} isMe={message.senderId === user?.id} />)}

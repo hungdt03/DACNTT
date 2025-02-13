@@ -19,21 +19,21 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.Messages.AddAsync(message);
         }
 
-        public async Task<(List<Message>, int)> GetAllMessagesByChatRoomIdAsync(Guid chatRoomId, int page, int size)
+        public async Task<(List<Message>, int)> GetAllMessagesByChatRoomIdAsync(Guid chatRoomId, int page, int size, DateTimeOffset? lastMessageDate)
         {
             var query = _context.Messages
-                .Where(msg => msg.ChatRoomId == chatRoomId)
-               .Include(m => m.Medias)
-               .Include(m => m.Sender)
-               .Include(m => m.Reads)
-               .ThenInclude(m => m.User);
+                .Where(msg => msg.ChatRoomId == chatRoomId && (lastMessageDate == null || lastMessageDate.Value >= msg.DateCreated));
 
-            int totalCount = await query.CountAsync();
+            int totalCount = await query.CountAsync(); 
             var messages = await query
                 .OrderByDescending(s => s.DateCreated)
                 .ThenByDescending(s => s.SentAt)
-                .Skip((page - 1)  * size).Take(size).ToListAsync();
-
+                .Skip((page - 1) * size).Take(size)
+                .Include(m => m.Medias)
+                .Include(m => m.Sender)
+                .Include(m => m.Reads)
+                .ThenInclude(m => m.User)
+                .ToListAsync();
             messages.Reverse();
             return (messages, totalCount);
         }

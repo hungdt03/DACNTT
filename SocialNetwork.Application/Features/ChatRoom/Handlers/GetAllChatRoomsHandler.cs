@@ -65,7 +65,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     var chatRoomMember = await _unitOfWork.ChatRoomMemberRepository
                         .GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId);
 
-                    item.IsMember = chatRoomMember != null;
+                    item.IsMember = true;
                     item.IsAdmin = chatRoomMember != null && chatRoomMember.IsLeader;
 
                     var offlineMembers = chatRoom.Members.Where(s => !onlineUsers.Any(m => m == s.UserId)).ToList();

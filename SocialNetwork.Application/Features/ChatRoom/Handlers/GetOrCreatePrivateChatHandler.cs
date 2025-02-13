@@ -53,6 +53,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 chatRoom.UniqueName = ChatUtils.GenerateChatRoomName(memberIds);
                 chatRoom.Name = "Private chat";
                 chatRoom.ImageUrl = "NONE";
+                chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
 
                 var me = new ChatRoomMember()
                 {

@@ -8,6 +8,7 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.BlockList.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.BlockList.Handlers
 {
@@ -36,6 +37,16 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
                     ?? throw new AppException("Bạn chưa chặn người dùng này");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
+            var friendShip = await _unitOfWork
+                .FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(request.UserId, userId);
+
+            if (friendShip != null)
+            {
+                friendShip.Status = FriendShipStatus.NONE;
+                friendShip.IsConnect = true;
+            }
+
             _unitOfWork.BlockListRepository.RemoveBlockList(blockUser);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

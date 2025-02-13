@@ -20,13 +20,31 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.ChatRooms.AddAsync(chatRoom);
         }
 
+        public async Task<List<string>> GetAllChatRoomNamesByUserIdAsync(string userId)
+        {
+            var chatRooms = await _context.ChatRooms
+               .Include(c => c.Members)
+                   .ThenInclude(m => m.User)
+               .Where(c =>
+                   c.Members.Any(m => m.UserId == userId) && 
+                   (!c.IsPrivate || c.Members.Any(m => m.IsAccepted && m.UserId == userId)) 
+               )
+               .Select(c => c.UniqueName) 
+               .ToListAsync();
+
+            return chatRooms;
+        }
+
         public async Task<List<ChatRoom>> GetAllChatRoomsByUserIdAsync(string userId)
         {
             var chatRooms = await _context.ChatRooms
                 .Include(c => c.Members)
-                    .ThenInclude(c => c.User)
-                .Where(c => c.Members.Any(s => (s.IsAccepted || c.IsPrivate) && s.UserId.Equals(userId)))
-                .OrderByDescending(c => c.LastMessageDate)
+                    .ThenInclude(m => m.User)
+                .Where(c =>
+                    c.Members.Any(m => m.UserId == userId) &&
+                    (!c.IsPrivate || c.Members.Any(m => m.IsAccepted && m.UserId == userId)) 
+                )
+                .OrderByDescending(c => c.LastMessageDate) 
                 .ToListAsync();
 
             return chatRooms;

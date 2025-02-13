@@ -1,5 +1,4 @@
 ﻿
-using System.Text.Json.Serialization;
 
 namespace SocialNetwork.Application.DTOs
 {
@@ -14,6 +13,10 @@ namespace SocialNetwork.Application.DTOs
         public ICollection<MediaResponse> Medias { get; set; }
         public DateTimeOffset SentAt { get; set; }
         public List<ReadStatus> Reads { get; set; }
+
+        // Bổ sung cho việc xóa thành viên khỏi group
+        public bool IsRemoveMember { get; set; }
+        public string RemoveMemberId { get; set; }
     }
 
     public class ReadStatus

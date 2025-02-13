@@ -21,11 +21,11 @@ const MessageFromOther: FC<MessageFromOtherProps> = ({
             <div className="flex items-start gap-x-2 max-w-[70%] w-full">
                 <Avatar className="flex-shrink-0" size='small' src={message.sender.avatar ?? images.user} />
                 <div className="flex flex-col w-full items-start gap-y-1">
-                    <Tooltip placement="right" title={<span className="text-[12px]">{message.status === 'sending' ? 'Đang gửi' : `${formatTimeMessage(new Date(message.sentAt))}`}</span>}>
+                    <Tooltip placement="right" className="w-full" title={<span className="text-[12px] w-full">{message.status === 'sending' ? 'Đang gửi' : `${formatTimeMessage(new Date(message.sentAt))}`}</span>}>
                         {message.medias && <MessageMedia medias={message.medias} />}
-                        {message.content && <p className="bg-gray-200 text-black p-2 rounded-lg text-[13px] break-words max-w-full">
+                        {message.content && <span className="inline-block bg-gray-200 text-black p-2 rounded-lg text-[13px] break-words max-w-full w-fit">
                             {message.content}
-                        </p>}
+                        </span>}
                     </Tooltip>
                 </div>
             </div>

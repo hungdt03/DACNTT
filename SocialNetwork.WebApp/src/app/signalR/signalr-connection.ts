@@ -88,6 +88,10 @@ class SignalRConnector {
     public sendMessage = async (message: MessageRequest) => {
         if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
             await this.connection.send("SendMessage", message)
+                .catch(err => {
+                    console.log(err)
+                })
+           
         } else {
             console.error("Chưa kết nối tới Server SignalR");
         }

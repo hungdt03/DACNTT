@@ -6,6 +6,7 @@ namespace SocialNetwork.Application.Interfaces
     {
         Task CreateChatRoom(ChatRoom chatRoom);
         Task<List<ChatRoom>> GetAllChatRoomsByUserIdAsync(string userId);
+        Task<List<string>> GetAllChatRoomNamesByUserIdAsync(string userId);
         Task<List<ChatRoom>> GetAllPrivateChatRoomsByUserIdAsync(string userId);
         Task<ChatRoom?> GetChatRoomByUniqueNameAsync(string uniqueName);
         Task<ChatRoom?> GetChatRoomByIdAsync(Guid id);

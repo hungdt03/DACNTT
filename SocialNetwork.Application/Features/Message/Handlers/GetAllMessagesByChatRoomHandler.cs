@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
+using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Message.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
@@ -23,10 +24,14 @@ namespace SocialNetwork.Application.Features.Message.Handlers
 
         public async Task<BaseResponse> Handle(GetAllMessagesByChatRoomQuery request, CancellationToken cancellationToken)
         {
-            var (messages, totalCount) = await _unitOfWork.MessageRepository.GetAllMessagesByChatRoomIdAsync(request.ChatRoomId, request.Page, request.Size);
-            var response = new List<MessageResponse>();
             var userId = _contextAccessor.HttpContext.User.GetUserId();
+            var chatRoomMember = await _unitOfWork.ChatRoomMemberRepository
+                .GetChatRoomMemberByRoomIdAndUserId(request.ChatRoomId, userId)
+                ?? throw new NotFoundException("Chỉ có thành viên của đoạn chat mới được xem danh sách tin nhắn");
 
+            var (messages, totalCount) = await _unitOfWork.MessageRepository.GetAllMessagesByChatRoomIdAsync(request.ChatRoomId, request.Page, request.Size, chatRoomMember.HasLeftGroup ? chatRoomMember.LastMessageDate : null);
+            var response = new List<MessageResponse>();
+           
             foreach(var message in messages)
             {
                 if (message.SenderId == userId)

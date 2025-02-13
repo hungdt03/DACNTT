@@ -25,6 +25,16 @@ class FriendService {
         })
     }
 
+    getAllConnectFriends(page: number, size: number) : Promise<PaginationResponse<FriendResource[]>> {
+        return axiosInterceptor.get('/api/friends/connected-users', {
+            params: {
+                page,
+                size
+            }
+        })
+    }
+
+
     getAllFriendsByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<FriendResource[]>> {
         return axiosInterceptor.get('/api/friends/' + userId, {
             params: {

@@ -53,6 +53,10 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             };
             await _unitOfWork.MessageRepository.CreateMessageAsync(message);
 
+            chatRoomMember.HasLeftGroup = true;
+            chatRoomMember.LastMessageId = message.Id;
+            chatRoomMember.LastMessageDate = message.DateCreated;
+
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             await _signalRService.SendMessageToSpecificGroup(chatRoomMember.ChatRoom.UniqueName, ApplicationMapper.MapToMessage(message));

@@ -6,15 +6,19 @@ export type ChatRoomResource  = {
     name: string;
     members: UserResource[];
     imageUrl: string;
-    isMember: boolean;
-    isLeader: boolean;
     lastMessage: string;
     lastMessageDate: Date;
-    isPrivate: boolean;
     friend: UserResource | null;
     isRead: boolean;
     isOnline: boolean;
     recentOnlineTime: Date;
+
+    // 
+    isMember: boolean;
+    isAdmin: boolean;
+    lastMessageId?: string;
+    hasLeftGroup: boolean;
+    isPrivate: boolean;
     isAccept: boolean;
     isRecipientAccepted: boolean;
 }

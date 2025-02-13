@@ -7,19 +7,16 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.ChatRoom.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
-using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Application.Utils;
+using SocialNetwork.Common;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
-using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 {
     public class CreateChatRoomHandler : IRequestHandler<CreateChatRoomCommand, BaseResponse>
     {
-        private const string PREFIX_FILE_API = "/api/files/images/";
-        private const string GROUP_FILENAME = "group.png";
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly ISignalRService _signalRService;
@@ -73,8 +70,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 Name = request.GroupName,
                 LastMessage = "Các bạn hiện đã được kết nối với nhau",
                 Members = members,
-                ImageUrl = _configuration["ServerHost"] + PREFIX_FILE_API + GROUP_FILENAME
-        };
+                ImageUrl = _configuration["ServerHost"] + ShareConstant.PREFIX_FILE_API + ShareConstant.GROUP_FILENAME
+            };
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -95,6 +92,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             int count = 1;
             foreach (var member in members)
             {
+                if (member.UserId == userId) continue;
                 var messageItem = new Domain.Entity.MessageInfo.Message()
                 {
                     MessageType = MessageType.SYSTEM,

@@ -43,7 +43,7 @@ const ChatDetails: FC<ChatDetailsProps> = ({
             key: '1',
             label: 'Thành viên',
             className: 'bg-white border-none',
-            children: user && <MemberCollapse onFetch={fetchChatRoomMembers} isLeader={chatRoom.isLeader} members={members} user={user} />,
+            children: user && <MemberCollapse onFetch={fetchChatRoomMembers} isLeader={chatRoom.isAdmin} members={members} user={user} />,
 
         },
         {
