@@ -64,6 +64,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             var mapMessage = ApplicationMapper.MapToMessage(message);
+            mapMessage.IsRemove = true;
+            mapMessage.MemberId = chatRoomMember.UserId;
             await _signalRService.SendMessageToSpecificGroup(chatRoomMember.ChatRoom.UniqueName, mapMessage);
             await _signalRService.LeaveGroup(chatRoomMember.UserId, chatRoomMember.ChatRoom.UniqueName);
 

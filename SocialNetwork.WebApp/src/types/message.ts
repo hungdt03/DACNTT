@@ -12,7 +12,7 @@ export type MessageResource = {
     status: string;
     reads?: ReadStatusResource[];
 
-    type?: "REMOVE" | "ADD" ;
+    isRemove?: boolean;
     memberId?: string;
 }
 

@@ -14,6 +14,10 @@ namespace SocialNetwork.Application.DTOs
         public DateTimeOffset SentAt { get; set; }
         public List<ReadStatus> Reads { get; set; }
 
+        // Remove
+        public bool IsRemove { get; set; }
+        public string MemberId { get; set; }
+
     }
 
     public class ReadStatus

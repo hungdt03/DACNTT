@@ -32,8 +32,6 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
     const { user } = useSelector(selectAuth);
     const navigate = useNavigate();
 
-    const dispatch = useDispatch<AppDispatch>()
-
      const getChatRoomById = async (chatRoomId: string): Promise<ChatRoomResource | undefined> => {
             const response = await chatRoomService.getChatRoomById(chatRoomId);
             if (response.isSuccess) {
@@ -79,7 +77,9 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
                 } else {
                     getChatRoomById(message.chatRoomId)
                         .then(data => {
-                            if (data) dispatch(add(data));
+                            if(data) {
+                                setChatRooms(prev => [data, ...prev])
+                            }
                         });
                 }
             },
@@ -100,6 +100,8 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
             undefined,
             undefined,
         );
+
+        return  () => SignalRConnector.unsubscribeEvents()
 
     }, [chatRoom]);
 

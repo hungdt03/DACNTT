@@ -24,12 +24,14 @@ type ChatAreaProps = {
     chatRoom: ChatRoomResource;
     onToggleChatDetails: () => void;
     showChatDetails: boolean;
+    onFetch: () => void
 }
 
 const ChatArea: FC<ChatAreaProps> = ({
     chatRoom,
     showChatDetails,
-    onToggleChatDetails
+    onToggleChatDetails,
+    onFetch
 }) => {
     const { user } = useSelector(selectAuth);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -107,6 +109,9 @@ const ChatArea: FC<ChatAreaProps> = ({
             (message) => {
                 if (message.chatRoomId === chatRoom.id) {
 
+                    if(message.isRemove && message.memberId === user?.id) {
+                        onFetch()
+                    }
                     setPendingMessages((prev) =>
                         prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
                     );

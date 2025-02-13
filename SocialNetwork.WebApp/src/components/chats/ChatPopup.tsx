@@ -15,7 +15,7 @@ import { MediaType } from "../../enums/media";
 import { formatTime } from "../../utils/date";
 import { Link } from "react-router-dom";
 import cn from "../../utils/cn";
-import { setChatRoomRead } from "../../features/slices/chat-popup-slice";
+import { remove, setChatRoomAccepted, setChatRoomRead } from "../../features/slices/chat-popup-slice";
 import { AppDispatch } from "../../app/store";
 import { Pagination } from "../../types/response";
 import { BlockResource } from "../../types/block";
@@ -90,13 +90,21 @@ const ChatPopup: FC<ChatPopupProps> = ({
         if (response.isSuccess) {
             message.success(response.message)
             setBlockUser(undefined)
-            setIsShowPrevent(room.isPrivate && !room.isAccept && !!room.lastMessage)
-            console.log(room.isPrivate && !room.isAccept && !!room.lastMessage)
         } else {
             message.error(response.message)
         }
     }
 
+    
+    const handleBlockUser = async (userId: string) => {
+        const response = await userService.blockUser(userId);
+        if (response.isSuccess) {
+            message.success(response.message)
+            dispatch(remove(room.id))
+        } else {
+            message.error(response.message)
+        }
+    }
 
 
     useEffect(() => {
@@ -271,6 +279,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
             if (response.isSuccess) {
                 if (isShowPrevent) {
                     setIsShowPrevent(false)
+                    dispatch(setChatRoomAccepted(room.id));
                 }
             }
         } else {
@@ -281,6 +290,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 await SignalRConnector.sendMessage(msgPayload)
                 if (isShowPrevent) {
                     setIsShowPrevent(false)
+                    dispatch(setChatRoomAccepted(room.id));
                 }
             } catch (error) {
                 alert(error)
@@ -327,7 +337,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                     <p className="text-[12px] text-gray-400 text-center">Nếu bạn trả lời, {room.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.</p>
 
                     <div className="flex justify-center">
-                        <button className="py-2 px-5 rounded-md text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200">Chặn</button>
+                        <button onClick={() => room.friend && handleBlockUser(room.friend?.id)} className="py-2 px-5 rounded-md text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200">Chặn</button>
                     </div>
                 </div>}
                 {typing && <div key={room.id} className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
@@ -388,7 +398,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
             </div>
         </div>
 
-        <div className={cn("overflow-y-auto px-2 py-3 custom-scrollbar flex flex-col gap-y-3", isShowPrevent ? 'h-[220px]' : 'h-[330px]')}>
+        <div className={cn("overflow-y-auto px-2 py-3 custom-scrollbar flex flex-col gap-y-3", isShowPrevent && !blockUser ? 'h-[220px]' : 'h-[330px]')}>
             {!pagination.hasMore && room.isPrivate && room.friend && <div className="flex flex-col gap-y-1 items-center">
                 <Avatar src={room.friend.avatar} size={'large'} />
                 <span className="text-sm text-gray-600 font-bold">{room.friend.fullName}</span>
@@ -403,27 +413,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
         </div>
 
         {renderMessageBox()}
-        {/* <div className="sticky bottom-0">
-            {isShowPrevent && <div className="flex flex-col gap-y-2 p-3 bg-white border-b-[1px] border-t-[1px] border-gray-300">
-                <p className="text-[12px] text-gray-400 text-center">Nếu bạn trả lời, {room.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.</p>
-
-                <div className="flex justify-center">
-                    <button className="py-2 px-5 rounded-md text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200">Chặn</button>
-                </div>
-            </div>}
-            {typing && <div key={room.id} className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
-                {typing}
-            </div>}
-            <div className="p-3 bg-white shadow border-t-[1px] border-gray-100">
-                <BoxSendMessage
-                    value={msgPayload.content}
-                    onChange={handleBoxChange}
-                    onSubmit={handleSendMessage}
-                    onFocus={() => handleReadMessage()}
-                />
-            </div>
-
-        </div> */}
+       
     </div >
 
 };

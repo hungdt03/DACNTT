@@ -36,6 +36,7 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
                 .GetBlockListByBlockeeIdAndBlockerIdAsync(request.UserId, userId)
                     ?? throw new AppException("Bạn chưa chặn người dùng này");
 
+           
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var friendShip = await _unitOfWork

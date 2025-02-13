@@ -1,10 +1,5 @@
-import { Avatar, Empty, Modal, Tabs, TabsProps } from "antd";
-import { FC, useEffect, useState } from "react";
-import images from "../../assets";
-import { Edit, Search } from "lucide-react";
-import CreateGroupChatModal from "../modals/CreateGroupChatModal";
-import cn from "../../utils/cn";
-import ChatUserSkeleton from "../skeletons/ChatUserSkeleton";
+import { Tabs} from "antd";
+import { FC } from "react";
 import ChatRoomTab from "../chats/ChatRoomTab";
 import PendingChatTab from "../chats/PendingChatTab";
 

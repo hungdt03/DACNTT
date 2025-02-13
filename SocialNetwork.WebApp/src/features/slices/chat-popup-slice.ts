@@ -83,6 +83,12 @@ const chatPopupSlice = createSlice({
                 chat.chatRoom.isRead = true;
             }
         },
+        setChatRoomAccepted: (state, action: PayloadAction<string>) => {
+            const chat = state.chatRooms.find(s => s.chatRoom.id === action.payload);
+            if (chat) {
+                chat.chatRoom.isAccept = true;
+            }
+        },
         setChatRoomMessage: (state, action: PayloadAction<LastMessagePayload>) => {
             const chat = state.chatRooms.find(s => s.chatRoom.id === action.payload.chatRoomId);
             if (chat) {
@@ -101,5 +107,5 @@ const chatPopupSlice = createSlice({
 });
 
 export const selectChatPopup = (state: RootState) => state.chatPopup;
-export const { add, remove, expand, minimize, setChatRoomRead, setChatRoomMessage } = chatPopupSlice.actions;
+export const { add, remove, expand, minimize, setChatRoomRead, setChatRoomMessage, setChatRoomAccepted } = chatPopupSlice.actions;
 export default chatPopupSlice.reducer;

@@ -25,9 +25,7 @@ const PopupWrapper: FC = () => {
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
-                console.log('COME IN WRAPPER')
                 const chatRoom = chatRooms.find(c => c.chatRoom.id === message.chatRoomId);
-
                 if (chatRoom) {
                     console.log(chatRoom)
                 } else {
@@ -37,8 +35,8 @@ const PopupWrapper: FC = () => {
                         });
                 }
             },
-
         );
+
     }, [])
 
     return <div className="flex items-center gap-x-4">
