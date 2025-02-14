@@ -49,8 +49,8 @@ const GroupPendingMembers: FC = () => {
         }
     }
 
-    return <div className="w-full">
-        <div className="grid grid-cols-2 gap-4 py-4 px-8">
+    return <div className="w-full px-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 px-8">
             {pendingRequests?.map(request => <PendingMember
                 onApproval={() => handleApprovalRequest(request.id)}
                 onReject={() => handleRejectRequest(request.id)}

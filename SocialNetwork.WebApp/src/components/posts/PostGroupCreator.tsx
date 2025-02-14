@@ -47,8 +47,8 @@ const PostGroupCreator: FC<PostGroupCreatorProps> = ({
 
     return <div className="p-4 rounded-md bg-white flex flex-col gap-y-4 shadow">
         <div className="flex items-center gap-x-4">
-            <Avatar className="flex-shrink-0" size='large' src={user?.avatar ?? images.user} />
-            <button onClick={showModal} className="text-gray-500 py-2 px-3 rounded-xl bg-gray-50 w-full text-left">{user?.fullName?.split(' ').slice(-1)[0]} ơi, bạn đang nghĩ gì thế?</button>
+            <Avatar className="flex-shrink-0 w-[25px] h-[25px] md:w-[40px] md:h-[40px]" src={user?.avatar ?? images.user} />
+            <button onClick={showModal} className="text-gray-500 py-2 px-3 text-[14px] md:text-sm lg:text-[16px] rounded-xl bg-gray-50 w-full text-left">Bạn đang nghĩ gì thế?</button>
         </div>
         <Divider className="my-2" />
 

@@ -18,16 +18,16 @@ const SearchGroupItem: FC<SearchGroupItemProps> = ({
         <div className="flex items-center gap-x-3">
             <img src={suggestGroup.group.coverImage ?? images.cover} className="w-[55px] h-[55px] rounded-md border-[1px] border-gray-100" />
             <div className="flex flex-col">
-                <span className="font-semibold text-[16px] line-clamp-1">{suggestGroup.group.name}</span>
-                <div className="flex items-center gap-x-3">
-                    {suggestGroup.isMember && <span className="text-gray-600 text-sm">
+                <span className="font-semibold text-sm md:text-[16px] line-clamp-1">{suggestGroup.group.name}</span>
+                <div className="flex items-center flex-wrap gap-x-2 md:gap-3">
+                    {suggestGroup.isMember && <span className="text-gray-600 text-xs md:text-sm">
                         Nhóm của bạn
                     </span>}
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-gray-600 text-xs md:text-sm">
                         {getGroupPrivacyTitle(suggestGroup.group.privacy)}
                     </span>
                     <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-gray-600 text-xs md:text-sm">
                         {suggestGroup.totalMembers} thành viên
                     </span>
                 </div>
@@ -36,7 +36,7 @@ const SearchGroupItem: FC<SearchGroupItemProps> = ({
                     <Avatar.Group>
                         {suggestGroup.friendMembers.map(member => <Avatar key={member.id} src={member.avatar} size='small' />)}
                     </Avatar.Group>
-                    <span className="text-gray-600 text-sm">{suggestGroup.countFriendMembers} người bạn là thành viên</span>
+                    <span className="text-gray-600 text-xs md:text-sm">{suggestGroup.countFriendMembers} người bạn là thành viên</span>
                 </div>}
             </div>
         </div>

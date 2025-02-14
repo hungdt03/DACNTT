@@ -57,7 +57,7 @@ const InviteFriendsJoinGroup: FC<InviteFriendsJoinGroupProps> = ({
 
     return <div className="max-h-[500px] h-[500px]">
         <Divider className="my-0" />
-        <div className="grid grid-cols-3 h-full">
+        <div className="flex flex-col md:grid grid-cols-3 h-full">
             <div className="col-span-2 p-2 flex flex-col gap-y-2 h-full overflow-y-hidden">
                 <div className="px-3 py-1 bg-gray-100 flex items-center gap-x-1 rounded-3xl overflow-hidden">
                     <Search size={16} className="text-gray-500" />

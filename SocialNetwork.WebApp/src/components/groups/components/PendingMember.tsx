@@ -26,7 +26,7 @@ const PendingMember: FC<PendingMemberProps> = ({
                 </div>
             </div>
 
-            <div className="flex flex-col gap-x-3">
+            <div className="flex flex-col gap-x-3 gap-y-2">
                 <Button onClick={onApproval} type="primary">Phê duyệt</Button>
                 <button onClick={onReject} className="px-3 py-[6px] hover:bg-gray-200 rounded-md font-semibold text-sm bg-gray-100">
                     Từ chối

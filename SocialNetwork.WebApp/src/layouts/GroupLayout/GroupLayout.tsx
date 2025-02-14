@@ -77,8 +77,12 @@ const GroupLayout: FC = () => {
     if (loading || loadingRequest || loadingInvite) return <Loading />
 
     return group?.isHidden && !inviteJoin && !group.isMember ? <NotAllowedComponent /> : <div className="grid grid-cols-12 w-full h-full overflow-hidden">
-        {group?.isMine && <MyGroupManageSidebar group={group} />}
-        <div id="group-layout" className={cn("w-full flex flex-col h-full bg-slate-100 overflow-y-auto", group?.isMine ? 'col-span-9' : 'col-span-12')}>
+        {group?.isMine &&
+            <div className="lg:col-span-3 lg:block hidden bg-white h-full overflow-y-auto w-full shadow border-r-[1px] border-gray-200">
+                <MyGroupManageSidebar group={group} />
+            </div>
+        }
+        <div id="group-layout" className={cn("w-full flex flex-col h-full bg-slate-100 overflow-y-auto", group?.isMine ? 'lg:col-span-9 col-span-12' : 'col-span-12')}>
             {group && !NOT_ALLOWED_ROUTES.some(route => location.pathname.includes(route)) && <GroupHeader onFetchGroup={fetchGroup} onFetchRequest={fetchRequestJoin} onFetchInvite={fetchInviteJoin} inviteJoin={inviteJoin} requestJoin={requestJoin} group={group} />}
             <Outlet />
         </div>

@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react";
 import images from "../../assets";
 import { Avatar, Button, Divider, Drawer, Form, FormProps, Input, Modal, Popconfirm, Popover, Radio, Select, Switch, Tooltip, message } from "antd";
 import { SettingOutlined } from '@ant-design/icons'
-import { Plus } from "lucide-react";
+import { ChartNoAxesGantt, Plus } from "lucide-react";
 import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
 import useModal from "../../hooks/useModal";
 import { GroupResource } from "../../types/group";
@@ -18,6 +18,7 @@ import { GroupInvitationResource } from "../../types/group-invitation";
 import GroupInvitationLabel from "../labels/GroupInvitationLabel";
 import { GroupMemberResource } from "../../types/group-member";
 import ChooseNewAdminModal from "../modals/ChooseNewAdminModal";
+import MyGroupManageSidebar from "./components/MyGroupManageSidebar";
 
 export type InviteFriendsRequest = {
     inviteeIds: string[];
@@ -58,7 +59,8 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     const { handleCancel: cancelLeave, handleOk: okLeave, showModal: showLeave, isModalOpen: openLeave } = useModal();
 
     const [openSetting, setOpenSetting] = useState(false);
-    const [loadingUpdate, setLoadingUpdate] = useState(false)
+    const [openManage, setOpenManage] = useState(false);
+    const [loadingUpdate, setLoadingUpdate] = useState(false);
 
     const [roleInvitation, setRoleInvitation] = useState<GroupRoleInvitationResource>();
     const [isDisabled, setIsDisabled] = useState(false);
@@ -189,14 +191,14 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     }
 
 
-    return <div className="bg-white w-full shadow">
-        <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto overflow-hidden">
+    return <div className="bg-white w-full shadow lg:px-4 sm:px-2 px-2">
+        <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm lg:px-0 mx-auto overflow-hidden">
             <img className="w-full object-cover max-h-[40vh] rounded-b-xl" src={group.coverImage ?? images.coverGroup} />
             <div className="py-4 flex flex-col gap-y-2">
                 <span className="font-bold text-3xl">{group.name}</span>
                 <div className="flex items-center gap-x-3">
-                    <span className="text-gray-500">Nhóm {getGroupPrivacyTitle(group.privacy)}</span>
-                    <span className="font-semibold text-gray-500">{group.members.length} thành viên</span>
+                    <span className="text-gray-500 text-sm md:text-[16px]">Nhóm {getGroupPrivacyTitle(group.privacy)}</span>
+                    <span className="font-semibold text-sm md:text-[16px] text-gray-500">{group.members.length} thành viên</span>
                 </div>
 
                 <div className="flex md:flex-row flex-col items-start gap-4 md:gap-0 md:items-center justify-between">
@@ -212,24 +214,27 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                         </Avatar.Group>
                     )}
 
-                    <div className="flex items-center gap-x-2">
+                    <div className="flex items-center flex-wrap gap-2">
                         {group.isMember ? (
                             <>
+                                {group.isMine && <Button className="lg:hidden" onClick={() => setOpenManage(true)} icon={<ChartNoAxesGantt size={16} />} type="primary">
+                                    Quản lí
+                                </Button>}
                                 {group.isMine && <Button onClick={() => setOpenSetting(true)} icon={<SettingOutlined size={16} />} type="primary">
                                     Cài đặt
                                 </Button>}
                                 <Button onClick={showModal} icon={<Plus size={16} />} type="primary">
                                     Mời
                                 </Button>
-                                {group.isMine && group.adminCount === 1 && group.countMembers > 1 ? <button onClick={showLeave} className="px-3 py-1 hover:bg-gray-200 rounded-md bg-gray-100">
+                                {group.isMine && group.adminCount === 1 && group.countMembers > 1 ? <button onClick={showLeave} className="font-semibold px-3 py-[6px] text-sm hover:bg-gray-200 rounded-md bg-gray-100">
                                     Rời nhóm
                                 </button>
-                                : <Popconfirm onConfirm={() => handleLeaveGroup(group.id)} title='Rời nhóm' cancelText='Hủy bỏ' okText='Rời nhóm' description={group.countMembers === 1 ? 'Bạn là thành viên cuối cùng của nhóm, nhóm sẽ bị xóa khi bạn rời đi!' : 'Bạn có chắc muốn rời nhóm không'}>
-                                    <button className="px-3 py-1 hover:bg-gray-200 rounded-md bg-gray-100">
-                                        Rời nhóm
-                                    </button>
-                                </Popconfirm>}
-                                <button className="bg-sky-50 text-primary px-3 py-1 rounded-md">Đã tham gia</button>
+                                    : <Popconfirm onConfirm={() => handleLeaveGroup(group.id)} title='Rời nhóm' cancelText='Hủy bỏ' okText='Rời nhóm' description={group.countMembers === 1 ? 'Bạn là thành viên cuối cùng của nhóm, nhóm sẽ bị xóa khi bạn rời đi!' : 'Bạn có chắc muốn rời nhóm không'}>
+                                        <button className="font-semibold px-3 py-[6px] text-sm hover:bg-gray-200 rounded-md bg-gray-100">
+                                            Rời nhóm
+                                        </button>
+                                    </Popconfirm>}
+                                <button className="font-semibold bg-sky-50 text-sm text-primary px-3 py-[6px] rounded-md">Đã tham gia</button>
                             </>
                         ) : !inviteJoin && (requestJoin ? (
                             <>
@@ -259,10 +264,10 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                 <Divider className="my-3" />
 
                 {group.isMember && <div className="flex gap-x-2 items-center">
-                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", ['/members', '/videos', '/images'].every(route => !location.pathname.includes(route)) && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}`}>Thảo luận</Link>
-                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/members') && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}/members`}>Thành viên</Link>
-                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/images') && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}/images`}>Ảnh</Link>
-                    <Link className={cn("px-4 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 font-semibold", location.pathname.includes('/videos') && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}/videos`}>Video</Link>
+                    <Link className={cn("md:px-4 px-2 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 text-sm md:text-[16px] font-semibold", ['/members', '/videos', '/images'].every(route => !location.pathname.includes(route)) && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}`}>Thảo luận</Link>
+                    <Link className={cn("md:px-4 px-2 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 text-sm md:text-[16px] font-semibold", location.pathname.includes('/members') && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}/members`}>Thành viên</Link>
+                    <Link className={cn("md:px-4 px-2 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 text-sm md:text-[16px] font-semibold", location.pathname.includes('/images') && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}/images`}>Ảnh</Link>
+                    <Link className={cn("md:px-4 px-2 py-2 rounded-md hover:bg-gray-100 hover:text-gray-600 text-gray-600 text-sm md:text-[16px] font-semibold", location.pathname.includes('/videos') && 'border-b-[3px] border-primary bg-gray-100')} to={`/groups/${group.id}/videos`}>Video</Link>
                 </div>}
             </div>
         </div>
@@ -420,6 +425,12 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                     </Button>
                 </Form.Item>
             </Form>
+        </Drawer>
+
+        <Drawer classNames={{
+            body: '!p-2',
+        }} open={openManage} onClose={() => setOpenManage(false)} title='Quản lí nhóm'>
+            {group?.isMine && <MyGroupManageSidebar group={group} />}
         </Drawer>
 
         <Modal

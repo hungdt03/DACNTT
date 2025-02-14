@@ -14,6 +14,7 @@ import StoryViewers from "./StoryViewers";
 import StoryReplyBox from "./StoryReplyBox";
 import StoryCollapsed from "./StoryCollapsed";
 import { useSearchParams } from "react-router-dom";
+import LoadingIndicator from "../LoadingIndicator";
 
 export type ReactStory = {
     storyId: string;
@@ -33,7 +34,7 @@ const StoryShow: FC<StoryShowProps> = ({
     onDelete
 }) => {
     const [params] = useSearchParams()
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [viewers, setViewers] = useState<ViewerResource[]>([]);
     const [isFetch, setIsFetch] = useState(false);
     const [storyItem, setStoryItem] = useState<StoryResource | null>(null)
@@ -43,8 +44,6 @@ const StoryShow: FC<StoryShowProps> = ({
     const { user } = useSelector(selectAuth);
 
     useEffect(() => {
-        console.log('vô đây')
-        console.log(story)
         if (story.user.id !== user?.id) {
             setViewers([])
             setIsFetch(false)
@@ -54,9 +53,7 @@ const StoryShow: FC<StoryShowProps> = ({
     }, [story])
 
     const handleViewStory = async (storyId: string) => {
-        console.log('View')
         const response = await storyService.viewStory(storyId);
-        console.log(response)
         if (response.isSuccess) {
             message.success(response.message)
         }
@@ -105,7 +102,7 @@ const StoryShow: FC<StoryShowProps> = ({
         }
     },  [params])
     
-    return <div className={cn("h-full flex flex-col justify-center gap-y-6 py-4", isFetch ? 'items-start' : 'items-center')}>
+    return <div className={cn("h-full flex flex-col justify-center gap-y-6 md:py-4", isFetch ? 'items-start' : 'items-center')}>
         <div className="rounded-xl overflow-hidden">
             <Stories
                 progressStyles={{

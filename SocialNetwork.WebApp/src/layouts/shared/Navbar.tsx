@@ -20,7 +20,7 @@ const Navbar: FC = () => {
     const [countUnreadChatRoom, setCountUnreadChatRoom] = useState<number>(0)
     const [countUnreadNotification, setCountUnreadNotification] = useState<number>(0)
 
-    return <div className="flex items-center gap-x-2 md:gap-x-3">
+    return <div className="flex items-center gap-x-2 md:gap-x-3 flex-shrink-0">
         <Badge count={countUnreadNotification}>
             <Popover trigger='click' placement="topRight" content={<NotificationDialog
                 onCountNotification={(count) => setCountUnreadNotification(count)}

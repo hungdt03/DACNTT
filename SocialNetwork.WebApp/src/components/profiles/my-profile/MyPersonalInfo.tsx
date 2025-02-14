@@ -223,7 +223,7 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
 
         <Modal
             style={{ top: 50 }}
-            title={<p className="text-center font-bold text-[16px]">{userSchool ? 'CẬP NHẬT THÔNG TIN HỌC VẤN' : 'THÊM THÔNG TIN HỌC VẤN'}</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">{userSchool ? 'CẬP NHẬT THÔNG TIN HỌC VẤN' : 'THÊM THÔNG TIN HỌC VẤN'}</p>}
             width='500px'
             open={openEducation}
             onOk={okEducation}
@@ -243,7 +243,7 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
 
         <Modal
             style={{ top: 50 }}
-            title={<p className="text-center font-bold text-[16px]">{userSchool ? 'CẬP NHẬT THÔNG TIN VIỆC LÀM' : 'THÊM THÔNG TIN VIỆC LÀM'}</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">{userSchool ? 'CẬP NHẬT THÔNG TIN VIỆC LÀM' : 'THÊM THÔNG TIN VIỆC LÀM'}</p>}
             width='500px'
             open={openWorkPlace}
             onOk={okWorkPlace}
@@ -263,7 +263,7 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
 
         <Modal
             style={{ top: 50 }}
-            title={<p className="text-center font-bold text-[16px]">CẬP NHẬT THÔNG TIN QUÊ QUÁN</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">CẬP NHẬT THÔNG TIN QUÊ QUÁN</p>}
             width='500px'
             open={openHometown}
             onOk={okHomeTown}
@@ -283,7 +283,7 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
 
         <Modal
             style={{ top: 50 }}
-            title={<p className="text-center font-bold text-[16px]">CẬP NHẬT THÔNG TIN NƠI SỐNG HIỆN TẠI</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">CẬP NHẬT THÔNG TIN NƠI SỐNG HIỆN TẠI</p>}
             width='500px'
             open={isModalOpen}
             onOk={handleOk}

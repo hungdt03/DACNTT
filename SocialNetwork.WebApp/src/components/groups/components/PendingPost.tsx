@@ -22,10 +22,13 @@ const PendingPost: FC<PendingPostProps> = ({
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
-                <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
+            {!post.user.haveStory 
+                    ? <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0" src={post.user.avatar ?? images.user} /> 
+                    : <Link className="p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
+                }
                 <div className="flex flex-col gap-y-[1px]">
                     <div className="font-semibold text-[15px] text-gray-600">
-                        <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                    <Link className="text-[13px] md:text-sm hover:text-gray-600 font-bold" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
                         {post.tags.length > 0 &&
                             (() => {
                                 const maxDisplay = 3;
@@ -51,7 +54,7 @@ const PendingPost: FC<PendingPostProps> = ({
                     </div>
                     <div className="flex items-center gap-x-2">
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
-                            <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
+                        <span className="text-[11px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
                         {getPrivacyPost(post.privacy)}
                     </div>
@@ -64,9 +67,8 @@ const PendingPost: FC<PendingPostProps> = ({
             {post.background ? <div style={{
                 background: post.background,
                 width: '100%',
-                height: 380
-            }} className="flex items-center justify-center px-6 py-8 rounded-md">
-                <p className="text-2xl font-bold text-center break-words break-all text-white">{post.content}</p>
+            }} className="flex items-center md:h-[380px] sm:h-[350px] h-[280px] justify-center px-6 py-8 rounded-md">
+                <p className="text-lg lg:text-2xl font-bold text-center break-words break-all text-white">{post.content}</p>
             </div> : <p className="text-sm text-gray-700 break-words">{post.content}</p>}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
         </div>
@@ -74,8 +76,8 @@ const PendingPost: FC<PendingPostProps> = ({
         <Divider className="my-2" />
 
         <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold">Vào lúc: {formatVietnamDate(new Date(post.createdAt))}</span>
-            <div className="flex items-center gap-x-3">
+            <span className="text-[13px] md:text-sm font-semibold">Vào lúc: {formatVietnamDate(new Date(post.createdAt))}</span>
+            <div className="flex items-center flex-wrap gap-y-2 gap-x-3">
                 <Button onClick={onApproval} type="primary">Phê duyệt</Button>
                 <button onClick={onReject} className="px-3 py-[6px] hover:bg-gray-200 rounded-md font-semibold text-sm bg-gray-100">
                     Từ chối

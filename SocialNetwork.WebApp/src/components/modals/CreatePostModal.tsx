@@ -219,7 +219,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                             }}
                         />}>
                             <button className={cn(postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200 && 'cursor-not-allowed')} disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200} onClick={() => setIsUseBackground(!isUseBackground)}>
-                                <img className="sm:w-[30px] sm:h-[30xp] w-[25px] h-[25px]" src={images.AaBackground} />
+                                <img className="sm:w-[30px] sm:h-[30xp] object-cover w-[25px] h-[25px]" src={images.AaBackground} />
                             </button>
                         </Popover>
                     </Tooltip>
@@ -242,7 +242,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                 </div>
             </div>
         </div>
-        <button onClick={handleCreatePost} disabled={!postRequest.content} className="sm:py-[5px] py-[3px] w-full rounded-md font-semibold text-sm sm:text-[16px] text-white bg-sky-500">Đăng</button>
+        <button onClick={handleCreatePost} disabled={!postRequest.content} className="sm:py-[8px] py-[3px] w-full rounded-md font-semibold text-sm sm:text-[16px] text-white bg-sky-500">Đăng</button>
 
     </div>
 };

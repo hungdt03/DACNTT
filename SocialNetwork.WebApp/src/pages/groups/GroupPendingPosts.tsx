@@ -183,14 +183,14 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
     }, [debouncedValue])
 
     return <div className="w-full">
-        <div className="w-full flex items-center justify-center bg-white shadow sticky top-0 z-10">
+        <div className="w-full flex items-center justify-center bg-white shadow sticky top-0 z-10 px-2">
             <div className="max-w-screen-lg w-full py-3 flex flex-col gap-y-3">
                 <div className="flex items-center gap-x-2">
                     <span className="text-xl font-bold">Đang chờ phê duyệt</span>
                     <span className="w-1 h-1 rounded-full bg-gray-500"></span>
                     <span className="text-xl font-bold">{pendingPosts.length}</span>
                 </div>
-                <div className="flex items-center gap-x-4">
+                <div className="flex items-center flex-wrap gap-y-2 gap-x-4">
                     <div className="px-4 flex items-center gap-x-2 rounded-3xl bg-gray-100">
                         <Search size={14} />
                         <input value={searchValue} onChange={e => setSearchValue(e.target.value)} placeholder="Tìm kiếm" className="px-2 py-1 w-full bg-gray-100 outline-none border-none" />
@@ -268,7 +268,7 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
 
         {pendingPosts.length === 0 ? <div className="w-full h-full flex items-center justify-center">
             <Empty description='Không có bài viết nào đang chờ phê duyệt' />
-        </div> : <div className="grid grid-cols-2 gap-4 py-4 px-8">
+        </div> : <div className="w-full max-w-screen-lg mx-auto px-2 sm:px-0 grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
             {pendingPosts.map(post => <PendingPost
                 onReject={() => handleRejectPost(post.id)}
                 onApproval={() => handleApprovalPost(post.id)}

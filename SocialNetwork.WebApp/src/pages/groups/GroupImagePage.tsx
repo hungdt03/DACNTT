@@ -44,10 +44,10 @@ const GroupImagePage: FC = () => {
         fetchImages(pagination.page, pagination.size)
     }, [id])
 
-    return <div className="py-6 h-full w-full max-w-screen-lg mx-auto">
+    return <div className="py-6 h-full w-full max-w-screen-lg mx-auto px-2">
         <div className="p-4 rounded-md bg-white shadow flex flex-col gap-y-2">
-            <span className="text-lg font-bold">File ảnh được đăng trong nhóm</span>
-            {images.length > 0 ? <Image.PreviewGroup> <div className="grid grid-cols-5 gap-2">
+            <span className="text-[16px] md:text-lg text-gray-700 font-bold">File ảnh được đăng trong nhóm</span>
+            {images.length > 0 ? <Image.PreviewGroup> <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                 {images.map(media => (
                     <div key={media.id} style={{
                         aspectRatio: 1 / 1

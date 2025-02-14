@@ -6,7 +6,7 @@ import storyService from "../services/storyService";
 import StorySidebar from "../components/story/StorySidebar";
 import StoryShow from "../components/story/StoryShow";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { MoveLeft, Plus } from "lucide-react";
 
 const ViewStoryPage: FC = () => {
     const { userId } = useParams();
@@ -36,7 +36,6 @@ const ViewStoryPage: FC = () => {
     }
 
     useEffect(() => {
-        console.log('Vô dây không kakakakaak')
         fetchStories()
         fetchUserStories()
     }, [userId, user])
@@ -89,8 +88,14 @@ const ViewStoryPage: FC = () => {
             <StorySidebar myStory={myStory} selectStory={userStory} onRefresh={fetchUserStories} userStories={userStories} />
         </div>
         <div className="lg:col-span-8 xl:col-span-9 col-span-12 h-full bg-black flex justify-center items-center">
-            {userStory && userStory.stories.length > 0 
-                ? <StoryShow onDelete={handleDeleteStory} onEnd={handleNextStory} story={userStory} />
+            {userStory && userStory.stories.length > 0
+                ? <div className="overflow-hidden">
+                    <Link to='/' className="lg:hidden flex items-center gap-x-2 text-white text-sm p-1">
+                        <MoveLeft className="text-white" />
+                        Trang chủ
+                    </Link>
+                    <StoryShow onDelete={handleDeleteStory} onEnd={handleNextStory} story={userStory} />
+                </div>
                 : <Link to='/stories/create' className="flex flex-col gap-y-2 items-center">
                     <button className="bg-sky-100 w-10 h-10 rounded-full text-primary flex items-center justify-center">
                         <Plus strokeWidth={3} size={16} />

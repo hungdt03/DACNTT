@@ -13,7 +13,7 @@ const SearchSidebar: FC = () => {
         if(value) setSearchValue(value)
     }, [searchParam])
 
-    return <div className="h-full overflow-y-auto custom-scrollbar flex flex-col gap-y-3 p-4 bg-white col-span-3 shadow border-r-[1px] border-gray-200">
+    return <div className="h-full overflow-y-auto custom-scrollbar flex-col gap-y-3 p-4 bg-white hidden lg:flex lg:col-span-3 shadow border-r-[1px] border-gray-200">
         <span className="font-bold text-xl">Kết quả tìm kiếm</span>
         <Divider className="my-3" />
 

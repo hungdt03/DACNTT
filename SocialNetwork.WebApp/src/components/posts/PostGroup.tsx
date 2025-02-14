@@ -163,7 +163,7 @@ const PostGroup: FC<PostGroupProps> = ({
                 </div>
                 <div className="flex flex-col gap-y-[1px]">
                     <div className="font-semibold text-[15px] text-gray-800">
-                        <Link to={`/groups/${post.group.id}`}>{post.group?.name}</Link>
+                        <Link to={`/groups/${post.group.id}`} className="font-bold text-sm">{post.group?.name}</Link>
                         {post.tags.length > 0 &&
                             (() => {
                                 const maxDisplay = 3;
@@ -189,9 +189,9 @@ const PostGroup: FC<PostGroupProps> = ({
                     </div>
                     <div className="flex items-center gap-x-2">
 
-                        <Link className="font-semibold text-[13px] text-gray-600" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                        <Link className="font-semibold text-[13px] md:text-sm text-gray-600" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
-                            <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
+                            <span className="text-[12px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
                         {getPrivacyPost(post.privacy)}
                     </div>
@@ -204,7 +204,7 @@ const PostGroup: FC<PostGroupProps> = ({
                 isMine={post.user.id === user?.id}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
-                    <MoreHorizontal className="text-gray-400" />
+                    <MoreHorizontal size={16} className="text-gray-400" />
                 </button>
             </Popover>
         </div>
@@ -213,9 +213,8 @@ const PostGroup: FC<PostGroupProps> = ({
             {post.background ? <div style={{
                 background: post.background,
                 width: '100%',
-                height: 380
-            }} className="flex items-center justify-center px-6 py-8 rounded-md">
-                <p className="text-2xl font-bold text-center break-words break-all text-white">{post.content}</p>
+            }} className="flex items-center justify-center md:h-[380px] sm:h-[350px] h-[280px] px-6 py-8 rounded-md">
+                <p className="md:text-2xl text-lg font-bold text-center break-words break-all text-white">{post.content}</p>
             </div> : <ExpandableText content={post.content} />}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
         </div>
@@ -238,12 +237,12 @@ const PostGroup: FC<PostGroupProps> = ({
             />}>
                 {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
             </Popover>
-            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
-                <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
+            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center items-center gap-x-2 text-sm text-gray-500">
+                <ChatBubbleLeftIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            {allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
-                <ShareIcon className="h-5 w-5 text-gray-500" />
+            {allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center items-center gap-x-2 text-sm text-gray-500">
+                <ShareIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>}
         </div>

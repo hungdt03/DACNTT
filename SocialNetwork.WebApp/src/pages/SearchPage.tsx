@@ -23,12 +23,12 @@ const SearchPage: FC = () => {
         users: []
     })
 
-   
+
     useEffect(() => {
         const paramType = searchParam.get('type');
 
         const paramSearch = searchParam.get('q')
-        if(paramSearch) {
+        if (paramSearch) {
             setSearchValue(paramSearch)
             handleSearchTop(paramSearch)
         }
@@ -43,19 +43,18 @@ const SearchPage: FC = () => {
 
     const handleSearchTop = async (query: string) => {
         const response = await searchService.searchAll(query);
-        console.log(response)
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setSearchResult(response.data)
             setMessage(response.message)
         }
     }
 
-    return <div className="flex flex-col gap-y-6 max-w-screen-md w-full mx-auto p-4 rounded-lg">
-        <div className="text-gray-500">{message}</div>
+    return <div className="flex flex-col gap-y-2 md:gap-y-6 max-w-screen-md w-full mx-auto p-2 md:p-4 rounded-lg">
+      
         {!searchFilter || searchFilter === 'top' && <div className="flex flex-col gap-y-4">
-            {searchResult.users.length > 0 && <SearchUserBlock users={searchResult.users} />}
-            {searchResult.groups.length > 0 && <SearchGroupBlock groups={searchResult.groups} />}
-            {searchResult.posts.length > 0 && <SearchPostBlock posts={searchResult.posts} />}
+            {searchResult.users.length > 0 && <SearchUserBlock searchValue={searchValue} users={searchResult.users} />}
+            {searchResult.groups.length > 0 && <SearchGroupBlock searchValue={searchValue} groups={searchResult.groups} />}
+            {searchResult.posts.length > 0 && <SearchPostBlock searchValue={searchValue} posts={searchResult.posts} />}
         </div>}
 
         {searchFilter === 'group' && <SearchGroupWrapper searchValue={searchValue} />}

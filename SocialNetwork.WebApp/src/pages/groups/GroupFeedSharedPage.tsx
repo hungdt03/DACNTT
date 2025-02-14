@@ -62,7 +62,7 @@ const GroupFeedSharedPage: FC = () => {
     };
 
     return (
-        <div className="w-full bg-gray-100 py-8 h-full overflow-y-auto custom-scrollbar">
+        <div className="w-full bg-gray-100 lg:py-8 pb-8 px-1 sm:px-0 h-full overflow-y-auto custom-scrollbar">
             <div ref={containerRef} className="flex flex-col gap-y-4 max-w-screen-sm mx-auto">
                 {posts.map(post => {
                     if (post.postType === PostType.SHARE_POST) {

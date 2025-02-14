@@ -8,6 +8,8 @@ import { PostType } from "../../enums/post-type";
 import SharePost from "../posts/SharePost";
 import PostGroup from "../posts/PostGroup";
 import Post from "../posts/Post";
+import { Empty } from "antd";
+import LoadingIndicator from "../LoadingIndicator";
 
 
 type SearchPostWrapperProps = {
@@ -20,7 +22,8 @@ const SearchPostWrapper: FC<SearchPostWrapperProps> = ({
     const [searchParam] = useSearchParams();
     const [posts, setPosts] = useState<PostResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('')
 
     const fetchPosts = async (value: string, page: number, size: number) => {
         setLoading(true)
@@ -30,6 +33,7 @@ const SearchPostWrapper: FC<SearchPostWrapperProps> = ({
         if (response.isSuccess) {
             setPosts(response.data);
             setPagination(response.pagination)
+            setMessage(response.message)
         }
     }
 
@@ -40,6 +44,7 @@ const SearchPostWrapper: FC<SearchPostWrapperProps> = ({
     }, [searchParam])
 
     return <div className="flex flex-col gap-y-4 w-full h-full custom-scrollbar overflow-y-auto">
+        {!loading && posts.length === 0 && <div className="text-gray-500 md:text-[16px] text-sm text-center">{message}</div>}
         {posts.map(post => {
             if (post.postType === PostType.SHARE_POST) {
                 return <SharePost key={post.id} post={post} />;
@@ -49,6 +54,9 @@ const SearchPostWrapper: FC<SearchPostWrapperProps> = ({
 
             return <Post key={post.id} post={post} />;
         })}
+
+        {loading && <LoadingIndicator />}
+
     </div>
 };
 

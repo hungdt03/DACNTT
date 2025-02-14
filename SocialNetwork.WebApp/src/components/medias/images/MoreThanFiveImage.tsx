@@ -30,7 +30,7 @@ const MoreThanFiveImage: FC<ImageProps> = ({ items }) => {
                             key={image.id}
                             src={image.mediaUrl}
                             alt={`Post Image ${index + 1}`}
-                            className="object-cover"
+                            className="object-cover aspect-square"
                             width='100%'
                             height='100%'
                             style={{
@@ -53,7 +53,7 @@ const MoreThanFiveImage: FC<ImageProps> = ({ items }) => {
                                 <Image
                                     src={image.mediaUrl}
                                     alt={`Post Image ${index + 4}`}
-                                    className="object-cover"
+                                    className="object-cover aspect-square"
                                     width='100%'
                                     height='100%'
                                     preview={{

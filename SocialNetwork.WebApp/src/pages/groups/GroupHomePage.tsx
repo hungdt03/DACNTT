@@ -24,12 +24,12 @@ const GroupHomePage: FC = () => {
         fetchGroup();
     }, [id])
 
-    return <div className="flex flex-col h-full gap-y-4 lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto">
-            {group?.isMember || group?.privacy === GroupPrivacy.PUBLIC ? <div className="grid grid-cols-12 gap-6 overflow-y-hidden h-full">
-                {group && <GroupPostList group={group} />}
-                {group && <GroupRightSide group={group} />}
-            </div> : group && <GroupPending group={group} />}
-        </div>
+    return <div className="flex flex-col w-full h-full gap-y-4 lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-2 md:px-4 lg:px-0 mx-auto">
+        {group?.isMember || group?.privacy === GroupPrivacy.PUBLIC ? <div className="grid grid-cols-12 gap-6 overflow-y-hidden h-full w-full">
+            {group && <GroupPostList group={group} />}
+            {group && <GroupRightSide group={group} />}
+        </div> : group && <GroupPending group={group} />}
+    </div>
 }
 
 export default GroupHomePage;

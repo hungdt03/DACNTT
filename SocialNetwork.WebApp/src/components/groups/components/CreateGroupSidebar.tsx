@@ -22,10 +22,12 @@ export type CreateGroupForm = {
 
 type CreateGroupSidebarProps = {
     onChange?: (values: CreateGroupForm) => void;
+    showHeader?: boolean;
 }
 
 const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
-    onChange
+    onChange,
+    showHeader = true
 }) => {
     const [disabled, setDisabled] = useState<boolean>(true);
     const [loading, setLoading] = useState<boolean>(false);
@@ -117,16 +119,18 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
         },
     ];
 
-    return <div className="relative h-full col-span-3 shadow overflow-hidden">
-        <div className="flex items-center gap-x-2 p-3">
-            <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-400">
-                <CloseOutlined />
-            </Link>
-            <Link to='/'><img width='36px' height='36px' src={images.facebook} /></Link>
-        </div>
-        <Divider className="my-0" />
-        <div className="p-3 flex flex-col gap-y-6 h-full overflow-hidden">
-            <span className="font-bold text-2xl">Tạo nhóm</span>
+    return <div className="h-full relative">
+        {showHeader && <>
+            <div className="flex items-center gap-x-2 p-3">
+                <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-400">
+                    <CloseOutlined />
+                </Link>
+                <Link to='/'><img width='36px' height='36px' src={images.facebook} /></Link>
+            </div> <Divider className="my-0" />
+        </>}
+
+        <div className="p-3 flex flex-col gap-y-6 h-full">
+            {showHeader && <span className="font-bold text-2xl">Tạo nhóm</span>}
 
             <div className="flex items-center gap-x-2">
                 <Avatar size='large' src={user?.avatar ?? images.user} />
@@ -136,7 +140,7 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
                 </div>
             </div>
             <Divider className="my-0" />
-            <div className="flex flex-col h-[60%] gap-y-4 overflow-y-auto custom-scrollbar">
+            <div className="flex flex-col h-full gap-y-4 pb-4 overflow-y-auto custom-scrollbar">
                 <div className="flex flex-col justify-center">
                     <span className="font-semibold pl-1 text-gray-700">Ảnh bìa</span>
                     <div className="flex justify-center">
@@ -176,11 +180,10 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
                         </p>
                     </div>}
                 </div>
-
             </div>
         </div>
 
-        <div className="absolute left-0 right-0 bottom-0 shadow border-t-[1px] bg-white z-10 border-gray-100 px-3 py-4">
+        <div className="sticky left-0 right-0 bottom-0 shadow border-t-[1px] bg-white z-10 border-gray-100 px-3 py-4">
             <Button className="w-full" onClick={handleSubmit} type="primary" loading={loading} disabled={disabled || loading}>Tạo</Button>
         </div>
     </div>

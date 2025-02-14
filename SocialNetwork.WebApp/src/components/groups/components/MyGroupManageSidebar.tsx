@@ -7,7 +7,6 @@ import { GroupApprovalSummaryResource } from "../../../types/group-approval-summ
 import groupService from "../../../services/groupService";
 import { Link, useLocation } from "react-router-dom";
 import cn from "../../../utils/cn";
-import { getPrivacyTitle } from "../../../enums/privacy";
 import { getGroupPrivacyTitle } from "../../../utils/privacy";
 
 type MyGroupManageSidebarProps = {
@@ -32,7 +31,7 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
     }, [group])
 
 
-    return <div className="col-span-3 bg-white h-full overflow-y-auto w-full shadow border-r-[1px] border-gray-200">
+    return <>
         <div className="flex items-center gap-x-2 px-2 py-4">
             <img className="w-[50px] h-[50px] rounded-md object-cover border-[1px] border-gray-100" src={group.coverImage ?? images.cover} />
             <div className="flex flex-col">
@@ -73,10 +72,8 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
                     <span className="font-semibold">Báo cáo đang chờ</span>
                 </Link>
             </Badge.Ribbon>
-
-
         </div >
-    </div >
+    </>
 };
 
 export default MyGroupManageSidebar;

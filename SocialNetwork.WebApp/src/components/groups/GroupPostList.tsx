@@ -89,8 +89,8 @@ const GroupPostList: FC<GroupPostListProps> = ({
         });
     };
 
-    return <div className="col-span-12 lg:col-span-7 h-full overflow-y-auto scrollbar-hide py-6">
-        <div ref={containerRef} className="flex flex-col gap-y-4">
+    return <div className="col-span-12 lg:col-span-7 h-full overflow-y-auto scrollbar-hide py-2 md:py-6">
+        <div ref={containerRef} className="flex flex-col gap-y-2 md:gap-y-4">
             <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} group={group} />
             {posts.map(post => {
                 return <Post onRemovePost={() => handleRemovePost(post.id)} group={group} key={post.id} post={post} allowShare={group.privacy === GroupPrivacy.PUBLIC} />
@@ -100,10 +100,10 @@ const GroupPostList: FC<GroupPostListProps> = ({
             <div id="group-post-scroll-trigger" className="w-full h-1" />
 
             {!pagination.hasMore && !loading && posts.length > 0 && (
-                <p className="text-center text-gray-500 pb-6">Không còn bài viết để tải.</p>
+                <p className="text-center text-gray-500 pb-6 text-sm md:text-[15px]">Không còn bài viết để tải.</p>
             )}
 
-            {posts.length === 0 && !loading && <p className="text-center text-gray-500">Không có bài viết để tải</p>}
+            {posts.length === 0 && !loading && <p className="text-center text-sm md:text-[15px] text-gray-500">Không có bài viết để tải</p>}
         </div>
     </div>
 };

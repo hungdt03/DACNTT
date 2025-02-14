@@ -103,7 +103,7 @@ const GroupPendingReports: FC = ({
         {pendingReports.length === 0 && !loading && <div className="w-full h-full flex items-center justify-center">
             <Empty description='Không có báo cáo nào để xử lí' />
         </div>}
-        <div ref={containerRef} className="grid grid-cols-2 gap-4 py-4 px-8">
+        <div ref={containerRef} className="w-full max-w-screen-lg mx-auto px-2 sm:px-0 grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
             {pendingReports.map(report => {
                 if (report.reportType === ReportType.COMMENT) {
                     return <ReportComment

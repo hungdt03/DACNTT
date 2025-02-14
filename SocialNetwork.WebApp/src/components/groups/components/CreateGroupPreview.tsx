@@ -5,18 +5,24 @@ import { Avatar, Divider, Tooltip } from "antd";
 import { CreateGroupForm } from "./CreateGroupSidebar";
 import { getGroupPrivacyTitle } from "../../../utils/privacy";
 import { GroupPrivacy } from "../../../enums/group-privacy";
+import { Bars3BottomRightIcon } from "@heroicons/react/24/outline";
 
 type CreateGroupPreviewProps = {
-    values: CreateGroupForm | undefined
+    values: CreateGroupForm | undefined;
+    onOpenDrawer: () => void
 }
 
 const CreateGroupPreview: FC<CreateGroupPreviewProps> = ({
-    values
+    values,
+    onOpenDrawer
 }) => {
     return <div className="w-[85%] h-full mx-auto">
         <div className="p-4 flex flex-col h-full gap-y-5 rounded-lg shadow-2xl border-[1px] border-gray-100 overflow-hidden">
-            <div>
+            <div className="flex items-center justify-between">
                 <span className="font-bold">Xem trước</span>
+                <button onClick={onOpenDrawer} className="hover:text-gray-600 text-gray-600 text-sm font-bold block lg:hidden hover:bg-gray-100 p-2 rounded-full">
+                    <Bars3BottomRightIcon className="text-gray-500" width={20} />
+                </button>
             </div>
 
             <div className="rounded-xl border-[1px] border-gray-200 h-full overflow-y-auto custom-scrollbar">
@@ -52,7 +58,7 @@ const CreateGroupPreview: FC<CreateGroupPreviewProps> = ({
                 </div>
 
                 <div className="bg-slate-100 p-4 grid grid-cols-12 gap-4">
-                    <div className="col-span-7">
+                    <div className="lg:col-span-7 col-span-12">
                         <Tooltip title='Bạn có thể dùng tính năng này sau khi tạo Nhóm'>
                             <div className="rounded-lg p-3 flex flex-col gap-y-2 bg-slate-50 shadow border-[1px] border-gray-50 cursor-not-allowed">
                                 <div className="flex items-center gap-x-2 text-gray-400">
@@ -75,7 +81,7 @@ const CreateGroupPreview: FC<CreateGroupPreviewProps> = ({
                             </div>
                         </Tooltip>
                     </div>
-                    <div className="col-span-5">
+                    <div className="lg:col-span-5 col-span-12">
                         <div className="rounded-lg p-3 bg-white border-[1px] border-gray-200">
                             <span className="font-bold">Giới thiệu</span>
 
