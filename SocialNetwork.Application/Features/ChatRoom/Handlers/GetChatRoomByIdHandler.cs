@@ -44,7 +44,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                        .IsUserHaveStoryAsync(friend.UserId);
 
                 response.Friend.HaveStory = haveStory;
-                response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId)?.IsAccepted ?? false;
+                response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId).IsAccepted;
                 response.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;
                 
                 if (!isOnline)
@@ -84,10 +84,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 var chatRoomMember = await _unitOfWork.ChatRoomMemberRepository
                         .GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId);
 
-                response.IsMember = true;
+                response.IsMember = chatRoomMember != null;
                 response.IsAdmin = chatRoomMember != null && chatRoomMember.IsLeader;
-                response.HasLeftGroup = chatRoomMember != null && chatRoomMember.HasLeftGroup;
-                response.LastMessageId = chatRoomMember?.LastMessageId;
             }
             
 

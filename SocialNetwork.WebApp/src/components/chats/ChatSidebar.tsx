@@ -11,10 +11,12 @@ SwiperCore.use([Navigation]);
 import { ChatRoomResource } from "../../types/chatRoom";
 import chatRoomService from "../../services/chatRoomService";
 import useDebounce from "../../hooks/useDebounce";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import LoadingIndicator from "../LoadingIndicator";
 import messageService from "../../services/messageService";
+import { AppDispatch } from "../../app/store";
+import { add } from "../../features/slices/chat-popup-slice";
 
 type ChatSidebarProps = {
     chatRoom: ChatRoomResource
@@ -30,36 +32,56 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
     const { user } = useSelector(selectAuth);
     const navigate = useNavigate();
 
+     const getChatRoomById = async (chatRoomId: string): Promise<ChatRoomResource | undefined> => {
+            const response = await chatRoomService.getChatRoomById(chatRoomId);
+            if (response.isSuccess) {
+                return response.data;
+            }
+    
+            return undefined;
+        }
+    
+
     useEffect(() => {
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
-                setChatRooms(prev => {
-                    const updatedList = [...prev];
+                const findChatRoom = chatRooms.find(c => c.id === message.chatRoomId);
+                if (findChatRoom) {
+                    setChatRooms(prev => {
+                        const updatedList = [...prev];
 
-                    const findChatRoomIndex = updatedList.findIndex(chatRoom => chatRoom.id === message.chatRoomId);
+                        const findChatRoomIndex = updatedList.findIndex(chatRoom => chatRoom.id === message.chatRoomId);
 
-                    if (findChatRoomIndex !== -1) {
-                        const chatRoom = updatedList.splice(findChatRoomIndex, 1)[0];
+                        if (findChatRoomIndex !== -1) {
+                            const chatRoom = updatedList.splice(findChatRoomIndex, 1)[0];
 
-                        // Cập nhật trạng thái đã đọc nếu tin nhắn không phải do user gửi
-                        if (user?.id !== message.senderId) {
-                            chatRoom.isRead = false;
+                            // Cập nhật trạng thái đã đọc nếu tin nhắn không phải do user gửi
+                            if (user?.id !== message.senderId) {
+                                chatRoom.isRead = false;
+                            }
+
+                            // Cập nhật nội dung tin nhắn cuối cùng
+                            chatRoom.lastMessageDate = message.sentAt;
+                            chatRoom.lastMessage = message.medias?.length
+                                ? `${message.sender?.fullName ?? "Người dùng"} đã gửi ${message.medias.length} file`
+                                : message.content;
+
+                            // Đưa chatRoom lên đầu danh sách
+                            updatedList.unshift(chatRoom);
                         }
 
-                        // Cập nhật nội dung tin nhắn cuối cùng
-                        chatRoom.lastMessageDate = message.sentAt;
-                        chatRoom.lastMessage = message.medias?.length
-                            ? `${message.sender?.fullName ?? "Người dùng"} đã gửi ${message.medias.length} file`
-                            : message.content;
+                        return updatedList;
+                    });
 
-                        // Đưa chatRoom lên đầu danh sách
-                        updatedList.unshift(chatRoom);
-                    }
-
-                    return updatedList;
-                });
-
+                } else {
+                    getChatRoomById(message.chatRoomId)
+                        .then(data => {
+                            if(data) {
+                                setChatRooms(prev => [data, ...prev])
+                            }
+                        });
+                }
             },
             (message) => {
                 setChatRooms(prev => {
@@ -77,10 +99,9 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
             undefined,
             undefined,
             undefined,
-            undefined,
-            undefined,
-            undefined,
         );
+
+        return  () => SignalRConnector.unsubscribeEvents()
 
     }, [chatRoom]);
 

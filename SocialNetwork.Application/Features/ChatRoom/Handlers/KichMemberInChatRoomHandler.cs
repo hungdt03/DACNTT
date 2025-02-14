@@ -56,17 +56,16 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 SentAt = DateTimeOffset.UtcNow,
             };
 
+            _unitOfWork.ChatRoomMemberRepository.DeleteMember(chatRoomMember);
             await _unitOfWork.MessageRepository.CreateMessageAsync(message);
 
-            chatRoomMember.HasLeftGroup = true;
-            chatRoomMember.LastMessageId = message.Id;
-            chatRoomMember.LastMessageDate = message.DateCreated;
+            chatRoomMember.IsLeader = false;
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             var mapMessage = ApplicationMapper.MapToMessage(message);
-            mapMessage.IsRemoveMember = true;
-            mapMessage.RemoveMemberId = chatRoomMember.UserId;
+            mapMessage.IsRemove = true;
+            mapMessage.MemberId = chatRoomMember.UserId;
             await _signalRService.SendMessageToSpecificGroup(chatRoomMember.ChatRoom.UniqueName, mapMessage);
             await _signalRService.LeaveGroup(chatRoomMember.UserId, chatRoomMember.ChatRoom.UniqueName);
 

@@ -9,16 +9,17 @@ import messageService from "../../services/messageService";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import BoxSendMessage, { BoxMessageType } from "./BoxSendMessage";
-import { Avatar, Popover, Tooltip, UploadFile } from "antd";
+import { Avatar, message, Popover, Tooltip, UploadFile } from "antd";
 import { imageTypes, videoTypes } from "../../utils/file";
 import { MediaType } from "../../enums/media";
 import { formatTime } from "../../utils/date";
 import { Link } from "react-router-dom";
 import cn from "../../utils/cn";
-import { add, selectChatPopup, setChatRoomRead } from "../../features/slices/chat-popup-slice";
+import { remove, setChatRoomAccepted, setChatRoomRead } from "../../features/slices/chat-popup-slice";
 import { AppDispatch } from "../../app/store";
-import chatRoomService from "../../services/chatRoomService";
 import { Pagination } from "../../types/response";
+import { BlockResource } from "../../types/block";
+import userService from "../../services/userService";
 
 export type MessageRequest = {
     content: string;
@@ -46,6 +47,9 @@ const ChatPopup: FC<ChatPopupProps> = ({
     const [messages, setMessages] = useState<MessageResource[]>([])
     const [isRead, setIsRead] = useState(room.isOnline);
     const [isShowPrevent, setIsShowPrevent] = useState(false)
+
+    const [blockUser, setBlockUser] = useState<BlockResource>()
+
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         size: 10,
@@ -71,25 +75,45 @@ const ChatPopup: FC<ChatPopupProps> = ({
         }
     }
 
+
+    const getBlock = async (userId: string) => {
+        const response = await userService.getBlockUser(userId);
+        if (response.isSuccess) {
+            setBlockUser(response.data)
+        } else {
+            setBlockUser(undefined)
+        }
+    }
+
+    const handleUnblock = async (userId: string) => {
+        const response = await userService.unblockUser(userId);
+        if (response.isSuccess) {
+            message.success(response.message)
+            setBlockUser(undefined)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    
+    const handleBlockUser = async (userId: string) => {
+        const response = await userService.blockUser(userId);
+        if (response.isSuccess) {
+            message.success(response.message)
+            dispatch(remove(room.id))
+        } else {
+            message.error(response.message)
+        }
+    }
+
+
     useEffect(() => {
+
         fetchMessages(pagination.page, pagination.size);
 
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
-                // if (message.senderId !== user?.id) {
-                //     const chatRoom = chatRooms.find(item => item.chatRoom.id === message.chatRoomId);
-                //     console.log('MESSAGE CCOMMING ......')
-                //     if (!chatRoom) {
-                //         getChatRoomById(message.chatRoomId)
-                //             .then(data => {
-                //                 if (data) dispatch(add(data));
-                //             });
-                //     }
-                // }
-
-                console.log('MESSAGE COMING IN CHAT POPUP')
-
                 if (message.chatRoomId === room.id) {
                     setPendingMessages((prev) =>
                         prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
@@ -97,14 +121,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
                     setMessages((prev) => {
                         const updatedMessages = [...prev];
-                        if (message.senderId === user?.id) {
-                            const normalizeMessage = { ...message }
-                            // normalizeMessage.seen = (message.reads?.filter(msg => msg.userId !== user.id).length ?? 0) > 0
-                            updatedMessages.push(normalizeMessage)
-                        } else {
-                            updatedMessages.push(message)
-                        }
-
+                        updatedMessages.push(message)
                         if (message.senderId !== user?.id) {
                             const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === message.senderId));
 
@@ -161,13 +178,11 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 groupName === room.uniqueName && setTyping('')
             },
             undefined,
-            undefined,
-            undefined,
-            undefined,
         );
     }, []);
 
     useEffect(() => {
+        room.isPrivate && room.friend && getBlock(room.friend?.id)
         setIsShowPrevent(room.isPrivate && !room.isAccept && !!room.lastMessage)
     }, [room])
 
@@ -261,9 +276,10 @@ const ChatPopup: FC<ChatPopupProps> = ({
             formData.append('sentAt', sentAt);
 
             const response = await messageService.sendMessage(formData);
-            if(response.isSuccess) {
-                if(isShowPrevent) {
+            if (response.isSuccess) {
+                if (isShowPrevent) {
                     setIsShowPrevent(false)
+                    dispatch(setChatRoomAccepted(room.id));
                 }
             }
         } else {
@@ -272,8 +288,9 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
             try {
                 await SignalRConnector.sendMessage(msgPayload)
-                if(isShowPrevent) {
+                if (isShowPrevent) {
                     setIsShowPrevent(false)
+                    dispatch(setChatRoomAccepted(room.id));
                 }
             } catch (error) {
                 alert(error)
@@ -293,6 +310,50 @@ const ChatPopup: FC<ChatPopupProps> = ({
         await messageService.readMessage(room.id);
         dispatch(setChatRoomRead(room.id));
         setIsRead(true)
+    }
+
+    const renderMessageBox = () => {
+        if (room.isPrivate) {
+            if (blockUser?.blockeeId === user?.id) {
+                return (
+                    <div className="sticky bottom-0 p-4 shadow border-t-[1px] flex justify-center">
+                        <span className="text-xs text-gray-500">Bạn không thể nhắn tin cho người này</span>
+                    </div>
+                );
+            }
+            if (blockUser?.blockerId === user?.id) {
+                return (
+                    <div className="sticky bottom-0 p-2 shadow border-t-[1px] flex flex-col items-center gap-y-1">
+                        <span className="text-xs text-gray-500">Bạn đã chặn người này</span>
+                        <button onClick={() => room.friend && handleUnblock(room.friend?.id)} className="px-2 py-[4px] font-semibold rounded-md bg-gray-100 text-gray-500 text-xs hover:bg-gray-200">Bỏ chặn</button>
+                    </div>
+                );
+            }
+        }
+
+        return (
+            <div className="sticky bottom-0">
+                {isShowPrevent && <div className="flex flex-col gap-y-2 p-3 bg-white border-b-[1px] border-t-[1px] border-gray-300">
+                    <p className="text-[12px] text-gray-400 text-center">Nếu bạn trả lời, {room.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.</p>
+
+                    <div className="flex justify-center">
+                        <button onClick={() => room.friend && handleBlockUser(room.friend?.id)} className="py-2 px-5 rounded-md text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200">Chặn</button>
+                    </div>
+                </div>}
+                {typing && <div key={room.id} className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
+                    {typing}
+                </div>}
+                <div className="p-3 bg-white shadow border-t-[1px] border-gray-100">
+                    <BoxSendMessage
+                        value={msgPayload.content}
+                        onChange={handleBoxChange}
+                        onSubmit={handleSendMessage}
+                        onFocus={() => handleReadMessage()}
+                    />
+                </div>
+
+            </div>
+        );
     }
 
     return <div className="w-[320px] z-[200] relative bg-white rounded-t-xl overflow-hidden shadow-md">
@@ -337,7 +398,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
             </div>
         </div>
 
-        <div className={cn("overflow-y-auto px-2 py-3 custom-scrollbar flex flex-col gap-y-3", isShowPrevent ? 'h-[220px]' : 'h-[330px]')}>
+        <div className={cn("overflow-y-auto px-2 py-3 custom-scrollbar flex flex-col gap-y-3", isShowPrevent && !blockUser ? 'h-[220px]' : 'h-[330px]')}>
             {!pagination.hasMore && room.isPrivate && room.friend && <div className="flex flex-col gap-y-1 items-center">
                 <Avatar src={room.friend.avatar} size={'large'} />
                 <span className="text-sm text-gray-600 font-bold">{room.friend.fullName}</span>
@@ -351,27 +412,8 @@ const ChatPopup: FC<ChatPopupProps> = ({
             <div ref={messagesEndRef}></div>
         </div>
 
-        <div className="sticky bottom-0">
-            {isShowPrevent && <div className="flex flex-col gap-y-2 p-3 bg-white border-b-[1px] border-t-[1px] border-gray-300">
-                <p className="text-[12px] text-gray-400 text-center">Nếu bạn trả lời, {room.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.</p>
-
-                <div className="flex justify-center">
-                    <button className="py-2 px-5 rounded-md text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200">Chặn</button>
-                </div>
-            </div>}
-            {typing && <div key={room.id} className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
-                {typing}
-            </div>}
-            <div className="p-3 bg-white shadow border-t-[1px] border-gray-100">
-                <BoxSendMessage
-                    value={msgPayload.content}
-                    onChange={handleBoxChange}
-                    onSubmit={handleSendMessage}
-                    onFocus={() => handleReadMessage()}
-                />
-            </div>
-
-        </div>
+        {renderMessageBox()}
+       
     </div >
 
 };

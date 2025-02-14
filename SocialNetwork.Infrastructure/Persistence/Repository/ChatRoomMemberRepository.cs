@@ -52,7 +52,16 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<ChatRoomMember?> GetChatRoomMemberByRoomIdAndUserId(Guid chatRoomId, string userId)
         {
             return await _context.ChatRoomMembers
+                 .Include(c => c.ChatRoom)
                 .SingleOrDefaultAsync(s => s.UserId == userId && s.ChatRoomId == chatRoomId);
+        }
+
+    
+
+        public async Task<int> CountMembersByChatRoomId(Guid chatRoomId)
+        {
+            return await _context.ChatRoomMembers
+                .Where(c => c.ChatRoomId == chatRoomId).CountAsync();
         }
     }
 }

@@ -33,7 +33,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
             var userFullname = _contextAccessor.HttpContext.User.GetFullName();
-            var friendShips = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(userId, FriendShipStatus.ACCEPTED);
+            var friendShips = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(userId);
 
             var members = new List<ChatRoomMember>
             {
@@ -46,7 +46,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             foreach (var friendId in request.MemberIds)
             {
-                if (!friendShips.Any(friendship => friendship.UserId == userId ? friendship.FriendId == friendId : friendship.UserId == friendId)) throw new AppException($"Bạn không thể thêm {friendId} vì không phải là bạn bè");
+                if (!friendShips.Any(friendship => (friendship.IsConnect || friendship.Status == FriendShipStatus.ACCEPTED) && friendship.UserId == userId ? friendship.FriendId == friendId : friendship.UserId == friendId)) throw new AppException($"Bạn không thể thêm {friendId} vì không phải là bạn bè");
                 var friend = await _unitOfWork.UserRepository
                     .GetUserByIdAsync(friendId);
 

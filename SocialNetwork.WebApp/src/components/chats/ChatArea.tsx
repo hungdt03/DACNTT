@@ -1,4 +1,4 @@
-import { Avatar, Tooltip } from "antd";
+import { Avatar, message, Tooltip } from "antd";
 import { FC, useEffect, useRef, useState } from "react";
 import images from "../../assets";
 import SignalRConnector from '../../app/signalR/signalr-connection'
@@ -17,22 +17,26 @@ import { MediaType } from "../../enums/media";
 import { Pagination } from "../../types/response";
 import cn from "../../utils/cn";
 import LoadingIndicator from "../LoadingIndicator";
+import userService from "../../services/userService";
+import { BlockResource } from "../../types/block";
 
 type ChatAreaProps = {
     chatRoom: ChatRoomResource;
     onToggleChatDetails: () => void;
     showChatDetails: boolean;
+    onFetch: () => void
 }
 
 const ChatArea: FC<ChatAreaProps> = ({
     chatRoom,
     showChatDetails,
-    onToggleChatDetails
+    onToggleChatDetails,
+    onFetch
 }) => {
     const { user } = useSelector(selectAuth);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [isShowPrevent, setIsShowPrevent] = useState(false);
-    const [isLeaveGroup, setIsLeaveGroup] = useState(false)
+    const [blockUser, setBlockUser] = useState<BlockResource>()
 
     const [messages, setMessages] = useState<MessageResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>({
@@ -61,7 +65,6 @@ const ChatArea: FC<ChatAreaProps> = ({
             setMessages(prevMessages => [...response.data, ...prevMessages])
             setPagination(response.pagination)
 
-
             if (containerRef.current) {
                 containerRef.current.scrollBy({ top: 50, behavior: 'instant' });
             }
@@ -70,25 +73,45 @@ const ChatArea: FC<ChatAreaProps> = ({
 
     const loadMessages = async (page: number, size: number, chatRoomId: string) => {
         const response = await messageService.getAllMessagesByChatRoomId(chatRoomId, page, size);
-        console.log(response)
         if (response.isSuccess) {
             setMessages(response.data)
             setPagination(response.pagination)
         }
     }
 
+    const getBlock = async (userId: string) => {
+        const response = await userService.getBlockUser(userId);
+        if (response.isSuccess) {
+            setBlockUser(response.data)
+        } else {
+            setBlockUser(undefined)
+        }
+    }
+
+    const handleUnblock = async (userId: string) => {
+        const response = await userService.unblockUser(userId);
+        if(response.isSuccess) {
+            message.success(response.message)
+            setBlockUser(undefined)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+
     useEffect(() => {
-        setIsLeaveGroup(chatRoom.hasLeftGroup)
+        chatRoom.isPrivate && chatRoom.friend && getBlock(chatRoom.friend?.id)
+
         loadMessages(1, 10, chatRoom.id);
 
-        !chatRoom.hasLeftGroup && SignalRConnector.events(
+        SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
                 if (message.chatRoomId === chatRoom.id) {
-                    if (message.isRemoveMember && message.removeMemberId === user?.id) {
-                        setIsLeaveGroup(true)
-                    }
 
+                    if(message.isRemove && message.memberId === user?.id) {
+                        onFetch()
+                    }
                     setPendingMessages((prev) =>
                         prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
                     );
@@ -146,15 +169,15 @@ const ChatArea: FC<ChatAreaProps> = ({
                 groupName === chatRoom.uniqueName && setTyping('')
             },
             undefined,
-            undefined,
-            undefined,
-            undefined,
         );
 
         setMsgPayload(prev => ({
             ...prev,
             chatRoomName: chatRoom.uniqueName
         }))
+
+        if (messagesEndRef.current)
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
 
         return () => {
             SignalRConnector.unsubscribeEvents()
@@ -308,6 +331,52 @@ const ChatArea: FC<ChatAreaProps> = ({
         };
     }, [pagination, loading]);
 
+    const renderMessageBox = () => {
+        if (chatRoom.isPrivate) {
+            if (blockUser?.blockeeId === user?.id) {
+                return (
+                    <div className="w-full px-4 py-4 shadow flex flex-col items-center gap-y-2">
+                        <span className="text-[14px] text-gray-500">Bạn không thể nhắn tin cho người này</span>
+                    </div>
+                );
+            }
+            if (blockUser?.blockerId === user?.id) {
+                return (
+                    <div className="w-full px-4 py-4 shadow flex flex-col items-center gap-y-2">
+                        <span className="text-[14px] text-gray-500">Bạn đã chặn người này</span>
+                        <button onClick={() => chatRoom.friend && handleUnblock(chatRoom.friend?.id)} className="px-3 py-[6px] text-sm font-bold rounded-md bg-gray-100 text-gray-500 hover:bg-gray-200">Bỏ chặn</button>
+                    </div>
+                );
+            }
+        }
+        
+        return (
+            <div className="w-full px-4 py-4 shadow">
+                {isShowPrevent && (
+                    <div className="flex flex-col gap-y-2 p-2 bg-white border-t-[1px] border-gray-500">
+                        <p className="text-[12px] text-gray-400 text-center">
+                            Nếu bạn trả lời, {chatRoom.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.
+                        </p>
+                        <div className="flex justify-center">
+                            <button className="py-2 px-5 rounded-md text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200">Chặn</button>
+                        </div>
+                    </div>
+                )}
+                {typing && (
+                    <div key={chatRoom.id} className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
+                        {typing}
+                    </div>
+                )}
+                <BoxSendMessage
+                    value={msgPayload.content}
+                    onChange={handleBoxChange}
+                    onSubmit={handleSendMessage}
+                    onFocus={handleReadMessage}
+                />
+            </div>
+        );
+    };
+
     return <div className={cn("flex flex-col h-full overflow-hidden col-span-12", !showChatDetails ? 'md:col-span-12' : 'md:col-span-8')}>
         <div className="flex items-center justify-between p-4 shadow">
             <div className="flex justify-center items-center gap-x-3">
@@ -346,27 +415,7 @@ const ChatArea: FC<ChatAreaProps> = ({
             <div ref={messagesEndRef}></div>
         </div>
 
-        {isLeaveGroup ? <div className="w-full px-4 py-4 shadow flex flex-col items-center gap-y-2">
-            <span className="text-[16px] font-bold">Bạn không thể nhắn tin cho nhóm này</span>
-            <p className="text-sm text-gray-500">Bạn đã rời khỏi nhóm này và không thể gửi hoặc nhận tin nhắn nữa, trừ khi có người thêm lại bạn vào nhóm.</p>
-        </div> : <div className="w-full px-4 py-4 shadow">
-            {isShowPrevent && <div className="flex flex-col gap-y-2 p-2 bg-white border-t-[1px] border-gray-500">
-                <p className="text-[12px] text-gray-400 text-center">Nếu bạn trả lời, {chatRoom.friend?.fullName} cũng sẽ có thể xem các thông tin như Trạng thái hoạt động và thời điểm bạn đọc tin nhắn.</p>
-
-                <div className="flex justify-center">
-                    <button className="py-2 px-5 rounded-md text-xs font-bold text-gray-700 bg-gray-100 hover:bg-gray-200">Chặn</button>
-                </div>
-            </div>}
-            {typing && <div key={chatRoom.id} className="ml-2 text-[10px] text-white px-2 bg-sky-400 rounded-md inline-block animate-bounce">
-                {typing}
-            </div>}
-            <BoxSendMessage
-                value={msgPayload.content}
-                onChange={handleBoxChange}
-                onSubmit={handleSendMessage}
-                onFocus={() => handleReadMessage()}
-            />
-        </div>}
+        {renderMessageBox()}
 
     </div>
 };

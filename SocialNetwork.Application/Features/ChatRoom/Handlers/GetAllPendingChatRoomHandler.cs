@@ -34,7 +34,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 var isAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId == userId)?.IsAccepted ?? false;
                 if(isAccepted || string.IsNullOrEmpty(chatRoom.LastMessage)) continue;
 
-                var friend = chatRoom.Members.Count == 2 ? chatRoom.Members.SingleOrDefault(m => m.UserId != userId) : null;
+                var friend = chatRoom.IsPrivate ? chatRoom.Members.SingleOrDefault(m => m.UserId != userId) : null;
                 var item = ApplicationMapper.MapToChatRoom(chatRoom);
                 if(friend != null)
                 {

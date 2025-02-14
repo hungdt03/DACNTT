@@ -44,7 +44,6 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             var memberIds = new List<string>() { userId, receiver.Id };
             var chatRoom = await _unitOfWork.ChatRoomRepository
                 .GetPrivateChatRoomByMemberIds(memberIds);
-
            
             if(chatRoom == null)
             {

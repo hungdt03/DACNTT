@@ -19,10 +19,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.Messages.AddAsync(message);
         }
 
-        public async Task<(List<Message>, int)> GetAllMessagesByChatRoomIdAsync(Guid chatRoomId, int page, int size, DateTimeOffset? lastMessageDate)
+        public async Task<(List<Message>, int)> GetAllMessagesByChatRoomIdAsync(Guid chatRoomId, int page, int size)
         {
             var query = _context.Messages
-                .Where(msg => msg.ChatRoomId == chatRoomId && (lastMessageDate == null || lastMessageDate.Value >= msg.DateCreated));
+                .Where(msg => msg.ChatRoomId == chatRoomId);
 
             int totalCount = await query.CountAsync(); 
             var messages = await query

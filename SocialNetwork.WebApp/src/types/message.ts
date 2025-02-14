@@ -12,8 +12,8 @@ export type MessageResource = {
     status: string;
     reads?: ReadStatusResource[];
 
-    isRemoveMember?: boolean;
-    removeMemberId?: string;
+    isRemove?: boolean;
+    memberId?: string;
 }
 
 export type ReadStatusResource = {

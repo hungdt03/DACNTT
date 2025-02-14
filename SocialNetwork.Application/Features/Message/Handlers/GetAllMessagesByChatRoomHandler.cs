@@ -29,7 +29,7 @@ namespace SocialNetwork.Application.Features.Message.Handlers
                 .GetChatRoomMemberByRoomIdAndUserId(request.ChatRoomId, userId)
                 ?? throw new NotFoundException("Chỉ có thành viên của đoạn chat mới được xem danh sách tin nhắn");
 
-            var (messages, totalCount) = await _unitOfWork.MessageRepository.GetAllMessagesByChatRoomIdAsync(request.ChatRoomId, request.Page, request.Size, chatRoomMember.HasLeftGroup ? chatRoomMember.LastMessageDate : null);
+            var (messages, totalCount) = await _unitOfWork.MessageRepository.GetAllMessagesByChatRoomIdAsync(request.ChatRoomId, request.Page, request.Size);
             var response = new List<MessageResponse>();
            
             foreach(var message in messages)

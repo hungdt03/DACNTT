@@ -55,7 +55,6 @@ namespace SocialNetwork.Application.Mappers
                 Id = chatRoomMember.Id,
                 IsAccepted = chatRoomMember.IsAccepted,
                 IsLeader = chatRoomMember.IsLeader,
-                HasLeftGroup = chatRoomMember.HasLeftGroup, 
             };
         }
 
@@ -177,6 +176,16 @@ namespace SocialNetwork.Application.Mappers
                     User = read.User != null ? MapToUser(read.User) : null,
                     ReadAt = read.ReadAt
                 }).ToList() : null
+            };
+        }
+
+        public static BlockResponse MapToBlock(BlockList blockList)
+        {
+            return new BlockResponse()
+            {
+                Id = blockList.Id,
+                BlockeeId = blockList.BlockeeId,
+                BlockerId = blockList.BlockerId,
             };
         }
 

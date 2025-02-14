@@ -2,7 +2,6 @@ import * as signalR from "@microsoft/signalr";
 import { getAccessToken } from "../../utils/auth";
 import { NotificationResource } from "../../types/notification";
 import { MessageRequest } from "../../components/chats/ChatPopup";
-import { AnswerPayload, CallPayload, IncomingCallPayload } from "../../contexts/webrtc/WebrtcProvider";
 import { MessageResource } from "../../types/message";
 
 const URL = import.meta.env.VITE_SERVER_HUB_URL;
@@ -17,9 +16,9 @@ class SignalRConnector {
         onTypingMessage?: (groupName: string, content: string) => void,
         onStopTypingMessage?: (groupName: string) => void,
         onNotificationReceived?: (notification: NotificationResource) => void,
-        onIncomingCall?: (payload: IncomingCallPayload) => void,
-        onCallAccepted?: (signalData: any) => void,
-        onLeaveCall?: () => void,
+        // onIncomingCall?: (payload: IncomingCallPayload) => void,
+        // onCallAccepted?: (signalData: any) => void,
+        // onLeaveCall?: () => void,
     ) => void
 
     private static instance: SignalRConnector;
@@ -37,7 +36,7 @@ class SignalRConnector {
 
         this.connection.start().catch(err => console.log(err));
 
-        this.events = (onMessageReceived, onReadStatusReceived, onTypingMessage, onStopTypingMessage, onNotificationReceived, onIncomingCall, onCallAccepted, onLeaveCall) => {
+        this.events = (onMessageReceived, onReadStatusReceived, onTypingMessage, onStopTypingMessage, onNotificationReceived) => {
             this.connection.on("NewMessage", (message: MessageResource) => {
                 onMessageReceived?.(message);
             });
@@ -57,18 +56,6 @@ class SignalRConnector {
             this.connection.on("NewNotification", (notification: NotificationResource) => {
                 onNotificationReceived?.(notification);
             });
-
-            this.connection.on("CallFriend", (payload: IncomingCallPayload) => {
-                onIncomingCall?.(payload);
-            });
-
-            this.connection.on("AcceptCall", (signalData: any) => {
-                onCallAccepted?.(signalData);
-            });
-
-            this.connection.on("LeaveCall", () => {
-                onLeaveCall?.();
-            });
         };
 
 
@@ -80,9 +67,6 @@ class SignalRConnector {
         this.connection.off("TypingMessage");
         this.connection.off("StopTypingMessage");
         this.connection.off("NewNotification");
-        this.connection.off("CallFriend");
-        this.connection.off("AcceptCall");
-        this.connection.off("LeaveCall");
     };
 
     public sendMessage = async (message: MessageRequest) => {
@@ -114,30 +98,6 @@ class SignalRConnector {
             console.error("Chưa kết nối tới Server SignalR");
         }
 
-    }
-
-    public callFriend = async (payload: CallPayload) => {
-        if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
-            await this.connection.send("CallFriend", payload)
-        } else {
-            console.error("Chưa kết nối tới Server SignalR");
-        }
-    }
-
-    public answerCall = async (payload: AnswerPayload) => {
-        if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
-            await this.connection.send("AnswerCall", payload)
-        } else {
-            console.error("Chưa kết nối tới Server SignalR");
-        }
-    }
-
-    public leaveCall = async (username: string) => {
-        if (this.connection && this.connection.state === signalR.HubConnectionState.Connected) {
-            await this.connection.send("LeaveCall", username)
-        } else {
-            console.error("Chưa kết nối tới Server SignalR");
-        }
     }
 
     public static getInstance(): SignalRConnector {

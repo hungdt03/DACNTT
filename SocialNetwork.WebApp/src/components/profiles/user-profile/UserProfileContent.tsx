@@ -24,9 +24,10 @@ import { Link, useNavigate } from "react-router-dom";
 import userService from "../../../services/userService";
 import chatRoomService from "../../../services/chatRoomService";
 import { AppDispatch } from "../../../app/store";
-import { add } from "../../../features/slices/chat-popup-slice";
+import { add, remove } from "../../../features/slices/chat-popup-slice";
 import ProfileImageList from "../shared/ProfileImageList";
 import ProfileVideoList from "../shared/ProfileVideoList";
+import { ChatRoomResource } from "../../../types/chatRoom";
 
 
 type ProfileUserContentProps = {
@@ -47,6 +48,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
     const [activeKey, setActiveKey] = useState<string>('1');
     const [reason, setReason] = useState('');
     const navigate = useNavigate();
+    const [chatRoom, setChatRoom] = useState<ChatRoomResource>()
 
     const dispatch = useDispatch<AppDispatch>()
 
@@ -120,7 +122,9 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
         const response = await userService.blockUser(targetUser.id);
         if (response.isSuccess) {
             message.success(response.message);
-            navigate('/')
+            navigate('/');
+            if(chatRoom)
+                dispatch(remove(chatRoom.id))
         } else {
             message.error(response.message)
         }
@@ -148,6 +152,7 @@ const ProfileUserContent: FC<ProfileUserContentProps> = ({
     const handleGetOrCreateChatRoom = async () => {
         const response = await chatRoomService.getOrCreateChatRoom(targetUser.id);
         if (response.isSuccess) {
+            setChatRoom(response.data)
             dispatch(add(response.data))
         } else {
             message.error(response.message)

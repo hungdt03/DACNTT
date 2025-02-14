@@ -32,21 +32,15 @@ const ChatPage: FC = () => {
     return <div className="grid grid-cols-12 h-screen">
         {currentChatRoom && <ChatSidebar chatRoom={currentChatRoom} />}
         <div className="lg:col-span-8 xl:col-span-9 col-span-12 overflow-hidden">
-            {/* {currentChatRoom?.isMember || currentChatRoom?.isPrivate ? <div className="grid grid-cols-12 h-full overflow-hidden">
-                {currentChatRoom && <ChatArea showChatDetails={showChatDetails} onToggleChatDetails={() => setShowChatDetails(!showChatDetails)} chatRoom={currentChatRoom} />}
+            {currentChatRoom?.isMember ? <div className="grid grid-cols-12 h-full overflow-hidden">
+                {currentChatRoom && <ChatArea onFetch={fetchChatRoom} showChatDetails={showChatDetails} onToggleChatDetails={() => setShowChatDetails(!showChatDetails)} chatRoom={currentChatRoom} />}
                 <div className={cn("overflow-hidden", showChatDetails ? 'col-span-4 md:block hidden' : 'hidden')}>
-                    {currentChatRoom && <ChatDetails chatRoom={currentChatRoom} />}
+                    {currentChatRoom && <ChatDetails onFetch={fetchChatRoom} chatRoom={currentChatRoom} />}
                 </div>
-            </div>
-                : <NotAllowedComponent />
-            } */}
-
-            <div className="grid grid-cols-12 h-full overflow-hidden">
-                {currentChatRoom && <ChatArea showChatDetails={showChatDetails} onToggleChatDetails={() => setShowChatDetails(!showChatDetails)} chatRoom={currentChatRoom} />}
-                <div className={cn("overflow-hidden", showChatDetails ? 'col-span-4 md:block hidden' : 'hidden')}>
-                    {currentChatRoom && <ChatDetails chatRoom={currentChatRoom} />}
-                </div>
-            </div>
+            </div> : <NotAllowedComponent
+                title="Bạn không phải là thành viên của đoạn chat"
+                description="Có thể bạn đã bị xóa khỏi nhóm hoặc bạn đã tự rời đi"
+            />}
         </div>
     </div>
 };

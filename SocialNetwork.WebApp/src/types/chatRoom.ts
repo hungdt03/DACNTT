@@ -16,8 +16,6 @@ export type ChatRoomResource  = {
     // 
     isMember: boolean;
     isAdmin: boolean;
-    lastMessageId?: string;
-    hasLeftGroup: boolean;
     isPrivate: boolean;
     isAccept: boolean;
     isRecipientAccepted: boolean;

@@ -14,10 +14,8 @@ namespace SocialNetwork.Application.DTOs
         public DateTimeOffset? LastMessageDate { get; set; }
 
         // For current user
-        public Guid? LastMessageId { get; set; }
         public bool IsMember { get; set; }
         public bool IsAdmin { get; set; }
-        public bool HasLeftGroup { get; set; }
         public bool IsPrivate { get; set; }
         public bool IsAccept { get; set; }
         public bool IsRecipientAccepted { get; set; }

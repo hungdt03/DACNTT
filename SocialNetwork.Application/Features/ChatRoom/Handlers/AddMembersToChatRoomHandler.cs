@@ -11,6 +11,7 @@ using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
+using SocialNetwork.Domain.Entity.MessageInfo;
 using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.ChatRoom.Handlers
@@ -51,22 +52,31 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             var allMembers = await _unitOfWork.ChatRoomMemberRepository.GetAllMembersByChatRoomIdAsync(chatRoom.Id);
             var messages = new List<Domain.Entity.MessageInfo.Message>();
+
+            var listRoomMembers = new List<Domain.Entity.ChatRoomInfo.ChatRoomMember>();
             foreach(var memberId in request.UserIds)
             {
-                if (allMembers.Any(m => m.UserId == memberId))
-                    continue;
-
                 var memberUser = await _userManager.FindByIdAsync(memberId)
                     ?? throw new AppException("Vui lòng kiểm tra lại danh sách userIds");
 
-                var member = new ChatRoomMember()
+                var chatRoomMember = await _unitOfWork.ChatRoomMemberRepository
+                    .GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, memberId);
+
+                if(chatRoomMember == null)
                 {
-                    IsLeader = false,
-                    UserId = memberId,
-                    User = memberUser,
-                    ChatRoomId = chatRoom.Id,
-                    IsAccepted = true,
-                };
+                    var member = new ChatRoomMember()
+                    {
+                        IsLeader = false,
+                        UserId = memberId,
+                        User = memberUser,
+                        ChatRoomId = chatRoom.Id,
+                        IsAccepted = true,
+                    };
+
+                    await _unitOfWork.ChatRoomMemberRepository.CreateChatRoomMember(member);
+
+                    listRoomMembers.Add(member);
+                } 
 
                 var message = new Domain.Entity.MessageInfo
                     .Message()
@@ -77,17 +87,22 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     SentAt = DateTimeOffset.UtcNow,
                 };
 
-                await _unitOfWork.MessageRepository.CreateMessageAsync(message);
-                await _unitOfWork.ChatRoomMemberRepository.CreateChatRoomMember(member);
-                await _signalRService.JoinGroup(memberId, chatRoom.UniqueName);
+                await _unitOfWork.MessageRepository.CreateMessageAsync(message);       
+                
                 messages.Add(message);
             }
            
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            foreach (var message in messages)
+            listRoomMembers.ForEach(async member =>
             {
-                await _signalRService.SendMessageToSpecificGroup(chatRoom.UniqueName, ApplicationMapper.MapToMessage(message));
+                await _signalRService.JoinGroup(member.UserId, chatRoom.UniqueName);
+            });
+
+            for(int i = 0; i < messages.Count; i++)
+            {
+                var mapMessage = ApplicationMapper.MapToMessage(messages[i]);
+                await _signalRService.SendMessageToSpecificGroup(chatRoom.UniqueName, mapMessage);
             }
 
             return new BaseResponse()

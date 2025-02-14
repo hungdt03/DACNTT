@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Features.ChatRoom.Commands;
 using SocialNetwork.Application.Features.ChatRoom.Queries;
+using SocialNetwork.Application.Features.Group.Commands;
 
 namespace SocialNetwork.API.Controllers
 {

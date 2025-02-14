@@ -5,5 +5,4 @@ export type ChatRoomMemberResource = {
     user: UserResource;
     isLeader: boolean;
     isAccepted: boolean;
-    hasLeftGroup: boolean;
 }
