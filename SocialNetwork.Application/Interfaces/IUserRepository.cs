@@ -10,7 +10,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<List<User>> GetAllRoleUser();
         Task DeleteUser(string id); 
         Task DeleteAllUser();
-        Task AddUser(User user);
         Task DeleteManyUser(List<string> listUserId);
         Task UnLockAndLockOneAccount(string userId);
         Task UnLockAndLockManyAccount(List<string> users, string number);

@@ -12,7 +12,7 @@ using SocialNetwork.Infrastructure.DBContext;
 namespace SocialNetwork.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250212181037_InitialCreate")]
+    [Migration("20250213154429_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -220,6 +220,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("DeletedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<bool>("HasLeftGroup")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsAccepted")
                         .HasColumnType("bit");
 
@@ -228,6 +231,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
                     b.Property<bool>("IsLeader")
                         .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LastMessageDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("LastMessageId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()

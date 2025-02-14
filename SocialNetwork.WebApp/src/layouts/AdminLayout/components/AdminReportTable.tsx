@@ -21,22 +21,22 @@ import { faPlus, faMinus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import adminService from '../../../services/adminService'
 import { toast } from 'react-toastify'
 import { Popconfirm } from 'antd'
-import { PostResource } from '../../../types/post'
+import { ReportResource } from '../../../types/report'
 
 type PostsTableProps = {
-    posts: PostResource[]
-    onPostSelect: (selectedPosts: string[]) => void
+    reports: ReportResource[]
+    onReportSelect: (selectedReports: string[]) => void
     rowsPerPage: number
     page: number
-    fetchPosts: () => void
+    fetchReports: () => void
 }
 
 type Order = 'asc' | 'desc'
 
-const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsPerPage, page, fetchPosts }) => {
+const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect, rowsPerPage, page, fetchReports }) => {
     const [selected, setSelected] = useState<string[]>([])
     const [order, setOrder] = useState<Order>('asc')
-    const [orderBy, setOrderBy] = useState<keyof PostResource>('content')
+    const [orderBy, setOrderBy] = useState<keyof ReportResource>('id')
     const [expanded, setExpanded] = useState<string | null>(null)
     const [open, setOpen] = useState(false)
 
@@ -44,36 +44,36 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
         handleDeleteClick(id)
         setOpen(false)
     }
-    const handleRequestSort = (property: keyof PostResource) => {
+    const handleRequestSort = (property: keyof ReportResource) => {
         const isAsc = orderBy === property && order === 'asc'
         setOrder(isAsc ? 'desc' : 'asc')
         setOrderBy(property)
     }
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newSelected = event.target.checked ? posts.map((post) => post.id) : []
+        const newSelected = event.target.checked ? reports.map((report) => report.id) : []
         setSelected(newSelected)
-        onPostSelect(newSelected)
+        onReportSelect(newSelected)
     }
 
     const handleClick = (id: string) => {
         const newSelected = selected.includes(id) ? selected.filter((item) => item !== id) : [...selected, id]
         setSelected(newSelected)
-        onPostSelect(newSelected)
+        onReportSelect(newSelected)
     }
 
     const handleExpandClick = (id: string) => {
         setExpanded(expanded === id ? null : id)
     }
     const handleDeleteClick = async (id: string) => {
-        const response = await adminService.DeleteOnePost(id)
+        const response = await adminService.DeleteOneReport(id)
         if (response.isSuccess) {
-            toast.success('Xóa bài viết thành công')
-            fetchPosts()
+            toast.success('Xóa báo cáo thành công')
+            fetchReports()
         }
     }
 
-    const sortedPosts = [...posts].sort((a, b) => {
+    const sortedPosts = [...reports].sort((a, b) => {
         const aValue = a[orderBy]
         const bValue = b[orderBy]
 
@@ -104,8 +104,8 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                             </TableCell>
                             <TableCell padding='checkbox'>
                                 <Checkbox
-                                    indeterminate={selected.length > 0 && selected.length < posts.length}
-                                    checked={posts.length > 0 && selected.length === posts.length}
+                                    indeterminate={selected.length > 0 && selected.length < reports.length}
+                                    checked={reports.length > 0 && selected.length === reports.length}
                                     onChange={handleSelectAllClick}
                                 />
                             </TableCell>
@@ -115,7 +115,7 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                                     <TableSortLabel
                                         active={orderBy === column.key}
                                         direction={orderBy === column.key ? order : 'asc'}
-                                        onClick={() => handleRequestSort(column.key as keyof PostResource)}
+                                        onClick={() => handleRequestSort(column.key as keyof ReportResource)}
                                     >
                                         <b>{column.label}</b>
                                     </TableSortLabel>
@@ -127,48 +127,40 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {posts.length === 0 ? (
+                        {reports.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={8} sx={{ textAlign: 'center' }}>
                                     Không có bài viết nào tồn tại
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            paginatedPosts.map((post, index) => (
-                                <React.Fragment key={post.id}>
+                            paginatedPosts.map((report, index) => (
+                                <React.Fragment key={report.id}>
                                     <TableRow sx={{ height: 50 }}>
                                         <TableCell>
-                                            <IconButton size='small' onClick={() => handleExpandClick(post.id)}>
-                                                <FontAwesomeIcon icon={expanded === post.id ? faMinus : faPlus} />
+                                            <IconButton size='small' onClick={() => handleExpandClick(report.id)}>
+                                                <FontAwesomeIcon icon={expanded === report.id ? faMinus : faPlus} />
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                                         <TableCell padding='checkbox'>
                                             <Checkbox
-                                                checked={selected.includes(post.id)}
-                                                onClick={() => handleClick(post.id)}
+                                                checked={selected.includes(report.id)}
+                                                onClick={() => handleClick(report.id)}
                                             />
                                         </TableCell>
-                                        <TableCell>{post.content}</TableCell>
+                                        <TableCell>{report.reason}</TableCell>
                                         <TableCell>
-                                            {post.createdAt ? dayjs(post.createdAt).format('DD/MM/YYYY') : '-'}
+                                            {report.resolvedAt ? dayjs(report.resolvedAt).format('DD/MM/YYYY') : '-'}
                                         </TableCell>
-                                        <TableCell>{post.user.fullName}</TableCell>
+                                        <TableCell>{report.reason}</TableCell>
 
-                                        <TableCell>{post.postType}</TableCell>
-
-                                        <TableCell>
-                                            {post.privacy === 'PUBLIC'
-                                                ? 'Công khai'
-                                                : post.privacy === 'PRIVATE'
-                                                  ? 'Riêng tư'
-                                                  : 'Khác'}
-                                        </TableCell>
+                                        <TableCell>{report.reason}</TableCell>
 
                                         <TableCell sx={{ textAlign: 'center' }}>
                                             <span style={{ width: 10, display: 'contents' }}></span>
                                             <Popconfirm
-                                                onConfirm={() => handleConfirmDelete(post.id)}
+                                                onConfirm={() => handleConfirmDelete(report.id)}
                                                 title='Xác nhận xóa'
                                                 description='Bạn có chắc chắn muốn xóa bài viết này?'
                                                 cancelText='Không'
@@ -190,7 +182,7 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                                     </TableRow>
                                     <TableRow>
                                         <TableCell colSpan={8} sx={{ padding: 0, paddingLeft: 10 }}>
-                                            <Collapse in={expanded === post.id} timeout='auto' unmountOnExit>
+                                            <Collapse in={expanded === report.id} timeout='auto' unmountOnExit>
                                                 <Typography
                                                     variant='subtitle2'
                                                     sx={{
@@ -200,17 +192,17 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                                                         paddingTop: 1
                                                     }}
                                                 >
-                                                    Chi tiết bài viết: {post.content}
+                                                    Chi tiết bài viết: {report.reason}
                                                 </Typography>
                                                 <Grid container spacing={1} sx={{ fontSize: '0.85rem' }}>
                                                     <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Tổng số lượt chia sẻ: ${post.content}`}</Typography>
+                                                        <Typography variant='body2'>{`Tổng số lượt chia sẻ: ${report.reason}`}</Typography>
                                                     </Grid>
                                                     <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Tổng số bình luận: ${post.content}`}</Typography>
+                                                        <Typography variant='body2'>{`Tổng số bình luận: ${report.reason}`}</Typography>
                                                     </Grid>
                                                     <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Tổng số cảm xúc : ${post.content}`}</Typography>
+                                                        <Typography variant='body2'>{`Tổng số cảm xúc : ${report.reason}`}</Typography>
                                                     </Grid>
                                                 </Grid>
                                             </Collapse>
@@ -226,4 +218,4 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
     )
 }
 
-export default AdminPostsTable
+export default AdminReportsTable

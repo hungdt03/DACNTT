@@ -20,6 +20,23 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.Groups.AddAsync(group);
         }
 
+        public async Task DeleteAllGroup()
+        {
+           await _context.Groups.ExecuteDeleteAsync();
+        }
+
+        public async Task DeleteOneGroup(Guid id)
+        {
+            await _context.Groups.Where(g=>g.Id.Equals(id)).ExecuteDeleteAsync();
+        }
+
+        public async Task DeletManyGroup(List<string> listGroupId)
+        {
+            await _context.Groups
+                .Where(u => listGroupId.Contains(u.Id.ToString()))
+                .ExecuteDeleteAsync();
+        }
+
         public async Task<IEnumerable<Group>> GetAllGroupsAsync()
         {
             return await _context.Groups.ToListAsync();

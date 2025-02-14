@@ -14,44 +14,44 @@ const AdminLayout: FC = () => {
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false)
 
     return (
-        <Flex style={{ minHeight: '100vh', width: '100%' }}>
-            <Layout style={{ minHeight: '100vh', width: '100%' }}>
+        <Flex style={{ height: '100vh', width: '100%', overflow: 'hidden' }}>
+            <Layout style={{ height: '100vh', width: '100%', position: 'relative' }}>
                 <AdminSidebar
                     isCollapsed={isSidebarCollapsed}
                     toggleSidebar={() => setSidebarCollapsed(!isSidebarCollapsed)}
                     setCurrentTab={setCurrentTab}
                     currentTab={currentTab}
                 />
-                <AdminHeader title={currentTab} />
+                <AdminHeader title={currentTab} isSidebarCollapsed={isSidebarCollapsed} />
                 <Box
                     sx={{
-                        flexGrow: 1,
-                        marginLeft: isSidebarCollapsed ? '0px' : '200px',
+                        flex: 1,
+                        marginLeft: isSidebarCollapsed ? '80px' : '250px',
+                        marginTop: '80px',
                         transition: 'margin 0.3s',
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        position: 'relative'
+                        height: 'calc(100vh - 80px)',
+                        overflow: 'hidden',
+                        p: 2
                     }}
                 >
-                    <Box
+                    <Container
+                        maxWidth={false}
                         sx={{
-                            flex: 1,
-                            padding: 2,
-                            marginTop: '100px',
                             height: '100%',
-                            width: '100%',
-                            flexDirection: 'column'
+                            display: 'flex',
+                            flexDirection: 'column',
+                            '&.MuiContainer-root': {
+                                maxWidth: '100%',
+                                px: 3
+                            }
                         }}
                     >
-                        <Container sx={{ flex: 1, width: '100%' }}>
-                            {currentTab === 'Quản lý bài viết' && <PostsPage />}
-                            {currentTab === 'Quản lý tài khoản' && <UsersPage />}
-                            {currentTab === 'Quản lý báo cáo' && <ReportsPage />}
-                            {currentTab === 'Quản lý nhóm' && <GroupsPage />}
-                            {currentTab === 'Bảng thống kê' && <StatisticsPage />}
-                        </Container>
-                    </Box>
+                        {currentTab === 'Quản lý bài viết' && <PostsPage />}
+                        {currentTab === 'Quản lý tài khoản' && <UsersPage />}
+                        {currentTab === 'Quản lý báo cáo' && <ReportsPage />}
+                        {currentTab === 'Quản lý nhóm' && <GroupsPage />}
+                        {currentTab === 'Bảng thống kê' && <StatisticsPage />}
+                    </Container>
                 </Box>
             </Layout>
         </Flex>

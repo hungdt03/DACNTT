@@ -32,7 +32,9 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, curr
                     overflowX: 'hidden',
                     transition: 'width 0.3s',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    zIndex: 1201,
+                    height: '100vh'
                 }
             }}
         >
