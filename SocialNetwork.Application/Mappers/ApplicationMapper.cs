@@ -155,7 +155,27 @@ namespace SocialNetwork.Application.Mappers
                 TargetGroup = report.TargetGroup != null ? MapToGroup(report.TargetGroup) : null,
                 TargetPost = report.TargetPost != null ? MapToPost(report.TargetPost) : null,
                 TargetUser = report.TargetUser != null ? MapToUser(report.TargetUser) : null,
+                DateCreatedAt = report.DateCreated
             };
+        }
+        public static List<ReportResponse> MapToListReport(List<Report> reports)
+        {
+            return reports.Select( report => new ReportResponse
+            {
+                Id = report.Id,
+                Group = report.Group != null ? MapToGroup(report.Group) : null,
+                Reason = report.Reason,
+                Reporter = report.Reporter != null ? MapToUser(report.Reporter) : null,
+                ReportType = report.ReportType,
+                ResolutionNotes = report.ResolutionNotes,
+                ResolvedAt = report.ResolvedAt,
+                Status = report.Status,
+                TargetComment = report.TargetComment != null ? MapToComment(report.TargetComment) : null,
+                TargetGroup = report.TargetGroup != null ? MapToGroup(report.TargetGroup) : null,
+                TargetPost = report.TargetPost != null ? MapToPost(report.TargetPost) : null,
+                TargetUser = report.TargetUser != null ? MapToUser(report.TargetUser) : null,
+                DateCreatedAt = report.DateCreated
+            }).ToList();
         }
 
         public static MessageResponse MapToMessage(Message message)
@@ -273,6 +293,7 @@ namespace SocialNetwork.Application.Mappers
                 SharePost = post.SharePost != null ? MapToPost(post.SharePost) : null,
                 OriginalPost = post.OriginalPost != null ? MapToPost(post.OriginalPost) : null,
                 Group = post.Group != null ? MapToGroup(post.Group) : null,
+                Reactions = post.Reactions != null ? post.Reactions.Count : 0,
             }).ToList();
         }
 

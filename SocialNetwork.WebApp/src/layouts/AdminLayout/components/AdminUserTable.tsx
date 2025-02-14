@@ -95,7 +95,7 @@ const AdminUsersTable: React.FC<UsersTableProps> = ({ users, onUserSelect, rowsP
 
     return (
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
+            <TableContainer sx={{ overflow: 'auto' }}>
                 <Table stickyHeader sx={{ width: '100%', minHeight: '100%' }}>
                     <TableHead>
                         <TableRow>
@@ -128,13 +128,7 @@ const AdminUsersTable: React.FC<UsersTableProps> = ({ users, onUserSelect, rowsP
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {users.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} sx={{ textAlign: 'center' }}>
-                                    Không có tài khoản nào tồn tại
-                                </TableCell>
-                            </TableRow>
-                        ) : (
+                        {users.length > 0 &&
                             paginatedUsers.map((user, index) => (
                                 <React.Fragment key={user.id}>
                                     <TableRow sx={{ height: 50 }}>
@@ -226,8 +220,7 @@ const AdminUsersTable: React.FC<UsersTableProps> = ({ users, onUserSelect, rowsP
                                         </TableCell>
                                     </TableRow>
                                 </React.Fragment>
-                            ))
-                        )}
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>

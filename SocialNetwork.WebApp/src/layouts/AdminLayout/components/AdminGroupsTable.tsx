@@ -21,7 +21,6 @@ import { faPlus, faMinus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import adminService from '../../../services/adminService'
 import { toast } from 'react-toastify'
 import { Popconfirm } from 'antd'
-import { PostResource } from '../../../types/post'
 import { GroupResource } from '../../../types/group'
 
 type GroupsTableProps = {
@@ -95,7 +94,7 @@ const AdminGroupsTable: React.FC<GroupsTableProps> = ({ groups, onGroupSelect, r
 
     return (
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
+            <TableContainer sx={{ overflow: 'auto' }}>
                 <Table stickyHeader sx={{ width: '100%', minHeight: '100%' }}>
                     <TableHead>
                         <TableRow>
@@ -128,13 +127,7 @@ const AdminGroupsTable: React.FC<GroupsTableProps> = ({ groups, onGroupSelect, r
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {groups.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} sx={{ textAlign: 'center' }}>
-                                    Không có bài viết nào tồn tại
-                                </TableCell>
-                            </TableRow>
-                        ) : (
+                        {groups.length > 0 &&
                             paginatedGroups.map((group, index) => (
                                 <React.Fragment key={group.id}>
                                     <TableRow sx={{ height: 50 }}>
@@ -212,8 +205,7 @@ const AdminGroupsTable: React.FC<GroupsTableProps> = ({ groups, onGroupSelect, r
                                         </TableCell>
                                     </TableRow>
                                 </React.Fragment>
-                            ))
-                        )}
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>

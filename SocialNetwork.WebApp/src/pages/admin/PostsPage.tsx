@@ -140,8 +140,12 @@ const PostsPage: React.FC = () => {
                     overflow: 'hidden'
                 }}
             >
-                {!loading && (
-                    <>
+                {!loading &&
+                    (filteredPosts.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', alignItems: 'center', fontSize: '24px', marginTop: 20 }}>
+                            Không có bài viết nào tồn tại
+                        </Box>
+                    ) : (
                         <AdminPostsTable
                             posts={filteredPosts}
                             onPostSelect={handlePostSelect}
@@ -149,8 +153,7 @@ const PostsPage: React.FC = () => {
                             page={page}
                             fetchPosts={fetchPosts}
                         />
-                    </>
-                )}
+                    ))}
             </Box>
             <CustomTablePagination
                 count={allPost.length}

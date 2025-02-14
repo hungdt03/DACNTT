@@ -16,5 +16,6 @@ namespace SocialNetwork.Application.DTOs
         public GroupResponse? TargetGroup { get; set; }
         public CommentResponse? TargetComment { get; set; }
         public DateTimeOffset? ResolvedAt { get; set; }
+        public DateTimeOffset? DateCreatedAt { get; set; }
     }
 }

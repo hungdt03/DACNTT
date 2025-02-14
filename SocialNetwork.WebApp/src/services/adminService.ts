@@ -1,5 +1,4 @@
 import axiosInterceptor from "../configurations/axiosInterceptor";
-import { SignUpRequest } from "../pages/auth/SignUpPage";
 import { GroupResource } from "../types/group";
 import { PostResource } from "../types/post";
 import { ReportResource } from "../types/report";
@@ -74,6 +73,9 @@ class AdminService {
      }
      DeleteAllReport() : Promise<BaseResponse> {
           return axiosInterceptor.delete('/api/admin/delete-all-report')
+     }
+     UpdateStatusReport(reportId : string, newSratus : string) : Promise<BaseResponse> {
+          return axiosInterceptor.delete('/api/admin/update-report/' + reportId, {data: newSratus})
      }
 }
 export default AdminService.getInstance();

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Modal, Button } from 'antd'
-import { Formik, Form, Field } from 'formik'
+import React, { useState } from 'react'
+import { Modal, Button, Form, Input } from 'antd'
+import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { toast } from 'react-toastify'
 import { SignUpRequest } from '../../pages/auth/SignUpPage'
@@ -11,10 +11,8 @@ type AddAccountDialogProps = {
     onClose: () => void
     fetchUsers: () => void
 }
-
 const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ isVisible, onClose, fetchUsers }) => {
     const [loading, setLoading] = useState(false)
-    const [email, setEmail] = useState('')
 
     const signUpSchema = Yup.object().shape({
         fullName: Yup.string().required('Họ và tên không được để trống'),
@@ -33,52 +31,61 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ isVisible, onClose,
             fetchUsers()
             toast.success('Thêm tài khoản thành công')
             onClose()
-            setEmail(values.email)
         } else {
             toast.error(response.message)
         }
     }
 
     return (
-        <Modal title='Thêm tài khoản' open={isVisible} onCancel={onClose} footer={null}>
+        <Modal title='Thêm tài khoản' open={isVisible} onCancel={onClose} footer={null} centered>
             <Formik
                 initialValues={{ fullName: '', email: '', password: '', confirmPassword: '' }}
                 validationSchema={signUpSchema}
                 onSubmit={handleAddAccountAsync}
             >
-                {({ errors, touched, handleChange }) => (
-                    <Form className='flex flex-col gap-y-4 w-full'>
-                        <Field name='fullName' placeholder='Họ và tên' className='input-field' />
-                        {errors.fullName && touched.fullName && <div className='error-text'>{errors.fullName}</div>}
+                {({ errors, touched, handleChange, handleSubmit }) => (
+                    <Form layout='vertical' onFinish={handleSubmit}>
+                        <Form.Item
+                            label='Họ và tên'
+                            validateStatus={errors.fullName && touched.fullName ? 'error' : ''}
+                            help={touched.fullName && errors.fullName}
+                        >
+                            <Input name='fullName' onChange={handleChange} placeholder='Nhập họ và tên' />
+                        </Form.Item>
 
-                        <Field
-                            name='email'
-                            type='email'
-                            placeholder='Địa chỉ email'
-                            className='input-field'
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                handleChange(e)
-                                setEmail(e.target.value)
-                            }}
-                        />
-                        {errors.email && touched.email && <div className='error-text'>{errors.email}</div>}
+                        <Form.Item
+                            label='Email'
+                            validateStatus={errors.email && touched.email ? 'error' : ''}
+                            help={touched.email && errors.email}
+                        >
+                            <Input name='email' type='email' onChange={handleChange} placeholder='Nhập email' />
+                        </Form.Item>
 
-                        <Field name='password' type='password' placeholder='Mật khẩu' className='input-field' />
-                        {errors.password && touched.password && <div className='error-text'>{errors.password}</div>}
+                        <Form.Item
+                            label='Mật khẩu'
+                            validateStatus={errors.password && touched.password ? 'error' : ''}
+                            help={touched.password && errors.password}
+                        >
+                            <Input.Password name='password' onChange={handleChange} placeholder='Nhập mật khẩu' />
+                        </Form.Item>
 
-                        <Field
-                            name='confirmPassword'
-                            type='password'
-                            placeholder='Xác nhận mật khẩu'
-                            className='input-field'
-                        />
-                        {errors.confirmPassword && touched.confirmPassword && (
-                            <div className='error-text'>{errors.confirmPassword}</div>
-                        )}
+                        <Form.Item
+                            label='Xác nhận mật khẩu'
+                            validateStatus={errors.confirmPassword && touched.confirmPassword ? 'error' : ''}
+                            help={touched.confirmPassword && errors.confirmPassword}
+                        >
+                            <Input.Password
+                                name='confirmPassword'
+                                onChange={handleChange}
+                                placeholder='Nhập lại mật khẩu'
+                            />
+                        </Form.Item>
 
-                        <Button htmlType='submit' type='primary' loading={loading}>
-                            Đăng ký
-                        </Button>
+                        <Form.Item>
+                            <Button type='primary' htmlType='submit' loading={loading} block>
+                                Thêm tài khoản
+                            </Button>
+                        </Form.Item>
                     </Form>
                 )}
             </Formik>

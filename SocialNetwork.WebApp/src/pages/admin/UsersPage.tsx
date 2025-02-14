@@ -225,8 +225,12 @@ const UsersPage: React.FC = () => {
                     overflow: 'hidden'
                 }}
             >
-                {!loading && (
-                    <>
+                {!loading &&
+                    (filteredUsers.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', alignItems: 'center', fontSize: '24px', marginTop: 20 }}>
+                            Không có tài khoản nào tồn tại
+                        </Box>
+                    ) : (
                         <AdminUsersTable
                             users={filteredUsers}
                             onUserSelect={handleUserSelect}
@@ -234,8 +238,7 @@ const UsersPage: React.FC = () => {
                             page={page}
                             fetchUsers={fetchUsers}
                         />
-                    </>
-                )}
+                    ))}
             </Box>
             <CustomTablePagination
                 count={allUser.length}

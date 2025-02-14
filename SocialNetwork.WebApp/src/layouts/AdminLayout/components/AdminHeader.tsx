@@ -21,7 +21,6 @@ const AdminHeader: React.FC<HeaderProps> = ({ title, isSidebarCollapsed }) => {
             sx={{
                 boxShadow: 1,
                 height: '80px',
-                zIndex: 1200,
                 left: 'auto',
                 right: 0,
                 width: `calc(100% - ${isSidebarCollapsed ? 80 : 250}px)`,

@@ -17,11 +17,13 @@ import {
     Button
 } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faMinus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faMinus, faTrash, faPen } from '@fortawesome/free-solid-svg-icons'
 import adminService from '../../../services/adminService'
 import { toast } from 'react-toastify'
 import { Popconfirm } from 'antd'
 import { ReportResource } from '../../../types/report'
+import UpdateReportDialog from '../../../components/dialogs/UpdateReportDialog'
+import { ReportType } from '../../../enums/report-type'
 
 type PostsTableProps = {
     reports: ReportResource[]
@@ -36,10 +38,18 @@ type Order = 'asc' | 'desc'
 const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect, rowsPerPage, page, fetchReports }) => {
     const [selected, setSelected] = useState<string[]>([])
     const [order, setOrder] = useState<Order>('asc')
-    const [orderBy, setOrderBy] = useState<keyof ReportResource>('id')
+    const [orderBy, setOrderBy] = useState<keyof ReportResource>('dateCreatedAt')
     const [expanded, setExpanded] = useState<string | null>(null)
     const [open, setOpen] = useState(false)
+    const [isUpdateReportDialogOpen, setIsOpenUpdateReportDialog] = useState(false)
+    const [reportSelected, setReportSelected] = useState<ReportResource>()
 
+    const handleOpenUpdateReportDialog = (reportId: ReportResource) => {
+        setReportSelected(reportId)
+        setIsOpenUpdateReportDialog(true)
+    }
+
+    const handleCloseUpdateReportDialog = () => setIsOpenUpdateReportDialog(false)
     const handleConfirmDelete = (id: string) => {
         handleDeleteClick(id)
         setOpen(false)
@@ -73,6 +83,49 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
         }
     }
 
+    const getReportedAccount = (report: ReportResource) => {
+        switch (report.reportType) {
+            case ReportType.USER:
+                return report.targetUser?.fullName || 'Không xác định'
+            case ReportType.GROUP:
+                return report.targetGroup?.name || 'Không xác định'
+            case ReportType.POST:
+                return report.targetPost?.user?.fullName || 'Không xác định'
+            case ReportType.COMMENT:
+                return report.targetComment?.user?.fullName || 'Không xác định'
+            default:
+                return 'Không xác định'
+        }
+    }
+    const getContentReported = (report: ReportResource) => {
+        switch (report.reportType) {
+            case ReportType.USER:
+                return report.targetUser?.fullName || 'Không có'
+            case ReportType.GROUP:
+                return report.targetGroup?.name || 'Không có'
+            case ReportType.POST:
+                return report.targetPost?.content || 'Không xác định'
+            case ReportType.COMMENT:
+                return report.targetComment?.content || 'Không xác định'
+            default:
+                return 'Không xác định'
+        }
+    }
+    const getTargetLabel = (reportType: string) => {
+        switch (reportType) {
+            case ReportType.USER:
+                return 'Tài khoản'
+            case ReportType.GROUP:
+                return 'Nhóm'
+            case ReportType.POST:
+                return 'Tài khoản đăng bài viết'
+            case ReportType.COMMENT:
+                return 'Tài khoản bình luận'
+            default:
+                return 'Đối tượng'
+        }
+    }
+
     const sortedPosts = [...reports].sort((a, b) => {
         const aValue = a[orderBy]
         const bValue = b[orderBy]
@@ -82,19 +135,19 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
         return 0
     })
 
-    const paginatedPosts = sortedPosts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    const paginatedReports = sortedPosts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 
     const columns = [
-        { key: 'content', label: 'Nội dung' },
-        { key: 'createdAt', label: 'Ngày tạo' },
-        { key: 'user', label: 'Người đăng' },
-        { key: 'postType', label: 'Kiểu bài viết' },
-        { key: 'privacy', label: 'Chế độ bài viết' }
+        { key: 'reporter', label: 'Tài khoản báo cáo' },
+        { key: 'reason', label: 'Lý do báo cáo' },
+        { key: 'reportType', label: 'Loại báo cáo' },
+        { key: 'status', label: 'Trạng thái' },
+        { key: 'dateCreatedAt', label: 'Ngày báo cáo' }
     ]
 
     return (
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
+            <TableContainer sx={{ overflow: 'auto' }}>
                 <Table stickyHeader sx={{ width: '100%', minHeight: '100%' }}>
                     <TableHead>
                         <TableRow>
@@ -127,14 +180,8 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {reports.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} sx={{ textAlign: 'center' }}>
-                                    Không có bài viết nào tồn tại
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            paginatedPosts.map((report, index) => (
+                        {reports.length > 0 &&
+                            paginatedReports.map((report, index) => (
                                 <React.Fragment key={report.id}>
                                     <TableRow sx={{ height: 50 }}>
                                         <TableCell>
@@ -149,16 +196,40 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                                 onClick={() => handleClick(report.id)}
                                             />
                                         </TableCell>
+                                        <TableCell>{report.reporter.fullName}</TableCell>
                                         <TableCell>{report.reason}</TableCell>
                                         <TableCell>
-                                            {report.resolvedAt ? dayjs(report.resolvedAt).format('DD/MM/YYYY') : '-'}
+                                            {report.reportType === ReportType.USER
+                                                ? 'Tài khoản'
+                                                : report.reportType === ReportType.GROUP
+                                                  ? 'Nhóm'
+                                                  : report.reportType === ReportType.POST
+                                                    ? 'Bài viết'
+                                                    : 'Bình luận'}
                                         </TableCell>
-                                        <TableCell>{report.reason}</TableCell>
-
-                                        <TableCell>{report.reason}</TableCell>
-
+                                        <TableCell>
+                                            {report.status === 'PENDING'
+                                                ? 'Chưa xử lý'
+                                                : report.status === 'RESOLVED'
+                                                  ? 'Đã xử lý'
+                                                  : 'Đã từ chối'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {report.dateCreatedAt
+                                                ? dayjs(report.dateCreatedAt).format('DD/MM/YYYY')
+                                                : '-'}
+                                        </TableCell>
                                         <TableCell sx={{ textAlign: 'center' }}>
-                                            <span style={{ width: 10, display: 'contents' }}></span>
+                                            <Button
+                                                variant='contained'
+                                                color='info'
+                                                size='small'
+                                                startIcon={<FontAwesomeIcon icon={faPen} style={{ fontSize: 10 }} />}
+                                                onClick={() => handleOpenUpdateReportDialog(report)}
+                                            >
+                                                Cập nhật
+                                            </Button>
+                                            <span style={{ width: 10, display: 'inline-block' }}></span>
                                             <Popconfirm
                                                 onConfirm={() => handleConfirmDelete(report.id)}
                                                 title='Xác nhận xóa'
@@ -173,7 +244,6 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                                     startIcon={
                                                         <FontAwesomeIcon icon={faTrash} style={{ fontSize: 10 }} />
                                                     }
-                                                    style={{ fontSize: 12, padding: '3px 8px', minWidth: 'auto' }}
                                                 >
                                                     Xóa
                                                 </Button>
@@ -192,26 +262,40 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                                         paddingTop: 1
                                                     }}
                                                 >
-                                                    Chi tiết bài viết: {report.reason}
+                                                    Chi tiết báo cáo: {report.reason}
                                                 </Typography>
                                                 <Grid container spacing={1} sx={{ fontSize: '0.85rem' }}>
-                                                    <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Tổng số lượt chia sẻ: ${report.reason}`}</Typography>
+                                                    <Grid item xs={6} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>{`${getTargetLabel(report.reportType) + ' bị báo cáo'}: ${getReportedAccount(report)}`}</Typography>
                                                     </Grid>
-                                                    <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Tổng số bình luận: ${report.reason}`}</Typography>
+                                                    <Grid item xs={6} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>{`Nội dung bị báo cáo: ${getContentReported(report)}`}</Typography>
                                                     </Grid>
-                                                    <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Tổng số cảm xúc : ${report.reason}`}</Typography>
+                                                    <Grid item xs={6} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>{`Ghi chú giải quyết: ${report.resolutionNotes}`}</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={6} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>{`Ngày xử lý: ${
+                                                            report.resolvedAt
+                                                                ? dayjs(report.resolvedAt).format('DD/MM/YYYY')
+                                                                : 'Chưa có'
+                                                        }`}</Typography>
                                                     </Grid>
                                                 </Grid>
                                             </Collapse>
                                         </TableCell>
                                     </TableRow>
                                 </React.Fragment>
-                            ))
-                        )}
+                            ))}
                     </TableBody>
+                    {reportSelected && (
+                        <UpdateReportDialog
+                            isVisible={isUpdateReportDialogOpen}
+                            onClose={handleCloseUpdateReportDialog}
+                            fetchReports={fetchReports}
+                            tagetReport={reportSelected}
+                        />
+                    )}
                 </Table>
             </TableContainer>
         </Paper>

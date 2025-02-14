@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
+using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Application.Features.Admin.Queries;
 using SocialNetwork.Application.Features.Post.Commands;
@@ -34,6 +35,12 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> GetAllGroup()
         {
             var response = await mediator.Send(new GetAllGroupQuery());
+            return Ok(response);
+        }
+        [HttpGet("get-all-report")]
+        public async Task<IActionResult> GetAllReport()
+        {
+            var response = await mediator.Send(new GetAllReportQuery());
             return Ok(response);
         }
         // USER
@@ -104,6 +111,31 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> DeleteManyGroup([FromBody] List<string> listPostId)
         {
             var response = await mediator.Send(new DeleteManyGroupQuery(listPostId));
+            return Ok(response);
+        }
+        // REPORT
+        [HttpDelete("update-report/{reportId}")]
+        public async Task<IActionResult> UpdateOneReport([FromRoute] Guid reportId, [FromBody] string newStatus)
+        {
+            var response = await mediator.Send(new UpdateReportCommand(reportId, newStatus));
+            return Ok(response);
+        }
+        [HttpDelete("delete-report/{reportId}")]
+        public async Task<IActionResult> DeleteOneReport([FromRoute] Guid reportId)
+        {
+            var response = await mediator.Send(new DeleteOneReportQuery(reportId));
+            return Ok(response);
+        }
+        [HttpDelete("delete-all-report")]
+        public async Task<IActionResult> DeleteAllReport()
+        {
+            var response = await mediator.Send(new DeleteAllReportQuery());
+            return Ok(response);
+        }
+        [HttpDelete("delete-many-report")]
+        public async Task<IActionResult> DeleteManyReport([FromBody] List<string> listReportId)
+        {
+            var response = await mediator.Send(new DeleteManyReportQuery(listReportId));
             return Ok(response);
         }
     }

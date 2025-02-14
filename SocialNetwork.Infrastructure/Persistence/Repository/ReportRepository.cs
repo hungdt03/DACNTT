@@ -63,5 +63,40 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             _context.Reports.Remove(report);
         }
+        public async Task<List<Report>> GetAllReports()
+        {
+            return await _context.Reports
+                .Include(r=>r.TargetGroup)
+                .Include(r => r.TargetComment)
+                .Include(r => r.TargetPost)
+                .Include(r => r.TargetUser)
+                .Include(r => r.Reporter)
+                .ToListAsync();
+        }
+
+        public async Task DeleteOneReport(Guid id)
+        {
+            await _context.Reports.Where(r=>r.Id.Equals(id)).ExecuteDeleteAsync();
+        }
+
+        public async Task DeleteManyReport(List<string> id)
+        {
+            await _context.Reports
+                .Where(u => id.Contains(u.Id.ToString()))
+                .ExecuteDeleteAsync();
+        }
+
+        public async Task DeleteAllReport()
+        {
+            await _context.Reports.ExecuteDeleteAsync();
+        }
+        public async Task UpdateReport(Guid id, string newStatus)
+        {
+            var report = await GetReportByIdAsync(id);
+            if (report == null) { return; }
+            report.Status = newStatus;
+            _context.Reports.Update(report);
+            _context.SaveChanges();
+        }
     }
 }

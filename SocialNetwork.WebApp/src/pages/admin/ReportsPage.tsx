@@ -1,12 +1,20 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { Toolbar, Button, InputAdornment, TextField, Box } from '@mui/material'
+import {
+    Toolbar,
+    Button,
+    InputAdornment,
+    TextField,
+    Box,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select
+} from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch, faTrash } from '@fortawesome/free-solid-svg-icons'
 import adminService from '../../services/adminService'
 import ConfirmDeleteDialog from '../../components/dialogs/ConfirmDeleteDialog'
 import CustomTablePagination from '../../layouts/AdminLayout/components/TablePagination'
-import { PostResource } from '../../types/post'
-import AdminPostsTable from '../../layouts/AdminLayout/components/AdminPostTable'
 import { toast } from 'react-toastify'
 import { ReportResource } from '../../types/report'
 import AdminReportsTable from '../../layouts/AdminLayout/components/AdminReportTable'
@@ -16,12 +24,14 @@ const ReportsPage: React.FC = () => {
     const [allReport, setAllReport] = useState<ReportResource[]>([])
     const [dialogOpen, setDialogOpen] = useState(false)
     const [deleteType, setDeleteType] = useState<'delete-all' | 'delete-selected' | null>(null)
-    const [selectedPosts, setSelectedPosts] = useState<string[]>([])
+    const [selectedReports, setSelectedReports] = useState<string[]>([])
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [loading, setLoading] = useState(false)
+    const [StatusFilter, setStatusFilter] = useState('')
+    const [ReportTypeFilter, setReportTypeFilter] = useState('')
 
-    const fetchPosts = async () => {
+    const fetchReports = async () => {
         setLoading(true)
         try {
             const response = await adminService.getAllReport()
@@ -35,11 +45,11 @@ const ReportsPage: React.FC = () => {
     }
 
     useEffect(() => {
-        fetchPosts()
+        fetchReports()
     }, [])
 
-    const handlePostSelect = (selected: string[]) => {
-        setSelectedPosts(selected)
+    const handleReportSelect = (selected: string[]) => {
+        setSelectedReports(selected)
     }
 
     const removeDiacritics = (str: string) => {
@@ -48,12 +58,20 @@ const ReportsPage: React.FC = () => {
 
     const filteredReports = useMemo(() => {
         const normalizedSearchTerm = removeDiacritics(searchTerm)
-        return allReport.filter((report) =>
-            [report.reason, report.reportType, report.reporter.fullName, report.group.name].some((field) =>
-                removeDiacritics(field || '').includes(normalizedSearchTerm)
-            )
+        return allReport.filter(
+            (report) =>
+                [
+                    report.reason,
+                    report.reportType,
+                    report.reporter.fullName,
+                    report.targetGroup?.name,
+                    report.targetUser?.fullName,
+                    report.group?.name
+                ].some((field) => removeDiacritics(field || '').includes(normalizedSearchTerm)) &&
+                (StatusFilter != '' ? report.status === StatusFilter : true) &&
+                (ReportTypeFilter !== '' ? report.reportType === ReportTypeFilter : true)
         )
-    }, [searchTerm, allReport])
+    }, [searchTerm, allReport, StatusFilter, ReportTypeFilter])
 
     const handleOpenDialog = (type: 'delete-all' | 'delete-selected') => {
         setDeleteType(type)
@@ -68,7 +86,7 @@ const ReportsPage: React.FC = () => {
     const handleConfirmDelete = async () => {
         setLoading(true)
         try {
-            if (deleteType === 'delete-selected' && selectedPosts.length === 0) {
+            if (deleteType === 'delete-selected' && selectedReports.length === 0) {
                 toast.error('Không có báo cáo nào được chọn')
             }
             if (deleteType === 'delete-all' && allReport.length === 0) {
@@ -78,13 +96,13 @@ const ReportsPage: React.FC = () => {
                 const response = await adminService.DeleteAllReport()
                 if (response.isSuccess) {
                     toast.success('Xóa tất cả báo cáo thành công')
-                    await fetchPosts()
+                    await fetchReports()
                 }
-            } else if (deleteType === 'delete-selected' && selectedPosts.length > 0) {
-                const response = await adminService.DeleteManyReport(selectedPosts)
+            } else if (deleteType === 'delete-selected' && selectedReports.length > 0) {
+                const response = await adminService.DeleteManyReport(selectedReports)
                 if (response.isSuccess) {
                     toast.success('Xóa các báo cáo đã chọn thành công')
-                    await fetchPosts()
+                    await fetchReports()
                 }
             }
         } catch (error) {
@@ -126,6 +144,25 @@ const ReportsPage: React.FC = () => {
                         )
                     }}
                 />
+                <FormControl size='small' sx={{ minWidth: 160, width: 'fit-content' }}>
+                    <InputLabel>Trạng thái</InputLabel>
+                    <Select value={StatusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                        <MenuItem value=''>Tất cả</MenuItem>
+                        <MenuItem value='PENDING'>Chưa xử lý</MenuItem>
+                        <MenuItem value='RESOLVED'>Đã xử lý</MenuItem>
+                        <MenuItem value='REJECTED'>Đã từ chối</MenuItem>
+                    </Select>
+                </FormControl>
+                <FormControl size='small' sx={{ minWidth: 190, width: 'fit-content' }}>
+                    <InputLabel>Kiểu báo cáo</InputLabel>
+                    <Select value={ReportTypeFilter} onChange={(e) => setReportTypeFilter(e.target.value)}>
+                        <MenuItem value=''>Tất cả</MenuItem>
+                        <MenuItem value='USER'>Tài khoản</MenuItem>
+                        <MenuItem value='GROUP'>Nhóm</MenuItem>
+                        <MenuItem value='POST'>Bài viết</MenuItem>
+                        <MenuItem value='COMMENT'>Bình luận</MenuItem>
+                    </Select>
+                </FormControl>
                 <Toolbar sx={{ display: 'flex', gap: 1, marginLeft: 'auto' }}>
                     <Button variant='contained' color='warning' onClick={() => handleOpenDialog('delete-all')}>
                         <FontAwesomeIcon icon={faTrash} style={{ marginRight: 5 }} /> Xóa tất cả báo cáo
@@ -142,18 +179,22 @@ const ReportsPage: React.FC = () => {
                     overflow: 'hidden'
                 }}
             >
-                {!loading && (
-                    <>
+                {!loading &&
+                    (filteredReports.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', alignItems: 'center', fontSize: '24px', marginTop: 20 }}>
+                            Không có báo cáo nào tồn tại
+                        </Box>
+                    ) : (
                         <AdminReportsTable
                             reports={filteredReports}
-                            onReportSelect={handlePostSelect}
+                            onReportSelect={handleReportSelect}
                             rowsPerPage={rowsPerPage}
                             page={page}
-                            fetchReports={fetchPosts}
+                            fetchReports={fetchReports}
                         />
-                    </>
-                )}
+                    ))}
             </Box>
+
             <CustomTablePagination
                 count={allReport.length}
                 page={page}
