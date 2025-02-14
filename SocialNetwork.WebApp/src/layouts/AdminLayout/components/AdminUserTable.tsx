@@ -96,10 +96,13 @@ const AdminUsersTable: React.FC<UsersTableProps> = ({ users, onUserSelect, rowsP
     return (
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
-                <Table stickyHeader sx={{ width: '100%', minHeight: '500%' }}>
+                <Table stickyHeader sx={{ width: '100%', minHeight: '100%' }}>
                     <TableHead>
                         <TableRow>
                             <TableCell></TableCell>
+                            <TableCell>
+                                <b>STT</b>
+                            </TableCell>
                             <TableCell padding='checkbox'>
                                 <Checkbox
                                     indeterminate={selected.length > 0 && selected.length < users.length}
@@ -125,88 +128,106 @@ const AdminUsersTable: React.FC<UsersTableProps> = ({ users, onUserSelect, rowsP
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paginatedUsers.map((user) => (
-                            <React.Fragment key={user.id}>
-                                <TableRow sx={{ height: 50 }}>
-                                    <TableCell>
-                                        <IconButton size='small' onClick={() => handleExpandClick(user.id)}>
-                                            <FontAwesomeIcon icon={expanded === user.id ? faMinus : faPlus} />
-                                        </IconButton>
-                                    </TableCell>
-                                    <TableCell padding='checkbox'>
-                                        <Checkbox
-                                            checked={selected.includes(user.id)}
-                                            onClick={() => handleClick(user.id)}
-                                        />
-                                    </TableCell>
+                        {users.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={8} sx={{ textAlign: 'center' }}>
+                                    Không có tài khoản nào tồn tại
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            paginatedUsers.map((user, index) => (
+                                <React.Fragment key={user.id}>
+                                    <TableRow sx={{ height: 50 }}>
+                                        <TableCell>
+                                            <IconButton size='small' onClick={() => handleExpandClick(user.id)}>
+                                                <FontAwesomeIcon icon={expanded === user.id ? faMinus : faPlus} />
+                                            </IconButton>
+                                        </TableCell>
+                                        <TableCell sx={{ textAlign: 'center' }}>
+                                            {page * rowsPerPage + index + 1}
+                                        </TableCell>
+                                        <TableCell padding='checkbox'>
+                                            <Checkbox
+                                                checked={selected.includes(user.id)}
+                                                onClick={() => handleClick(user.id)}
+                                            />
+                                        </TableCell>
 
-                                    <TableCell>{user.fullName}</TableCell>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell>{user.phoneNumber || 'Không có'}</TableCell>
-                                    <TableCell>
-                                        {user.gender === 'MALE' ? 'Nam' : user.gender === 'FEMALE' ? 'Nữ' : 'Khác'}
-                                    </TableCell>
-                                    <TableCell>
-                                        {user.dateOfBirth ? dayjs(user.dateOfBirth).format('DD/MM/YYYY') : '-'}
-                                    </TableCell>
-                                    <TableCell sx={{ textAlign: 'right' }}>
-                                        <UserLockButton user={user} />
-                                        <span style={{ width: 10, display: 'inline-block' }}></span>
-                                        <Popconfirm
-                                            onConfirm={() => handleConfirmDelete(user.id)}
-                                            title='Xác nhận xóa'
-                                            description='Bạn có chắc chắn muốn xóa tài khoản này?'
-                                            cancelText='Không'
-                                            okText='Chắc chắn'
-                                        >
-                                            <Button
-                                                variant='contained'
-                                                color='error'
-                                                size='small'
-                                                startIcon={<FontAwesomeIcon icon={faTrash} style={{ fontSize: 10 }} />}
-                                                style={{ fontSize: 12, padding: '3px 8px', minWidth: 'auto' }}
+                                        <TableCell>{user.fullName}</TableCell>
+                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell>{user.phoneNumber || 'Không có'}</TableCell>
+                                        <TableCell>
+                                            {user.gender === 'MALE' ? 'Nam' : user.gender === 'FEMALE' ? 'Nữ' : 'Khác'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {user.dateOfBirth ? dayjs(user.dateOfBirth).format('DD/MM/YYYY') : '-'}
+                                        </TableCell>
+                                        <TableCell sx={{ textAlign: 'right' }}>
+                                            <UserLockButton user={user} />
+                                            <span style={{ width: 10, display: 'inline-block' }}></span>
+                                            <Popconfirm
+                                                onConfirm={() => handleConfirmDelete(user.id)}
+                                                title='Xác nhận xóa'
+                                                description='Bạn có chắc chắn muốn xóa tài khoản này?'
+                                                cancelText='Không'
+                                                okText='Chắc chắn'
                                             >
-                                                Xóa
-                                            </Button>
-                                        </Popconfirm>
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell colSpan={8} sx={{ padding: 0, paddingLeft: 3 }}>
-                                        <Collapse in={expanded === user.id} timeout='auto' unmountOnExit>
-                                            <Typography
-                                                variant='subtitle2'
-                                                sx={{ paddingBottom: '1px', fontWeight: 'bold', paddingTop: 1 }}
-                                            >
-                                                Chi tiết tài khoản: {user.fullName}
-                                            </Typography>
-                                            <Grid container spacing={1} sx={{ fontSize: '0.85rem' }}>
-                                                <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                    <Typography variant='body2'>{`Tổng số bài viết: ${user.postCount}`}</Typography>
+                                                <Button
+                                                    variant='contained'
+                                                    color='error'
+                                                    size='small'
+                                                    startIcon={
+                                                        <FontAwesomeIcon icon={faTrash} style={{ fontSize: 10 }} />
+                                                    }
+                                                    style={{ fontSize: 12, padding: '3px 8px', minWidth: 'auto' }}
+                                                >
+                                                    Xóa
+                                                </Button>
+                                            </Popconfirm>
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell colSpan={8} sx={{ padding: 0, paddingLeft: 10 }}>
+                                            <Collapse in={expanded === user.id} timeout='auto' unmountOnExit>
+                                                <Typography
+                                                    variant='subtitle2'
+                                                    sx={{
+                                                        paddingBottom: '1px',
+                                                        fontWeight: 'bold',
+                                                        fontSize: '0.9rem',
+                                                        paddingTop: 1
+                                                    }}
+                                                >
+                                                    Chi tiết tài khoản: {user.fullName}
+                                                </Typography>
+                                                <Grid container spacing={1} sx={{ fontSize: '0.85rem' }}>
+                                                    <Grid item xs={4} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>{`Tổng số bài viết: ${user.postCount}`}</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={4} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>{`Tổng số người theo dõi: ${user.followerCount}`}</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={4} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>{`Tổng số người đang theo dõi: ${user.followingCount}`}</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={4} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>{`Tổng số bạn bè: ${user.friendCount}`}</Typography>
+                                                    </Grid>
+                                                    <Grid item xs={4} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>
+                                                            {`Địa chỉ: ${user.location || 'Chưa có'}`}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={4} sx={{ padding: '2px' }}>
+                                                        <Typography variant='body2'>{`Ngày tham gia: ${dayjs(user.dateJoined).format('DD/MM/YYYY')}`}</Typography>
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                    <Typography variant='body2'>{`Tổng số người theo dõi: ${user.followerCount}`}</Typography>
-                                                </Grid>
-                                                <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                    <Typography variant='body2'>{`Tổng số người đang theo dõi: ${user.followingCount}`}</Typography>
-                                                </Grid>
-                                                <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                    <Typography variant='body2'>{`Tổng số bạn bè: ${user.friendCount}`}</Typography>
-                                                </Grid>
-                                                <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                    <Typography variant='body2'>
-                                                        {`Địa chỉ: ${user.location || 'Chưa có'}`}
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                    <Typography variant='body2'>{`Ngày tham gia: ${dayjs(user.dateJoined).format('DD/MM/YYYY')}`}</Typography>
-                                                </Grid>
-                                            </Grid>
-                                        </Collapse>
-                                    </TableCell>
-                                </TableRow>
-                            </React.Fragment>
-                        ))}
+                                            </Collapse>
+                                        </TableCell>
+                                    </TableRow>
+                                </React.Fragment>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>

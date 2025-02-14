@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Application.Features.Admin.Queries;
-using SocialNetwork.Application.Features.Auth.Commands;
+using SocialNetwork.Application.Features.Post.Commands;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -36,6 +36,7 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetAllGroupQuery());
             return Ok(response);
         }
+        // USER
         [HttpPut("lock-users")]
         public async Task<IActionResult> LockAccount([FromBody] UnlockAndLockManyAccountCommand command)
         {
@@ -48,6 +49,7 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new UnLockAndLockOneAccountQuery(userId));
             return Ok(response);
         }
+        
         [HttpDelete("delete-user/{userId}")]
         public async Task<IActionResult> DeleteOneAccount(string userId)
         {
@@ -64,6 +66,44 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> DeleteManyAccount([FromBody] List<string>listUserId)
         {
             var response = await mediator.Send(new DeleteManyUserQuery(listUserId));
+            return Ok(response);
+        }
+        // POST
+        [HttpDelete("delete-post/{postId}")]
+        public async Task<IActionResult> DeleteOnePost([FromRoute] Guid postId)
+        {
+            var response = await mediator.Send(new DeletePostCommand(postId));
+            return Ok(response);
+        }
+        [HttpDelete("delete-all-post")]
+        public async Task<IActionResult> DeleteAllPost()
+        {
+            var response = await mediator.Send(new DeleteAllPostQuery());
+            return Ok(response);
+        }
+        [HttpDelete("delete-many-post")]
+        public async Task<IActionResult> DeleteManyPost([FromBody] List<string> listPostId)
+        {
+            var response = await mediator.Send(new DeleteManyPostQuery(listPostId));
+            return Ok(response);
+        }
+        // GROUP
+        [HttpDelete("delete-group/{groupId}")]
+        public async Task<IActionResult> DeleteOneGroup([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new DeleteOneGroupQuery(groupId));
+            return Ok(response);
+        }
+        [HttpDelete("delete-all-group")]
+        public async Task<IActionResult> DeleteAllGroup()
+        {
+            var response = await mediator.Send(new DeleteAllGroupQuery());
+            return Ok(response);
+        }
+        [HttpDelete("delete-many-group")]
+        public async Task<IActionResult> DeleteManyGroup([FromBody] List<string> listPostId)
+        {
+            var response = await mediator.Send(new DeleteManyGroupQuery(listPostId));
             return Ok(response);
         }
     }

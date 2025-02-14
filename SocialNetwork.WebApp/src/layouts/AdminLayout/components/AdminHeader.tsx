@@ -9,12 +9,25 @@ import AdminAccountDialog from './AdminAccountDialog'
 
 type HeaderProps = {
     title: string
+    isSidebarCollapsed: boolean
 }
 
-const AdminHeader: React.FC<HeaderProps> = ({ title }) => {
+const AdminHeader: React.FC<HeaderProps> = ({ title, isSidebarCollapsed }) => {
     const { user } = useSelector(selectAuth)
     return (
-        <AppBar position='fixed' color='primary' sx={{ boxShadow: 1, height: '80px' }}>
+        <AppBar
+            position='fixed'
+            color='primary'
+            sx={{
+                boxShadow: 1,
+                height: '80px',
+                zIndex: 1200,
+                left: 'auto',
+                right: 0,
+                width: `calc(100% - ${isSidebarCollapsed ? 80 : 250}px)`,
+                transition: 'width 0.3s'
+            }}
+        >
             <Toolbar sx={{ height: '100%', display: 'flex', alignItems: 'center', position: 'relative' }}>
                 <Typography
                     variant='h6'

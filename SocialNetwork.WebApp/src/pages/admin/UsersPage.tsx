@@ -17,7 +17,6 @@ import AdminUsersTable from '../../layouts/AdminLayout/components/AdminUserTable
 import { UserResource } from '../../types/user'
 import adminService from '../../services/adminService'
 import ConfirmDeleteDialog from '../../components/dialogs/ConfirmDeleteDialog'
-import { Layout, Spin } from 'antd'
 import CustomTablePagination from '../../layouts/AdminLayout/components/TablePagination'
 import AddAccountDialog from '../../components/dialogs/AddAccountDialog'
 import { toast } from 'react-toastify'
@@ -35,7 +34,7 @@ const UsersPage: React.FC = () => {
     >(null)
     const [selectedUsers, setSelectedUsers] = useState<string[]>([])
     const [page, setPage] = useState(0)
-    const [rowsPerPage, setRowsPerPage] = useState(5)
+    const [rowsPerPage, setRowsPerPage] = useState(10)
     const [loading, setLoading] = useState(false)
     const [isSignUpDialogOpen, setIsSignUpDialogOpen] = useState(false)
 
@@ -136,96 +135,98 @@ const UsersPage: React.FC = () => {
     }
 
     return (
-        <Layout>
-            {loading && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                    <Spin size='large' />
-                </div>
-            )}
-            {!loading && (
-                <>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: 2,
-                            alignItems: 'center',
-                            marginBottom: 1,
-                            boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)'
-                        }}
-                    >
-                        <TextField
-                            variant='outlined'
-                            size='small'
-                            placeholder='Tìm kiếm'
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            sx={{ backgroundColor: 'white', borderRadius: '4px', width: '225px' }}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position='start'>
-                                        <FontAwesomeIcon icon={faSearch} style={{ color: '#757575' }} />
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
-                        <FormControl size='small' variant='outlined' sx={{ minWidth: 110, width: 'fit-content' }}>
-                            <InputLabel>Giới tính</InputLabel>
-                            <Select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)}>
-                                <MenuItem value=''>Tất cả</MenuItem>
-                                <MenuItem value='MALE'>Nam</MenuItem>
-                                <MenuItem value='FEMALE'>Nữ</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <FormControl size='small' sx={{ minWidth: 160, width: 'fit-content' }}>
-                            <InputLabel>Khóa tài khoản</InputLabel>
-                            <Select value={isLockFilter} onChange={(e) => setIsLockFilter(e.target.value)}>
-                                <MenuItem value=''>Tất cả</MenuItem>
-                                <MenuItem value='true'>Đã khóa</MenuItem>
-                                <MenuItem value='false'>Chưa khóa</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <FormControl size='small' sx={{ minWidth: 190, width: 'fit-content' }}>
-                            <InputLabel>Xác thực tài khoản</InputLabel>
-                            <Select
-                                value={isVerificationFilter}
-                                onChange={(e) => setIsVerificationFilter(e.target.value)}
-                            >
-                                <MenuItem value=''>Tất cả</MenuItem>
-                                <MenuItem value='true'>Đã xác thực</MenuItem>
-                                <MenuItem value='false'>Chưa xác thực</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <Toolbar sx={{ display: 'flex', gap: 1, marginLeft: 'auto' }}>
-                            <Button variant='contained' color='primary' onClick={handleOpenMenu}>
-                                <FontAwesomeIcon icon={faCircleChevronDown} style={{ marginRight: 5 }} />
-                                Thêm thao tác
-                            </Button>
-                            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-                                <MenuItem onClick={() => handleOpenDialog('delete-all')}>
-                                    <FontAwesomeIcon icon={faTrashAlt} style={{ marginRight: 10, color: 'red' }} />
-                                    Xóa tất cả tài khoản
-                                </MenuItem>
-                                <MenuItem onClick={() => handleOpenDialog('delete-selected')}>
-                                    <FontAwesomeIcon icon={faTrashAlt} style={{ marginRight: 10, color: 'red' }} />
-                                    Xóa các tài khoản đã chọn
-                                </MenuItem>
-                                <MenuItem onClick={() => handleOpenDialog('lock-selected')}>
-                                    <FontAwesomeIcon icon={faLock} style={{ marginRight: 10, color: 'red' }} />
-                                    Khóa các tài khoản đã chọn
-                                </MenuItem>
-                                <MenuItem onClick={() => handleOpenDialog('unlock-selected')}>
-                                    <FontAwesomeIcon icon={faUnlock} style={{ marginRight: 10, color: 'green' }} />
-                                    Mở khóa các tài khoản đã chọn
-                                </MenuItem>
-                            </Menu>
-                            <Button variant='contained' color='secondary' onClick={() => handleOpenSignUpDialog()}>
-                                <FontAwesomeIcon icon={faAdd} style={{ marginRight: 5 }} /> Thêm tài khoản
-                            </Button>
-                        </Toolbar>
-                    </Box>
-
-                    <Box sx={{ flex: 1, overflow: 'auto' }}>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                gap: 2
+            }}
+        >
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 2,
+                    alignItems: 'center'
+                }}
+            >
+                <TextField
+                    variant='outlined'
+                    size='small'
+                    placeholder='Tìm kiếm'
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    sx={{ backgroundColor: 'white', borderRadius: '4px', width: '225px' }}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position='start'>
+                                <FontAwesomeIcon icon={faSearch} style={{ color: '#757575' }} />
+                            </InputAdornment>
+                        )
+                    }}
+                />
+                <FormControl size='small' variant='outlined' sx={{ minWidth: 110, width: 'fit-content' }}>
+                    <InputLabel>Giới tính</InputLabel>
+                    <Select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)}>
+                        <MenuItem value=''>Tất cả</MenuItem>
+                        <MenuItem value='MALE'>Nam</MenuItem>
+                        <MenuItem value='FEMALE'>Nữ</MenuItem>
+                    </Select>
+                </FormControl>
+                <FormControl size='small' sx={{ minWidth: 160, width: 'fit-content' }}>
+                    <InputLabel>Khóa tài khoản</InputLabel>
+                    <Select value={isLockFilter} onChange={(e) => setIsLockFilter(e.target.value)}>
+                        <MenuItem value=''>Tất cả</MenuItem>
+                        <MenuItem value='true'>Đã khóa</MenuItem>
+                        <MenuItem value='false'>Chưa khóa</MenuItem>
+                    </Select>
+                </FormControl>
+                <FormControl size='small' sx={{ minWidth: 190, width: 'fit-content' }}>
+                    <InputLabel>Xác thực tài khoản</InputLabel>
+                    <Select value={isVerificationFilter} onChange={(e) => setIsVerificationFilter(e.target.value)}>
+                        <MenuItem value=''>Tất cả</MenuItem>
+                        <MenuItem value='true'>Đã xác thực</MenuItem>
+                        <MenuItem value='false'>Chưa xác thực</MenuItem>
+                    </Select>
+                </FormControl>
+                <Toolbar sx={{ display: 'flex', gap: 1, marginLeft: 'auto' }}>
+                    <Button variant='contained' color='primary' onClick={handleOpenMenu}>
+                        <FontAwesomeIcon icon={faCircleChevronDown} style={{ marginRight: 5 }} />
+                        Thêm thao tác
+                    </Button>
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+                        <MenuItem onClick={() => handleOpenDialog('delete-all')}>
+                            <FontAwesomeIcon icon={faTrashAlt} style={{ marginRight: 10, color: 'red' }} />
+                            Xóa tất cả tài khoản
+                        </MenuItem>
+                        <MenuItem onClick={() => handleOpenDialog('delete-selected')}>
+                            <FontAwesomeIcon icon={faTrashAlt} style={{ marginRight: 10, color: 'red' }} />
+                            Xóa các tài khoản đã chọn
+                        </MenuItem>
+                        <MenuItem onClick={() => handleOpenDialog('lock-selected')}>
+                            <FontAwesomeIcon icon={faLock} style={{ marginRight: 10, color: 'red' }} />
+                            Khóa các tài khoản đã chọn
+                        </MenuItem>
+                        <MenuItem onClick={() => handleOpenDialog('unlock-selected')}>
+                            <FontAwesomeIcon icon={faUnlock} style={{ marginRight: 10, color: 'green' }} />
+                            Mở khóa các tài khoản đã chọn
+                        </MenuItem>
+                    </Menu>
+                    <Button variant='contained' color='secondary' onClick={() => handleOpenSignUpDialog()}>
+                        <FontAwesomeIcon icon={faAdd} style={{ marginRight: 5 }} /> Thêm tài khoản
+                    </Button>
+                </Toolbar>
+            </Box>
+            <Box
+                sx={{
+                    flex: 1,
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}
+            >
+                {!loading && (
+                    <>
                         <AdminUsersTable
                             users={filteredUsers}
                             onUserSelect={handleUserSelect}
@@ -233,32 +234,32 @@ const UsersPage: React.FC = () => {
                             page={page}
                             fetchUsers={fetchUsers}
                         />
-                    </Box>
-                    <CustomTablePagination
-                        count={allUser.length}
-                        page={page}
-                        rowsPerPage={rowsPerPage}
-                        onPageChange={(_, newPage) => setPage(newPage)}
-                        onRowsPerPageChange={(event) => {
-                            setRowsPerPage(parseInt(event.target.value, 10))
-                            setPage(0)
-                        }}
-                    />
-                    <ConfirmDeleteDialog
-                        title={'tài khoản'}
-                        dialogOpen={dialogOpen}
-                        deleteType={deleteType}
-                        handleCloseDialog={handleCloseDialog}
-                        handleConfirmDelete={handleConfirmDelete}
-                    />
-                    <AddAccountDialog
-                        isVisible={isSignUpDialogOpen}
-                        onClose={handleCloseSignUpDialog}
-                        fetchUsers={fetchUsers}
-                    />
-                </>
-            )}
-        </Layout>
+                    </>
+                )}
+            </Box>
+            <CustomTablePagination
+                count={allUser.length}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onPageChange={(_, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                    setRowsPerPage(parseInt(event.target.value, 10))
+                    setPage(0)
+                }}
+            />
+            <ConfirmDeleteDialog
+                title={'tài khoản'}
+                dialogOpen={dialogOpen}
+                deleteType={deleteType}
+                handleCloseDialog={handleCloseDialog}
+                handleConfirmDelete={handleConfirmDelete}
+            />
+            <AddAccountDialog
+                isVisible={isSignUpDialogOpen}
+                onClose={handleCloseSignUpDialog}
+                fetchUsers={fetchUsers}
+            />
+        </Box>
     )
 }
 

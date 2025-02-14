@@ -116,9 +116,5 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Where(u => listUserId.Contains(u.Id))
                 .ExecuteDeleteAsync();
         }
-        public async Task AddUser(User user)
-        {
-            await _context.Users.AddAsync(user);
-        }
     }
 }

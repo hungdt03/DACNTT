@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
+using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.DBContext;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
@@ -286,6 +287,18 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Posts
                 .Where(p => p.IsGroupPost && p.GroupId == groupId && p.DateCreated.Date == DateTimeOffset.UtcNow.Date).CountAsync();
+        }
+
+        public async Task DeleteManyPost(List<string> listPostId)
+        {
+            await _context.Posts
+                .Where(u => listPostId.Contains(u.Id.ToString()))
+                .ExecuteDeleteAsync();
+        }
+
+        public async Task DeleteAllPost()
+        {
+             await _context.Posts.ExecuteDeleteAsync();
         }
     }
 }
