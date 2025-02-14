@@ -16,13 +16,11 @@ import LoadingIndicator from "../LoadingIndicator";
 
 type SearchSuggestionListProps = {
     suggestion: SearchAllSuggestResource;
-    isUserBefore: boolean;
     searchValue: string;
 }
 
 const SearchSuggestionList: FC<SearchSuggestionListProps> = ({
     suggestion,
-    isUserBefore,
     searchValue
 }) => {
     const [pagination, setPagination] = useState(inititalValues);

@@ -167,39 +167,49 @@ const SharePost: FC<SharePostProps> = ({
     return <div className="flex flex-col gap-y-3 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
-                <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
+                {!post.user.haveStory
+                    ? <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
+                    : <Link className="p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
+                }
                 <div className="flex flex-col gap-y-[1px]">
-                    <div className="flex items-center gap-x-1">
-                        <div className="font-bold text-[14px] text-gray-600">
-                            <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
-                            {post.tags.length > 0 &&
-                                (() => {
-                                    const maxDisplay = 3;
-                                    const displayedTags = post.tags.slice(0, maxDisplay);
-                                    const remainingTagsCount = post.tags.length - maxDisplay;
-                                    const remainingTags = post.tags.slice(maxDisplay)
+                    <div className="inline-flex items-center gap-x-1 flex-wrap text-[14px] text-gray-600">
+                        <span className="font-bold">
+                            <Link to={`/profile/${post.user.id}`} className="text-[13px] md:text-sm hover:underline inline">
+                                {post.user?.fullName}
+                            </Link>
+                        </span>
+                        {post.tags.length > 0 &&
+                            (() => {
+                                const maxDisplay = 3;
+                                const displayedTags = post.tags.slice(0, maxDisplay);
+                                const remainingTagsCount = post.tags.length - maxDisplay;
+                                const remainingTags = post.tags.slice(maxDisplay);
 
-                                    return (
-                                        <>
-                                            {' cùng với '}
-                                            {displayedTags.map((tag, index) => (
-                                                <Link className="hover:underline" to={`/profile/${tag.user.id}`} key={tag.id}>
+                                return (
+                                    <>
+                                        <span> cùng với </span>
+                                        {displayedTags.map((tag, index) => (
+                                            <span key={tag.id}>
+                                                <Link to={`/profile/${tag.user.id}`} className="hover:underline inline">
                                                     {tag.user.fullName}
-                                                    {index < displayedTags.length - 1 ? ', ' : ''}
                                                 </Link>
-                                            ))}
+                                                {index < displayedTags.length - 1 ? ", " : ""}
+                                            </span>
+                                        ))}
+                                        {remainingTagsCount > 0 && (
                                             <Tooltip title={<PostOtherTags tags={remainingTags} />}>
-                                                {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
+                                                <span> và {remainingTagsCount} người khác</span>
                                             </Tooltip>
-                                        </>
-                                    );
-                                })()}
-                        </div>
-                        <p className="text-gray-400 text-[14px]">đã chia sẻ bài viết</p>
+                                        )}
+                                    </>
+                                );
+                            })()}
+                        <span className="text-[13px] md:text-sm text-gray-400"> đã chia sẻ bài viết</span>
                     </div>
+
                     <div className="flex items-center gap-x-2">
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
-                            <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
+                            <span className="text-[11px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
                         <button onClick={post.isGroupPost || post.user.id !== user?.id ? undefined : showPrivacy}>{getPrivacyPost(post.privacy)}</button>
                     </div>
@@ -221,16 +231,16 @@ const SharePost: FC<SharePostProps> = ({
             <ExpandableText content={post.content} />
             {post.originalPostId ? <PostShareInner post={post.originalPost} /> : <PostNotFound />}
         </div>
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between md:text-sm text-[13px]">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
                 <Avatar.Group>
-                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="w-5 h-5 mx-[5px]" />)}
+                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="md:w-5 w-3 h-3 md:h-5 mx-[5px]" />)}
                 </Avatar.Group>
                 <span className="hover:underline">{reactions?.length === 0 ? '' : reactions?.length}</span>
             </button>
             <div className="flex gap-x-4 items-center">
                 <button onClick={showModal} className="hover:underline text-gray-500">{post.comments} bình luận</button>
-                <button onClick={showListShare} className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>
+                {post.privacy === PrivacyType.PUBLIC && <button onClick={showListShare} className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>}
             </div>
         </div>
         <Divider className='my-0' />
@@ -240,35 +250,35 @@ const SharePost: FC<SharePostProps> = ({
             />}>
                 {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
             </Popover>
-            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
-                <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
+            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex items-center justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
+                <ChatBubbleLeftIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
                 <span>Bình luận</span>
             </button>
-            {(post.originalPostId || allowShare) && (<button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
-                <ShareIcon className="h-5 w-5 text-gray-500" />
+            {(post.originalPostId && allowShare) && (<button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 text-sm text-gray-500">
+                <ShareIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>)}
         </div>
         <Divider className='mt-0 mb-2' />
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Bài viết của {post.user.fullName}</p>} width='700px' footer={[
+        <Modal style={{ top: 20 }} title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Bài viết của {post.user.fullName}</p>} width='700px' footer={[
 
         ]} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             <PostModal post={post} />
         </Modal>
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
+        <Modal style={{ top: 20 }} title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
             <PostReactionModal reactions={reactions} />
         </Modal>
 
-        <Modal title={<p className="text-center font-bold text-lg">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
+        <Modal title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
             <EditSharePostModal
                 onSubmit={handleEditSharePostAsync}
                 post={post}
             />
         </Modal>
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
+        <Modal style={{ top: 20 }} title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
             <SharePostModal
                 post={post}
                 onSuccess={(data, msg) => {
@@ -284,7 +294,7 @@ const SharePost: FC<SharePostProps> = ({
 
         <Modal
             style={{ top: 20 }}
-            title={<p className="text-center font-bold text-lg">Những người đã chia sẻ bài viết</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Những người đã chia sẻ bài viết</p>}
             width='500px'
             centered
             open={openListShare}
@@ -300,7 +310,7 @@ const SharePost: FC<SharePostProps> = ({
 
         {/* MODAL CHANGE PRIVACY*/}
         <Modal
-            title={<p className="text-center font-bold text-lg">Chọn đối tượng</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Chọn đối tượng</p>}
             centered
             open={openPrivacy}
             onOk={okPrivacy}

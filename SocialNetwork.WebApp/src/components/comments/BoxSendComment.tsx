@@ -205,9 +205,9 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
 
     return <div className="flex flex-col items-start gap-y-2">
         <div className="flex items-center gap-x-4 w-full">
-            <Avatar size='default' className="flex-shrink-0" src={user?.avatar ?? images.user} />
+            <Avatar className="flex-shrink-0 w-[25px] h-[25px] sm:w-[35px] sm:h-[35px]" src={user?.avatar ?? images.user} />
 
-            <div className={cn("bg-gray-100 px-1 rounded-xl w-full flex items-center justify-between py-[2px]")}>
+            <div className={cn("bg-gray-100 px-1 rounded-xl w-full flex items-center justify-between sm:py-[2px]")}>
 
                 {initialEditorState &&
                     <LexicalComposer initialConfig={{
@@ -220,7 +220,7 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
                                     className="w-full min-h-[30px] border-none outline-none px-4 z-0"
                                 />}
                                 placeholder={
-                                    <p className="text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
+                                    <p className="text-xs md:text-sm line-clamp-1 text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
                                         Nhập bình luận...
                                     </p>
                                 }

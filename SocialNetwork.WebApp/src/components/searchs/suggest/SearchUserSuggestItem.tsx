@@ -19,7 +19,7 @@ const SearchUserSuggestItem: FC<SearchUserSuggestItemProps> = ({
 
         <div className="flex items-center gap-x-2">
             <img src={suggest.user.avatar ?? images.cover} className="w-[35px] h-[35px] rounded-full border-[1px] border-gray-100" />
-            <div className="flex flex-col">
+            <div className="flex flex-col items-start">
                 <span className="text-sm font-semibold line-clamp-1">{suggest.user.fullName}</span>
                 <span className="text-gray-600 text-xs line-clamp-1">
                     {suggest.isFriend ? 'Bạn bè' : `${suggest.countMutualFriends} bạn chung`}

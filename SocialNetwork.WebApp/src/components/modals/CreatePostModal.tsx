@@ -130,7 +130,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
 
     return <div className="flex flex-col gap-y-4 max-h-[600px] overflow-y-auto custom-scrollbar">
         <div className="flex items-center gap-x-2">
-            <Avatar className="flex-shrink-0" size='large' src={user?.avatar ?? images.user} />
+            <Avatar className="flex-shrink-0 w-[30px] h-[30px] sm:w-[40px] sm:h-[40px]"  src={user?.avatar ?? images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
                 <div className="text-[14px] font-semibold text-gray-700">
                     {user?.fullName}
@@ -166,7 +166,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         </div>
         <div className="flex flex-col gap-y-4">
             <div className="relative w-full flex justify-center">
-                <div className={cn("relative items-center justify-center w-full h-[320px] rounded-md px-6 py-8", postRequest.background ? 'flex' : 'hidden')} style={{
+                <div className={cn("relative items-center justify-center w-full h-[260px] sm:h-[320px] rounded-md px-6 py-8", postRequest.background ? 'flex' : 'hidden')} style={{
                     background: postRequest.background
                 }} >
                     <div
@@ -185,11 +185,11 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                         }}
                         contentEditable
                         aria-placeholder="Bạn đang nghĩ gì thế"
-                        className="text-2xl font-bold editable-div bg-transparent text-center w-full outline-none border-none text-white break-words break-all"
+                        className="sm:text-2xl text-lg font-bold editable-div bg-transparent text-center w-full outline-none border-none text-white break-words break-all"
                     ></div>
 
                 </div>
-                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 3 : 5} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full max-h-[400px] overflow-y-auto custom-scrollbar p-2", isLongText ? 'text-[16px]' : 'text-xl')} placeholder="Bạn đang nghĩ gì thế" />}
+                {!postRequest.background && <textarea ref={textareaRef} value={postRequest.content} rows={showUpload ? 3 : 5} onChange={e => handleContentChange(e.target.value)} className={cn("outline-none border-none w-full max-h-[400px] overflow-y-auto custom-scrollbar p-2", isLongText ? 'sm:text-[16px] text-[14px]' : 'sm:text-xl text-lg')} placeholder="Bạn đang nghĩ gì thế" />}
             </div>
             {showUpload && <div className="flex flex-col">
                 <UploadMultipleFile
@@ -198,9 +198,9 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                 />
                 <span className="text-sm italic">(Tối đa 50MB)</span>
             </div>}
-            <div className="p-2 rounded-md border-[1px] border-gray-200 flex justify-between items-center">
-                <span>Thêm vào bài viết của bạn</span>
-                <div className="flex items-center gap-x-1">
+            <div className="sm:p-2 px-2 py-1 rounded-md border-[1px] border-gray-200 flex justify-between items-center">
+                <span className="sm:text-sm text-[13px]">Thêm vào bài viết của bạn</span>
+                <div className="flex items-center sm:gap-x-1">
                     <Tooltip title='Phông nền'>
                         <Popover trigger='click' content={<BackgroundPostOption
                             onChange={background => {
@@ -219,13 +219,13 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                             }}
                         />}>
                             <button className={cn(postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200 && 'cursor-not-allowed')} disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200} onClick={() => setIsUseBackground(!isUseBackground)}>
-                                <img width={30} height={30} src={images.AaBackground} />
+                                <img className="sm:w-[30px] sm:h-[30xp] w-[25px] h-[25px]" src={images.AaBackground} />
                             </button>
                         </Popover>
                     </Tooltip>
                     <Tooltip title='Ảnh/video'>
                         <button disabled={!!postRequest.background || postRequest.images.length > 0 || postRequest.videos.length > 0} onClick={handleShowUploadBtn} className={cn("p-2 rounded-full hover:bg-gray-100", (!!postRequest.background || postRequest.images.length > 0 || postRequest.videos.length > 0) && 'cursor-not-allowed')}>
-                            <img alt="Ảnh" className="w-6 h-6" src={images.photo} />
+                            <img alt="Ảnh" className="sm:w-6 sm:h-6 w-[22px] h-[22px]" src={images.photo} />
                         </button>
                     </Tooltip>
                     <Popover trigger='click' placement="right" open={finishTag} content={<TagFriendModal
@@ -236,13 +236,13 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                         })}
                     />} title='Gắn thẻ người khác'>
                         <button onClick={() => setFinishTag(!finishTag)} className="p-2 rounded-full hover:bg-gray-100">
-                            <img alt="Tag" className="w-7 h-7" src={images.tagFriend} />
+                            <img alt="Tag" className="sm:w-7 sm:h-7 w-6 h-6" src={images.tagFriend} />
                         </button>
                     </Popover>
                 </div>
             </div>
         </div>
-        <button onClick={handleCreatePost} disabled={!postRequest.content} className="py-[5px] w-full rounded-md font-semibold text-[16px] text-white bg-sky-500">Đăng</button>
+        <button onClick={handleCreatePost} disabled={!postRequest.content} className="sm:py-[5px] py-[3px] w-full rounded-md font-semibold text-sm sm:text-[16px] text-white bg-sky-500">Đăng</button>
 
     </div>
 };

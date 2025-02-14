@@ -20,27 +20,29 @@ const Navbar: FC = () => {
     const [countUnreadChatRoom, setCountUnreadChatRoom] = useState<number>(0)
     const [countUnreadNotification, setCountUnreadNotification] = useState<number>(0)
 
-    return <div className="flex items-center gap-x-3">
+    return <div className="flex items-center gap-x-2 md:gap-x-3">
         <Badge count={countUnreadNotification}>
             <Popover trigger='click' placement="topRight" content={<NotificationDialog
                 onCountNotification={(count) => setCountUnreadNotification(count)}
-             />}>
-                <button className="p-3 rounded-md bg-gray-100">
-                    <Bell className="text-gray-500" size={18} />
+            />}>
+                <button className="p-[10px] md:p-3 rounded-md bg-gray-100">
+                    <Bell className="text-gray-500 md:hidden" size={15} />
+                    <Bell className="hidden md:block text-gray-500" size={18} />
                 </button>
             </Popover>
         </Badge>
         <Badge count={countUnreadChatRoom}>
             <Popover trigger='click' placement="bottomRight" content={<MessengerDialog onCountChatRoom={count => setCountUnreadChatRoom(count)} />}>
-                <button className="p-3 rounded-md bg-gray-100">
-                    <MessageSquare className="text-gray-500" size={18} />
+                <button className="p-[10px] md:p-3 rounded-md bg-gray-100">
+                    <MessageSquare className="text-gray-500 md:hidden" size={15} />
+                    <MessageSquare className="hidden md:block text-gray-500" size={18} />
                 </button>
             </Popover>
         </Badge>
-        <Popover trigger='click' placement="bottomRight" content={<AccountDialog />}>
+        <Popover trigger='click' className="flex-shrink-0" placement="bottomRight" content={<AccountDialog />}>
             <div className="relative">
                 <button className="border-[1px] border-gray-300 rounded-full overflow-hidden">
-                    <img className='object-cover w-[38px] h-[38px]' src={user?.avatar ?? images.user} />
+                    <img className='object-cover w-[30px] h-[30px] md:w-[36px] md:h-[36px]' src={user?.avatar ?? images.user} />
                 </button>
                 <button className="absolute right-0 bottom-0 p-[1px] rounded-full border-[1px] bg-gray-50 border-gray-200">
                     <ChevronDown className="text-gray-500 font-bold" size={14} />

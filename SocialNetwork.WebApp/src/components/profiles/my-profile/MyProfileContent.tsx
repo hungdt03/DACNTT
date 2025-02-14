@@ -21,115 +21,27 @@ import ProfileFolloweeList from "../shared/ProfileFolloweesList";
 import ProfileSavedPost from "../shared/ProfileSavedPost";
 import ProfileImageList from "../shared/ProfileImageList";
 import ProfileVideoList from "../shared/ProfileVideoList";
-import useModal from "../../../hooks/useModal";
-import UpdateUserInfoModal from "../../modals/UpdateUserInfoModal";
 
 type MyProfileContentProps = {
     user: UserResource;
-    friends: FriendResource[]
 }
 
-const VALID_TABS = ["friends", "followers", "followees", "saved-posts", "images", "videos"];
+export const VALID_TABS = ["friends", "followers", "followees", "saved-posts", "images", "videos"];
 
 const MyProfileContent: FC<MyProfileContentProps> = ({
     user,
-    friends
 }) => {
-
-    const dispatch = useDispatch<AppDispatch>();
-    const [loading, setLoading] = useState(false);
-    const [coverLoading, setCoverLoading] = useState(false)
-    const [tempCoverImage, setTempCoverImage] = useState<string>('')
-    const [fileCoverImage, setFileCoverImage] = useState<UploadFile>();
 
     const { id, tab } = useParams();
     const navigate = useNavigate();
-    const { isModalOpen, handleCancel, handleOk, showModal } = useModal()
 
     useEffect(() => {
         if (id && tab && !VALID_TABS.includes(tab)) {
             navigate(`/profile/${id}`, { replace: true });
         }
 
-        console.log(user)
     }, [tab, id, navigate]);
 
-    const onAvatarChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
-        if (!isValidImage(newFileList[0] as RcFile)) {
-            message.error('Vui lòng chọn file ảnh')
-            return false;
-        } else {
-            const totalSize = (newFileList[0] as RcFile).size;
-            const maxSize = 4 * 1024 * 1024;
-
-            if (totalSize > maxSize) {
-                message.error("Vui lòng chọn file ảnh tối đa 4MB");
-                return false;
-            }
-        }
-
-        uploadAvatar(newFileList[0])
-    };
-
-    const onCoverImageChange: UploadProps['onChange'] = async ({ file }) => {
-        if (!isValidImage(file as RcFile)) {
-            message.error('Vui lòng chọn file ảnh')
-            return;
-        } else {
-            const totalSize = (file as RcFile).size;
-            const maxSize = 4 * 1024 * 1024;
-
-            if (totalSize > maxSize) {
-                message.error("Vui lòng chọn file ảnh tối đa 4MB");
-                return;
-            }
-        }
-
-        const base64Url = await getBase64(file as RcFile);
-        setTempCoverImage(base64Url);
-        setFileCoverImage(file)
-    };
-
-    const uploadAvatar = async (file: UploadFile) => {
-        if (file.originFileObj) {
-            const formData = new FormData();
-            formData.append('file', file.originFileObj, file.name);
-
-            setLoading(true)
-            const response = await userService.uploadAvatar(formData);
-            setLoading(false)
-
-            if (response.isSuccess) {
-                toast.success(response.message);
-                dispatch(setUserDetails(response.data))
-            } else {
-                toast.error(response.message)
-            }
-        }
-
-    }
-
-    const uploadCoverImage = async (file: UploadFile | undefined) => {
-
-        if (file) {
-            const formData = new FormData();
-            formData.append('file', file as RcFile);
-
-            setCoverLoading(true)
-            const response = await userService.uploadCoverImage(formData);
-            setCoverLoading(false)
-
-            if (response.isSuccess) {
-                toast.success(response.message);
-                dispatch(setUserDetails(response.data))
-                setFileCoverImage(undefined)
-                setTempCoverImage('')
-            } else {
-                toast.error(response.message)
-            }
-        }
-
-    }
 
     const items: TabsProps['items'] = [
         {
@@ -174,109 +86,8 @@ const MyProfileContent: FC<MyProfileContentProps> = ({
     };
 
 
-    return <div id="my-profile-page" className="bg-transparent w-full col-span-12 lg:col-span-8 overflow-y-auto scrollbar-hide py-4">
-        <div className="flex flex-col gap-y-4 overflow-y-auto bg-white p-4">
-            <div className="w-full h-full relative z-10">
-                <img alt="Ảnh bìa" className="w-full border-[1px] object-cover max-h-[25vh] h-full md:max-h-[30vh] rounded-lg" src={tempCoverImage || user.coverImage || images.cover} />
-                <div className="flex items-center gap-x-2 absolute right-4 top-4 md:top-auto md:bottom-4 shadow">
-                    <Upload
-                        beforeUpload={() => false}
-                        showUploadList={false}
-                        onChange={onCoverImageChange}
-                        multiple={false}
-                        className="cursor-pointer w-full"
-                        disabled={loading}
-                    >
-                        <button disabled={coverLoading} className="shadow bg-white text-primary flex items-center gap-x-2 px-3 py-2 rounded-md cursor-pointer">
-                            <LucideUpload size={18} />
-                            <span className="text-sm font-semibold">
-                                {tempCoverImage ? 'Chọn ảnh khác' : 'Thêm ảnh bìa'}
-                            </span>
-                        </button>
-                    </Upload>
-                    {tempCoverImage && <Button loading={coverLoading} onClick={() => uploadCoverImage(fileCoverImage)} type="primary" className="cursor-pointer" icon={<CheckIcon />}>
-                        Lưu lại
-                    </Button>}
-                </div>
-            </div>
-
-            <div className="flex flex-col lg:flex-row items-center lg:items-end -mt-20 gap-x-6 lg:-mt-12 px-8">
-                <div className="relative z-30 flex-shrink-0">
-                    {user?.haveStory ?
-                        <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[4px] p-1 border-primary flex items-center justify-center aspect-square" to={`/stories/${user.id}`}>
-                            <img alt="Ảnh đại diện" className="object-cover w-full h-full rounded-full" src={user?.avatar ?? images.user} />
-                        </Link>
-                        : <img
-                            alt="Ảnh đại diện"
-                            className="lg:w-32 lg:h-32 w-28 h-28 rounded-full z-30 object-cover"
-                            src={user?.avatar ?? images.user}
-                        />
-                    }
-
-                    {user?.isOnline && <div className="absolute bottom-2 right-3 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
-                    <ImgCrop modalOk="Lưu lại" modalCancel="Hủy bỏ" modalTitle="Ảnh đại diện" showGrid showReset resetText="Bắt đầu lại" rotationSlider>
-                        <Upload
-                            multiple={false}
-                            maxCount={1}
-                            beforeUpload={(_) => false}
-                            showUploadList={false}
-                            onChange={onAvatarChange}
-                            className="cursor-pointer absolute bottom-0 right-0 p-1 bg-white border-primary border-[1px] w-8 h-8 flex items-center justify-center rounded-full"
-                        >
-                            <Camera className="text-primary" size={18} />
-                        </Upload>
-                    </ImgCrop>
-
-                </div>
-                <div className="lg:py-6 py-3 flex flex-col lg:flex-row items-center gap-y-4 lg:gap-y-0 lg:items-end justify-between w-full">
-                    <div className="flex flex-col items-center lg:items-start gap-y-1">
-                        <span className="font-bold text-2xl">{user?.fullName}</span>
-                        <div className="flex items-center gap-x-3">
-                            <span className="text-gray-500">{user?.friendCount} người bạn</span>
-                            <div className="bg-primary w-2 h-2 rounded-full"></div>
-                            <span className="font-semibold text-gray-500">{user?.followingCount} đang theo dõi</span>
-                            <div className="bg-primary w-2 h-2 rounded-full"></div>
-                            <span className="font-semibold text-gray-500">{user?.followerCount} theo dõi</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="w-full flex justify-between">
-                <Avatar.Group>
-                    {friends.map(friend => <Tooltip key={friend.id} title={friend.fullName}>
-                        <Avatar src={friend.avatar} />
-                    </Tooltip>)}
-                </Avatar.Group>
-                <div className="flex items-center gap-x-2">
-                    <Button onClick={showModal} icon={<Plus size={16} />} type='primary'>Thông tin cá nhân</Button>
-                    <Link to='/stories/create'>
-                        <Button icon={<Plus size={16} />} type='primary'>Thêm vào tin</Button>
-                    </Link>
-                </div>
-            </div>
-            <Divider className="my-3" />
-            <Tabs defaultActiveKey="" activeKey={tab} onChange={handleTabChange} className="bg-white p-4 rounded-lg" items={items} />
-            {loading && <Loading />}
-
-        </div>
-
-        <Modal
-            style={{ top: 50 }}
-            title={<p className="text-center font-bold text-[16px]">Cập nhật thông tin cá nhân</p>}
-            width='500px'
-            open={isModalOpen}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            classNames={{
-                footer: 'hidden'
-            }}
-        >
-            <UpdateUserInfoModal
-                onSuccess={handleOk}
-                user={user}
-            />
-        </Modal>
-
+    return <div id="my-profile-page" className="bg-transparent w-full lg:h-full lg:overflow-y-auto lg:scrollbar-hide lg:col-span-7 py-2 md:py-4">
+        <Tabs defaultActiveKey="" activeKey={tab} onChange={handleTabChange} className="p-4 h-full rounded-lg bg-white" items={items} />
     </div >
 };
 

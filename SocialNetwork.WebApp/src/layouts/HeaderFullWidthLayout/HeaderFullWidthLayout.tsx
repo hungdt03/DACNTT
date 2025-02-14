@@ -5,7 +5,7 @@ import PopupWrapper from "../../components/chats/PopupWrapper";
 import MinimizePopupWrapper from "../../components/chats/MinimizePopupWrapper";
 
 const HeaderFullWidthLayout: FC = () => {
-    return <div className="flex flex-col bg-slate-100 h-screen w-screen">
+    return <div className="flex flex-col bg-slate-100 h-screen w-screen overflow-hidden">
         <HeaderFullWidth />
         <Outlet />
 

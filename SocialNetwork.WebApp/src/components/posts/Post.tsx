@@ -238,13 +238,13 @@ const Post: FC<PostProps> = ({
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
                 {!post.user.haveStory 
-                    ? <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} /> 
+                    ? <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0" src={post.user.avatar ?? images.user} /> 
                     : <Link className="p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
                 }
                 
-                <div className="flex flex-col gap-y-[1px]">
-                    <div className="font-bold text-[14px] text-gray-600">
-                        <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                <div className="flex flex-col md:gap-y-[1px]">
+                    <div className="font-bold text-gray-600">
+                        <Link className="text-[13px] md:text-sm" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
                         {post.tags.length > 0 &&
                             (() => {
                                 const maxDisplay = 3;
@@ -270,7 +270,7 @@ const Post: FC<PostProps> = ({
                     </div>
                     <div className="flex items-center gap-x-2">
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
-                            <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
+                            <span className="text-[11px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
                        <button onClick={post.isGroupPost || post.user.id !== user?.id ? undefined : showPrivacy}>{getPrivacyPost(post.privacy)}</button>
                     </div>
@@ -298,16 +298,15 @@ const Post: FC<PostProps> = ({
             {post.background ? <div style={{
                 background: post.background,
                 width: '100%',
-                height: 380
-            }} className="flex items-center justify-center px-6 py-8 rounded-md">
-                <p className="text-2xl font-bold text-center break-words break-all text-white">{post.content}</p>
+            }} className="flex items-center md:h-[380px] sm:h-[350px] h-[280px] justify-center px-6 py-8 rounded-md">
+                <p className="md:text-2xl text-lg font-bold text-center break-words break-all text-white">{post.content}</p>
             </div> : <ExpandableText content={post.content} />}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
         </div>
         <div className="flex items-center justify-between md:text-sm text-[13px]">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
                 <Avatar.Group>
-                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="w-5 h-5 mx-[5px]" />)}
+                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="md:w-5 w-3 h-3 md:h-5 mx-[5px]" />)}
                 </Avatar.Group>
                 <span className="hover:underline">{reactions?.length === 0 ? '' : reactions?.length}</span>
             </button>
@@ -324,12 +323,12 @@ const Post: FC<PostProps> = ({
             />}>
                 {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
             </Popover>
-            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
-                <ChatBubbleLeftIcon className="h-5 w-5 text-gray-500" />
+            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex items-center justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
+                <ChatBubbleLeftIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
                 <span>Bình luận</span>
             </button>
             {allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
-                <ShareIcon className="h-5 w-5 text-gray-500" />
+                <ShareIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>}
         </div>
@@ -339,7 +338,7 @@ const Post: FC<PostProps> = ({
 
         <Modal
             style={{ top: 20 }}
-            title={<p className="text-center font-bold text-lg">Bình luận về bài viết của {post.user.fullName}</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Bình luận về bài viết của {post.user.fullName}</p>}
             width='700px'
             open={isModalOpen}
             onOk={handleOk}
@@ -361,13 +360,13 @@ const Post: FC<PostProps> = ({
         </Modal>
 
         {/*======== MODAL REACTION ====== */}
-        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
+        <Modal style={{ top: 20 }} title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
             <PostReactionModal reactions={reactions} />
         </Modal>
 
         {/*======== MODAL EDIT POST ====== */}
 
-        <Modal title={<p className="text-center font-bold text-lg">Chỉnh sửa bài viết</p>} classNames={{
+        <Modal title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Chỉnh sửa bài viết</p>} classNames={{
             footer: 'hidden'
         }} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
             {isEditPostOpen && <EditPostModal
@@ -378,7 +377,7 @@ const Post: FC<PostProps> = ({
 
         {/*======== MODAL SHARE POST ====== */}
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
+        <Modal style={{ top: 20 }} title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
             <SharePostModal
                 onSuccess={(data, msg) => {
                     okSharePost()
@@ -394,7 +393,7 @@ const Post: FC<PostProps> = ({
 
         <Modal
             style={{ top: 20 }}
-            title={<p className="text-center font-bold text-lg">Những người đã chia sẻ bài viết</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Những người đã chia sẻ bài viết</p>}
             width='500px'
             centered
             open={openListShare}
@@ -409,7 +408,7 @@ const Post: FC<PostProps> = ({
 
         {/* MODAL CHANGE PRIVACY*/}
         <Modal
-            title={<p className="text-center font-bold text-lg">Chọn đối tượng</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Chọn đối tượng</p>}
             centered
             open={openPrivacy}
             onOk={okPrivacy}
@@ -430,7 +429,7 @@ const Post: FC<PostProps> = ({
 
         {/* REPORT TO ADMIN OF GROUP */}
         <Modal
-            title={<p className="text-center font-bold text-lg">Báo cáo bài viết tới quản trị viên nhóm</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Báo cáo bài viết tới quản trị viên nhóm</p>}
             centered
             open={openReportAdmin}
             onOk={okReportAdmin}
@@ -452,7 +451,7 @@ const Post: FC<PostProps> = ({
 
         {/* REPORT TO ADMIN OF APPLICATION*/}
         <Modal
-            title={<p className="text-center font-bold text-lg">Báo cáo bài viết</p>}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Báo cáo bài viết</p>}
             centered
             open={openReport}
             onOk={okReport}

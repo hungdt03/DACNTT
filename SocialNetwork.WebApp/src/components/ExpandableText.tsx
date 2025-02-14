@@ -12,7 +12,7 @@ const ExpandableText: FC<ExpandableTextProps> = ({
     return (
         <div className="relative">
             <p
-                className={`text-sm text-gray-700 break-words whitespace-pre-wrap ${isExpanded ? "" : "line-clamp-5" }`}
+                className={`text-xs md:text-sm text-gray-700 break-words whitespace-pre-wrap ${isExpanded ? "" : "line-clamp-5" }`}
             >
                 {content}
             </p>

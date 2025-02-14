@@ -48,12 +48,10 @@ const BoxSearchHeader: FC = () => {
     const handleSearchSuggestion = async (value: string) => {
         setLoading(true)
         const response = await searchService.searchAllSuggestion(value);
-        setTimeout(() => {
-            setLoading(false)
-            if (response.isSuccess) {
-                setSearchSuggestions(response.data)
-            }
-        }, 1000)
+        setLoading(false)
+        if (response.isSuccess) {
+            setSearchSuggestions(response.data)
+        }
 
     }
 
@@ -64,24 +62,24 @@ const BoxSearchHeader: FC = () => {
         }
     }
 
-    return <Popover placement="bottomLeft" arrow={false} open={openPopover} content={<div className="w-[380px]" ref={searchResultRef}>
+    return <Popover placement="bottomLeft" arrow={false} open={openPopover} content={<div className="w-[280px] md:w-[380px]" ref={searchResultRef}>
         {
             loading ? <div className="w-full flex justify-center gap-x-4 items-center">
                 <LoadingIndicator />
             </div>
                 : searchValue.trim() && !searchSuggestions?.groups.length && !searchSuggestions.users.length
                     ? <SearchTextPlain onClick={() => handleClickSuggestText(searchValue)} searchValue={searchValue} />
-                    : <SearchSuggestionList searchValue={searchValue} suggestion={searchSuggestions} isUserBefore={searchSuggestions.users.length > searchSuggestions.groups.length} />
+                    : <SearchSuggestionList searchValue={searchValue} suggestion={searchSuggestions} />
         }
     </div>}>
-        <div className="flex items-center gap-x-4 px-3 py-3 md:py-[6px] rounded-md border-[1px] bg-gray-100 border-slate-100 w-[380px]">
+        <div className="flex items-center gap-x-4 px-3 py-[6px] md:py-2 rounded-md border-[1px] bg-gray-100 border-slate-100 w-full md:w-[380px]">
             <Search size={18} />
             <input
                 ref={inputRef}
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 onFocus={() => setOpenPopover(true)}
-                className="w-full hidden md:block border-none outline-none bg-gray-100"
+                className="w-full md:block border-none outline-none text-sm md:text-[16px] bg-gray-100"
                 placeholder="Tìm kiếm ở đây ..."
                 onKeyDown={(e) => {
                     if (e.key === "Enter" && debouncedValue.trim().length > 1) {

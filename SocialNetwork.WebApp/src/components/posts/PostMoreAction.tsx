@@ -27,7 +27,7 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
     onRemoveSavedPost
 }) => {
 
-    return <div className="flex flex-col items-start rounded-md">
+    return <div className="flex flex-col items-start rounded-md md:text-sm text-xs">
         {isMine && <>
             <button onClick={onEditPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
                 <Edit size={17} className="text-gray-500" />

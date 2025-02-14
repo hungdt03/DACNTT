@@ -245,7 +245,7 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
                         <RichTextPlugin
                             contentEditable={<ContentEditable className="w-full min-h-[30px] border-none outline-none px-4 z-0" />}
                             placeholder={
-                                <p className="text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
+                                <p className="text-xs md:text-sm line-clamp-1 text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
                                     Nhập bình luận...
                                 </p>
                             }

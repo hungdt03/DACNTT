@@ -18,14 +18,13 @@ const StoryItem: FC<StoryItemProps> = ({
     return (
         <Link
             to={`/stories/${story.user.id}`}
-            className="rounded-xl relative flex items-center justify-center px-4 py-6 overflow-hidden cursor-pointer"
+            className="rounded-xl md:h-[200px] h-[160px] relative flex items-center justify-center px-4 py-6 overflow-hidden cursor-pointer"
             style={{
                 background: story.stories[0].type === StoryType.STORY_TEXT
                     ? story.stories[0].background
                     : `url(${story.stories[0].background})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                height: '200px',
                 backgroundRepeat: 'no-repeat',
             }}
         >

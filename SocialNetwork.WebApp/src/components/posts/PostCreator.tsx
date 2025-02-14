@@ -42,14 +42,14 @@ const PostCreator: FC<PostCreatorProps> = ({
     }
 
     return <div className="p-4 rounded-md bg-white flex flex-col gap-y-4 shadow">
-        <div className="flex items-center gap-x-4">
-            <Avatar className="flex-shrink-0" size='large' src={user?.avatar ?? images.user} />
-            <button onClick={showModal} className="text-gray-500 py-2 px-3 rounded-xl bg-gray-50 w-full text-left">{user?.fullName?.split(' ').slice(-1)[0]} ơi, bạn đang nghĩ gì thế?</button>
+        <div className="flex items-center gap-x-2 md:gap-x-4">
+            <Avatar className="flex-shrink-0 w-[25px] h-[25px] md:w-[40px] md:h-[40px]"  src={user?.avatar ?? images.user} />
+            <button onClick={showModal} className="text-gray-500 py-2 px-3 text-[14px] md:text-sm lg:text-[16px] rounded-xl bg-gray-50 w-full text-left">{user?.fullName?.split(' ').slice(-1)[0]} ơi, bạn đang nghĩ gì thế?</button>
         </div>
         <Divider className="my-2" />
-        <p className="text-sm italic text-gray-500 text-center font-bold">"Hãy cho chúng tôi và bạn bè biết về suy nghĩ của bạn nào!"</p>
+        <p className="text-[13px] md:text-sm italic text-gray-500 text-center font-bold">"Hãy cho chúng tôi và bạn bè biết về suy nghĩ của bạn nào!"</p>
         <Modal title={<div>
-            <p className="text-center font-bold text-lg">Tạo bài viết</p>
+            <p className="text-center font-bold text-sm sm:text-lg">Tạo bài viết</p>
             <Divider className="my-2" />
         </div>} classNames={{
             footer: 'hidden'

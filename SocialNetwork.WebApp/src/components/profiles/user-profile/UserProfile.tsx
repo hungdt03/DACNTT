@@ -11,6 +11,7 @@ import friendRequestService from "../../../services/friendRequestService";
 import Loading from "../../Loading";
 import UserProfileContent from "./UserProfileContent";
 import UserProfileSide from "./UserProfileSide";
+import UserProfileHeader from "./UserProfileHeader";
 
 type UserProfileProps = {
     userId: string
@@ -23,7 +24,7 @@ const UserProfile: FC<UserProfileProps> = ({
     const [user, setUser] = useState<UserResource | null>(null)
     const [loading, setLoading] = useState(false)
     const [friends, setFriends] = useState<FriendResource[]>([]);
-   
+
     const fetchFriends = async (userId: string) => {
         const response = await friendService.getAllFriendsByUserId(userId, 1, 9);
         if (response.isSuccess) {
@@ -58,12 +59,12 @@ const UserProfile: FC<UserProfileProps> = ({
             undefined,
             undefined,
             (notification: NotificationResource) => {
-                if(notification.type === NotificationType.FRIEND_REQUEST_SENT || notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
+                if (notification.type === NotificationType.FRIEND_REQUEST_SENT || notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
                     fetchFriendRequestData(userId)
                 }
             }
         )
-       
+
     }, [])
 
     const fetchUserData = async (userId: string) => {
@@ -80,7 +81,6 @@ const UserProfile: FC<UserProfileProps> = ({
     const fetchFriendRequestData = async (userId: string) => {
         try {
             const friendRequestResponse = await friendRequestService.getFriendRequestByUserId(userId);
-            console.log(friendRequestResponse)
             if (friendRequestResponse.isSuccess) {
                 setFriendRequest(friendRequestResponse.data);
             } else {
@@ -91,10 +91,20 @@ const UserProfile: FC<UserProfileProps> = ({
         }
     };
 
-    return <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm px-4 lg:px-0 mx-auto w-full grid grid-cols-12 gap-4 h-full lg:h-[90vh] bg-slate-100">
+    return <div className="flex flex-col h-full w-full overflow-y-auto custom-scrollbar bg-slate-100">
         {loading && <Loading />}
-        {user && <UserProfileSide user={user} friends={friends} />}
-        {user && <UserProfileContent friends={friends} onRefresh={() => fetchFriendRequestData(userId)} user={user} friendRequest={friendRequest} />}
+        <div className="bg-white shadow">
+            {user && <UserProfileHeader 
+                friendRequest={friendRequest} 
+                onRefresh={() => fetchFriendRequestData(userId)}  
+                user={user} 
+                friends={friends}
+            />}
+        </div>
+        <div className="w-full h-full xl:max-w-screen-lg lg:max-w-screen-lg lg:px-0 md:max-w-screen-md max-w-screen-sm px-2 mx-auto flex flex-col lg:grid grid-cols-12 lg:gap-4">
+            {user && <UserProfileSide user={user} friends={friends} />}
+            {user && <UserProfileContent user={user} />}
+        </div>
     </div>
 };
 

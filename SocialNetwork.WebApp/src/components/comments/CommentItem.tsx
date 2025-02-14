@@ -43,13 +43,13 @@ export const extractContentFromJSON = (commentJSON: string): JSX.Element => {
                                 key={index + item.id}
                                 to={`/profile/${item.id}`}
                                 style={{ fontWeight: 'bold' }}
-                                className="hover:text-black"
+                                className="hover:text-black md:text-sm text-xs"
                             >
                                 {item.content}
                             </Link>
                         );
                     } else {
-                        return <span key={index + item.content}>{item.content || ' '}</span>;
+                        return <span className="md:text-sm text-xs" key={index + item.content}>{item.content || ' '}</span>;
                     }
                 })}
             </>
@@ -104,11 +104,11 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 {comment.parentCommentId && (
                     <div className="absolute -left-[24px] w-7 top-[0px] h-[20px] bg-transparent border-b-[2px] border-l-[2px] rounded-bl-lg border-gray-200"></div>
                 )}
-                <Avatar className="flex-shrink-0" src={comment.user.avatar ?? images.user} />
+                <Avatar className="flex-shrink-0 w-[25px] h-[25px] md:w-[30px] md:h-[30px]" src={comment.user.avatar ?? images.user} />
                 <div className="flex flex-col gap-y-2">
                     <div className="flex items-center gap-x-2 group">
                         <div className={cn("py-2 rounded-2xl flex flex-col items-start", comment.content ? 'bg-gray-100 px-4' : '-mt-1')}>
-                            <span className="font-semibold">{comment?.user?.fullName}</span>
+                            <span className="font-semibold text-xs md:text-sm">{comment?.user?.fullName}</span>
                             <p className="text-left overflow-hidden break-words break-all">
                                 {extractContentFromJSON(comment.content)}
                             </p>

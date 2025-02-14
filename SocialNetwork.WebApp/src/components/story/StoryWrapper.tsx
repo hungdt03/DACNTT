@@ -36,7 +36,7 @@ const StoryWrapper: FC = () => {
         fetchUserStories()
     }, [])
 
-    return userStories.length > 0 && !loading ? <div className="relative w-full h-[200px]">
+    return userStories.length > 0 && !loading ? <div className="relative w-full h-[160px] md:h-[200px]">
             <Swiper
                 modules={[Navigation]}
                 slidesPerView={4.75} // Mặc định cho desktop
@@ -51,15 +51,15 @@ const StoryWrapper: FC = () => {
                         spaceBetween: 8,
                     },
                     540: { // Tablet
-                        slidesPerView: 4.75,
+                        slidesPerView: 5.5,
                         spaceBetween: 8,
                     },
                     380: { // Mobile 
-                        slidesPerView: 3.75,
+                        slidesPerView: 4.25,
                         spaceBetween: 8,
                     },
                     300: { // Mobile 
-                        slidesPerView: 2.75,
+                        slidesPerView: 3.5,
                         spaceBetween: 8,
                     },
 

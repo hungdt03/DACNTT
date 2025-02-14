@@ -10,8 +10,8 @@ const CreateStoryArea: FC = () => {
             </button>
 
             <div className="flex flex-col">
-                <span className="text-[16px] font-bold">Tạo tin</span>
-                <p className="text-gray-500 text-sm">Bạn có thể chia sẻ ảnh hoặc viết gì đó</p>
+                <span className="text-sm md:text-[16px] font-bold">Tạo tin</span>
+                <p className="text-gray-500 text-[13px] md:text-sm">Bạn có thể chia sẻ ảnh hoặc viết gì đó</p>
             </div>
         </Link>
     </div>

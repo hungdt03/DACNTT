@@ -39,7 +39,7 @@ const ProfileImage: FC<ProfileImageProps> = ({
     }, [userId, isMe])
 
     return <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
-        <span className="font-bold text-lg text-gray-700">File ảnh</span>
+        <span className="font-bold text-[15px] md:text-lg text-gray-700">File ảnh</span>
 
         {!loading && <div className="grid grid-cols-2 gap-1">
             {images.map(image => <Image

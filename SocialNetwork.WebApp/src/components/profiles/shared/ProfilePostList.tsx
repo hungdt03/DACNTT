@@ -53,7 +53,7 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
         fetchPosts(pagination.page + 1, pagination.size)
     }
 
-    return <div className="col-span-12 lg:col-span-7 max-w-screen-sm mx-auto flex flex-col gap-y-4">
+    return <div className="col-span-12 lg:col-span-7 max-w-screen-sm mx-auto flex flex-col gap-y-4 pb-8">
         {posts.map(post => {
             if (post.postType === PostType.SHARE_POST) {
                 return <SharePost onFetch={() => fetchPosts(1, pagination.size)} key={post.id} post={post} />;

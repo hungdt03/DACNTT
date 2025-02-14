@@ -61,13 +61,13 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
     }, [user])
 
     return <div className="flex flex-col gap-y-4">
-        {user.dateOfBirth && <div className="flex flex-col gap-y-3">
+        {user.dateOfBirth && <div className="flex flex-col gap-y-3 text-[14px] md:text-[16px]">
             <div className="flex items-center gap-x-3">
                 <Cake className="flex-shrink-0 text-gray-400" size={20} />
                 <span>{formatDateStandard(new Date(user.dateOfBirth))}</span>
             </div>
         </div>}
-        {user.gender && <div className="flex flex-col gap-y-3">
+        {user.gender && <div className="flex flex-col gap-y-3 text-[14px] md:text-[16px]">
             <div className="flex items-center gap-x-3">
                 <FontAwesomeIcon
                     icon={user.gender === Gender.MALE ? faMars : user.gender === Gender.FEMALE ? faVenus : faMarsAndVenus}
@@ -80,10 +80,9 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
             </div>
         </div>}
         {userSchools.length > 0 && <div className="flex flex-col gap-y-3">
-            <span className="font-bold">Học vấn</span>
-            <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
-                {userSchools.map(userSchool => <div key={userSchool.id} className="flex items-center gap-x-3">
-                    <GraduationCap className="flex-shrink-0 text-gray-400" size={16} />
+            <div className="flex flex-col gap-y-3 text-gray-700">
+                {userSchools.map(userSchool => <div key={userSchool.id} className="flex items-center gap-x-3 text-[14px] md:text-[16px]">
+                    <GraduationCap className="flex-shrink-0 text-gray-400" size={20} />
                     <div>
                         <span>
                             {userSchool.status === EducationStatus.GRADUATED ? 'Đã học ' : 'Đang học '}
@@ -105,11 +104,10 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
         </div>}
 
         {userWorkPlaces.length > 0 && <div className="flex flex-col gap-y-3">
-            <span className="font-bold">Làm việc</span>
 
-            <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
+            <div className="flex flex-col gap-y-3 text-gray-700 text-[14px] md:text-[16px]">
                 {userWorkPlaces.map(workPlace => <div key={workPlace.id} className="flex items-center gap-x-3">
-                    <BriefcaseBusiness className="flex-shrink-0 text-gray-400" size={16} />
+                    <BriefcaseBusiness className="flex-shrink-0 text-gray-400" size={20} />
                     <div>
                         <span>
                             {workPlace.isCurrent ? 'Đang làm ' : 'Từng làm '}
@@ -128,14 +126,14 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
             </div>
         </div>}
 
-        {currentLocation && <div className="flex items-center gap-x-3 text-gray-700">
+        {currentLocation && <div className="flex items-center gap-x-3 text-gray-700 text-[14px] md:text-[16px]">
             <Home size={20} className="text-gray-400" />
             <span>
                 <span>{' Sống tại '}</span>
                 <span className="font-bold">{currentLocation.address + ' '}</span>
             </span>
         </div>}
-        {userHometown && <div className="flex items-center gap-x-3 text-gray-700">
+        {userHometown && <div className="flex items-center gap-x-3 text-gray-700 text-[14px] md:text-[16px]">
             <MapPin className="text-gray-400" size={20} />
             <span>
                 <span>{' Đến từ '}</span>

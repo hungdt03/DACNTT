@@ -107,12 +107,12 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
     return <>
         <div className="flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-3">
-                <div className="flex items-center gap-x-3">
+                <div className="flex items-center gap-x-3 text-[14px] md:text-[16px]">
                     <Cake className="flex-shrink-0 text-gray-400" size={20} />
                     <span>{formatDateStandard(new Date(user.dateOfBirth))}</span>
                 </div>
             </div>
-            {user.gender && <div className="flex flex-col gap-y-3">
+            {user.gender && <div className="flex flex-col gap-y-3 text-[14px] md:text-[16px]">
                 <div className="flex items-center gap-x-3">
                     <FontAwesomeIcon
                         icon={user.gender === Gender.MALE ? faMars : user.gender === Gender.FEMALE ? faVenus : faMarsAndVenus}
@@ -126,12 +126,12 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
             </div>}
             <div className="flex flex-col gap-y-3">
                 <div className="flex items-center justify-between">
-                    <span className="font-bold">Học vấn</span>
+                    <span className="font-bold text-[15px] md:text-[16px] text-gray-700">Học vấn</span>
                     <button onClick={() => handleSelectUserSchool(undefined)} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                         <Plus size={16} className="text-white" />
                     </button>
                 </div>
-                {userSchools.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
+                {userSchools.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700 text-[14px] md:text-[16px]">
                     {userSchools.map(userSchool => <div key={userSchool.id} className="flex items-center gap-x-3">
                         <GraduationCap className="flex-shrink-0 text-gray-400" size={20} />
                         <div>
@@ -157,12 +157,12 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
 
             <div className="flex flex-col gap-y-3">
                 <div className="flex items-center justify-between">
-                    <span className="font-bold">Làm việc</span>
+                    <span className="font-bold text-[15px] md:text-[16px] text-gray-700">Làm việc</span>
                     <button onClick={() => handleSelectUserWorlPlace()} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                         <Plus size={16} className="text-white" />
                     </button>
                 </div>
-                {userWorkPlaces.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700">
+                {userWorkPlaces.length > 0 && <div className="flex flex-col gap-y-3 pl-4 text-gray-700 text-[14px] md:text-[16px]">
                     {userWorkPlaces.map(workPlace => <div key={workPlace.id} className="flex items-center gap-x-3">
                         <BriefcaseBusiness className="flex-shrink-0 text-gray-400" size={20} />
                         <div>
@@ -187,7 +187,7 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
             </div>
 
 
-            {currentLocation ? <div className="flex items-center gap-x-3">
+            {currentLocation ? <div className="flex items-center gap-x-3 text-[14px] md:text-[16px]">
                 <Home size={20} className="text-gray-400" />
                 <span>
                     <span>{' Sống tại '}</span>
@@ -196,14 +196,14 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
                 </span>
             </div> : <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2">
-                    <span className="font-bold">Nơi sống hiện tại</span>
+                    <span className="font-bold text-[15px] md:text-[16px] text-gray-700">Nơi sống hiện tại</span>
                 </div>
                 <button onClick={showModal} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                     <Plus size={16} className="text-white" />
                 </button>
             </div>}
 
-            {userHometown ? <div className="flex items-center gap-x-3 text-gray-700">
+            {userHometown ? <div className="flex items-center gap-x-3 text-gray-700 text-[14px] md:text-[16px]">
                 <MapPin size={20} className="text-gray-400" />
                 <span>
                     <span>{' Đến từ '}</span>
@@ -212,7 +212,7 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
                 </span>
             </div> : <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-2">
-                    <span className="font-bold">Quê quán</span>
+                    <span className="font-bold text-[15px] md:text-[16px] text-gray-700">Quê quán</span>
                 </div>
                 <button onClick={showHometown} className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-sky-600 bg-primary">
                     <Plus size={16} className="text-white" />

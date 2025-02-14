@@ -105,7 +105,7 @@ const HomePage: FC = () => {
             <div id="post-scroll-trigger" className="w-full h-1" />
 
             {!pagination.hasMore && !loading && (
-                <p className="text-center text-gray-500">Không còn bài viết để tải.</p>
+                <p className="text-sm md:text-[16px] text-center text-gray-500">Không còn bài viết để tải.</p>
             )}
         </div>
     );

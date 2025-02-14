@@ -32,13 +32,13 @@ const PostShareInner: FC<PostShareInnerProps> = ({
                                 to={`/stories/${post.user.id}`}
                             >
                                 <Avatar
-                                    className={`${post.isGroupPost ? 'w-6 h-6' : 'w-9 h-9 flex-shrink-0'} border-[1px] border-gray-50`}
+                                    className={`${post.isGroupPost ? 'w-6 h-6' : 'md:w-9 md:h-9 w-8 h-8 flex-shrink-0'} border-[1px] border-gray-50`}
                                     src={post.user.avatar ?? images.user}
                                 />
                             </Link>
                         ) : (
                             <Avatar
-                                className={`${post.isGroupPost ? 'w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50' : 'w-10 h-10 flex-shrink-0'}`}
+                                className={`${post.isGroupPost ? 'w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50' : 'w-8 h-8 md:w-10 md:h-10 flex-shrink-0'}`}
                                 src={post.user.avatar ?? images.user}
                             />
                         )}
@@ -46,7 +46,7 @@ const PostShareInner: FC<PostShareInnerProps> = ({
 
                     <div className="flex flex-col gap-y-[1px]">
                         <div className="font-bold text-[14px] text-gray-600">
-                            <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                            <Link to={`/profile/${post.user.id}`} className="text-[13px] md:text-sm hover:underline">{post.user?.fullName}</Link>
                             {post.tags.length > 0 &&
                                 (() => {
                                     const maxDisplay = 3;
@@ -69,7 +69,7 @@ const PostShareInner: FC<PostShareInnerProps> = ({
                         </div>
                         <div className="flex items-center gap-x-2">
                             <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
-                                <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
+                                <span className="text-[11px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                             </Tooltip>
                             {getPrivacyPost(post.privacy)}
                         </div>

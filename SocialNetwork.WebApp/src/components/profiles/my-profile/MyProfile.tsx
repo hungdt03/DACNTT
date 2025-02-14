@@ -5,6 +5,7 @@ import { selectAuth } from "../../../features/slices/auth-slice";
 import friendService from "../../../services/friendService";
 import MyProfileContent from "./MyProfileContent";
 import MyProfileSide from "./MyProfileSide";
+import MyProfileHeader from "./MyProfileHeader";
 
 const MyProfile: FC = () => {
     const { user } = useSelector(selectAuth);
@@ -12,7 +13,6 @@ const MyProfile: FC = () => {
 
     const fetchFriends = async () => {
         const response = await friendService.getAllMyFriends(1, 9);
-        console.log(response)
         if (response.isSuccess) {
             setFriends(response.data)
         }
@@ -21,10 +21,15 @@ const MyProfile: FC = () => {
     useEffect(() => {
         fetchFriends()
     }, [])
-    
-    return <div className="xl:max-w-screen-xl lg:max-w-screen-lg md:px-0 md:max-w-screen-md max-w-screen-sm px-4 mx-auto w-full grid grid-cols-12 gap-4 h-full lg:h-[90vh] bg-slate-100">
-        {user && <MyProfileContent friends={friends} user={user} />}
-        {user && <MyProfileSide friends={friends} />}
+
+    return <div className="flex flex-col h-full w-full overflow-y-auto custom-scrollbar bg-slate-100">
+        <div className="bg-white shadow">
+            {user && <MyProfileHeader user={user} friends={friends} />}
+        </div>
+        <div className="w-full h-full xl:max-w-screen-lg lg:max-w-screen-lg lg:px-0 md:max-w-screen-md max-w-screen-sm px-2 mx-auto flex flex-col lg:grid grid-cols-12 lg:gap-4">
+            {user && <MyProfileSide friends={friends} />}
+            {user && <MyProfileContent user={user} />}
+        </div>
     </div>
 };
 
