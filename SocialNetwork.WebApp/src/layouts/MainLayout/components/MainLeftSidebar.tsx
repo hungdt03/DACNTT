@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 
 const MainLeftSidebar: FC = () => {
     const { user } = useSelector(selectAuth);
+    console.log(user)
 
     return <div className="col-span-3 hidden xl:block h-full py-4 overflow-y-hidden scrollbar-hide">
         <div className="relative flex flex-col rounded-md h-[90%]">
@@ -14,13 +15,17 @@ const MainLeftSidebar: FC = () => {
                 <div className="flex flex-col gap-y-3 items-center">
                     <div className="w-full flex flex-col items-center">
                         <img alt="Ảnh bìa" className="w-full h-[100px] object-cover" src={user?.coverImage ?? images.cover} />
-                        {
-                            user?.haveStory ? <Link className="h-[50px] w-[50px] p-[1px] rounded-full border-[3px] border-primary -mt-[25px]" to={`/stories/${user?.id}`}>
-                                <img alt="Avatar" className="w-full h-full object-cover flex-shrink-0 rounded-full" src={user?.avatar ?? images.user} />
-                            </Link>
-                                :
-                            <img alt="Avatar" className="h-[50px] w-[50px] object-cover flex-shrink-0 rounded-full -mt-[25px]" src={user?.avatar ?? images.user} />
-                        }
+                        <div className="relative">
+                            {
+                                user?.haveStory ? <Link className="h-[50px] w-[50px] p-[1px] rounded-full border-[3px] border-primary -mt-[25px]" to={`/stories/${user?.id}`}>
+                                    <img alt="Avatar" className="w-full h-full object-cover flex-shrink-0 rounded-full" src={user?.avatar ?? images.user} />
+                                </Link>
+                                    :
+                                    <img alt="Avatar" className="h-[50px] w-[50px] object-cover flex-shrink-0 rounded-full -mt-[25px]" src={user?.avatar ?? images.user} />
+                            }
+
+                            {user?.isOnline && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                        </div>
                     </div>
                     <div className="flex flex-col items-center">
                         <span className="font-bold text-[17px]">{user?.fullName}</span>
@@ -72,7 +77,7 @@ const MainLeftSidebar: FC = () => {
                     <img alt="Nhóm" className="w-8 h-8" src={images.group} />
                     <span className="text-[15px] font-semibold text-gray-500">Nhóm</span>
                 </Link>
-              
+
             </div>
         </div>
     </div>

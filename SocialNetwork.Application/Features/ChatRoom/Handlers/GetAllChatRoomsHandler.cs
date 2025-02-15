@@ -40,9 +40,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
                 if(friend != null)
                 {
-                    var isOnline = await _userStatusService.HasConnectionsAsync(friend.UserId);
                     item.Friend = ApplicationMapper.MapToUser(friend.User);
-                    item.Friend.IsOnline = item.IsOnline = isOnline;
+                    item.Friend.IsOnline = item.IsOnline = item.Friend.IsOnline;
                     item.IsMember = true;
 
                     var haveStory = await _unitOfWork.StoryRepository
@@ -52,11 +51,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
                     item.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId)?.IsAccepted ?? false;
                     item.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;
+                    item.RecentOnlineTime = friend.User.RecentOnlineTime;
 
-                    if (!isOnline)
-                    {
-                        item.RecentOnlineTime = friend.User.RecentOnlineTime;
-                    }
                 } else
                 {
                     var chatRoomMember = await _unitOfWork.ChatRoomMemberRepository
@@ -70,8 +66,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     foreach(var member in chatRoom.Members)
                     {
                         if (member.UserId == userId) continue;
-                        var hasConnections = await _userStatusService.HasConnectionsAsync(member.UserId);
-                        if(hasConnections)
+                        if(member.User.IsOnline)
                         {
                             item.IsOnline = true;
                             break;

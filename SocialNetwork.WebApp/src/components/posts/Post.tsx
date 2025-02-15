@@ -108,6 +108,7 @@ const Post: FC<PostProps> = ({
 
     useEffect(() => {
         fetchReactions();
+        console.log(post.user)
     }, [post])
 
     const fetchPostById = async () => {
@@ -184,7 +185,7 @@ const Post: FC<PostProps> = ({
 
     const handleReportPost = async (reason: string) => {
         const response = await reportService.reportPost(post.id, reason, group?.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message)
             okReportAdmin()
             setReason('')
@@ -195,7 +196,7 @@ const Post: FC<PostProps> = ({
 
     const handleSavedPost = async (postId: string) => {
         const response = await postService.addSavedPost(postId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
             setPost(prev => ({
                 ...prev,
@@ -208,7 +209,7 @@ const Post: FC<PostProps> = ({
 
     const handleRemoveSavedPost = async (postId: string) => {
         const response = await postService.removeSavedPostByPostId(postId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message)
             setPost(prev => ({
                 ...prev,
@@ -221,7 +222,7 @@ const Post: FC<PostProps> = ({
 
     const handleChangePrivacy = async (postId: string, privacy: PrivacyType) => {
         const response = await postService.changePrivacy(postId, privacy);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message)
             setPost(prev => ({
                 ...prev,
@@ -237,11 +238,14 @@ const Post: FC<PostProps> = ({
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
-                {!post.user.haveStory 
-                    ? <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0" src={post.user.avatar ?? images.user} /> 
-                    : <Link className="p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
-                }
-                
+                <div className="relative">
+                    {!post.user.haveStory
+                        ? <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
+                        : <Link className="p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
+                    }
+                    {post.user.isOnline && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                </div>
+
                 <div className="flex flex-col md:gap-y-[1px]">
                     <div className="font-bold text-gray-600">
                         <Link className="text-[13px] md:text-sm" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
@@ -272,7 +276,7 @@ const Post: FC<PostProps> = ({
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
                             <span className="text-[11px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
-                       <button onClick={post.isGroupPost || post.user.id !== user?.id ? undefined : showPrivacy}>{getPrivacyPost(post.privacy)}</button>
+                        <button onClick={post.isGroupPost || post.user.id !== user?.id ? undefined : showPrivacy}>{getPrivacyPost(post.privacy)}</button>
                     </div>
                 </div>
             </div>

@@ -27,7 +27,7 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
         public async Task<BaseResponse> Handle(GetPrincipalQuery request, CancellationToken cancellationToken)
         {
             var userId = contextAccessor.HttpContext.User.GetUserId();
-            var user = await unitOfWork.UserRepository.GetUserByIdAsync(userId)
+            var user = await userManager.FindByIdAsync(userId)
                  ?? throw new AppException("Thông tin user không tồn tại");
 
             var response = ApplicationMapper.MapToUser(user);

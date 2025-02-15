@@ -50,6 +50,7 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+       
         [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
@@ -58,6 +59,7 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)

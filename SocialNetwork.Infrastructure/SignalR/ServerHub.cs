@@ -10,12 +10,9 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
-using SocialNetwork.Application.Utils;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
 using SocialNetwork.Domain.Entity.System;
-using SocialNetwork.Infrastructure.SignalR.Payload;
-using System.Runtime.InteropServices;
 
 namespace SocialNetwork.Infrastructure.SignalR
 {
@@ -39,7 +36,12 @@ namespace SocialNetwork.Infrastructure.SignalR
         {
             var userId = Context.User.GetUserId();
             await userStatusService.AddConnectionAsync(userId, Context.ConnectionId);
-            
+            var user = await userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                user.IsOnline = true;
+                await userManager.UpdateAsync(user);
+            }
             var chatRooms = await unitOfWork.ChatRoomRepository.GetAllChatRoomNamesByUserIdAsync(userId);
             await JoinChatRooms(chatRooms);
             await base.OnConnectedAsync();
@@ -196,6 +198,7 @@ namespace SocialNetwork.Infrastructure.SignalR
                 if(user != null)
                 {
                     user.RecentOnlineTime = DateTimeOffset.UtcNow;
+                    user.IsOnline = false;
                     await userManager.UpdateAsync(user);
                 }
             }

@@ -36,9 +36,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             if (friend != null)
             {
-                var isOnline = await _userStatusService.HasConnectionsAsync(friend.UserId);
                 response.Friend = ApplicationMapper.MapToUser(friend.User);
-                response.Friend.IsOnline = response.IsOnline = isOnline;
+                response.Friend.IsOnline = response.IsOnline = friend.User.IsOnline;
 
                 var haveStory = await _unitOfWork.StoryRepository
                        .IsUserHaveStoryAsync(friend.UserId);
@@ -47,7 +46,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId).IsAccepted;
                 response.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;
                 
-                if (!isOnline)
+                if (!response.IsOnline)
                 {
                     response.RecentOnlineTime = response.Friend.RecentOnlineTime;
                 }
@@ -59,8 +58,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 foreach (var member in chatRoom.Members)
                 {
                     if (member.UserId == userId) continue;
-                    var hasConnections = await _userStatusService.HasConnectionsAsync(member.UserId);
-                    if (hasConnections)
+                    if (member.User.IsOnline)
                     {
                         response.IsOnline = true;
                         break;

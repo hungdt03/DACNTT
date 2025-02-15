@@ -43,6 +43,7 @@ const MyProfileHeader: FC<MyProfileHeaderProps> = ({
             navigate(`/profile/${id}`, { replace: true });
         }
 
+        console.log(user)
     }, [tab, id, navigate]);
 
     const onAvatarChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
@@ -159,7 +160,7 @@ const MyProfileHeader: FC<MyProfileHeaderProps> = ({
                     />
                 }
 
-                {user?.isOnline && <div className="absolute bottom-2 right-3 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
+                {user?.isOnline && <div className="absolute bottom-0 right-8 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
                 <ImgCrop modalOk="Lưu lại" modalCancel="Hủy bỏ" modalTitle="Ảnh đại diện" showGrid showReset resetText="Bắt đầu lại" rotationSlider>
                     <Upload
                         multiple={false}

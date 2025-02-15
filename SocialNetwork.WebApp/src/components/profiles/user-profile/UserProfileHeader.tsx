@@ -171,7 +171,7 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
                     />
                 }
 
-                {user?.isOnline && <div className="absolute bottom-2 right-3 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
+                {targetUser?.isOnline && <div className="absolute bottom-2 right-3 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
             </div>
             <div className="lg:py-6 py-3 flex flex-col lg:flex-row items-center gap-y-4 lg:gap-y-0 lg:items-end justify-between w-full">
                 <div className="flex flex-col items-center lg:items-start gap-y-3">
