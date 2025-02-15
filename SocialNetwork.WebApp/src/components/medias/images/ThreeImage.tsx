@@ -15,10 +15,14 @@ const ThreeImage: FC<ImageProps> = ({
         <div className="flex flex-col gap-2">
             <Image preview={{
                 mask: 'Xem'
-            }} src={items[1].mediaUrl} width='100%' height='100%' className="object-cover" />
+            }} src={items[1].mediaUrl} width='100%' height='100%' style={{
+                aspectRatio: 3/2
+            }} className="object-cover" />
             <Image preview={{
                 mask: 'Xem'
-            }} src={items[2].mediaUrl} width='100%' height='100%' className="object-cover" />
+            }} src={items[2].mediaUrl} width='100%' height='100%' style={{
+                aspectRatio: 3/2
+            }} className="object-cover" />
         </div>
     </div>
 };

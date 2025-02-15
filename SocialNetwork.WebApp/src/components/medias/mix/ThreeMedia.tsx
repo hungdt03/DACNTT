@@ -42,9 +42,12 @@ const ThreeMedia: FC<MixMediaProps> = ({
                         <video
                             src={item.mediaUrl}
                             key={item.id}
-                            className="w-full h-full object-cover aspect-square"
+                            className="w-full h-full object-cover"
                             onClick={() => handlePreview(index + 1)}
                             controls
+                            style={{
+                                aspectRatio: 3/2
+                            }}
                         />
                     ) : (
                         <img
@@ -53,6 +56,9 @@ const ThreeMedia: FC<MixMediaProps> = ({
                             alt={`Post Media ${index + 1}`}
                             className="w-full h-full object-cover"
                             onClick={() => handlePreview(index + 1)}
+                            style={{
+                                aspectRatio: 3/2
+                            }}
                         />
                     )
                 })}

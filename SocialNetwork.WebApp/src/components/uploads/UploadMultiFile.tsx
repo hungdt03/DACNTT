@@ -1,8 +1,9 @@
 import { Image, Upload, UploadFile, UploadProps } from "antd";
 import { InboxOutlined } from '@ant-design/icons'
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { FileType, getBase64, isValidImage, isValidVideo } from "../../utils/file";
+import { FileType, getBase64, isValidImage, isValidVideo, videoTypes } from "../../utils/file";
 import UploadButton from "./UploadButton";
+import { RcFile } from "antd/es/upload";
 
 const MAX_SIZE_MB_UPLOAD = 50;
 const MAX_SIZE_IN_BYTES = MAX_SIZE_MB_UPLOAD * 1024 * 1024;
@@ -12,6 +13,7 @@ type UploadMultipleFileProps = {
     valueUrls?: string[];
     onRemoveFileUrl?: (url: string | undefined) => void;
 }
+
 
 type UploadMultipleFileRef = {
     clear: () => void;
@@ -52,7 +54,7 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
             setErrorMessage('Tổng kích thước các tệp vượt quá 50MB!');
             return;
         } else {
-            setErrorMessage(null); 
+            setErrorMessage(null);
         }
 
         // Cập nhật fileList
@@ -74,10 +76,10 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
             const isValidFile = (file: UploadFile) => {
                 return isValidImage(file.originFileObj as File) || isValidVideo(file.originFileObj as File);
             };
-    
+
             const totalSize = info.fileList.reduce((acc, file) => acc + (file.originFileObj as File).size, 0);
             const invalidFile = info.fileList.find(file => !isValidFile(file));
-    
+
             if (invalidFile) {
                 setErrorMessage('Vui lòng chọn tệp ảnh hoặc video hợp lệ!');
                 return;
@@ -85,7 +87,7 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
                 setErrorMessage('Tổng kích thước các tệp vượt quá 50MB!');
                 return;
             } else {
-                setErrorMessage(null); 
+                setErrorMessage(null);
             }
 
             onChange?.(info.fileList)
@@ -131,6 +133,22 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
                     onPreview={handleImagePreview}
                     onChange={handleImageChange}
                     onRemove={handleRemoveFile}
+                    iconRender={(file) => {
+                        const fileObj = file.originFileObj as RcFile;
+                        if (fileObj && isValidVideo(fileObj)) {
+                            const videoUrl = URL.createObjectURL(fileObj);
+                            return (
+                                <video
+                                    src={videoUrl}
+                                    width={'100%'}
+                                    height={'100%'}
+                                    controls
+                                    onLoadedData={() => URL.revokeObjectURL(videoUrl)}
+                                />
+                            );
+                        }
+                        return null; // Không hiển thị icon cho ảnh
+                    }}
                 >
                     {(fileList?.length ?? 0) >= 8 ? null : <UploadButton />}
                 </Upload>
