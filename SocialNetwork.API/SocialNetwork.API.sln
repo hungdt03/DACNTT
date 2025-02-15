@@ -11,7 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocialNetwork.Infrastructur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocialNetwork.Application", "..\SocialNetwork.Application\SocialNetwork.Application.csproj", "{C69CA4E2-6891-4199-8019-1EFB2517F1B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialNetwork.Common", "..\Common\SocialNetwork.Common.csproj", "{1AEEC25A-760D-44AD-8531-D55F07DE144F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocialNetwork.Common", "..\Common\SocialNetwork.Common.csproj", "{1AEEC25A-760D-44AD-8531-D55F07DE144F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{88546206-0A17-44B9-A38F-B71E1B4B39F1}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -31,6 +31,7 @@ namespace SocialNetwork.Application.Features.Otp.Handlers
                 ?? throw new NotFoundException("Địa chỉ email chưa tồn tại");
 
             user.IsVerification = true;
+            user.RecentOnlineTime = DateTimeOffset.UtcNow;
 
             var updateResult = await _userManager.UpdateAsync(user);
 

@@ -20,6 +20,7 @@ namespace SocialNetwork.Domain.Entity.System
         public bool IsVerification { get; set; }
         public DateTimeOffset DateOfBirth { get; set; }
         public DateTimeOffset DateJoined { get; set; }
+        public DateTimeOffset RecentOnlineTime { get; set; }
         public bool IsLock { get; set; }
 
         public Guid? LocationId { get; set; }

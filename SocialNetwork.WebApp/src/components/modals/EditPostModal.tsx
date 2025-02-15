@@ -1,12 +1,9 @@
 import { Avatar, Popover, Tooltip, UploadFile } from "antd";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import images from "../../assets";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
-import { Lock, User } from "lucide-react";
-import UploadMultipleFile from "../uploads/UploadMultiFile";
+import UploadMultipleFile, { UploadFileBinding } from "../uploads/UploadMultiFile";
 import { PrivacyType } from "../../enums/privacy";
-import { imageTypes, isValidImage, isValidVideo, videoTypes } from "../../utils/file";
+import {  isValidImage, isValidVideo } from "../../utils/file";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
@@ -41,7 +38,12 @@ const EditPostModal: FC<EditPostModalProps> = ({
     const [showUpload, setShowUpload] = useState(false);
     const uploadRef = useRef<{ clear: () => void }>(null);
     const { user } = useSelector(selectAuth)
-    const valueUrls = useMemo(() => post.medias.map(item => item.mediaUrl), [post.medias]);
+
+    const valueUrls = useMemo(() => post.medias.map(item => ({
+        url: item.mediaUrl,
+        type: item.mediaType
+    } as UploadFileBinding)), [post.medias]);
+
     const [isEdited, setIsEdited] = useState(false)
     const [tags, setTags] = useState<FriendResource[]>([])
 
@@ -313,7 +315,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                         onTagRemove={handleRemoveTag}
                     />} title='Gắn thẻ người khác'>
                         <button className="p-2 rounded-full hover:bg-gray-100">
-                            <img alt="Tag"  className="sm:w-7 sm:h-7 w-6 h-6" src={images.tagFriend} />
+                            <img alt="Tag" className="sm:w-7 sm:h-7 w-6 h-6" src={images.tagFriend} />
                         </button>
                     </Popover>
                 </div>

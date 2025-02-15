@@ -27,6 +27,9 @@ namespace SocialNetwork.Infrastructure.Configuration
     {
         public static IServiceCollection ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            // Registry background service
+            services.AddHostedService<ServerStartupTask>();
+
             // Registry Options Pattern
             services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
             services.Configure<CloudinaryOptions>(configuration.GetSection(nameof(CloudinaryOptions)));

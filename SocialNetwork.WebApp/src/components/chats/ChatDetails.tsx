@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import images from "../../assets";
-import { LogOut, MoreHorizontal, UserPlus, UserRound } from "lucide-react";
+import { Check, Edit3, LogOut, MoreHorizontal, UserPlus, UserRound, X } from "lucide-react";
 import { MessageMediaResource } from "../../types/message";
 import { Pagination } from "../../types/response";
 import chatRoomService from "../../services/chatRoomService";
@@ -8,12 +7,14 @@ import { MediaType } from "../../enums/media";
 import { ChatRoomResource } from "../../types/chatRoom";
 import { Link } from "react-router-dom";
 import { ChatRoomMemberResource } from "../../types/chat-room-member";
-import { Avatar, Collapse, CollapseProps, message, Modal, Popconfirm, Popover, Tag } from "antd";
+import { Avatar, Button, Collapse, CollapseProps, Input, message, Modal, Popconfirm, Popover, Tag } from "antd";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { UserResource } from "../../types/user";
 import useModal from "../../hooks/useModal";
 import AddFriendToChatRoom from "../modals/AddFriendToChatRoom";
+import { CameraIcon } from "@heroicons/react/24/outline";
+import { formatTime } from "../../utils/date";
 
 type ChatDetailsProps = {
     chatRoom: ChatRoomResource;
@@ -28,6 +29,14 @@ const ChatDetails: FC<ChatDetailsProps> = ({
     const { isModalOpen, handleCancel, handleOk, showModal } = useModal();
     const [members, setMembers] = useState<ChatRoomMemberResource[]>([]);
 
+    const [roomImage, setRoomImage] = useState(chatRoom.isPrivate ? chatRoom.friend?.avatar : chatRoom.imageUrl);
+    const [tempFile, setTempFile] = useState<File>();
+    const [loading, setLoading] = useState(false)
+    const [isUpload, setIsUpload] = useState(false)
+
+    const [isEdit, setIsEdit] = useState(false)
+    const [editName, setEditName] = useState(chatRoom.name);
+
     const fetchChatRoomMembers = async () => {
         const response = await chatRoomService.getMembersByChatRoomId(chatRoom.id);
         if (response.isSuccess) {
@@ -36,7 +45,9 @@ const ChatDetails: FC<ChatDetailsProps> = ({
     }
 
     useEffect(() => {
-        fetchChatRoomMembers()
+        fetchChatRoomMembers();
+        setEditName(chatRoom.name);
+        setRoomImage(chatRoom.isPrivate ? chatRoom.friend?.avatar : chatRoom.imageUrl)
     }, [chatRoom])
 
 
@@ -44,9 +55,8 @@ const ChatDetails: FC<ChatDetailsProps> = ({
         {
             key: '1',
             label: 'Thành viên',
-            className: 'bg-white border-none',
+            className: `bg-white border-none ${chatRoom.isPrivate && 'hidden'}`,
             children: user && <MemberCollapse onFetch={fetchChatRoomMembers} isLeader={chatRoom.isAdmin} members={members} user={user} />,
-
         },
         {
             key: '2',
@@ -55,11 +65,11 @@ const ChatDetails: FC<ChatDetailsProps> = ({
             children: user && <FileCollapse user={user} chatRoom={chatRoom} />
         },
 
-    ];
+    ]
 
     const handleLeaveGroup = async () => {
         const response = await chatRoomService.leaveGroup(chatRoom.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             onFetch()
             message.success(response.message)
         } else {
@@ -67,28 +77,124 @@ const ChatDetails: FC<ChatDetailsProps> = ({
         }
     }
 
+    const handleUpdateChatRoomName = async () => {
+        const response = await chatRoomService.changeRoomName(chatRoom.id, editName);
+        if (response.isSuccess) {
+            message.success(response.message)
+            onFetch()
+            setIsEdit(false)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleUploadChange = (files: FileList | null) => {
+        if (files?.[0]) {
+            setTempFile(files[0]);
+            const tempUrl = URL.createObjectURL(files[0]);
+            setRoomImage(tempUrl);
+            setIsUpload(true)
+        }
+    }
+
+    const handleChangeRoomImage = async () => {
+        const formData = new FormData();
+        formData.append('chatRoomId', chatRoom.id);
+        if (tempFile) {
+            formData.append('image', tempFile);
+        } else {
+            message.error('Vui lòng chọn tệp ảnh');
+            return;
+        }
+
+        setLoading(true)
+        const response = await chatRoomService.uploadRoomImage(formData);
+        setLoading(false)
+
+        if (response.isSuccess) {
+            message.success(response.message)
+            onFetch()
+            setIsUpload(false)
+            setTempFile(undefined)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleCancelUpload = () => {
+        setIsUpload(false);
+        setRoomImage(chatRoom.imageUrl);
+        setTempFile(undefined)
+    }
+
+    useEffect(() => {
+        return () => {
+            if (roomImage && tempFile) {
+                URL.revokeObjectURL(roomImage);
+            }
+        };
+    }, [roomImage, chatRoom]);
+
     return <>
         <div className="h-full border-l-[1px] border-gray-200 p-4">
             <div className="flex flex-col gap-y-8 h-full">
                 <div className="flex flex-col gap-y-2">
                     <div className="flex flex-col items-center gap-y-1">
-                        <img src={chatRoom.isPrivate ? chatRoom.friend?.avatar : images.group} className="w-20 h-20 object-cover rounded-full" />
-                        <span className="font-semibold text-lg">{chatRoom.isPrivate ? chatRoom.friend?.fullName : chatRoom.name}</span>
-                        <p className="text-xs text-gray-400">Hoạt động 34 phút trước</p>
+                        <div className="relative">
+                            <img src={roomImage} className="w-20 h-20 object-cover rounded-full" />
+
+                            {!chatRoom.isPrivate && <label htmlFor="upload-room-name" className="cursor-pointer absolute bottom-2 right-2 w-6 h-6 bg-gray-100 flex items-center justify-center rounded-full shadow border-[1px] border-gray-400">
+                                <CameraIcon color="gray" width={18} />
+                            </label>}
+
+                            <input disabled={loading} onChange={(e) => handleUploadChange(e.target.files)} type="file" hidden id="upload-room-name" />
+                        </div>
+
+                        {isUpload && <div className="flex justify-end gap-x-2">
+                            <button disabled={loading} onClick={handleCancelUpload} className="text-sm w-[25px] h-[25px] flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200">
+                                <X size={14} />
+                            </button>
+                            <Button loading={loading} disabled={!tempFile} onClick={handleChangeRoomImage} size="small" shape="circle" type="primary">
+                                <Check size={16} />
+                            </Button>
+                        </div>}
+
+                        {isEdit && <div className="flex flex-col gap-y-1">
+                            <Input placeholder='Nhập tên nhóm'
+                                value={editName}
+                                onChange={e => setEditName(e.target.value)}
+                            />
+                            <div className="flex justify-end gap-x-2">
+                                <button onClick={() => setIsEdit(false)} className="text-sm px-2 py-[7px] rounded-md bg-gray-100 hover:bg-gray-200">Hủy</button>
+                                <Button disabled={editName.trim().length === 0 || chatRoom.name === editName} onClick={handleUpdateChatRoomName} type="primary">Lưu</Button>
+                            </div>
+                        </div>}
+
+                        {!isEdit && <div className="flex items-center gap-x-1">
+                            <span className="font-semibold text-lg">{chatRoom.isPrivate ? chatRoom.friend?.fullName : chatRoom.name}</span>
+                            {!chatRoom.isPrivate && <button onClick={() => setIsEdit(true)} className="w-6 h-6 rounded-full hover:bg-gray-100 flex items-center justify-center">
+                                <Edit3 size={14} />
+                            </button>}
+                        </div>}
+
+                        <p className="text-xs text-gray-400">
+                            {chatRoom.isOnline ? 'Đang hoạt động' : `Hoạt động ${formatTime(chatRoom.recentOnlineTime)}`}
+                        </p>
                     </div>
                     <div className="flex items-center justify-center gap-x-4">
-                        {!chatRoom.isAdmin && <div className="flex flex-col items-center gap-y-1">
+                        {chatRoom.isAdmin && !chatRoom.isPrivate && <div className="flex flex-col items-center gap-y-1">
                             <button onClick={showModal} className="p-2 rounded-full text-black font-semibold hover:bg-gray-200 bg-gray-100 w-10 h-10 flex items-center justify-center">
                                 <UserPlus size={18} />
                             </button>
                             <span className="text-xs text-gray-700">Thêm</span>
                         </div>}
-                        <Link to={`/profile/${chatRoom.friend?.id}`} className="flex flex-col items-center gap-y-1">
+                        {chatRoom.isPrivate && <Link to={`/profile/${chatRoom.friend?.id}`} className="flex flex-col items-center gap-y-1">
                             <div className="p-2 rounded-full text-black font-semibold bg-gray-100 w-10 h-10 flex items-center justify-center">
                                 <UserRound size={18} />
                             </div>
                             <span className="text-xs text-gray-700">Trang cá nhân</span>
-                        </Link>
+                        </Link>}
+
                         {!chatRoom.isPrivate && <div className="flex flex-col items-center gap-y-1">
                             <button onClick={handleLeaveGroup} className="p-2 rounded-full text-black font-semibold hover:bg-gray-200 bg-gray-100 w-10 h-10 flex items-center justify-center">
                                 <LogOut size={18} />
@@ -98,7 +204,7 @@ const ChatDetails: FC<ChatDetailsProps> = ({
                     </div>
                 </div>
 
-                {!chatRoom.isPrivate &&  <Collapse className="overflow-y-auto" items={items} defaultActiveKey={['1']} />}
+                <Collapse className="overflow-y-auto" items={items} defaultActiveKey={['1']} />
             </div>
         </div>
 

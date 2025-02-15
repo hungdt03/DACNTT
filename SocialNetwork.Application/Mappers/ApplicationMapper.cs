@@ -23,7 +23,8 @@ namespace SocialNetwork.Application.Mappers
                 Email = user.Email,
                 FullName = user.FullName,
                 DateOfBirth = user.DateOfBirth,
-                Gender = user.Gender    
+                Gender = user.Gender,
+                RecentOnlineTime = user.RecentOnlineTime,
             };
         }
         public static List<UserResponse> MapToListUser(List<User> users)
@@ -44,6 +45,7 @@ namespace SocialNetwork.Application.Mappers
                 Isverification = user.IsVerification,
                 Location = user.Location != null ? user.Location.Address : null,
                 IsLock = user.IsLock,
+                RecentOnlineTime = user.RecentOnlineTime,
             }).ToList();
         }
 
@@ -426,6 +428,7 @@ namespace SocialNetwork.Application.Mappers
                 Bio = user.Bio,
                 Email = user.Email,
                 FullName = user.FullName,
+                RecentOnlineTime = user.RecentOnlineTime,
             };
         }
     }

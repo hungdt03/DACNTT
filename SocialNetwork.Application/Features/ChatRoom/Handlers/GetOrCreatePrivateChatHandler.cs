@@ -95,8 +95,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             var response = ApplicationMapper.MapToChatRoom(chatRoom);
             response.Friend = ApplicationMapper.MapToUser(receiver);
 
-            var isOnline = await _userStatusService.IsUserActiveAsync(receiver.Id);
-            response.Friend.IsOnline = response.IsOnline = isOnline;
+            var isOnline = await _userStatusService.HasConnectionsAsync(receiver.Id);
 
             var haveStory = await _unitOfWork.StoryRepository
                    .IsUserHaveStoryAsync(receiver.Id);
@@ -107,9 +106,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             if (!isOnline)
             {
-                var recentOnlineTime = await _userStatusService.GetLastActiveTimeAsync(userId);
-                DateTimeOffset utcDateTimeOffset = DateTimeOffset.Parse(recentOnlineTime).ToUniversalTime();
-                response.Friend.RecentOnlineTime = response.RecentOnlineTime = utcDateTimeOffset;
+                response.RecentOnlineTime = receiver.RecentOnlineTime;
             }
 
             return new DataResponse<ChatRoomResponse>()

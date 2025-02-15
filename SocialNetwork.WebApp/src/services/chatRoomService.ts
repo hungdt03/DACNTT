@@ -69,7 +69,7 @@ class ChatRoomService {
     }
 
     changeRoomName(chatRoomId: string, name: string) : Promise<BaseResponse> {
-        return axiosInterceptor.post("/api/chatRooms/upload-name", { chatRoomId, name });
+        return axiosInterceptor.put("/api/chatRooms/update-name", { chatRoomId, name });
     }
 
     chooseNewLeader(memberId: string) : Promise<BaseResponse> {

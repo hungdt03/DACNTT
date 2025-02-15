@@ -43,11 +43,12 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             var message = new Domain.Entity.MessageInfo
              .Message()
             {
-                Content = $"{userFullname} đã thay đổi tên nhóm",
+                Content = $"{userFullname} đã thay đổi tên nhóm thành {request.Name}",
                 ChatRoomId = chatRoom.Id,
                 MessageType = MessageType.SYSTEM,
                 SentAt = DateTimeOffset.UtcNow,
             };
+
             await _unitOfWork.MessageRepository.CreateMessageAsync(message);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

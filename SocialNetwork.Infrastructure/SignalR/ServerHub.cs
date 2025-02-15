@@ -39,7 +39,7 @@ namespace SocialNetwork.Infrastructure.SignalR
         {
             var userId = Context.User.GetUserId();
             await userStatusService.AddConnectionAsync(userId, Context.ConnectionId);
-
+            
             var chatRooms = await unitOfWork.ChatRoomRepository.GetAllChatRoomNamesByUserIdAsync(userId);
             await JoinChatRooms(chatRooms);
             await base.OnConnectedAsync();
@@ -188,6 +188,17 @@ namespace SocialNetwork.Infrastructure.SignalR
             await userStatusService.RemoveConnectionAsync(userId, Context.ConnectionId);
             var chatRooms = await unitOfWork.ChatRoomRepository.GetAllChatRoomNamesByUserIdAsync(userId);
             await LeaveChatRooms(chatRooms);
+
+            var connections = await userStatusService.GetAllConnections(userId);
+            if(connections.Count == 0)
+            {
+                var user = await userManager.FindByIdAsync(userId);
+                if(user != null)
+                {
+                    user.RecentOnlineTime = DateTimeOffset.UtcNow;
+                    await userManager.UpdateAsync(user);
+                }
+            }
             await base.OnDisconnectedAsync(exception);
         }
 

@@ -1,16 +1,22 @@
 import { Image, Upload, UploadFile, UploadProps } from "antd";
 import { InboxOutlined } from '@ant-design/icons'
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { FileType, getBase64, isValidImage, isValidVideo, videoTypes } from "../../utils/file";
+import { FileType, getBase64, isValidImage, isValidVideo } from "../../utils/file";
 import UploadButton from "./UploadButton";
 import { RcFile } from "antd/es/upload";
+import { MediaType } from "../../enums/media";
 
 const MAX_SIZE_MB_UPLOAD = 50;
 const MAX_SIZE_IN_BYTES = MAX_SIZE_MB_UPLOAD * 1024 * 1024;
 
+export type UploadFileBinding = {
+    url: string;
+    type: MediaType
+}
+
 type UploadMultipleFileProps = {
     onChange?: (fileList: UploadFile[]) => void;
-    valueUrls?: string[];
+    valueUrls?: UploadFileBinding[];
     onRemoveFileUrl?: (url: string | undefined) => void;
 }
 
@@ -100,7 +106,8 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
     useEffect(() => {
         if (valueUrls) {
             setFileList([...valueUrls.map(item => ({
-                url: item
+                url: item.url,
+                type: item.type
             }))])
         }
 
@@ -134,19 +141,39 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
                     onChange={handleImageChange}
                     onRemove={handleRemoveFile}
                     iconRender={(file) => {
+                       
+                        // Binding
+                        if (file.type === MediaType.VIDEO) {
+                            console.log(file)
+                            return (
+                                <video
+                                    src={file.url}
+                                    className="aspect-square object-cover"
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                    }}
+                                />
+                            );
+                        }
+
                         const fileObj = file.originFileObj as RcFile;
                         if (fileObj && isValidVideo(fileObj)) {
                             const videoUrl = URL.createObjectURL(fileObj);
                             return (
                                 <video
                                     src={videoUrl}
-                                    width={'100%'}
-                                    height={'100%'}
-                                    controls
+                                    className="aspect-square object-cover"
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                    }}
                                     onLoadedData={() => URL.revokeObjectURL(videoUrl)}
                                 />
                             );
                         }
+
+
                         return null; // Không hiển thị icon cho ảnh
                     }}
                 >

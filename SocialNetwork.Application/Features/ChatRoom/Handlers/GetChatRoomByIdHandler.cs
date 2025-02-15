@@ -36,7 +36,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             if (friend != null)
             {
-                var isOnline = await _userStatusService.IsUserActiveAsync(friend.UserId);
+                var isOnline = await _userStatusService.HasConnectionsAsync(friend.UserId);
                 response.Friend = ApplicationMapper.MapToUser(friend.User);
                 response.Friend.IsOnline = response.IsOnline = isOnline;
 
@@ -49,37 +49,28 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 
                 if (!isOnline)
                 {
-                    var recentOnlineTime = await _userStatusService.GetLastActiveTimeAsync(userId);
-                    DateTimeOffset utcDateTimeOffset = DateTimeOffset.Parse(recentOnlineTime).ToUniversalTime();
-                    response.Friend.RecentOnlineTime = response.RecentOnlineTime = utcDateTimeOffset;
+                    response.RecentOnlineTime = response.Friend.RecentOnlineTime;
                 }
             }
             else
             {
-                DateTimeOffset? mostRecentOnlineTime = null;
+                DateTimeOffset? lastOnlineTime = null;
 
                 foreach (var member in chatRoom.Members)
                 {
-                    var isMemberOnline = await _userStatusService.IsUserActiveAsync(member.UserId);
-                    if(isMemberOnline)
+                    if (member.UserId == userId) continue;
+                    var hasConnections = await _userStatusService.HasConnectionsAsync(member.UserId);
+                    if (hasConnections)
                     {
                         response.IsOnline = true;
                         break;
                     }
 
-                    var recentOnlineTime = await _userStatusService.GetLastActiveTimeAsync(member.UserId);
-
-                    if (DateTimeOffset.TryParse(recentOnlineTime.ToString(), out var parsedTime))
+                    if (member.User.RecentOnlineTime > lastOnlineTime)
                     {
-                        if (mostRecentOnlineTime == null || parsedTime > mostRecentOnlineTime)
-                        {
-                            mostRecentOnlineTime = parsedTime;
-                        }
+                        lastOnlineTime = member.User.RecentOnlineTime;
                     }
                 }
-
-                if (mostRecentOnlineTime != null && mostRecentOnlineTime.HasValue)
-                    response.RecentOnlineTime = mostRecentOnlineTime.Value;
 
                 var chatRoomMember = await _unitOfWork.ChatRoomMemberRepository
                         .GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId);
@@ -87,7 +78,6 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 response.IsMember = chatRoomMember != null;
                 response.IsAdmin = chatRoomMember != null && chatRoomMember.IsLeader;
             }
-            
 
             return new DataResponse<ChatRoomResponse>
             {

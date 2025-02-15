@@ -182,6 +182,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
     }, []);
 
     useEffect(() => {
+        console.log(room)
         room.isPrivate && room.friend && getBlock(room.friend?.id)
         setIsShowPrevent(room.isPrivate && !room.isAccept && !!room.lastMessage)
     }, [room])
@@ -375,7 +376,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                     <div className="flex flex-col flex-shrink-0">
                         <b className={cn("text-sm", isRead && 'text-black')}>{room.isPrivate ? room.friend?.fullName : room.name}</b>
                         <div className={cn("text-[12px] flex items-center gap-x-2", isRead && 'text-gray-400')}>
-                            {room.isOnline ? 'Đang hoạt động' : room.recentOnlineTime && `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
+                            {room.isOnline ? 'Đang hoạt động' :  `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
                             <span><DownOutlined className="text-gray-500" /></span>
                         </div>
                     </div>

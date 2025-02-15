@@ -32,7 +32,6 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             var response = new List<ChatRoomResponse>();
 
-            var onlineUsers = await _userStatusService.GetAllActiveUsersAsync();
             foreach (var chatRoom in chatRooms)
             {
 
@@ -43,46 +42,39 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
                 if (friend != null)
                 {
-                    var isOnline = onlineUsers.Any(s => s == friend.UserId);
+                    var isOnline = await _userStatusService.HasConnectionsAsync(friend.UserId);
                     item.Friend = ApplicationMapper.MapToUser(friend.User);
                     item.Friend.IsOnline = item.IsOnline = isOnline;
 
                     if (!isOnline)
                     {
-                        var recentOnlineTime = await _userStatusService.GetLastActiveTimeAsync(userId);
-                        DateTimeOffset utcDateTimeOffset = DateTimeOffset.Parse(recentOnlineTime).ToUniversalTime();
-                        item.Friend.RecentOnlineTime = item.RecentOnlineTime = utcDateTimeOffset;
+                        item.RecentOnlineTime = friend.User.RecentOnlineTime;
                     }
                 }
                 else
                 {
-                    var offlineMembers = chatRoom.Members.Where(s => !onlineUsers.Any(m => m == s.UserId)).ToList();
-                    var isOnline = offlineMembers.Count < item.Members.Count;
-                    item.IsOnline = isOnline;
+                    DateTimeOffset lastOnlineTime = DateTimeOffset.MinValue;
 
-                    if (!isOnline)
+                    foreach (var member in chatRoom.Members)
                     {
-                        DateTimeOffset? mostRecentOnlineTime = null;
-
-                        foreach (var member in offlineMembers)
+                        var hasConnections = await _userStatusService.HasConnectionsAsync(member.UserId);
+                        if (hasConnections)
                         {
-                            var recentOnlineTime = await _userStatusService.GetLastActiveTimeAsync(member.UserId);
-
-                            if (DateTimeOffset.TryParse(recentOnlineTime.ToString(), out var parsedTime))
-                            {
-                                if (mostRecentOnlineTime == null || parsedTime > mostRecentOnlineTime)
-                                {
-                                    mostRecentOnlineTime = parsedTime;
-                                }
-                            }
+                            item.IsOnline = true;
+                            break;
                         }
 
+                        if (member.User.RecentOnlineTime > lastOnlineTime)
+                        {
+                            lastOnlineTime = member.User.RecentOnlineTime;
+                        }
+                    }
 
-                        if (mostRecentOnlineTime != null && mostRecentOnlineTime.HasValue)
-                            item.RecentOnlineTime = mostRecentOnlineTime.Value;
+                    if (!item.IsOnline)
+                    {
+                        item.RecentOnlineTime = lastOnlineTime;
                     }
                 }
-
 
                 var lastMessage = await _unitOfWork.MessageRepository.GetLastMessageByGroupIdAsync(chatRoom.Id);
 

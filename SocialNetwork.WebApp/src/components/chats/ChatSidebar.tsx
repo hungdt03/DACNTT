@@ -11,12 +11,10 @@ SwiperCore.use([Navigation]);
 import { ChatRoomResource } from "../../types/chatRoom";
 import chatRoomService from "../../services/chatRoomService";
 import useDebounce from "../../hooks/useDebounce";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import LoadingIndicator from "../LoadingIndicator";
 import messageService from "../../services/messageService";
-import { AppDispatch } from "../../app/store";
-import { add } from "../../features/slices/chat-popup-slice";
 
 type ChatSidebarProps = {
     chatRoom: ChatRoomResource
