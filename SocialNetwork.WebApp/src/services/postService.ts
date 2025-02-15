@@ -68,6 +68,15 @@ class PostService {
         })
     }
 
+    getAllMemberPostsInGroup(memberId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/group/member/' + memberId, {
+            params: {
+                page: page,  
+                size: size  
+            }
+        })
+    }
+
     getAllGroupPostsByCurrentUser(page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
         return axiosInterceptor.get('/api/posts/group', {
             params: {

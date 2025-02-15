@@ -11,6 +11,8 @@ namespace SocialNetwork.Application.Interfaces
         Task<int> CountSharePostsByUserIdAsync(string userId);
         Task<(List<Post> Posts, int TotalCount)> GetAllPostsByGroupIdAsync(Guid groupId, int page, int size);
         Task<(List<Post> Posts, int TotalCount)> GetAllGroupPostsByUserIdAsync(string userId, int page, int size);
+        Task<(List<Post> Posts, int TotalCount)> GetAllMemberGroupPostsByGroupIdAsync(Guid groupId, string userId, int page, int size);
+     
         Task<Post?> GetPostByIdAsync(Guid id);
         Task<int> CountSharesByPostIdAsync(Guid postId);
         Task<(List<Post> Posts, int TotalCount)> GetAllSharesByPostIdAsync(Guid postId, int page, int size);  

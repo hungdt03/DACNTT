@@ -11,5 +11,7 @@ namespace SocialNetwork.Application.Features.User.Commands
         public string FullName { get; set; }
         public string Gender { get; set; }
         public DateTimeOffset Birthday { get; set; }
+        [RegularExpression(@"^[0-9]{10,11}$", ErrorMessage = "Số điện thoại không hợp lệ")]
+        public string? PhoneNumber { get; set; }
     }
 }

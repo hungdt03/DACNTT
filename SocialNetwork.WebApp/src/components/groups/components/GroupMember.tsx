@@ -7,8 +7,11 @@ import { Button, Divider, Popconfirm, Popover, Tag } from "antd";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../../features/slices/auth-slice";
 import { MoreHorizontal } from "lucide-react";
+import { GroupResource } from "../../../types/group";
+import { Link } from "react-router-dom";
 
 type GroupMemberProps = {
+    group: GroupResource;
     member: GroupMemberResource;
     isMine: boolean;
     adminCount: number;
@@ -24,6 +27,7 @@ type GroupMemberProps = {
 }
 
 const GroupMember: FC<GroupMemberProps> = ({
+    group,
     member,
     isMine,
     adminCount,
@@ -45,7 +49,7 @@ const GroupMember: FC<GroupMemberProps> = ({
 
                 <div className="flex flex-col items-start gap-y-1">
                     <div className="flex items-center gap-x-2">
-                        <span className="text-[16px] font-bold text-gray-700">{member.user.fullName}</span>
+                        <Link to={`/groups/${group.id}/user/${member.user.id}`} className="text-[16px] font-bold text-gray-700">{member.user.fullName}</Link>
                         {member.role === MemberRole.ADMIN ? <Tag color="cyan">Quản trị viên</Tag> : member.role === MemberRole.MODERATOR && <Tag color="green">Người kiểm duyệt</Tag>}
                     </div>
                     <span className="text-sm text-gray-500">Tham gia nhóm {formatTime(new Date(member.joinDate))}</span>

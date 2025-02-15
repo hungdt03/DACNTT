@@ -5,6 +5,7 @@ using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Features.Post.Commands;
+using SocialNetwork.Application.Features.Post.Handlers;
 using SocialNetwork.Application.Features.Post.Queries;
 using SocialNetwork.Application.Features.SavedPost.Commands;
 using SocialNetwork.Application.Features.SavedPost.Queries;
@@ -126,6 +127,13 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> GetAllGroupPostsByCurrentUser([FromQuery] int page = 1, [FromQuery] int size = 8)
         {
             var response = await _mediator.Send(new GetAllGroupPostsByCurrentUserQuery(page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("group/member/{memberId}")]
+        public async Task<IActionResult> GetAllMemberPostInGroup([FromRoute] Guid memberId, [FromQuery] int page = 1, [FromQuery] int size = 8)
+        {
+            var response = await _mediator.Send(new GetAllMemberPostByMemberQuery(memberId, page, size));
             return Ok(response);
         }
 

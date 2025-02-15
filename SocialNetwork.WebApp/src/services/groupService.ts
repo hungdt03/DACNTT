@@ -30,6 +30,10 @@ class GroupService {
         return axiosInterceptor.get('/api/groups/join')
     }
 
+    getGroupMemberByGroupIdAndUserId(groupId: string, userId: string) : Promise<DataResponse<GroupMemberResource>> {
+        return axiosInterceptor.get('/api/groups/member/' + groupId + '/' + userId)
+    }
+
     getAllManageGroup() : Promise<DataResponse<GroupResource[]>> {
         return axiosInterceptor.get('/api/groups/manage')
     }
@@ -48,6 +52,14 @@ class GroupService {
 
     acceptInviteFriend(inviteId: string) : Promise<BaseResponse> {
         return axiosInterceptor.put('/api/groups/invite-friends/accept/' + inviteId)
+    }
+
+    adminAcceptInviteFriend(inviteId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/invite-friends/admin-accept/' + inviteId)
+    }
+
+    adminRejectInviteFriend(inviteId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/groups/invite-friends/admin-reject/' + inviteId)
     }
 
     cancelInviteFriend(inviteId: string) : Promise<BaseResponse> {

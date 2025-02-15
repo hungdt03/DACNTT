@@ -162,7 +162,7 @@ const Notification: FC<NotificationProps> = ({
             onAcceptRequestFriendNotification()
         } else if (notification.type === NotificationType.ASSIGN_POST_TAG || notification.type === NotificationType.POST_REACTION) {
             onPostReactionNotification()
-        } else if (notification.type === NotificationType.INVITE_JOIN_GROUP || notification.type === NotificationType.INVITE_ROLE_GROUP) {
+        } else if (notification.type === NotificationType.INVITE_JOIN_GROUP || notification.type === NotificationType.INVITE_ROLE_GROUP || notification.type === NotificationType.APPROVAL_GROUP_INVITATION) {
             onGroupNotification()
         }
     }

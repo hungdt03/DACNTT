@@ -42,6 +42,7 @@ namespace SocialNetwork.Application.Features.User.Handlers
             user.FullName = request.FullName;
             user.DateOfBirth = request.Birthday;
             user.Gender = request.Gender;
+            user.PhoneNumber = request.PhoneNumber;
 
             var updateResult = await _userManager.UpdateAsync(user);
 

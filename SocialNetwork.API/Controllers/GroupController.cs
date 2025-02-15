@@ -52,6 +52,15 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("member/{groupId}/{userId}")]
+        public async Task<IActionResult> GetGroupMemberById([FromRoute] Guid groupId, [FromRoute] string userId)
+        {
+            var response = await mediator.Send(new GetGroupMemberByGroupIdAndUserIdQuery(groupId, userId));
+            return Ok(response);
+        }
+
+        // JOIN GROUP
+
         [HttpGet("join")]
         public async Task<IActionResult> GetAllGroupsJoinByCurrentUser()
         {
@@ -67,21 +76,6 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("pending-invites/{groupId}")]
-        public async Task<IActionResult> GetAllPendingInviteMembersByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
-        {
-            var response = await mediator.Send(new GetAllPendingInviteMembersByGroupIdQuery(groupId, page, size));
-            return Ok(response);
-        }
-
-
-        [HttpGet("pending-requests/{groupId}")]
-        public async Task<IActionResult> GetAllPendingJoinRequestesByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
-        {
-            var response = await mediator.Send(new GetAllJoinGroupRequestByGroupIdQuery(groupId, page, size));
-            return Ok(response);
-        }
-
         [HttpPost("join/{groupId}")]
         public async Task<IActionResult> RequestJoinGroup([FromRoute] Guid groupId)
         {
@@ -89,31 +83,26 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("approval/{requestId}")]
-        public async Task<IActionResult> ApprovalRequestJoinGroup([FromRoute] Guid requestId)
+        // INVITES
+
+        [HttpGet("pending-invites/{groupId}")]
+        public async Task<IActionResult> GetAllPendingInviteMembersByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
         {
-            var response = await mediator.Send(new ApprovalJoinGroupRequestCommand(requestId));
+            var response = await mediator.Send(new GetAllPendingInviteMembersByGroupIdQuery(groupId, page, size));
             return Ok(response);
         }
 
-        [HttpPut("cancel/{requestId}")]
-        public async Task<IActionResult> CancelRequestJoinGroup([FromRoute] Guid requestId)
+        [HttpPut("invite-friends/admin-accept/{inviteId}")]
+        public async Task<IActionResult> AdminAcceptInviteFriend([FromRoute] Guid inviteId)
         {
-            var response = await mediator.Send(new CancelJoinGroupRequestCommand(requestId));
+            var response = await mediator.Send(new AcceptInviteByAdminCommand(inviteId));
             return Ok(response);
         }
 
-        [HttpPut("reject/{requestId}")]
-        public async Task<IActionResult> RejectRequestJoinGroup([FromRoute] Guid requestId)
+        [HttpPut("invite-friends/admin-reject/{inviteId}")]
+        public async Task<IActionResult> AdminRejectInviteFriend([FromRoute] Guid inviteId)
         {
-            var response = await mediator.Send(new RejectJoinGroupRequestCommand(requestId));
-            return Ok(response);
-        }
-
-        [HttpGet("approval-summary/{groupId}")]
-        public async Task<IActionResult> GetGroupApprovalSummary([FromRoute] Guid groupId)
-        {
-            var response = await mediator.Send(new GetPendingApprovalsSummaryQuery(groupId));
+            var response = await mediator.Send(new RejectInviteByAdminCommand(inviteId));
             return Ok(response);
         }
 
@@ -142,6 +131,47 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> RejectInviteFriend([FromRoute] Guid inviteId)
         {
             var response = await mediator.Send(new RejectInviteFriendCommand(inviteId));
+            return Ok(response);
+        }
+
+
+        // PENDING REQUESTS
+
+        [HttpGet("pending-requests/{groupId}")]
+        public async Task<IActionResult> GetAllPendingJoinRequestesByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetAllJoinGroupRequestByGroupIdQuery(groupId, page, size));
+            return Ok(response);
+        }
+
+
+        [HttpPost("approval/{requestId}")]
+        public async Task<IActionResult> ApprovalRequestJoinGroup([FromRoute] Guid requestId)
+        {
+            var response = await mediator.Send(new ApprovalJoinGroupRequestCommand(requestId));
+            return Ok(response);
+        }
+
+        [HttpPut("cancel/{requestId}")]
+        public async Task<IActionResult> CancelRequestJoinGroup([FromRoute] Guid requestId)
+        {
+            var response = await mediator.Send(new CancelJoinGroupRequestCommand(requestId));
+            return Ok(response);
+        }
+
+        [HttpPut("reject/{requestId}")]
+        public async Task<IActionResult> RejectRequestJoinGroup([FromRoute] Guid requestId)
+        {
+            var response = await mediator.Send(new RejectJoinGroupRequestCommand(requestId));
+            return Ok(response);
+        }
+
+        // SUMMARY INFO LIKE: COUNT REPORTS, COUNT PENDING MEMBERS, COUNT PENDING REQUESTS, V.V
+
+        [HttpGet("approval-summary/{groupId}")]
+        public async Task<IActionResult> GetGroupApprovalSummary([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new GetPendingApprovalsSummaryQuery(groupId));
             return Ok(response);
         }
 

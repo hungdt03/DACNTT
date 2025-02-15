@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using MediatR;
+using SocialNetwork.Application.Contracts.Responses;
 
 namespace SocialNetwork.Application.Features.Group.Commands
 {
-    internal class AcceptInviteByAdminCommand
+    public class AcceptInviteByAdminCommand : IRequest<BaseResponse>
     {
+        public Guid InviteId { get; set; }
+
+        public AcceptInviteByAdminCommand(Guid inviteId)
+        {
+            InviteId = inviteId;
+        }
     }
 }

@@ -13,6 +13,7 @@ export type UpdateUserInfo = {
     fullName: string;
     gender?: string;
     birthday?: string;
+    phoneNumber?: string;
 };
 
 type UpdateUserInfoModalProps = {
@@ -29,7 +30,7 @@ const UpdateUserInfoModal: FC<UpdateUserInfoModalProps> = ({
 
     const onFinish: FormProps<UpdateUserInfo>['onFinish'] = async (values) => {
         const response = await userService.updateUserBasicInfo(values);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message)
             dispatch(setUserDetails(response.data))
             onSuccess()
@@ -46,7 +47,8 @@ const UpdateUserInfoModal: FC<UpdateUserInfoModalProps> = ({
             initialValues={{
                 fullName: user.fullName,
                 gender: user.gender,
-                birthday: user.dateOfBirth ? dayjs(new Date(user.dateOfBirth)) : dayjs()
+                birthday: user.dateOfBirth ? dayjs(new Date(user.dateOfBirth)) : dayjs(),
+                phoneNumber: user.phoneNumber
             }}
         >
             <Form.Item<UpdateUserInfo>
@@ -73,6 +75,19 @@ const UpdateUserInfoModal: FC<UpdateUserInfoModalProps> = ({
                 name="birthday"
             >
                 <DatePicker placeholder="Chọn ngày sinh" />
+            </Form.Item>
+
+            <Form.Item<UpdateUserInfo>
+                label="Số điện thoại"
+                name="phoneNumber"
+                rules={[
+                    {
+                        pattern: /^[0-9]{10,11}$/, // Kiểm tra số điện thoại (10-11 số)
+                        message: 'Số điện thoại không hợp lệ'
+                    }
+                ]}
+            >
+                <Input placeholder="Nhập số điện thoại" />
             </Form.Item>
             <Form.Item label={null}>
                 <Button type="primary" htmlType="submit">

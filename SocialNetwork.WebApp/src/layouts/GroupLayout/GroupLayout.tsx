@@ -10,7 +10,7 @@ import Loading from "../../components/Loading";
 import NotAllowedComponent from "../../components/NotAllowedComponent";
 import { GroupInvitationResource } from "../../types/group-invitation";
 
-const NOT_ALLOWED_ROUTES = ['/pending-reports', '/pending-posts', '/pending-members', '/pending-invites']
+const NOT_ALLOWED_ROUTES = ['/pending-reports', '/pending-posts', '/pending-members', '/pending-invites', '/user']
 
 const GroupLayout: FC = () => {
     const { id } = useParams();

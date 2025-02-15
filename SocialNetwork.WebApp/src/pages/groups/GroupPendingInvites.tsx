@@ -3,7 +3,7 @@ import PendingMember from "../../components/groups/components/PendingMember";
 import { inititalValues } from "../../utils/pagination";
 import { useNavigate, useParams } from "react-router-dom";
 import groupService from "../../services/groupService";
-import { message } from "antd";
+import { Empty, message } from "antd";
 import LoadingIndicator from "../../components/LoadingIndicator";
 import { GroupResource } from "../../types/group";
 import { GroupInvitationResource } from "../../types/group-invitation";
@@ -12,7 +12,7 @@ import InviteMemberPending from "../../components/groups/components/InviteMember
 const GroupPendingInvites: FC = () => {
     const { id } = useParams();
     const [group, setGroup] = useState<GroupResource>()
-    const [pendingInvites, setPendingInvites] = useState<GroupInvitationResource[]>();
+    const [pendingInvites, setPendingInvites] = useState<GroupInvitationResource[]>([]);
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState(inititalValues);
 
@@ -24,7 +24,13 @@ const GroupPendingInvites: FC = () => {
             const response = await groupService.getAllPendingInvitesByGroupId(id, page, size);
             setLoading(false)
             if (response.isSuccess) {
-                setPendingInvites(response.data)
+
+                setPendingInvites(prev => {
+                    const existingIds = new Set(prev.map(item => item.id));
+                    const news = response.data.filter(item => !existingIds.has(item.id));
+                    return [...prev, ...news];
+                });
+
                 setPagination(response.pagination)
             }
         }
@@ -51,21 +57,21 @@ const GroupPendingInvites: FC = () => {
         fetchPendingInvites(pagination.page, pagination.size)
     }, [id])
 
-    const handleRejectRequest = async (requestId: string) => {
-        const response = await groupService.rejectRequestJoinGroup(requestId);
+    const handleRejectInvite = async (requestId: string) => {
+        const response = await groupService.adminRejectInviteFriend(requestId);
         if (response.isSuccess) {
             message.success(response.message)
-            fetchPendingInvites(1, 6)
+            setPendingInvites(prev => [...prev.filter(p => p.id !== requestId)])
         } else {
             message.error(response.message)
         }
     }
 
-    const handleApprovalRequest = async (requestId: string) => {
-        const response = await groupService.approvalRequestJoinGroup(requestId);
+    const handleApprovalInvite = async (requestId: string) => {
+        const response = await groupService.adminAcceptInviteFriend(requestId);
         if (response.isSuccess) {
             message.success(response.message);
-            fetchPendingInvites(1, 6)
+            setPendingInvites(prev => [...prev.filter(p => p.id !== requestId)])
         } else {
             message.error(response.message)
         }
@@ -74,14 +80,14 @@ const GroupPendingInvites: FC = () => {
     return <div className="w-full px-2">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 px-8">
             {pendingInvites?.map(request => <InviteMemberPending
-                onApproval={() => handleApprovalRequest(request.id)}
-                onReject={() => handleRejectRequest(request.id)}
+                onApproval={() => handleApprovalInvite(request.id)}
+                onReject={() => handleRejectInvite(request.id)}
                 key={request.id}
                 invitation={request}
             />)}
             
         </div>
-
+        {!loading && pendingInvites.length === 0 && <Empty description='Không có lời mời nào đang chờ phê duyệt' />}
         {loading && <LoadingIndicator />}
     </div>
 };

@@ -49,6 +49,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.GroupInvitations
                 .Include(x => x.Group)
+                .Include(x => x.Invitee)
                 .SingleOrDefaultAsync(x => x.Id == id);
         }
 

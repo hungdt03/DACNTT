@@ -12,6 +12,8 @@ import Loading from "../../Loading";
 import UserProfileContent from "./UserProfileContent";
 import UserProfileSide from "./UserProfileSide";
 import UserProfileHeader from "./UserProfileHeader";
+import { Role } from "../../../enums/role";
+import { useNavigate } from "react-router-dom";
 
 type UserProfileProps = {
     userId: string
@@ -24,6 +26,7 @@ const UserProfile: FC<UserProfileProps> = ({
     const [user, setUser] = useState<UserResource | null>(null)
     const [loading, setLoading] = useState(false)
     const [friends, setFriends] = useState<FriendResource[]>([]);
+    const navigate = useNavigate();
 
     const fetchFriends = async (userId: string) => {
         const response = await friendService.getAllFriendsByUserId(userId, 1, 9);
@@ -71,6 +74,10 @@ const UserProfile: FC<UserProfileProps> = ({
         try {
             const userResponse = await userService.getUserById(userId);
             if (userResponse.isSuccess) {
+                console.log(userResponse)
+                if(userResponse.data.role == Role.ADMIN) {
+                    navigate('/404')
+                }
                 setUser(userResponse.data);
             }
         } catch (error) {

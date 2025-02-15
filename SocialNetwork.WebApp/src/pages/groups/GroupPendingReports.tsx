@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Empty, message } from "antd";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import LoadingIndicator from "../../components/LoadingIndicator";
@@ -11,6 +11,8 @@ import { ReportType } from "../../enums/report-type";
 import ReportComment from "../../components/reports/ReportComment";
 import ReportPost from "../../components/reports/ReportPost";
 import ReportUser from "../../components/reports/ReportUser";
+import { GroupResource } from "../../types/group";
+import groupService from "../../services/groupService";
 
 const GroupPendingReports: FC = ({
 }) => {
@@ -18,6 +20,24 @@ const GroupPendingReports: FC = ({
     const [pendingReports, setPendingReports] = useState<ReportResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate()
+
+    const [group, setGroup] = useState<GroupResource>();
+
+    const fetchGroup = async () => {
+        if (id) {
+            const response = await groupService.getGroupById(id);
+            if (response.isSuccess) {
+                setGroup(response.data)
+            } else {
+                navigate('/404')
+            }
+        }
+    }
+
+    useEffect(() => {
+        fetchGroup();
+    }, [id])
 
     const { containerRef } = useInfiniteScroll({
         fetchMore: () => void fetchMoreMembers(),
@@ -50,9 +70,9 @@ const GroupPendingReports: FC = ({
     const handleIgnoreReport = async (reportId: string) => {
         const response = await reportService.removeGroupReport(reportId);
         if (!response.isSuccess) message.error(response.message)
-            else {
-                setPendingReports(prevReports => [...prevReports.filter(r => r.id !== reportId)]);
-            }
+        else {
+            setPendingReports(prevReports => [...prevReports.filter(r => r.id !== reportId)]);
+        }
     }
 
     const handleRemoveComment = async (reportId: string) => {
@@ -104,7 +124,7 @@ const GroupPendingReports: FC = ({
             <Empty description='Không có báo cáo nào để xử lí' />
         </div>}
         <div ref={containerRef} className="w-full max-w-screen-lg mx-auto px-2 sm:px-0 grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-            {pendingReports.map(report => {
+            {group && pendingReports.map(report => {
                 if (report.reportType === ReportType.COMMENT) {
                     return <ReportComment
                         key={report.id}
@@ -114,6 +134,7 @@ const GroupPendingReports: FC = ({
                     />
                 } else if (report.reportType === ReportType.POST) {
                     return <ReportPost
+                        group={group}
                         key={report.id}
                         report={report}
                         onKeep={() => handleIgnoreReport(report.id)}
