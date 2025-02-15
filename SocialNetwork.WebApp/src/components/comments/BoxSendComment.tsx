@@ -205,7 +205,10 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
 
     return <div className="flex flex-col items-start gap-y-2">
         <div className="flex items-center gap-x-4 w-full">
-            <Avatar className="flex-shrink-0 w-[25px] h-[25px] sm:w-[35px] sm:h-[35px]" src={user?.avatar ?? images.user} />
+            <div className="relative">
+                <Avatar className="flex-shrink-0 w-[25px] h-[25px] sm:w-[35px] sm:h-[35px]" src={user?.avatar ?? images.user} />
+                <div className="absolute -bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
+            </div>
 
             <div className={cn("bg-gray-100 px-1 rounded-xl w-full flex items-center justify-between sm:py-[2px]")}>
 

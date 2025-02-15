@@ -82,6 +82,15 @@ class GroupService {
         return axiosInterceptor.get('/api/groups/join/' + groupId)
     }
 
+    getAllPendingInvitesByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<GroupInvitationResource[]>> {
+        return axiosInterceptor.get('/api/groups/pending-invites/' + groupId, {
+            params: {
+                page,
+                size
+            }
+        })
+    }
+
     getAllJoinGroupRequestByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<JoinGroupRequestResource[]>> {
         return axiosInterceptor.get('/api/groups/pending-requests/' + groupId, {
             params: {

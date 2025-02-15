@@ -48,7 +48,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 group.RequireApproval = false;
                 group.RequirePostApproval = false;
                 group.OnlyAdminCanApprovalMember = false;
-                group.OnlyAdminCanApprovalMember = false;
+                group.OnlyAdminCanPost = false;
             } else
             {
                 group.RequireApproval = request.Group.IsApprovalMember;
@@ -56,6 +56,14 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 group.OnlyAdminCanApprovalMember = request.Group.OnlyAdminCanApprovalMember;
                 group.OnlyAdminCanPost = request.Group.OnlyAdminCanPost;
                 group.IsHidden = request.Group.IsHidden;
+
+                if (request.Group.IsHidden)
+                {
+                    group.IsHidden = request.Group.IsHidden;
+                    group.RequireApproval = true;
+                    group.OnlyAdminCanApprovalMember = true;
+                }
+                
             }
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);

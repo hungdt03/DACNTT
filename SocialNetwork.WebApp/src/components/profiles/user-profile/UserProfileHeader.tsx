@@ -161,8 +161,8 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
         <div className="flex flex-col lg:flex-row items-center lg:items-end md:ml-10 ml-0 -mt-16 gap-x-6 lg:-mt-8 px-8">
             <div className="relative flex-shrink-0 z-30">
                 {targetUser?.haveStory ?
-                    <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[3px] p-[2px] border-primary flex items-center justify-center aspect-square" to={`/stories/${targetUser.id}`}>
-                        <img alt="Ảnh đại diện" className="object-cover aspect-square" src={targetUser?.avatar ?? images.user} />
+                    <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[4px] p-[2px] border-primary flex items-center justify-center aspect-square" to={`/stories/${targetUser.id}`}>
+                        <img alt="Ảnh đại diện" className="object-cover aspect-square rounded-full" src={targetUser?.avatar ?? images.user} />
                     </Link>
                     : <img
                         alt="Ảnh đại diện"

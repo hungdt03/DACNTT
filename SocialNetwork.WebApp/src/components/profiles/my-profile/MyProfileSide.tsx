@@ -75,12 +75,15 @@ const MyProfileSide: FC<MyProfileSideProps> = ({
                 <div className="grid grid-cols-3 gap-2">
                     {friends.map(friend => (
                         <Link to={`/profile/${friend.id}`} key={friend.id} className="flex flex-col items-start gap-1 cursor-pointer">
-                            <Image
-                                preview={false}
-                                src={friend.avatar ?? images.cover}
-                                style={{ height: '100%', width: '100%' }}
-                                className="border-[1px] w-full h-full object-cover border-gray-200 rounded-md aspect-square"
-                            />
+                            <div className="relative">
+                                <Image
+                                    preview={false}
+                                    src={friend.avatar ?? images.cover}
+                                    style={{ height: '100%', width: '100%' }}
+                                    className="border-[1px] w-full h-full object-cover border-gray-200 rounded-md aspect-square"
+                                />
+                                {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-4 right-4 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
+                            </div>
                             <span className="text-sm font-semibold line-clamp-1">{friend.fullName}</span>
                             {user?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}
                         </Link>

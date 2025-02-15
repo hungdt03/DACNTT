@@ -160,6 +160,8 @@ const PostGroup: FC<PostGroupProps> = ({
                         ? <Avatar className="w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} />
                         : <Link className="absolute -right-2 -bottom-2 border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-6 h-6 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} /> </Link>
                     }
+
+                    {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-2 -right-2 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                 </div>
                 <div className="flex flex-col gap-y-[1px]">
                     <div className="font-semibold text-[15px] text-gray-800">

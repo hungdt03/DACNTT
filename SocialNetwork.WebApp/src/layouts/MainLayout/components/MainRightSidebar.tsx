@@ -11,7 +11,6 @@ import { Link } from "react-router-dom";
 import friendRequestService from "../../../services/friendRequestService";
 import { selectAuth } from "../../../features/slices/auth-slice";
 import { FriendRequestResource } from "../../../types/friendRequest";
-import { toast } from "react-toastify";
 import { SuggestedFriendResource } from "../../../types/suggested-friend";
 import friendService from "../../../services/friendService";
 import LoadingIndicator from "../../../components/LoadingIndicator";
@@ -104,7 +103,7 @@ const FriendRequestsTab: FC<FriendRequestsTabProps> = ({
 
     const loadFriendRequests = async () => {
         setLoading(true)
-        const response = await friendRequestService.getAllFriendRequestByUserId(userId, 1, 6);
+        const response = await friendRequestService.getAllFriendRequestByUserId(1, 6);
         setLoading(false)
         if (response.isSuccess) {
             setListFriendRequests(response.data);

@@ -81,6 +81,7 @@ const UserProfile: FC<UserProfileProps> = ({
     const fetchFriendRequestData = async (userId: string) => {
         try {
             const friendRequestResponse = await friendRequestService.getFriendRequestByUserId(userId);
+            console.log(friendRequestResponse)
             if (friendRequestResponse.isSuccess) {
                 setFriendRequest(friendRequestResponse.data);
             } else {

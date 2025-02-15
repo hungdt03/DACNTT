@@ -1,15 +1,18 @@
 import { FC } from "react";
 import { Avatar, Button } from "antd";
 import { GroupInvitationResource } from "../../types/group-invitation";
+import { GroupResource } from "../../types/group";
 
 type GroupInvitationLabelProps = {
     invitation: GroupInvitationResource;
+    group: GroupResource;
     onAccept: () => void;
     onReject: () => void;
 }
 
 const GroupInvitationLabel: FC<GroupInvitationLabelProps> = ({
     invitation,
+    group,
     onAccept,
     onReject
 }) => {
@@ -20,7 +23,10 @@ const GroupInvitationLabel: FC<GroupInvitationLabelProps> = ({
             <div className="flex flex-col">
                 <span className="font-bold">{invitation.inviter.fullName} đã mời bạn tham gia nhóm này</span>
                 <p className="text-sm text-gray-500">
-                    Nếu chấp nhận, bạn sẽ có thể thấy được mọi hoạt động của nhóm
+                    Nếu chấp nhận, {
+                        group.onlyAdminCanApprovalMember ? 'lời mời này sẽ được gửi tới quản trị viên và người kiểm duyệt để chờ phê duyệt'
+                        : 'bạn sẽ có thể thấy được mọi hoạt động của nhóm'
+                    }
                 </p>
             </div>
         </div>

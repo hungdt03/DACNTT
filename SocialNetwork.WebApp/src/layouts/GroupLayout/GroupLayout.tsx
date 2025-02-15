@@ -10,7 +10,7 @@ import Loading from "../../components/Loading";
 import NotAllowedComponent from "../../components/NotAllowedComponent";
 import { GroupInvitationResource } from "../../types/group-invitation";
 
-const NOT_ALLOWED_ROUTES = ['/pending-reports', '/pending-posts', '/pending-members']
+const NOT_ALLOWED_ROUTES = ['/pending-reports', '/pending-posts', '/pending-members', '/pending-invites']
 
 const GroupLayout: FC = () => {
     const { id } = useParams();
@@ -30,6 +30,7 @@ const GroupLayout: FC = () => {
         if (id) {
             setLoadingRequest(true)
             const response = await groupService.getJoinGroupRequestByGroupId(id);
+           
             setLoadingRequest(false)
             if (response.isSuccess) {
                 setRequestJoin(response.data)
@@ -43,6 +44,7 @@ const GroupLayout: FC = () => {
         if (id) {
             setLoadingInvite(true)
             const response = await groupService.getInviteJoinGroup(id);
+            console.log(response)
             setLoadingInvite(false)
             if (response.isSuccess) {
                 setInviteJoin(response.data)
@@ -59,6 +61,8 @@ const GroupLayout: FC = () => {
             setLoading(false)
             if (response.isSuccess) {
                 setGroup(response.data)
+            } else {
+                navigate('/404')
             }
         }
     }

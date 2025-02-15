@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from "react";
 import images from "../../../assets";
-import { MoreHorizontal } from "lucide-react";
 import { FriendResource } from "../../../types/friend";
 import friendService from "../../../services/friendService";
 import { Empty } from "antd";
@@ -9,6 +8,8 @@ import { Pagination } from "../../../types/response";
 import { inititalValues } from "../../../utils/pagination";
 import { useElementInfinityScroll } from "../../../hooks/useElementInfinityScroll";
 import LoadingIndicator from "../../LoadingIndicator";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../../features/slices/auth-slice";
 
 type ProfileFriendListProps = {
     userId: string
@@ -19,7 +20,8 @@ const ProfileFriendList: FC<ProfileFriendListProps> = ({
 }) => {
     const [friends, setFriends] = useState<FriendResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const { user } = useSelector(selectAuth)
 
     const fetchFriends = async (page: number, size: number) => {
         setLoading(true)
@@ -55,8 +57,11 @@ const ProfileFriendList: FC<ProfileFriendListProps> = ({
     return <div className="grid grid-cols-2 gap-4">
         {friends.map(friend => (<div key={friend.id} className="flex items-center justify-between bg-white shadow p-4 rounded-md border-[1px] border-gray-100">
             <Link to={`/profile/${friend.id}`} className="hover:text-black flex items-center gap-x-3">
-                <img className="w-[50px] h-[50px] rounded-md border-[1px] border-gray-50"
-                    src={friend.avatar ?? images.photo} />
+                <div className="relative">
+                    <img className="w-[50px] h-[50px] rounded-md border-[1px] border-gray-50"
+                        src={friend.avatar ?? images.photo} />
+                    {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-0 right-1 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                </div>
                 <div className="flex flex-col">
                     <span className="font-semibold">{friend.fullName}</span>
                     <span className="text-xs text-gray-500">{friend.mutualFriends} bạn chung</span>

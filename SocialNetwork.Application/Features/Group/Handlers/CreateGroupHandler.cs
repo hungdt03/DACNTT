@@ -37,10 +37,18 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 Privacy = request.Privacy,
                 Description = request.Description,
                 Name = request.Name,
-                RequireApproval = true,
-                RequirePostApproval = true,
+                RequireApproval = false,
+                RequirePostApproval = false,
+                OnlyAdminCanApprovalMember = false,
+                OnlyAdminCanPost = false,
                 IsHidden = request.Privacy == GroupPrivacy.PUBLIC ? false : request.IsHidden,
             };
+
+            if(request.IsHidden)
+            {
+                group.RequireApproval = true;
+                group.OnlyAdminCanApprovalMember = true;
+            }
 
             if (request.CoverImage != null)
             {

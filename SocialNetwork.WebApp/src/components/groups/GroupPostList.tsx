@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import PostGroupCreator from "../posts/PostGroupCreator";
 import { Id, toast } from "react-toastify";
 import { PostResource } from "../../types/post";
@@ -12,11 +12,13 @@ import { GroupPrivacy } from "../../enums/group-privacy";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 
 type GroupPostListProps = {
-    group: GroupResource
+    group: GroupResource;
+    onFetchGroup: () => void
 }
 
 const GroupPostList: FC<GroupPostListProps> = ({
-    group
+    group,
+    onFetchGroup
 }) => {
     const [loading, setLoading] = useState(false);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
@@ -81,6 +83,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
     };
 
     const handleCreatePostFailed = (toastId: Id, msg: string) => {
+        onFetchGroup()
         toast.update(toastId, {
             render: msg,
             type: 'error',
@@ -91,7 +94,7 @@ const GroupPostList: FC<GroupPostListProps> = ({
 
     return <div className="col-span-12 lg:col-span-7 h-full overflow-y-auto scrollbar-hide py-2 md:py-6">
         <div ref={containerRef} className="flex flex-col gap-y-2 md:gap-y-4">
-            <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} group={group} />
+            {(group.onlyAdminCanPost && group.isMine) || !group.onlyAdminCanPost && <PostGroupCreator onFalied={handleCreatePostFailed} onSuccess={handleCreatePostSuccess} group={group} />}
             {posts.map(post => {
                 return <Post onRemovePost={() => handleRemovePost(post.id)} group={group} key={post.id} post={post} allowShare={group.privacy === GroupPrivacy.PUBLIC} />
             })}

@@ -7,6 +7,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Auth.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
 using System.Data;
 
@@ -17,14 +18,14 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
         private readonly UserManager<Domain.Entity.System.User> userManager;
         private readonly ITokenService tokenService;
         private readonly IUnitOfWork unitOfWork;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IUserStatusService userStatusService;
 
-        public LoginCommandHandler(IHttpContextAccessor httpContextAccessor, UserManager<Domain.Entity.System.User> userManager, ITokenService tokenService, IUnitOfWork unitOfWork)
+        public LoginCommandHandler(UserManager<Domain.Entity.System.User> userManager, ITokenService tokenService, IUnitOfWork unitOfWork, IUserStatusService userStatusService)
         {
             this.userManager = userManager;
             this.tokenService = tokenService;
             this.unitOfWork = unitOfWork;
-            this.httpContextAccessor = httpContextAccessor;
+            this.userStatusService = userStatusService;
         }
 
         public async Task<BaseResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -42,6 +43,7 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
 
             var tokens = await tokenService.GenerateTokenAsync(user);
             var mapUser = ApplicationMapper.MapToUser(user);
+            mapUser.IsOnline = await userStatusService.HasConnectionsAsync(user.Id);
             mapUser.Role = "USER";
             var roles = await userManager.GetRolesAsync(user);
             if (roles != null && roles.Count == 1)

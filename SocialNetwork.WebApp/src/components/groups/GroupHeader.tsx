@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
-import { Avatar, Button, Divider, Drawer, Form, FormProps, Input, Modal, Popconfirm, Popover, Radio, Select, Switch, Tooltip, message } from "antd";
+import { Avatar, Button, Divider, Drawer, Form, FormProps, Input, Modal, Popconfirm, Select, Switch, Tooltip, message } from "antd";
 import { SettingOutlined } from '@ant-design/icons'
 import { ChartNoAxesGantt, Plus } from "lucide-react";
 import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
@@ -64,6 +64,8 @@ const GroupHeader: FC<GroupHeaderProps> = ({
 
     const [roleInvitation, setRoleInvitation] = useState<GroupRoleInvitationResource>();
     const [isDisabled, setIsDisabled] = useState(false);
+    const [isDisabledSectionFriends, setIsDisabledSectionFriends] = useState(false);
+    const [isDisabledApprovalPost, setIsDisabledApprovalPost] = useState(false);
     const [isChange, setIsChange] = useState(false);
 
     const [form] = Form.useForm<EditGroupRequest>();
@@ -100,15 +102,19 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     const handleJoinGroup = async (groupId: string) => {
         const response = await groupService.createRequestJoinGroup(groupId);
         if (response.isSuccess) {
-            onFetchRequest()
+            onFetchRequest();
+            onFetchGroup();
             message.success(response.message)
         } else {
-            message.error(response.message)
+            message.error(response.message);
+            onFetchGroup();
         }
     }
 
     useEffect(() => {
         if (group.privacy === GroupPrivacy.PUBLIC) setIsDisabled(true);
+        if (group.isHidden) setIsDisabledSectionFriends(true);
+        if (group.onlyAdminCanPost) setIsDisabledApprovalPost(true);
         handleGetRoleInvitation()
     }, [group])
 
@@ -144,6 +150,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
             onFetchInvite();
             message.success(response.message)
         } else {
+            onFetchGroup();
             message.error(response.message)
         }
     }
@@ -217,40 +224,72 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                     <div className="flex items-center flex-wrap gap-2">
                         {group.isMember ? (
                             <>
-                                {group.isMine && <Button className="lg:hidden" onClick={() => setOpenManage(true)} icon={<ChartNoAxesGantt size={16} />} type="primary">
-                                    Quản lí
-                                </Button>}
-                                {group.isMine && <Button onClick={() => setOpenSetting(true)} icon={<SettingOutlined size={16} />} type="primary">
-                                    Cài đặt
-                                </Button>}
+                                {group.isMine && (
+                                    <>
+                                        <Button className="lg:hidden" onClick={() => setOpenManage(true)} icon={<ChartNoAxesGantt size={16} />} type="primary">
+                                            Quản lí
+                                        </Button>
+                                        <Button onClick={() => setOpenSetting(true)} icon={<SettingOutlined size={16} />} type="primary">
+                                            Cài đặt
+                                        </Button>
+                                    </>
+                                )}
+
                                 <Button onClick={showModal} icon={<Plus size={16} />} type="primary">
                                     Mời
                                 </Button>
-                                {group.isMine && group.adminCount === 1 && group.countMembers > 1 ? <button onClick={showLeave} className="font-semibold px-3 py-[6px] text-sm hover:bg-gray-200 rounded-md bg-gray-100">
-                                    Rời nhóm
-                                </button>
-                                    : <Popconfirm onConfirm={() => handleLeaveGroup(group.id)} title='Rời nhóm' cancelText='Hủy bỏ' okText='Rời nhóm' description={group.countMembers === 1 ? 'Bạn là thành viên cuối cùng của nhóm, nhóm sẽ bị xóa khi bạn rời đi!' : 'Bạn có chắc muốn rời nhóm không'}>
+
+                                {group.isMine && group.adminCount === 1 && group.countMembers > 1 ? (
+                                    <button onClick={showLeave} className="font-semibold px-3 py-[6px] text-sm hover:bg-gray-200 rounded-md bg-gray-100">
+                                        Rời nhóm
+                                    </button>
+                                ) : (
+                                    <Popconfirm
+                                        onConfirm={() => handleLeaveGroup(group.id)}
+                                        title="Rời nhóm"
+                                        cancelText="Hủy bỏ"
+                                        okText="Rời nhóm"
+                                        description={group.countMembers === 1 ?
+                                            "Bạn là thành viên cuối cùng của nhóm, nhóm sẽ bị xóa khi bạn rời đi!" :
+                                            "Bạn có chắc muốn rời nhóm không?"
+                                        }
+                                    >
                                         <button className="font-semibold px-3 py-[6px] text-sm hover:bg-gray-200 rounded-md bg-gray-100">
                                             Rời nhóm
                                         </button>
-                                    </Popconfirm>}
-                                <button className="font-semibold bg-sky-50 text-sm text-primary px-3 py-[6px] rounded-md">Đã tham gia</button>
-                            </>
-                        ) : !inviteJoin && (requestJoin ? (
-                            <>
-                                <button onClick={() => handleCancelJoinGroupRequest(requestJoin.id)} className="px-3 py-[6px] text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold">Hủy</button>
-                                <Button className="cursor-text" type="primary">Chờ phê duyệt</Button>
+                                    </Popconfirm>
+                                )}
+
+                                <button className="font-semibold bg-sky-50 text-sm text-primary px-3 py-[6px] rounded-md">
+                                    Đã tham gia
+                                </button>
                             </>
                         ) : (
-                            <Button onClick={() => handleJoinGroup(group.id)} icon={<Plus size={16} />} type="primary">
-                                Tham gia nhóm
-                            </Button>
-                        ))}
+                            inviteJoin?.status || requestJoin ? (
+                                <>
+                                    {requestJoin && (
+                                        <button
+                                            onClick={() => handleCancelJoinGroupRequest(requestJoin.id)}
+                                            className="px-3 py-[6px] text-sm rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold"
+                                        >
+                                            Hủy
+                                        </button>
+                                    )}
+                                    <Button className="cursor-text" type="primary">Chờ phê duyệt</Button>
+                                </>
+                            ) : (
+                                <Button onClick={() => handleJoinGroup(group.id)} icon={<Plus size={16} />} type="primary">
+                                    Tham gia nhóm
+                                </Button>
+                            )
+                        )}
                     </div>
+
                 </div>
 
-                {inviteJoin && <GroupInvitationLabel
+                {inviteJoin?.status === false && <GroupInvitationLabel
                     invitation={inviteJoin}
+                    group={group}
                     onAccept={() => handleAcceptInviteJoinGroup(inviteJoin.id)}
                     onReject={() => handleRejectInviteJoinGroup(inviteJoin.id)}
                 />}
@@ -309,7 +348,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                     isApprovalPost: group.requireApprovalPost,
                     isApprovalMember: group.requireApproval,
                     isHidden: group.isHidden,
-                    privacy: group.privacy === GroupPrivacy.PUBLIC
+                    isPublic: group.privacy === GroupPrivacy.PUBLIC
                 }}
             >
                 <div className="flex flex-col gap-y-4">
@@ -351,15 +390,17 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 />
                             </Form.Item>
                         </div>
-
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm mb-6">Ẩn nhóm (Chỉ thành viên mới tìm thấy nhóm)</span>
-                            <Form.Item<EditGroupRequest>
-                                valuePropName="checked"
-                                name="isHidden"
-                            >
-                                <Switch disabled={isDisabled} />
-                            </Form.Item>
+                        <div className="flex flex-col">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm mb-6">Ẩn nhóm (Chỉ thành viên hoặc người được mời mới tìm thấy nhóm)</span>
+                                <Form.Item<EditGroupRequest>
+                                    valuePropName="checked"
+                                    name="isHidden"
+                                >
+                                    <Switch onChange={e => setIsDisabledSectionFriends(e)} disabled={isDisabled} />
+                                </Form.Item>
+                            </div>
+                            <span className="text-xs mb-6 italic">Lưu ý: Khi ẩn nhóm, chỉ có Quản trị viên và người kiểm duyệt mới được phê duyệt thành viên</span>
                         </div>
                     </div>
                 </div>
@@ -373,15 +414,16 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 valuePropName="checked"
                                 name="isApprovalPost"
                             >
-                                <Switch disabled={isDisabled} />
+                                <Switch disabled={isDisabled || isDisabledApprovalPost} />
                             </Form.Item>
                         </div>
 
                         <Form.Item<EditGroupRequest>
                             name="onlyAdminCanPost"
-                            label='Ai có quyền phê duyệt'
+                            label='Ai có quyền đăng bài'
                         >
                             <Select
+                                onChange={e => setIsDisabledApprovalPost(e.value)}
                                 disabled={isDisabled}
                                 options={[
                                     { value: true, label: 'Quản trị viên và người kiểm duyệt' },
@@ -401,7 +443,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 valuePropName="checked"
                                 name="isApprovalMember"
                             >
-                                <Switch disabled={isDisabled} />
+                                <Switch disabled={isDisabled || isDisabledSectionFriends} />
                             </Form.Item>
                         </div>
 
@@ -410,7 +452,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                             label='Ai có quyền phê duyệt'
                         >
                             <Select
-                                disabled={isDisabled}
+                                disabled={isDisabled || isDisabledSectionFriends}
                                 options={[
                                     { value: true, label: 'Quản trị viên và người kiểm duyệt' },
                                     { value: false, label: 'Tất cả thành viên trong nhóm' },

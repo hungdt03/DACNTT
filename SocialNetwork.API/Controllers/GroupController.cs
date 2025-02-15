@@ -67,6 +67,14 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("pending-invites/{groupId}")]
+        public async Task<IActionResult> GetAllPendingInviteMembersByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetAllPendingInviteMembersByGroupIdQuery(groupId, page, size));
+            return Ok(response);
+        }
+
+
         [HttpGet("pending-requests/{groupId}")]
         public async Task<IActionResult> GetAllPendingJoinRequestesByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
         {

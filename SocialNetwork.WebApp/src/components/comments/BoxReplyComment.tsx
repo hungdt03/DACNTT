@@ -59,7 +59,7 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
     const [isMentioning, setIsMentioning] = useState(false);
     const editorStateRef = useRef<EditorState | null>(null);
     const editorRef = useRef<LexicalEditor | null>(null);
- 
+
 
     useEffect(() => {
         if (replyToUsername && user?.id !== replyToUsername.id) {
@@ -74,11 +74,11 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
                     const newStyle = `content: ${replyToUsername.id};background-color: #E0F2FE;color: #0EA5E9;`;
                     mentionNode.setStyle(newStyle);
 
-                    if(firstNode) {
+                    if (firstNode) {
                         firstNode.replace(mentionNode)
                     } else {
                         const selection = $getSelection();
-                        if($isRangeSelection(selection)) {
+                        if ($isRangeSelection(selection)) {
                             selection.insertNodes([mentionNode])
                         }
                     }
@@ -127,9 +127,9 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
             editorRef.current?.update(() => {
                 const nodeRoot = $getRoot();
                 nodeRoot.clear();
-                
+
                 const selection = $getSelection();
-                if($isRangeSelection(selection)) {
+                if ($isRangeSelection(selection)) {
                     selection.insertNodes([$createTextNode('')])
                 }
             })
@@ -235,7 +235,10 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
 
     return <div className="flex flex-col items-start gap-y-2 mb-2">
         <div className="flex items-center gap-x-2 w-full">
-            <Avatar size='small' className="flex-shrink-0" src={user?.avatar ?? images.user} />
+            <div className="relative">
+                <Avatar size='small' className="flex-shrink-0" src={user?.avatar ?? images.user} />
+                <div className="absolute -bottom-1 -right-1 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
+            </div>
             <div className={cn("relative bg-gray-100 px-1 rounded-xl w-full flex items-center justify-between py-[2px]")}>
                 {initialEditorState && <LexicalComposer initialConfig={{
                     ...editorConfig,

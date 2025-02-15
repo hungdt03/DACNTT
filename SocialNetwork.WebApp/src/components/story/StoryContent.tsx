@@ -4,6 +4,7 @@ import { StoryType } from "../../enums/story-type.";
 import { formatTime } from "../../utils/date";
 import { Ellipsis, Pause, Play } from "lucide-react";
 import { Popover } from "antd";
+import { Link } from "react-router-dom";
 
 export const getTopReactions = (reactions?: string[], top: number = 3) => {
     const counts = reactions?.reduce((acc, reaction) => {
@@ -45,14 +46,18 @@ const StoryContent: FC<StoryContentProps> = ({
     >
         <div className="absolute z-[1000] left-0 top-5 right-0 flex justify-between px-3">
             <div className="flex items-center gap-x-2">
-                <img className="rounded-full w-[40px] h-[40px] object-cover" src={story.user.avatar} />
+                <div className="relative">
+                    <img className="rounded-full w-[40px] h-[40px] object-cover" src={story.user.avatar} />
+                    <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
+                </div>
                 <div className="flex flex-col text-white">
-                    <span
-                        className="text-[15px]"
+                    <Link
+                        to={`/profile/${story.user.id}`}
+                        className="text-[15px] hover:text-white"
                         style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)" }}
                     >
                         {story.user.fullName}
-                    </span>
+                    </Link>
                     <span
                         className="text-[11px]"
                         style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)" }}

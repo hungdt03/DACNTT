@@ -94,8 +94,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             var response = ApplicationMapper.MapToChatRoom(chatRoom);
             response.Friend = ApplicationMapper.MapToUser(receiver);
-
-            var isOnline = await _userStatusService.HasConnectionsAsync(receiver.Id);
+            response.IsOnline = receiver.IsOnline;
 
             var haveStory = await _unitOfWork.StoryRepository
                    .IsUserHaveStoryAsync(receiver.Id);
@@ -103,11 +102,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             response.Friend.HaveStory = haveStory;
             response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId)?.IsAccepted ?? false;
             response.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;
-
-            if (!isOnline)
-            {
-                response.RecentOnlineTime = receiver.RecentOnlineTime;
-            }
+            response.RecentOnlineTime = receiver.RecentOnlineTime;
 
             return new DataResponse<ChatRoomResponse>()
             {

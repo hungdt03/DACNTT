@@ -34,7 +34,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 ?? throw new NotFoundException("Nhóm không tồn tại");
 
             if (group.IsHidden)
-                throw new NotFoundException("Bạn không thể yêu cầu tham gia nhóm riêng tư");
+                throw new NotFoundException("Bạn chỉ có thêm tham gia bằng lời mời");
 
             var groupMember = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId, userId);
 
@@ -112,7 +112,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             {
                 Data = new JoinGroupResponse()
                 {
-                    IsApproval = !group.RequireApproval
+                    IsApproval = group.RequireApproval
                 },
                 IsSuccess = true,
                 Message = message,
