@@ -141,8 +141,12 @@ const GroupsPage: React.FC = () => {
                     overflow: 'hidden'
                 }}
             >
-                {!loading && (
-                    <>
+                {!loading &&
+                    (filteredGroups.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', alignItems: 'center', fontSize: '24px', marginTop: 20 }}>
+                            Không có nhóm nào tồn tại
+                        </Box>
+                    ) : (
                         <AdminGroupsTable
                             groups={filteredGroups}
                             onGroupSelect={handleGroupSelect}
@@ -150,8 +154,7 @@ const GroupsPage: React.FC = () => {
                             page={page}
                             fetchGroups={fetchGroups}
                         />
-                    </>
-                )}
+                    ))}
             </Box>
             <CustomTablePagination
                 count={allGroup.length}

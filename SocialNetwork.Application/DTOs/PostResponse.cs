@@ -26,5 +26,6 @@ namespace SocialNetwork.Application.DTOs
         public PostResponse OriginalPost { get; set; }
         public GroupResponse Group { get; set; }
         public bool IsSaved { get; set; }
+        public int Reactions { get; set; }
     }
 }

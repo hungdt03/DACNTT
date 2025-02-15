@@ -17,5 +17,6 @@ export type ReportResource = {
     targetGroup: GroupResource;
     targetComment: CommentResource;
     resolvedAt: Date;
+    dateCreatedAt: Date;
   }
   

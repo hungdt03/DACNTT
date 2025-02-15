@@ -1,7 +1,7 @@
 import React from 'react'
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box, IconButton, Tooltip, Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faTachometerAlt, faFileAlt, faUsers, faObjectGroup } from '@fortawesome/free-solid-svg-icons'
+import { faBars, faTachometerAlt, faFileAlt, faUsers, faPerson, faBug } from '@fortawesome/free-solid-svg-icons'
 
 interface SidebarProps {
     isCollapsed: boolean
@@ -14,9 +14,9 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, curr
     const menuItems = [
         { label: 'Bảng thống kê', icon: faTachometerAlt },
         { label: 'Quản lý bài viết', icon: faFileAlt },
-        { label: 'Quản lý tài khoản', icon: faUsers },
-        { label: 'Quản lý nhóm', icon: faObjectGroup },
-        { label: 'Quản lý báo cáo', icon: faFileAlt }
+        { label: 'Quản lý tài khoản', icon: faPerson },
+        { label: 'Quản lý nhóm', icon: faUsers },
+        { label: 'Quản lý báo cáo', icon: faBug }
     ]
 
     return (
@@ -33,7 +33,6 @@ const AdminSidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar, curr
                     transition: 'width 0.3s',
                     display: 'flex',
                     flexDirection: 'column',
-                    zIndex: 1201,
                     height: '100vh'
                 }
             }}

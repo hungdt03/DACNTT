@@ -94,7 +94,7 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
 
     return (
         <Paper sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <TableContainer sx={{ flex: 1, overflow: 'auto' }}>
+            <TableContainer sx={{ overflow: 'auto' }}>
                 <Table stickyHeader sx={{ width: '100%', minHeight: '100%' }}>
                     <TableHead>
                         <TableRow>
@@ -127,13 +127,7 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {posts.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} sx={{ textAlign: 'center' }}>
-                                    Không có bài viết nào tồn tại
-                                </TableCell>
-                            </TableRow>
-                        ) : (
+                        {posts.length > 0 &&
                             paginatedPosts.map((post, index) => (
                                 <React.Fragment key={post.id}>
                                     <TableRow sx={{ height: 50 }}>
@@ -204,21 +198,20 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                                                 </Typography>
                                                 <Grid container spacing={1} sx={{ fontSize: '0.85rem' }}>
                                                     <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Tổng số lượt chia sẻ: ${post.content}`}</Typography>
+                                                        <Typography variant='body2'>{`Tổng số lượt chia sẻ: ${post.shares}`}</Typography>
                                                     </Grid>
                                                     <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Tổng số bình luận: ${post.content}`}</Typography>
+                                                        <Typography variant='body2'>{`Tổng số bình luận: ${post.comments}`}</Typography>
                                                     </Grid>
                                                     <Grid item xs={4} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Tổng số cảm xúc : ${post.content}`}</Typography>
+                                                        <Typography variant='body2'>{`Tổng số cảm xúc : ${post.reactions}`}</Typography>
                                                     </Grid>
                                                 </Grid>
                                             </Collapse>
                                         </TableCell>
                                     </TableRow>
                                 </React.Fragment>
-                            ))
-                        )}
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>

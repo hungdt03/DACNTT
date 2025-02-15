@@ -15,6 +15,7 @@ export type PostResource = {
     medias: PostMediaResource[];
     comments: number;
     shares: number;
+    reactions: number;
     postType: string;
     originalPostId: string;
     sharePost: PostResource;
