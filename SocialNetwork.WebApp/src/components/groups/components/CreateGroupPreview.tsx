@@ -6,6 +6,7 @@ import { CreateGroupForm } from "./CreateGroupSidebar";
 import { getGroupPrivacyTitle } from "../../../utils/privacy";
 import { GroupPrivacy } from "../../../enums/group-privacy";
 import { Bars3BottomRightIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 
 type CreateGroupPreviewProps = {
     values: CreateGroupForm | undefined;
@@ -19,6 +20,9 @@ const CreateGroupPreview: FC<CreateGroupPreviewProps> = ({
     return <div className="w-[85%] h-full mx-auto">
         <div className="p-4 flex flex-col h-full gap-y-5 rounded-lg shadow-2xl border-[1px] border-gray-100 overflow-hidden">
             <div className="flex items-center justify-between">
+                <Link to='/groups/feeds' className='block lg:hidden font-semibold text-xs py-1 px-2 rounded-md bg-gray-100'>
+                    Quay lại
+                </Link>
                 <span className="font-bold">Xem trước</span>
                 <button onClick={onOpenDrawer} className="hover:text-gray-600 text-gray-600 text-sm font-bold block lg:hidden hover:bg-gray-100 p-2 rounded-full">
                     <Bars3BottomRightIcon className="text-gray-500" width={20} />
@@ -29,7 +33,7 @@ const CreateGroupPreview: FC<CreateGroupPreviewProps> = ({
                 <div style={{
                     aspectRatio: 14 / 5
                 }}>
-                    <img className="w-full h-full object-cover rounded-xl" src={values?.coverUrl ? values?.coverUrl : images.cover} />
+                    <img className="w-full h-full object-cover rounded-xl" src={values?.coverUrl ? values?.coverUrl : images.coverGroup} />
                 </div>
 
                 <div className="px-4 py-6 flex flex-col gap-y-2 bg-white shadow-xl">

@@ -17,6 +17,8 @@ import bgStoryText from './images/bg-story-text.png'
 import bgStoryImage from './images/bg-story-image.png'
 import AaBackground from './images/AaBackground.png'
 import signal from './images/signal.png'
+import followee from './images/followee.png'
+import invites from './images/add-user.png'
 
 const images = {
     facebook,
@@ -37,7 +39,9 @@ const images = {
     bgStoryText,
     bgStoryImage,
     AaBackground,
-    signal
+    signal,
+    followee,
+    invites
 }
 
 export default images

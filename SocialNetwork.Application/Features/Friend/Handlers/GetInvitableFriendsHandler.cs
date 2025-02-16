@@ -28,16 +28,15 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
                ?? throw new NotFoundException("Nhóm không tồn tại");
 
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var myFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(userId, FriendShipStatus.ACCEPTED);
+            var myFriends = await _unitOfWork.FriendShipRepository.GetAllFriendsByName(userId, request.Query);
             var response = new List<InvitableFriendResponse>();
            
             foreach (var friend in myFriends)
             {
-                var friendItem = friend.FriendId == userId ? friend.User : friend.Friend;
-                var resource = ApplicationMapper.MapToFriend(friendItem);
+                var resource = ApplicationMapper.MapToFriend(friend);
                 
-                var existedInvitation = await _unitOfWork.GroupInvitationRepository.GetGroupInvitationByInviteeIdAndGroupIdAsync(friendItem.Id, request.GroupId);
-                var isMember = group.Members.Any(m => m.UserId == friendItem.Id);
+                var existedInvitation = await _unitOfWork.GroupInvitationRepository.GetGroupInvitationByInviteeIdAndGroupIdAsync(friend.Id, request.GroupId);
+                var isMember = group.Members.Any(m => m.UserId == friend.Id);
 
                 response.Add(new InvitableFriendResponse()
                 {

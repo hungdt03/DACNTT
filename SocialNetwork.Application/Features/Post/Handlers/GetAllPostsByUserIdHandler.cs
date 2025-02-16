@@ -25,7 +25,8 @@ namespace SocialNetwork.Application.Features.Post.Handlers
         public async Task<BaseResponse> Handle(GetAllPostByUserIdQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var (posts, totalCount) = await _unitOfWork.PostRepository.GetAllPostsByUserIdAsync(request.UserId, request.Page, request.Size);
+            var (posts, totalCount) = await _unitOfWork.PostRepository
+                .GetAllPostsByUserIdAsync(request.UserId, request.Page, request.Size, request.Search, request.SortOrder, request.ContentType, request.FromDate, request.ToDate);
 
             var response = new List<PostResponse>();
             foreach (var post in posts)

@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from "react";
 import images from "../../assets";
-import { Avatar, Button, Divider, Drawer, Form, FormProps, Input, Modal, Popconfirm, Select, Switch, Tooltip, message } from "antd";
+import { Avatar, Button, Divider, Drawer, Form, FormProps, Input, Modal, Popconfirm, Popover, Select, Switch, Tooltip, Upload, UploadFile, message } from "antd";
 import { SettingOutlined } from '@ant-design/icons'
-import { ChartNoAxesGantt, Plus } from "lucide-react";
+import { ChartNoAxesGantt, CheckIcon, LucideUpload, MoreHorizontal, Plus } from "lucide-react";
 import InviteFriendsJoinGroup from "../modals/InviteFriendsJoinGroup";
 import useModal from "../../hooks/useModal";
 import { GroupResource } from "../../types/group";
@@ -19,6 +19,8 @@ import GroupInvitationLabel from "../labels/GroupInvitationLabel";
 import { GroupMemberResource } from "../../types/group-member";
 import ChooseNewAdminModal from "../modals/ChooseNewAdminModal";
 import MyGroupManageSidebar from "./components/MyGroupManageSidebar";
+import { RcFile, UploadProps } from "antd/es/upload";
+import { getBase64, isValidImage } from "../../utils/file";
 
 export type InviteFriendsRequest = {
     inviteeIds: string[];
@@ -76,6 +78,10 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         inviteeIds: []
     });
 
+    const [coverLoading, setCoverLoading] = useState(false)
+    const [tempCoverImage, setTempCoverImage] = useState<string>('')
+    const [fileCoverImage, setFileCoverImage] = useState<UploadFile>();
+
     const [selectMember, setSelectMember] = useState<GroupMemberResource>()
 
     const handleGetRoleInvitation = async () => {
@@ -115,7 +121,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         if (group.privacy === GroupPrivacy.PUBLIC) setIsDisabled(true);
         if (group.isHidden) setIsDisabledSectionFriends(true);
         if (group.onlyAdminCanPost) setIsDisabledApprovalPost(true);
-        handleGetRoleInvitation()
+        handleGetRoleInvitation();
     }, [group])
 
     const onFinish: FormProps<EditGroupRequest>['onFinish'] = async (values) => {
@@ -197,10 +203,84 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         }
     }
 
+    const uploadCoverImage = async (file: UploadFile | undefined) => {
+
+        if (file) {
+            const formData = new FormData();
+            formData.append('image', file as RcFile);
+            formData.append('groupId', group.id);
+
+            setCoverLoading(true)
+            const response = await groupService.uploadCoverImage(formData);
+            setCoverLoading(false)
+
+            if (response.isSuccess) {
+                onFetchGroup()
+                message.success(response.message);
+                setFileCoverImage(undefined)
+                setTempCoverImage('')
+            } else {
+                message.error(response.message)
+            }
+        }
+
+    }
+
+    const onCoverImageChange: UploadProps['onChange'] = async ({ file }) => {
+
+        if (!isValidImage(file as RcFile)) {
+            message.error('Vui lòng chọn file ảnh')
+            return;
+        } else {
+            const totalSize = (file as RcFile).size;
+            const maxSize = 4 * 1024 * 1024;
+
+            if (totalSize > maxSize) {
+                message.error("Vui lòng chọn file ảnh tối đa 4MB");
+                return;
+            }
+        }
+
+        const base64Url = await getBase64(file as RcFile);
+        setTempCoverImage(base64Url);
+        setFileCoverImage(file)
+    };
+
+    const handleRemoveGroup = async () => {
+        const response = await groupService.deleteGroup(group.id);
+        if(response.isSuccess) {
+            message.success(response.message);
+            navigate('/groups')
+        } else {
+            message.error(response.message)
+        }
+    }
 
     return <div className="bg-white w-full shadow lg:px-4 sm:px-2 px-2">
         <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm lg:px-0 mx-auto overflow-hidden">
-            <img className="w-full object-cover max-h-[40vh] rounded-b-xl" src={group.coverImage ?? images.coverGroup} />
+            <div className="relative">
+                <img className="w-full object-cover max-h-[40vh] rounded-b-xl" src={tempCoverImage || group.coverImage || images.cover} />
+                {group.isMine && <div className="flex items-center gap-x-2 absolute right-4 top-4 md:top-auto md:bottom-4 shadow">
+                    <Upload
+                        beforeUpload={() => false}
+                        showUploadList={false}
+                        onChange={onCoverImageChange}
+                        multiple={false}
+                        className="cursor-pointer w-full"
+                        disabled={loading}
+                    >
+                        <button disabled={coverLoading} className="shadow bg-white text-primary flex items-center gap-x-2 px-3 py-2 rounded-md cursor-pointer">
+                            <LucideUpload size={18} />
+                            <span className="text-sm font-semibold">
+                                {tempCoverImage ? 'Chọn ảnh khác' : 'Thêm ảnh bìa'}
+                            </span>
+                        </button>
+                    </Upload>
+                    {tempCoverImage && <Button loading={coverLoading} onClick={() => uploadCoverImage(fileCoverImage)} type="primary" className="cursor-pointer" icon={<CheckIcon />}>
+                        Lưu lại
+                    </Button>}
+                </div>}
+            </div>
             <div className="py-4 flex flex-col gap-y-2">
                 <span className="font-bold text-3xl">{group.name}</span>
                 <div className="flex items-center gap-x-3">
@@ -283,6 +363,17 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 </Button>
                             )
                         )}
+                        <Popover trigger={'click'} content={<div className="flex flex-col">
+                            <Link to={`/groups/${group.id}/my-content/`} className="p-2 rounded-md hover:bg-gray-100 hover:text-black">Nội dung của bạn</Link>
+                            {group.isMine && 
+                                <Popconfirm onConfirm={handleRemoveGroup} title='Giải tán nhóm' description='Bạn có chắc là muốn giải tán nhóm?'>
+                                    <button className="text-left p-2 rounded-md hover:bg-gray-100 hover:text-black">Giải tán nhóm</button>
+                                </Popconfirm>
+                            }
+                        </div>}>
+                            <Button icon={<MoreHorizontal size={16} />} type="primary">
+                            </Button>
+                        </Popover>
                     </div>
 
                 </div>
@@ -490,7 +581,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
             <ChooseNewAdminModal
                 selectMember={selectMember}
                 onChange={(newSelect) => setSelectMember(newSelect)}
-                groupId={group.id}
+                group={group}
             />
         </Modal>
 

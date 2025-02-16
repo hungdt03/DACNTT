@@ -143,6 +143,7 @@ const GroupPendingReports: FC = ({
                 }
 
                 return <ReportUser
+                    group={group}
                     key={report.id}
                     report={report}
                     onKeep={() => handleIgnoreReport(report.id)}

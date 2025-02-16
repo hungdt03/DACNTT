@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Avatar, Button, Divider, Tooltip } from "antd";
 import images from "../../assets";
 import { extractContentFromJSON } from "../comments/CommentItem";
-import { formatTime, formatVietnamDate } from "../../utils/date";
+import { formatTime, formatTimeMessage, formatVietnamDate } from "../../utils/date";
 
 type ReportCommentProps = {
     report: ReportResource;
@@ -18,9 +18,9 @@ const ReportComment: FC<ReportCommentProps> = ({
     onRemove
 }) => {
     return <div className="p-4 rounded-md shadow bg-white flex flex-col gap-y-4">
-        <span className="text-gray-500 border-[1px] p-2">
-            <Link className="font-bold text-[15px] hover:underline text-black" to={`/profile/${report.reporter.id}`}>{report.reporter.fullName + ' '}</Link>
-            đã báo cáo <strong className="text-black">bình luận</strong> này vì cho rằng:
+        <span className="text-[14px] text-gray-500 border-[1px] p-2">
+            <Link className="font-bold hover:underline text-black" to={`/profile/${report.reporter.id}`}>{report.reporter.fullName + ' '}</Link>
+            đã báo cáo <strong className="text-black">bình luận</strong> này lúc <strong>{formatTimeMessage(new Date(report.dateCreatedAt))} </strong> vì cho rằng:
             <strong className="text-black">{' ' + report.reason}</strong>
         </span>
 

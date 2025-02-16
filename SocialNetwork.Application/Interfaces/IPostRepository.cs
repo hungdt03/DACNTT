@@ -6,7 +6,7 @@ namespace SocialNetwork.Application.Interfaces
     {
         Task CreatePostAsync(Post post);
         Task<List<Post>> GetAllPostsAsync();
-        Task<(List<Post> Posts, int TotalCount)> GetAllPostsByUserIdAsync(string userId, int page, int size);
+        Task<(List<Post> Posts, int TotalCount)> GetAllPostsByUserIdAsync(string userId, int page, int size, string search, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate);
         Task<int> CountPostsByUserIdAsync(string userId);
         Task<int> CountSharePostsByUserIdAsync(string userId);
         Task<(List<Post> Posts, int TotalCount)> GetAllPostsByGroupIdAsync(Guid groupId, int page, int size);
@@ -22,6 +22,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<int> CountPendingPostsByGroupIdAsync(Guid groupId);
         Task<int> CountTodayPostsByGroupIdAsync(Guid groupId);
         Task<(List<Post> Posts, int TotalCount)> GetAllPostsContainsKey(string key, int page, int size);
+        Task<(List<Post> Posts, int TotalCount)> GetAllGroupPostsByGroupIdAndUserIdAndStatus(Guid groupId, string userId, string status, int page, int size);
 
         Task DeleteManyPost(List<string> listPostId);
         Task DeleteAllPost();

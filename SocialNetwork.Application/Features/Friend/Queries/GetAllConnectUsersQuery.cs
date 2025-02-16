@@ -9,11 +9,13 @@ namespace SocialNetwork.Application.Features.Friend.Queries
     {
         public int Page {  get; set; }
         public int Size { get; set; }
+        public string Query { get; set; }
 
-        public GetAllConnectUsersQuery(int page, int size)
+        public GetAllConnectUsersQuery(int page, int size, string query)
         {
             Page = page;
             Size = size;
+            Query = query;
         }
     }
 }

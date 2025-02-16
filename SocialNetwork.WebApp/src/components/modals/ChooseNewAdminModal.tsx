@@ -6,17 +6,18 @@ import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import images from "../../assets";
 import LoadingIndicator from "../LoadingIndicator";
 import { Button } from "antd";
+import { GroupResource } from "../../types/group";
 
 type InviteAdminModalProps = {
     description?: string;
-    groupId: string;
+    group: GroupResource;
     selectMember?: GroupMemberResource;
     onChange?: (member: GroupMemberResource) => void
 }
 
 const ChooseNewAdminModal: FC<InviteAdminModalProps> = ({
-    groupId,
-    description = 'Bạn là quản trị viên cuối cùng của nhóm Test hai. Hãy chọn quản trị viên mới để họ duy trì nhóm này sau khi bạn rời đi nhé.',
+    group,
+    description = 'Bạn là quản trị viên cuối cùng của nhóm. Hãy chọn quản trị viên mới để họ duy trì nhóm này sau khi bạn rời đi nhé.',
     selectMember,
     onChange
 }) => {
@@ -34,14 +35,12 @@ const ChooseNewAdminModal: FC<InviteAdminModalProps> = ({
 
     const fetchNonAdminMembers = async (page: number, size: number) => {
         setLoading(true)
-        const response = await groupService.getAllNonAdminMembersByGroupId(groupId, page, size);
-        setTimeout(() => {
-            setLoading(false)
-            if (response.isSuccess) {
-                setMembers(response.data)
-                setPagination(response.pagination)
-            }
-        }, 4000)
+        const response = await groupService.getAllNonAdminMembersByGroupId(group.id, page, size);
+        setLoading(false)
+        if (response.isSuccess) {
+            setMembers(response.data)
+            setPagination(response.pagination)
+        }
     }
 
     const fetchMoreMembers = async () => {
@@ -51,7 +50,7 @@ const ChooseNewAdminModal: FC<InviteAdminModalProps> = ({
 
     useEffect(() => {
         fetchNonAdminMembers(pagination.page, pagination.size)
-    }, [groupId])
+    }, [group])
 
     return <div className="flex flex-col gap-y-4 h-[450px]">
         <div className="flex flex-col sticky top-0">

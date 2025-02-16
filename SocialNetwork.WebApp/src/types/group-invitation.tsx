@@ -6,5 +6,6 @@ export type GroupInvitationResource = {
     status: boolean;
     group: GroupResource;
     inviter: UserResource;
-    invitee: UserResource
+    invitee: UserResource;
+    dateCreated: Date
 }

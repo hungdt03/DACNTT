@@ -5,6 +5,7 @@ import images from "../../assets";
 import { InvitableFriendResource } from "../../types/invitable-friend";
 import friendService from "../../services/friendService";
 import { FriendResource } from "../../types/friend";
+import useDebounce from "../../hooks/useDebounce";
 
 type InviteFriendsJoinGroupProps = {
     groupId: string;
@@ -16,14 +17,20 @@ const InviteFriendsJoinGroup: FC<InviteFriendsJoinGroupProps> = ({
     onChange
 }) => {
     const [friends, setFriends] = useState<InvitableFriendResource[]>([]);
-    const [selectFriends, setSelectFriends] = useState<FriendResource[]>([])
+    const [selectFriends, setSelectFriends] = useState<FriendResource[]>([]);
+    const [searchValue, setSearchValue] = useState('');
+    const debouncedValue = useDebounce(searchValue, 300);
 
-    const fetchInvitableFriends = async () => {
-        const response = await friendService.getInvitableFriends(groupId);
+    const fetchInvitableFriends = async (search: string) => {
+        const response = await friendService.getInvitableFriends(groupId, search);
         if (response.isSuccess) {
             setFriends(response.data)
         }
     }
+
+    useEffect(() => {
+        fetchInvitableFriends(debouncedValue)
+    }, [debouncedValue, groupId])
 
     const handlePushFriendIntoSelectedList = (friend: FriendResource) => {
         const checkExisted = selectFriends.find(f => f.id === friend.id);
@@ -51,9 +58,6 @@ const InviteFriendsJoinGroup: FC<InviteFriendsJoinGroupProps> = ({
         }
     }
 
-    useEffect(() => {
-        fetchInvitableFriends()
-    }, [groupId])
 
     return <div className="max-h-[500px] h-[500px]">
         <Divider className="my-0" />
@@ -61,7 +65,7 @@ const InviteFriendsJoinGroup: FC<InviteFriendsJoinGroupProps> = ({
             <div className="col-span-2 p-2 flex flex-col gap-y-2 h-full overflow-y-hidden">
                 <div className="px-3 py-1 bg-gray-100 flex items-center gap-x-1 rounded-3xl overflow-hidden">
                     <Search size={16} className="text-gray-500" />
-                    <input placeholder="Tìm kiếm bạn bè theo tên" className="bg-gray-100 outline-none px-2 py-2 w-full h-full" />
+                    <input value={searchValue} onChange={e => setSearchValue(e.target.value)} placeholder="Tìm kiếm bạn bè theo tên" className="bg-gray-100 outline-none px-2 py-2 w-full h-full" />
                 </div>
 
                 <div className="pl-2 flex flex-col gap-y-2 h-full overflow-y-auto custom-scrollbar">

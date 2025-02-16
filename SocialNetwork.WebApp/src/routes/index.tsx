@@ -35,6 +35,11 @@ import AdminLayout from '../layouts/AdminLayout/AdminLayout'
 import AdminGuard from './adminGuard'
 import GroupPendingInvites from '../pages/groups/GroupPendingInvites'
 import GroupMemberDetailPage from '../pages/groups/GroupMemberDetailPage'
+import GroupPendingInvitesPage from '../pages/groups/GroupPendingInvitesPage'
+import GroupMyPostPage from '../pages/groups/post/GroupMyPostPage'
+import GroupMyPendingPostPage from '../pages/groups/post/GroupMyPendingPostPage'
+import GroupMyRejectedPostPage from '../pages/groups/post/GroupMyRejectedPostPage'
+import GroupMyAcceptedPostPage from '../pages/groups/post/GroupMyAcceptedPostPage'
 
 const appRouter = createBrowserRouter([
     {
@@ -79,6 +84,10 @@ const appRouter = createBrowserRouter([
             {
                 path: 'feeds',
                 element: <GroupFeedSharedPage />
+            },
+            {
+                path: 'pending-invites',
+                element: <GroupPendingInvitesPage />
             }
         ]
     },
@@ -96,6 +105,24 @@ const appRouter = createBrowserRouter([
                 path: 'groups/:id',
                 element: <GroupLayout />,
                 children: [
+                    {   
+                        path: 'my-content',
+                        element: <GroupMyPostPage />,
+                        children: [
+                            {
+                                path: 'posted',
+                                element: <GroupMyAcceptedPostPage />
+                            },
+                            {
+                                path: 'rejected',
+                                element: <GroupMyRejectedPostPage />
+                            },
+                            {
+                                path: 'pending',
+                                element: <GroupMyPendingPostPage />
+                            }
+                        ]
+                    },
                     {
                         path: '',
                         element: <GroupHomePage />

@@ -130,6 +130,19 @@ class GroupService {
         })
     }
 
+    getAllPendingInvitesByCurrentUser(page: number, size: number) : Promise<PaginationResponse<GroupInvitationResource[]>> {
+        return axiosInterceptor.get('/api/groups/pending-invites', {
+            params: {
+                page,
+                size
+            }
+        })
+    }
+
+    uploadCoverImage(formData: FormData) : Promise<BaseResponse> {
+        return axiosInterceptor.post('/api/groups/upload-cover', formData)
+    }
+
     updateGeneralInfo(groupId: string, payload: any) : Promise<BaseResponse> {
         return axiosInterceptor.put('/api/groups/' + groupId, payload)
     }
@@ -189,6 +202,10 @@ class GroupService {
 
     revokeMemberPermission(memberId: string) : Promise<BaseResponse> {
         return axiosInterceptor.put('/api/groups/revoke-role/' + memberId)
+    }
+
+    deleteGroup(groupId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.delete('/api/groups/remove-group/' + groupId)
     }
 
 }

@@ -9,7 +9,7 @@ import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import LoadingIndicator from "../../components/LoadingIndicator";
 import { Search } from "lucide-react";
 import { GroupResource } from "../../types/group";
-import { message, Modal } from "antd";
+import { Empty, message, Modal } from "antd";
 import ChooseNewAdminModal from "../../components/modals/ChooseNewAdminModal";
 import useModal from "../../hooks/useModal";
 import { MemberRole } from "../../enums/member-role";
@@ -213,7 +213,7 @@ const GroupMemberPage: FC = () => {
             </div>
 
             <div id="members-scroll-trigger" className="w-full h-1" />
-
+            {!loading && members.length === 0 && <Empty description='Không có thành viên nào' />}
             {loading && (
                 <LoadingIndicator />
             )}
@@ -231,10 +231,10 @@ const GroupMemberPage: FC = () => {
                 onClick: () => group && selectMember && void handleLeaveGroup(group.id, selectMember.id)
             }}
         >
-            {id && <ChooseNewAdminModal
+            {group && <ChooseNewAdminModal
                 selectMember={selectMember}
                 onChange={(newSelect) => setSelectMember(newSelect)}
-                groupId={id}
+                group={group}
             />}
         </Modal>
 

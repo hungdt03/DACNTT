@@ -35,6 +35,13 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpPost("upload-cover")]
+        public async Task<IActionResult> UploadCoverImage([FromForm] UploadGroupCoverCommand command)
+        {
+            var response = await mediator.Send(command);
+            return Ok(response);
+        }
+
 
         [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPut("{groupId}")]
@@ -89,6 +96,13 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> GetAllPendingInviteMembersByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
         {
             var response = await mediator.Send(new GetAllPendingInviteMembersByGroupIdQuery(groupId, page, size));
+            return Ok(response);
+        }
+
+        [HttpGet("pending-invites")]
+        public async Task<IActionResult> GetAllPendingInviteMembersByCurrentUser([FromQuery] int page = 1, [FromQuery] int size = 6)
+        {
+            var response = await mediator.Send(new GetAllInviteJoinGroupByCurrentUserQuery(page, size));
             return Ok(response);
         }
 
@@ -281,6 +295,13 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> GetInviteJoinGroup([FromRoute] Guid groupId)
         {
             var response = await mediator.Send(new GetInviteJoinGroupQuery(groupId));
+            return Ok(response);
+        }
+
+        [HttpDelete("remove-group/{groupId}")]
+        public async Task<IActionResult> RemoveGroup([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new DeleteGroupCommand(groupId));
             return Ok(response);
         }
     }

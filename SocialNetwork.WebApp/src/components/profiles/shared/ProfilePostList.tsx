@@ -11,6 +11,8 @@ import PostSkeletonList from "../../skeletons/PostSkeletonList";
 import PostGroup from "../../posts/PostGroup";
 import { Empty } from "antd";
 import { useElementInfinityScroll } from "../../../hooks/useElementInfinityScroll";
+import PostFilter, { ProfilePostFilter } from "../../posts/ProfilePostFilter";
+import { Filter, FilterX } from "lucide-react";
 
 type ProfilePostListProps = {
     user: UserResource;
@@ -22,6 +24,7 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
     const [loading, setLoading] = useState(false)
     const [posts, setPosts] = useState<PostResource[]>([]);
+    const [isFilter, setIsFilter] = useState(false)
 
     useElementInfinityScroll({
         onLoadMore: () => void fetchNewPosts(),
@@ -45,15 +48,49 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
         }
     }
 
+    const fetchPostFilter = async (page: number, size: number, filterParams: ProfilePostFilter) => {
+        setLoading(true)
+        const response = await postService.getAllPostsByUserId(user.id, page, size, filterParams);
+        setLoading(false)
+        if (response.isSuccess) {
+            setPagination(response.pagination)
+            setPosts(response.data);
+        }
+    }
+
     useEffect(() => {
         fetchPosts(pagination.page, pagination.size)
     }, [])
 
     const fetchNewPosts = async () => {
+        if (!pagination.hasMore || loading) return;
         fetchPosts(pagination.page + 1, pagination.size)
     }
 
     return <div className="col-span-12 lg:col-span-7 max-w-screen-sm mx-auto flex flex-col gap-y-4 pb-8">
+        <div className="z-10 shadow sticky top-0 p-2 rounded-md border-[1px] bg-white flex flex-col gap-y-3">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-x-1">
+                    <Filter size={18} />
+                    <span className="text-[16px] font-bold">Bộ lọc</span>
+                </div>
+                {isFilter && <button onClick={() => {
+                    fetchPosts(1, 6)
+                    setIsFilter(false)
+                }} className="py-1 px-2 hover:bg-gray-200 rounded-md bg-gray-100 flex items-center gap-x-1">
+                    <FilterX size={18} />
+                    <span>Bỏ lọc</span>
+                </button>}
+            </div>
+
+            <PostFilter
+                onChange={(filter) => {
+                    setIsFilter(true)
+                    fetchPostFilter(1, 6, filter)
+                }}
+            />
+        </div>
+
         {posts.map(post => {
             if (post.postType === PostType.SHARE_POST) {
                 return <SharePost onFetch={() => fetchPosts(1, pagination.size)} key={post.id} post={post} />;

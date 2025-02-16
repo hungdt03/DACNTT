@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using CloudinaryDotNet.Actions;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
 using SocialNetwork.Application.DTOs;
@@ -8,6 +10,7 @@ using SocialNetwork.Application.Features.Post.Commands;
 
 namespace SocialNetwork.API.Controllers
 {
+    [Authorize(Roles = "ADMIN")]
     [Route("api/admin")]
     [ApiController]
     public class AdminController : ControllerBase

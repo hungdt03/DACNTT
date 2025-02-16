@@ -74,7 +74,7 @@ namespace SocialNetwork.Application.Features.Report.Handlers
             return new BaseResponse()
             {
                 IsSuccess = true,
-                Message = "Báo cáo người dùng thành công và đã được gửi đi cho người quản trị hệ thống",
+                Message = "Báo cáo người dùng thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
             };
         }

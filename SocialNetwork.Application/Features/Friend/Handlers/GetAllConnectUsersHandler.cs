@@ -7,6 +7,7 @@ using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Features.Friend.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using System.Collections.Generic;
 
 namespace SocialNetwork.Application.Features.Friend.Handlers
 {
@@ -24,21 +25,29 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
         public async Task<BaseResponse> Handle(GetAllConnectUsersQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var (connectedUsers, totalCount) = await _unitOfWork.FriendShipRepository
-                .GetAllConnectedUsers(userId, request.Page, request.Size);
+            var connectedUsers = await _unitOfWork.FriendShipRepository.GetAllConnectedUsers(userId);
 
-            var response = new List<FriendResponse>();
-
-            foreach (var friend in connectedUsers)
+            if (!string.IsNullOrEmpty(request.Query))
             {
-                var friendItem = friend.FriendId == userId ? friend.User : friend.Friend;
-                var resource = ApplicationMapper.MapToFriend(friendItem);
-                response.Add(resource);
+                string lowerQuery = request.Query.ToLower();
+                connectedUsers = connectedUsers
+                    .Where(friend =>
+                        (friend.FriendId == userId && friend.User.FullName.ToLower().Contains(lowerQuery)) ||
+                        (friend.UserId == userId && friend.Friend.FullName.ToLower().Contains(lowerQuery)))
+                    .ToList();
             }
+
+            var totalCount = connectedUsers.Count();
+
+            var takeUsers = connectedUsers
+                .Skip((request.Page - 1) * request.Size)
+                .Take(request.Size)
+                .Select(friend => ApplicationMapper.MapToFriend(friend.FriendId == userId ? friend.User : friend.Friend))
+                .ToList();
 
             return new PaginationResponse<List<FriendResponse>>()
             {
-                Data = response,
+                Data = takeUsers,
                 IsSuccess = true,
                 Message = "Lấy danh sách những người đã kết nối thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
@@ -49,7 +58,7 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
                     Size = request.Size,
                 }
             };
-
         }
+
     }
 }

@@ -273,7 +273,7 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
             </div>
         </Modal>
 
-        {/* REPORT TO ADMIN OF GROUP */}
+        {/* REPORT TO ADMIN OF APP */}
         <Modal
             title={<p className="text-center font-bold text-lg">Báo cáo {targetUser.fullName} tới quản trị hệ thống</p>}
             centered

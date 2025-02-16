@@ -36,14 +36,14 @@ namespace SocialNetwork.Application.Features.Report.Handlers
                 .GetGroupMemberByGroupIdAndUserId(report.GroupId.Value, userId);
 
             if (groupMember == null || groupMember.Role != MemberRole.ADMIN)
-                throw new AppException("Bạn không đủ thẩm quyền để gỡ bình luận này");
+                throw new AppException("Bạn không đủ thẩm quyền để xóa người này khỏi nhóm");
 
             var member = await _unitOfWork.GroupMemberRepository
                 .GetGroupMemberByGroupIdAndUserId(report.GroupId.Value, report.TargetUserId)
                     ?? throw new NotFoundException("Người này không phải thành viên của nhóm");
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-            _unitOfWork.GroupMemberRepository.RemoveGroupMember(groupMember);
+            _unitOfWork.GroupMemberRepository.RemoveGroupMember(member);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             return new BaseResponse()

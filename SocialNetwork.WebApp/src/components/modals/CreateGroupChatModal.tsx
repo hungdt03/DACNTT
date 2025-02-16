@@ -4,11 +4,12 @@ import { PlusOutlined, CloseOutlined } from '@ant-design/icons'
 import images from "../../assets";
 import { FriendResource } from "../../types/friend";
 import friendService from "../../services/friendService";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, Search } from "lucide-react";
 import chatRoomService from "../../services/chatRoomService";
 import { inititalValues } from "../../utils/pagination";
 import { useElementInfinityScroll } from "../../hooks/useElementInfinityScroll";
 import LoadingIndicator from "../LoadingIndicator";
+import useDebounce from "../../hooks/useDebounce";
 
 export type CreateChatRoomRequest = {
     memberIds: string[];
@@ -26,14 +27,17 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
     const [addFriends, setAddFriends] = useState<FriendResource[]>([]);
     const [groupName, setGroupName] = useState<string>('');
     const [pagination, setPagination] = useState(inititalValues);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const debouncedValue = useDebounce(searchValue, 300);
 
-    const fetchFriends = async (page: number, size: number) => {
+    const fetchFriends = async (query: string, page: number, size: number, reset: boolean = false) => {
         setLoading(true)
-        const response = await friendService.getAllConnectFriends(page, size);
+        const response = await friendService.getAllConnectFriends(query, page, size);
         setLoading(false)
         if (response.isSuccess) {
             setFriends(prev => {
+                if (reset) return response.data
                 const existingIds = new Set(prev.map(item => item.id));
                 const news = response.data.filter(item => !existingIds.has(item.id));
                 return [...prev, ...news];
@@ -44,7 +48,7 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
 
     const fetchNextPage = () => {
         if (!pagination.hasMore || loading) return;
-        fetchFriends(pagination.page + 1, pagination.size)
+        fetchFriends(debouncedValue, pagination.page + 1, pagination.size)
     }
 
     useElementInfinityScroll({
@@ -86,8 +90,8 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
     }
 
     useEffect(() => {
-        fetchFriends(pagination.page, pagination.size)
-    }, [])
+        fetchFriends(debouncedValue, pagination.page, pagination.size, true)
+    }, [debouncedValue])
 
     return <div className="flex flex-col gap-y-4">
         <div className="flex flex-col gap-y-1">
@@ -97,6 +101,7 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
                 {addFriends.length > 1 && groupName.trim().length > 0 && <Button onClick={handleCreateChatRoom} type="primary" icon={<CheckIcon size={14} />}>Tạo nhóm</Button>}
             </div>
         </div>
+
 
         {addFriends.length > 0 && <div className="flex flex-col gap-y-2">
             <span className="font-semibold">Đã thêm</span>
@@ -109,7 +114,13 @@ const CreateGroupChatModal: FC<CreateGroupChatModalProps> = ({
         </div>}
 
         <div className="flex flex-col gap-y-2">
-            <span className="font-semibold">Bạn bè</span>
+            <div className="px-3 py-1 bg-gray-100 flex items-center gap-x-1 rounded-3xl overflow-hidden">
+                <Search size={16} className="text-gray-500" />
+                <input value={searchValue} onChange={e => setSearchValue(e.target.value)} placeholder="Tìm kiếm bạn bè theo tên" className="bg-gray-100 outline-none px-2 py-1 w-full h-full" />
+            </div>
+
+
+            <span className="font-semibold">Những người đã kết nối</span>
             <div className="flex flex-col gap-y-2 max-h-[350px] overflow-y-auto custom-scrollbar">
                 {friends.map(friend => <div key={friend.id} className="flex items-center justify-between px-2 py-[6px] rounded-xl hover:bg-gray-100">
                     <div className="cursor-pointer flex items-center gap-x-3">

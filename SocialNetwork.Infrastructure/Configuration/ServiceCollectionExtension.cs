@@ -94,6 +94,7 @@ namespace SocialNetwork.Infrastructure.Configuration
                 var interceptor = serviceProvider.GetRequiredService<ISaveChangesInterceptor>();
                 options.AddInterceptors(interceptor);
                 options.UseSqlServer(configuration.GetConnectionString("MyDbConnection"));
+                options.EnableSensitiveDataLogging();
             });
 
             // Register Identity

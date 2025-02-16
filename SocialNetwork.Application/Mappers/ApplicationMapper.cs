@@ -117,6 +117,8 @@ namespace SocialNetwork.Application.Mappers
                 Invitee = groupInvitation.Invitee != null ? MapToUser(groupInvitation.Invitee) : null,
                 Inviter = groupInvitation.Inviter != null ? MapToUser(groupInvitation.Inviter) : null,
                 Status = groupInvitation.Status,
+                Group = groupInvitation.Group != null ? MapToGroup(groupInvitation.Group) : null,
+                DateCreated = groupInvitation.DateCreated,
             };
         } 
 

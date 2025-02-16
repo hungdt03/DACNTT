@@ -46,7 +46,7 @@ const PostShareInner: FC<PostShareInnerProps> = ({
                             />
                         )}
 
-                         {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-3 -right-2 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                         {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-1 -right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                     </div>
 
                     <div className="flex flex-col gap-y-[1px]">

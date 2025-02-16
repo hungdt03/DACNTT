@@ -60,6 +60,8 @@ export const getTopReactions = (reactions?: ReactionResource[], top: number = 3)
 
 type PostProps = {
     allowShare?: boolean;
+    isShowMore?: boolean;
+    isShowInteraction?: boolean;
     group?: GroupResource;
     post: PostResource;
     onFetch?: (data: PostResource) => void;
@@ -69,6 +71,8 @@ type PostProps = {
 
 const Post: FC<PostProps> = ({
     allowShare = true,
+    isShowMore = true,
+    isShowInteraction = true,
     post: postParam,
     group,
     onFetch,
@@ -291,9 +295,9 @@ const Post: FC<PostProps> = ({
                 isSaved={post.isSaved}
                 isMine={post.user.id === user?.id}
             />}>
-                <button className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100">
+                {isShowMore && <button className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100">
                     <MoreHorizontal size={16} className="text-gray-400" />
-                </button>
+                </button>}
             </Popover>
         </div>
 
@@ -306,36 +310,39 @@ const Post: FC<PostProps> = ({
             </div> : <ExpandableText content={post.content} />}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
         </div>
-        <div className="flex items-center justify-between md:text-sm text-[13px]">
-            <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
-                <Avatar.Group>
-                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="md:w-5 w-3 h-3 md:h-5 mx-[5px]" />)}
-                </Avatar.Group>
-                <span className="hover:underline">{reactions?.length === 0 ? '' : reactions?.length}</span>
-            </button>
-            <div className="flex gap-x-4 items-center">
-                <button onClick={showModal} className="hover:underline text-gray-500">{post.comments} bình luận</button>
-                {post.privacy === PrivacyType.PUBLIC && <button onClick={showListShare} className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>}
-            </div>
-        </div>
+        {isShowInteraction && <>
 
-        <Divider className='my-0' />
-        <div className="flex items-center justify-between gap-x-4">
-            <Popover content={<PostReaction
-                onSelect={handleSaveReaction}
-            />}>
-                {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
-            </Popover>
-            <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex items-center justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
-                <ChatBubbleLeftIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
-                <span>Bình luận</span>
-            </button>
-            {allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
-                <ShareIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
-                <span>Chia sẻ</span>
-            </button>}
-        </div>
-        <Divider className='mt-0 mb-2' />
+            <div className="flex items-center justify-between md:text-sm text-[13px]">
+                <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
+                    <Avatar.Group>
+                        {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="md:w-5 w-3 h-3 md:h-5 mx-[5px]" />)}
+                    </Avatar.Group>
+                    <span className="hover:underline">{reactions?.length === 0 ? '' : reactions?.length}</span>
+                </button>
+                <div className="flex gap-x-4 items-center">
+                    <button onClick={showModal} className="hover:underline text-gray-500">{post.comments} bình luận</button>
+                    {post.privacy === PrivacyType.PUBLIC && <button onClick={showListShare} className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>}
+                </div>
+            </div>
+
+            <Divider className='my-0' />
+            <div className="flex items-center justify-between gap-x-4">
+                <Popover content={<PostReaction
+                    onSelect={handleSaveReaction}
+                />}>
+                    {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
+                </Popover>
+                <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex items-center justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
+                    <ChatBubbleLeftIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
+                    <span>Bình luận</span>
+                </button>
+                {allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center gap-x-2 md:text-sm text-[13px] text-gray-500">
+                    <ShareIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
+                    <span>Chia sẻ</span>
+                </button>}
+            </div>
+            <Divider className='mt-0 mb-2' />
+        </>}
 
         {/*======== MODAL COMMENTS ====== */}
 

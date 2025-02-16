@@ -62,7 +62,7 @@ const GroupVideoPage: FC = () => {
     return <div className="py-6 h-full w-full max-w-screen-lg mx-auto px-2">
         <div className="p-4 rounded-md bg-white shadow flex flex-col gap-y-2">
             <span className="text-[16px] md:text-lg text-gray-700 font-bold">File video được đăng trong nhóm</span>
-            {videos.length > 0 ? <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            {videos.length > 0 && <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                 {videos.map(media => (
                     <div key={media.id} style={{
                         aspectRatio: 1 / 1
@@ -74,7 +74,8 @@ const GroupVideoPage: FC = () => {
                         />
                     </div>
                 ))}
-            </div> : !loading && <Empty description="Chưa có file video nào" />}
+            </div>}
+            {!loading && <Empty description="Chưa có file video nào" />}
             <div className="col-span-5">{loading && <LoadingIndicator />}</div>
         </div>
     </div>

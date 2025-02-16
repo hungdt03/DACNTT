@@ -125,21 +125,18 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
            );
         }
 
-        public async Task<(IEnumerable<FriendShip> ConnectedUsers, int TotalCount)> GetAllConnectedUsers(string userId, int page, int size)
+        public async Task<IEnumerable<FriendShip>> GetAllConnectedUsers(string userId)
         {
-            var queryable = _context.FriendShips.Where(s => (s.UserId == userId || s.FriendId == userId) && s.IsConnect && s.Status != FriendShipStatus.BLOCKED);
-
-            var totalCount = await queryable.CountAsync();
-
-            var friendShips = await queryable
-                     .OrderByDescending(f => f.DateCreated)
-                     .Skip((page - 1) * size)
-                     .Take(size)
-                        .Include(f => f.User)
-                        .Include(f => f.Friend)
-                        .ToListAsync();
-
-            return (friendShips, totalCount);
+            return await _context.FriendShips
+                .Include(f => f.User)
+                .Include(f => f.Friend)
+                .Where(s => (s.UserId == userId || s.FriendId == userId)
+                            && s.IsConnect
+                            && s.Status != FriendShipStatus.BLOCKED)
+                .OrderByDescending(f => f.DateCreated)
+                .ToListAsync();
         }
+
+
     }
 }

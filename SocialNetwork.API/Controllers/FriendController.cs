@@ -37,17 +37,24 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet("connected-users")]
-        public async Task<IActionResult> GetAllConnectedUsers([FromQuery] int page = 1, [FromQuery] int size = 6)
+        public async Task<IActionResult> GetAllConnectedUsers([FromQuery] int page = 1, [FromQuery] int size = 6, [FromQuery] string query = "")
         {
-            var response = await mediator.Send(new GetAllConnectUsersQuery(page, size));
+            var response = await mediator.Send(new GetAllConnectUsersQuery(page, size, query));
+            return Ok(response);
+        }
+
+        [HttpGet("invitable-connected-users/{chatRoomId}")]
+        public async Task<IActionResult> GetAllInvitableConnectedUsers([FromRoute] Guid chatRoomId, [FromQuery] int page = 1, [FromQuery] int size = 6, [FromQuery] string query = "")
+        {
+            var response = await mediator.Send(new GetInvitableConnectedUserQuery(chatRoomId, query, page, size));
             return Ok(response);
         }
 
 
         [HttpGet("invitable/{groupId}")]
-        public async Task<IActionResult> GetAllInvitableFriends([FromRoute] Guid groupId)
+        public async Task<IActionResult> GetAllInvitableFriends([FromRoute] Guid groupId, [FromQuery] string query = "")
         {
-            var response = await mediator.Send(new GetInvitableFriendsQuery(groupId));
+            var response = await mediator.Send(new GetInvitableFriendsQuery(groupId, query));
             return Ok(response);
         }
 

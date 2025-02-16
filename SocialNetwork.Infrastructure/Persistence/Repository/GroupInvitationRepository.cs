@@ -2,6 +2,7 @@
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Infrastructure.DBContext;
+using System.Text.RegularExpressions;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -43,6 +44,25 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
             return (invitations, totalCount);
 
+        }
+
+        public async Task<(List<GroupInvitation> GroupInvitations, int TotalCount)> GetAllPendingInvitationsByInviteeIdAsync(string userId, int page, int size)
+        {
+            var queryable = _context.GroupInvitations
+                .Where(inv => inv.InviteeId == userId);
+
+            var totalCount = await queryable.CountAsync();
+
+            var invitations = await queryable
+                 .OrderByDescending(s => s.DateCreated)
+                 .Skip((page - 1) * size)
+                 .Take(size)
+                .Include(s => s.Group)
+                .Include(s => s.Inviter)
+                .Include(s => s.Invitee)
+                .ToListAsync();
+
+            return (invitations, totalCount);
         }
 
         public async Task<GroupInvitation?> GetGroupInvitationByIdAsync(Guid id)

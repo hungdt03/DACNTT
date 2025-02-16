@@ -10,5 +10,6 @@ namespace SocialNetwork.Application.DTOs
         public GroupResponse Group { get; set; }
         public UserResponse Inviter { get; set; }
         public UserResponse Invitee { get; set; }
+        public DateTimeOffset DateCreated { get; set; }
     }
 }

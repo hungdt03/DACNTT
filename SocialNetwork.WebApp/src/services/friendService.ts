@@ -25,14 +25,26 @@ class FriendService {
         })
     }
 
-    getAllConnectFriends(page: number, size: number) : Promise<PaginationResponse<FriendResource[]>> {
+    getAllConnectFriends(query: string, page: number, size: number) : Promise<PaginationResponse<FriendResource[]>> {
         return axiosInterceptor.get('/api/friends/connected-users', {
             params: {
                 page,
-                size
+                size,
+                query
             }
         })
     }
+
+    getAllInvitableConnectedUsers(chatRoomId: string, query: string, page: number, size: number) : Promise<PaginationResponse<FriendResource[]>> {
+        return axiosInterceptor.get('/api/friends/invitable-connected-users/' + chatRoomId, {
+            params: {
+                page,
+                size,
+                query
+            }
+        })
+    }
+
 
 
     getAllFriendsByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<FriendResource[]>> {
@@ -44,8 +56,12 @@ class FriendService {
         })
     }
 
-    getInvitableFriends(groupId: string) : Promise<DataResponse<InvitableFriendResource[]>> {
-        return axiosInterceptor.get('/api/friends/invitable/' + groupId)
+    getInvitableFriends(groupId: string, query: string) : Promise<DataResponse<InvitableFriendResource[]>> {
+        return axiosInterceptor.get('/api/friends/invitable/' + groupId, {
+            params: {
+                query
+            }
+        })
     }
 
 

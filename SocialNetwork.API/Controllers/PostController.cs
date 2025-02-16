@@ -9,6 +9,7 @@ using SocialNetwork.Application.Features.Post.Handlers;
 using SocialNetwork.Application.Features.Post.Queries;
 using SocialNetwork.Application.Features.SavedPost.Commands;
 using SocialNetwork.Application.Features.SavedPost.Queries;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -29,6 +30,28 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> CreatePost([FromForm] CreatePostCommand command)
         {
             var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+
+        [HttpGet("{postId}")]
+        public async Task<IActionResult> GetPostById([FromRoute] Guid postId)
+        {
+            var response = await _mediator.Send(new GetPostByIdQuery(postId));
+            return Ok(response);
+        }
+
+        [ServiceFilter(typeof(InputValidationFilter))]
+        [HttpPut("{postId}")]
+        public async Task<IActionResult> EditPost([FromRoute] Guid postId, [FromForm] EditPostRequest post)
+        {
+            var response = await _mediator.Send(new EditPostCommand(postId, post));
+            return Ok(response);
+        }
+
+        [HttpDelete("{postId}")]
+        public async Task<IActionResult> DeletePost([FromRoute] Guid postId)
+        {
+            var response = await _mediator.Send(new DeletePostCommand(postId));
             return Ok(response);
         }
 
@@ -100,17 +123,27 @@ namespace SocialNetwork.API.Controllers
         // GET POST FOR USER PAGE
 
         [HttpGet("principal")]
-        public async Task<IActionResult> GetAllPostsByPrincipal([FromQuery] int page = 1, [FromQuery] int size = 8)
+        public async Task<IActionResult> GetAllPostsByPrincipal([FromQuery] int page = 1, [FromQuery] int size = 8, [FromQuery] string search = "", [FromQuery] string sortOrder = "asc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset fromDate = default, [FromQuery] DateTimeOffset toDate = default)
         {
             var userId = HttpContext.User.GetUserId();
-            var response = await _mediator.Send(new GetAllPostByUserIdQuery(userId, page, size));
+            var response = await _mediator.Send(new GetAllPostByUserIdQuery(userId, page, size, search, sortOrder, contentType, fromDate, toDate));
             return Ok(response);
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetAllPostsByPrincipal([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 8)
+        public async Task<IActionResult> GetAllPostsByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 8, [FromQuery] string search = "", [FromQuery] string sortOrder = "asc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset fromDate = default, [FromQuery] DateTimeOffset toDate = default)
         {
-            var response = await _mediator.Send(new GetAllPostByUserIdQuery(userId, page, size));
+            if (fromDate == default)
+            {
+                fromDate = DateTimeOffset.UtcNow;
+            }
+
+            if (toDate == default)
+            {
+                toDate = DateTimeOffset.UtcNow;
+            }
+
+            var response = await _mediator.Send(new GetAllPostByUserIdQuery(userId, page, size, contentType, sortOrder, search, fromDate, toDate));
             return Ok(response);
         }
 
@@ -170,26 +203,30 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{postId}")]
-        public async Task<IActionResult> GetPostById([FromRoute] Guid postId)
+        // MY POST IN GROUP
+        [HttpGet("group/pending-posts/{groupId}")]
+        public async Task<IActionResult> GetAllMyPendingPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
         {
-            var response = await _mediator.Send(new GetPostByIdQuery(postId));
+
+            var response = await _mediator.Send(new GetAllPendingPostByGroupIdAndCurrentUserQuery(groupId, page, size));
             return Ok(response);
         }
 
-        [ServiceFilter(typeof(InputValidationFilter))]
-        [HttpPut("{postId}")]
-        public async Task<IActionResult> EditPost([FromRoute] Guid postId, [FromForm] EditPostRequest post)
+        [HttpGet("group/rejected-posts/{groupId}")]
+        public async Task<IActionResult> GetAllMyRejectedPostByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
         {
-            var response = await _mediator.Send(new EditPostCommand(postId, post));
+
+            var response = await _mediator.Send(new GetAllRejectedPostByGroupIdAndUserIdQuery(groupId, page, size));
             return Ok(response);
         }
 
-        [HttpDelete("{postId}")]
-        public async Task<IActionResult> DeletePost([FromRoute] Guid postId)
+        [HttpGet("group/approval-posts/{groupId}")]
+        public async Task<IActionResult> GetAllMyApprovalPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8)
         {
-            var response = await _mediator.Send(new DeletePostCommand(postId));
+
+            var response = await _mediator.Send(new GetAllAcceptedPostByGroupIdAndCurrentUserQuery(groupId, page, size));
             return Ok(response);
         }
+
     }
 }

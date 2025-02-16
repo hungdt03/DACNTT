@@ -4,7 +4,7 @@ import { JoinGroupRequestResource } from "../../types/join-group";
 import { inititalValues } from "../../utils/pagination";
 import { useParams } from "react-router-dom";
 import groupService from "../../services/groupService";
-import { message } from "antd";
+import { Empty, message } from "antd";
 import LoadingIndicator from "../../components/LoadingIndicator";
 
 const GroupPendingMembers: FC = () => {
@@ -60,6 +60,7 @@ const GroupPendingMembers: FC = () => {
         </div>
 
         {loading && <LoadingIndicator />}
+        {!loading && pendingRequests?.length === 0 && <Empty description='Không có yêu cầu tham gia nhóm nào' />}
     </div>
 };
 

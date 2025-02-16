@@ -7,8 +7,9 @@ import { Avatar, Button, Empty, message } from "antd";
 import { PlusOutlined, CloseOutlined } from '@ant-design/icons'
 import images from "../../assets";
 import LoadingIndicator from "../LoadingIndicator";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, Search } from "lucide-react";
 import chatRoomService from "../../services/chatRoomService";
+import useDebounce from "../../hooks/useDebounce";
 
 type AddFriendToChatRoomProps = {
     onSuccess: () => void;
@@ -23,14 +24,17 @@ const AddFriendToChatRoom: FC<AddFriendToChatRoomProps> = ({
     const [addFriends, setAddFriends] = useState<FriendResource[]>([]);
     const [pagination, setPagination] = useState(inititalValues);
     const [loading, setLoading] = useState(false);
-    const [submitLoading, setSubmitLoading] = useState(false)
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const debouncedValue = useDebounce(searchValue, 300);
 
-    const fetchFriends = async (page: number, size: number) => {
+    const fetchFriends = async (query: string, page: number, size: number, reset = false) => {
         setLoading(true)
-        const response = await friendService.getAllConnectFriends(page, size);
+        const response = await friendService.getAllInvitableConnectedUsers(chatRoomId, query, page, size);
         setLoading(false)
         if (response.isSuccess) {
             setFriends(prev => {
+                if(reset) return response.data
                 const existingIds = new Set(prev.map(item => item.id));
                 const news = response.data.filter(item => !existingIds.has(item.id));
                 return [...prev, ...news];
@@ -41,7 +45,7 @@ const AddFriendToChatRoom: FC<AddFriendToChatRoomProps> = ({
 
     const fetchNextPage = () => {
         if (!pagination.hasMore || loading) return;
-        fetchFriends(pagination.page + 1, pagination.size)
+        fetchFriends(debouncedValue, pagination.page + 1, pagination.size)
     }
 
     useElementInfinityScroll({
@@ -70,10 +74,10 @@ const AddFriendToChatRoom: FC<AddFriendToChatRoomProps> = ({
         setSubmitLoading(true)
         const response = await chatRoomService.addMember(chatRoomId, userIds);
         setSubmitLoading(false)
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
-            setFriends([])
             setAddFriends([])
+            fetchFriends('', 1, 10, true)
             onSuccess()
         } else {
             message.error(response.message)
@@ -81,10 +85,14 @@ const AddFriendToChatRoom: FC<AddFriendToChatRoomProps> = ({
     }
 
     useEffect(() => {
-        fetchFriends(pagination.page, pagination.size)
-    }, [])
+        fetchFriends(debouncedValue, 1, 8, true);
+    }, [debouncedValue]);
 
     return <div className="flex flex-col gap-y-4">
+        <div className="px-3 py-1 bg-gray-100 flex items-center gap-x-1 rounded-3xl overflow-hidden">
+            <Search size={16} className="text-gray-500" />
+            <input value={searchValue} onChange={e => setSearchValue(e.target.value)} placeholder="Tìm kiếm bạn bè theo tên" className="bg-gray-100 outline-none px-2 py-1 w-full h-full" />
+        </div>
 
         {addFriends.length > 0 && <div className="flex flex-col gap-y-2">
             <span className="font-semibold">Đã thêm</span>

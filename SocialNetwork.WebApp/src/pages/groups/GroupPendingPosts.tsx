@@ -14,32 +14,7 @@ import { UserResource } from "../../types/user";
 import useDebounce from "../../hooks/useDebounce";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import LoadingIndicator from "../../components/LoadingIndicator";
-
-export type ContentTypeKey = 'MEDIA' | 'TEXT' | 'BACKGROUND' | 'SHARE';
-export type SortOrderKey = 'asc' | 'desc';
-
-interface ContentType {
-    key: ContentTypeKey;
-    label: string;
-}
-
-interface SortOrder {
-    key: SortOrderKey;
-    label: string;
-}
-
-const CONTENT_TYPES: ContentType[] = [
-    { key: 'MEDIA', label: 'Ảnh/video' },
-    { key: 'TEXT', label: 'Văn bản' },
-    { key: 'BACKGROUND', label: 'Phông nền' },
-    { key: 'SHARE', label: 'Chia sẻ lại' },
-];
-
-const SORT_ORDER: SortOrder[] = [
-    { key: 'asc', label: 'Cũ nhất trước' },
-    { key: 'desc', label: 'Mới nhất trước' },
-];
-
+import { CONTENT_TYPES, ContentTypeKey, SORT_ORDER, SortOrderKey } from "../../utils/filter";
 
 export type PendingPostsFilter = {
     date?: string;
@@ -81,18 +56,16 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
     const fetchMembers = async (groupId: string, page: number, size: number) => {
         setMemberLoading(true);
         const response = await groupService.getAllMembersByGroupId(groupId, page, size);
-        setTimeout(() => {
-            setMemberLoading(false);
+        setMemberLoading(false);
 
-            if (response.isSuccess) {
-                setMemberPagination(response.pagination);
-                setMembers(prevMembers => {
-                    const existingIds = new Set(prevMembers.map(m => m.user.id));
-                    const newMembers = response.data.filter(m => !existingIds.has(m.user.id));
-                    return [...prevMembers, ...newMembers];
-                });
-            }
-        }, 2000)
+        if (response.isSuccess) {
+            setMemberPagination(response.pagination);
+            setMembers(prevMembers => {
+                const existingIds = new Set(prevMembers.map(m => m.user.id));
+                const newMembers = response.data.filter(m => !existingIds.has(m.user.id));
+                return [...prevMembers, ...newMembers];
+            });
+        }
     };
 
     const fetchMoreMembers = async () => {
@@ -266,16 +239,20 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
             </div>
         </div>
 
-        {pendingPosts.length === 0 ? <div className="w-full h-full flex items-center justify-center">
+        {pendingPosts.length === 0 && !loading && <div className="w-full h-full flex items-center justify-center">
             <Empty description='Không có bài viết nào đang chờ phê duyệt' />
-        </div> : <div className="w-full max-w-screen-lg mx-auto px-2 sm:px-0 grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+        </div>}
+
+        <div className="w-full max-w-screen-lg mx-auto px-2 sm:px-0 grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
             {pendingPosts.map(post => <PendingPost
                 onReject={() => handleRejectPost(post.id)}
                 onApproval={() => handleApprovalPost(post.id)}
                 key={post.id}
                 post={post}
             />)}
-        </div>}
+        </div>
+
+        {loading && <LoadingIndicator />}
     </div>
 };
 

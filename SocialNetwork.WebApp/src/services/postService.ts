@@ -6,6 +6,7 @@ import { PendingPostsFilter } from '../pages/groups/GroupPendingPosts';
 import { PostMediaResource, PostResource } from '../types/post';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 import { PrivacyType } from '../enums/privacy';
+import { ProfilePostFilter } from '../components/posts/ProfilePostFilter';
 
 
 class PostService {
@@ -50,11 +51,12 @@ class PostService {
         })
     }
 
-    getAllPostsByUserId(userId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+    getAllPostsByUserId(userId: string, page: number, size: number, filterParam?: ProfilePostFilter) : Promise<PaginationResponse<PostResource[]>> {
         return axiosInterceptor.get('/api/posts/user/' + userId, {
             params: {
                 page: page,  
-                size: size  
+                size: size,
+                ...filterParam
             }
         })
     }
@@ -160,6 +162,32 @@ class PostService {
     }
 
  
+    getAllMyPendingPostsByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/group/pending-posts/' + groupId, {
+            params: {
+                page: page,  
+                size: size,
+            }
+        })
+    }
+
+    getAllMyRejectedPostsByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/group/rejected-posts/' + groupId, {
+            params: {
+                page: page,  
+                size: size,
+            }
+        })
+    }
+
+    getAllMyApprovalPostsByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+        return axiosInterceptor.get('/api/posts/group/approval-posts/' + groupId, {
+            params: {
+                page: page,  
+                size: size,
+            }
+        })
+    }
 }
 
 export default PostService.getInstance();

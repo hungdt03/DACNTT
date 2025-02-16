@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 
 const MainLeftSidebar: FC = () => {
     const { user } = useSelector(selectAuth);
-    console.log(user)
 
     return <div className="col-span-3 hidden xl:block h-full py-4 overflow-y-hidden scrollbar-hide">
         <div className="relative flex flex-col rounded-md h-[90%]">
@@ -70,7 +69,7 @@ const MainLeftSidebar: FC = () => {
                     <span className="text-[15px] font-semibold text-gray-500">Người theo dõi</span>
                 </Link>
                 <Link to={`/profile/${user?.id}/followees`} className="flex items-center gap-x-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer">
-                    <img alt="Đang theo dõi" className="w-8 h-8" src={images.follower} />
+                    <img alt="Đang theo dõi" className="w-8 h-8" src={images.followee} />
                     <span className="text-[15px] font-semibold text-gray-500">Đang theo dõi</span>
                 </Link>
                 <Link to='/groups' className="flex items-center gap-x-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer">
