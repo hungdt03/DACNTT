@@ -1,11 +1,20 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { Toolbar, Button, InputAdornment, TextField, Box } from '@mui/material'
+import {
+    Toolbar,
+    Button,
+    InputAdornment,
+    TextField,
+    Box,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select
+} from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch, faTrash } from '@fortawesome/free-solid-svg-icons'
 import adminService from '../../services/adminService'
 import ConfirmDeleteDialog from '../../components/dialogs/ConfirmDeleteDialog'
 import CustomTablePagination from '../../layouts/AdminLayout/components/TablePagination'
-import AdminPostsTable from '../../layouts/AdminLayout/components/AdminPostTable'
 import { toast } from 'react-toastify'
 import { GroupResource } from '../../types/group'
 import AdminGroupsTable from '../../layouts/AdminLayout/components/AdminGroupsTable'
@@ -19,6 +28,7 @@ const GroupsPage: React.FC = () => {
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [loading, setLoading] = useState(false)
+    const [privacyFilter, setPrivacyFilter] = useState('')
 
     const fetchGroups = async () => {
         setLoading(true)
@@ -47,12 +57,13 @@ const GroupsPage: React.FC = () => {
 
     const filteredGroups = useMemo(() => {
         const normalizedSearchTerm = removeDiacritics(searchTerm)
-        return allGroup.filter((group) =>
-            [group.description, group.name, group.privacy].some((field) =>
-                removeDiacritics(field || '').includes(normalizedSearchTerm)
-            )
+        return allGroup.filter(
+            (group) =>
+                [group.description, group.name, group.privacy].some((field) =>
+                    removeDiacritics(field || '').includes(normalizedSearchTerm)
+                ) && (privacyFilter != '' ? group.privacy == privacyFilter : true)
         )
-    }, [searchTerm, allGroup])
+    }, [searchTerm, allGroup, privacyFilter])
 
     const handleOpenDialog = (type: 'delete-all' | 'delete-selected') => {
         setDeleteType(type)
@@ -125,6 +136,14 @@ const GroupsPage: React.FC = () => {
                         )
                     }}
                 />
+                <FormControl size='small' sx={{ minWidth: 150, width: 'fit-content' }}>
+                    <InputLabel>Chế độ nhóm</InputLabel>
+                    <Select value={privacyFilter} onChange={(e) => setPrivacyFilter(e.target.value)}>
+                        <MenuItem value=''>Tất cả</MenuItem>
+                        <MenuItem value='PUBLIC'>Công khai</MenuItem>
+                        <MenuItem value='PRIVATE'>Riêng tư</MenuItem>
+                    </Select>
+                </FormControl>
                 <Toolbar sx={{ display: 'flex', gap: 1, marginLeft: 'auto' }}>
                     <Button variant='contained' color='warning' onClick={() => handleOpenDialog('delete-all')}>
                         <FontAwesomeIcon icon={faTrash} style={{ marginRight: 5 }} /> Xóa tất cả nhóm

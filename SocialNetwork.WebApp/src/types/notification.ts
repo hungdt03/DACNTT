@@ -9,7 +9,7 @@ export type NotificationResource = {
     imageUrl: string;
     recipient: UserResource;
     isRead: boolean;
-  
+    reportId: string;
     groupId: string; 
     groupInvitationId: string; 
     groupRoleInvitationId: string; 

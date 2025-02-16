@@ -21,9 +21,9 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         {
             await unitOfWork.UserRepository.DeleteUser(request.id);
    
-            return new DataResponse<String>()
+            return new BaseResponse()
             {
-                Data = "",
+            
                 IsSuccess = true,
                 Message = "Xóa tài khoản thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,

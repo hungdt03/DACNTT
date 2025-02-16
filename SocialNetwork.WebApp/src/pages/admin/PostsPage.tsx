@@ -1,5 +1,15 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { Toolbar, Button, InputAdornment, TextField, Box } from '@mui/material'
+import {
+    Toolbar,
+    Button,
+    InputAdornment,
+    TextField,
+    Box,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select
+} from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch, faTrash } from '@fortawesome/free-solid-svg-icons'
 import adminService from '../../services/adminService'
@@ -18,6 +28,8 @@ const PostsPage: React.FC = () => {
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [loading, setLoading] = useState(false)
+    const [privacyFilter, setPrivacyFilter] = useState('')
+    const [postTypeFilter, setPostTypeFilter] = useState('')
 
     const fetchPosts = async () => {
         setLoading(true)
@@ -46,12 +58,15 @@ const PostsPage: React.FC = () => {
 
     const filteredPosts = useMemo(() => {
         const normalizedSearchTerm = removeDiacritics(searchTerm)
-        return allPost.filter((post) =>
-            [post.content, post.postType, post.privacy, post.user.fullName, post.user.email].some((field) =>
-                removeDiacritics(field || '').includes(normalizedSearchTerm)
-            )
+        return allPost.filter(
+            (post) =>
+                [post.content, post.postType, post.privacy, post.user.fullName, post.user.email].some((field) =>
+                    removeDiacritics(field || '').includes(normalizedSearchTerm)
+                ) &&
+                (privacyFilter != '' ? post.privacy === privacyFilter : true) &&
+                (postTypeFilter != '' ? post.postType === postTypeFilter : true)
         )
-    }, [searchTerm, allPost])
+    }, [searchTerm, allPost, privacyFilter, postTypeFilter])
 
     const handleOpenDialog = (type: 'delete-all' | 'delete-selected') => {
         setDeleteType(type)
@@ -124,6 +139,24 @@ const PostsPage: React.FC = () => {
                         )
                     }}
                 />
+                <FormControl size='small' sx={{ minWidth: 160, width: 'fit-content' }}>
+                    <InputLabel>Kiểu bài viết</InputLabel>
+                    <Select value={postTypeFilter} onChange={(e) => setPostTypeFilter(e.target.value)}>
+                        <MenuItem value=''>Tất cả</MenuItem>
+                        <MenuItem value='GROUP_POST'>Bài viết trong nhóm</MenuItem>
+                        <MenuItem value='ORIGINAL_POST'>Bài viết gốc</MenuItem>
+                        <MenuItem value='SHARE_POST'>Bài viết chia sẻ</MenuItem>
+                        <MenuItem value='GROUP_POST_SHARE'>Bài viết chia sẻ trong nhóm</MenuItem>
+                    </Select>
+                </FormControl>
+                <FormControl size='small' sx={{ minWidth: 150, width: 'fit-content' }}>
+                    <InputLabel>Chế độ bài viết</InputLabel>
+                    <Select value={privacyFilter} onChange={(e) => setPrivacyFilter(e.target.value)}>
+                        <MenuItem value=''>Tất cả</MenuItem>
+                        <MenuItem value='PUBLIC'>Công khai</MenuItem>
+                        <MenuItem value='PRIVATE'>Riêng tư</MenuItem>
+                    </Select>
+                </FormControl>
                 <Toolbar sx={{ display: 'flex', gap: 1, marginLeft: 'auto' }}>
                     <Button variant='contained' color='warning' onClick={() => handleOpenDialog('delete-all')}>
                         <FontAwesomeIcon icon={faTrash} style={{ marginRight: 5 }} /> Xóa tất cả bài viết

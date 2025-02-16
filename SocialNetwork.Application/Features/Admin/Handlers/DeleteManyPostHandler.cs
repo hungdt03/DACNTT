@@ -21,9 +21,9 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         {
             await unitOfWork.PostRepository.DeleteManyPost(request.listPostId);
    
-            return new DataResponse<String>()
+            return new BaseResponse()
             {
-                Data = "",
+           
                 IsSuccess = true,
                 Message = "Xóa các bài viết thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,

@@ -56,6 +56,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<Report?> GetReportByIdAsync(Guid id)
         {
             return await _context.Reports
+                 .Include(r => r.TargetGroup)
+                 .Include(r => r.TargetComment)
+                 .Include(r => r.TargetPost)
+                 .Include(r => r.TargetUser)
+                 .Include(r => r.Reporter)
                  .SingleOrDefaultAsync(r => r.Id == id);
         }
 
@@ -76,25 +81,42 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task DeleteOneReport(Guid id)
         {
-            await _context.Reports.Where(r=>r.Id.Equals(id)).ExecuteDeleteAsync();
+            await _context.Reports
+                .Where(r => r.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(r => r.IsDeleted, true)
+                    .SetProperty(r => r.DeletedAt, DateTime.UtcNow)
+                );
         }
 
-        public async Task DeleteManyReport(List<string> id)
+
+        public async Task DeleteManyReport(List<string> ids)
         {
+            var guidIds = ids.Select(Guid.Parse).ToList();
+
             await _context.Reports
-                .Where(u => id.Contains(u.Id.ToString()))
-                .ExecuteDeleteAsync();
+                .Where(r => guidIds.Contains(r.Id))
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(r => r.IsDeleted, true)
+                    .SetProperty(r => r.DeletedAt, DateTime.UtcNow)
+                );
         }
 
         public async Task DeleteAllReport()
         {
-            await _context.Reports.ExecuteDeleteAsync();
+            await _context.Reports
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(r => r.IsDeleted, true)
+                    .SetProperty(r => r.DeletedAt, DateTime.UtcNow)
+                );
         }
+
         public async Task UpdateReport(Guid id, string newStatus)
         {
             var report = await GetReportByIdAsync(id);
             if (report == null) { return; }
             report.Status = newStatus;
+            report.DateUpdated = DateTime.UtcNow;
             _context.Reports.Update(report);
             _context.SaveChanges();
         }

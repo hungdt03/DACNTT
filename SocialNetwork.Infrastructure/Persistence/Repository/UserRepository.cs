@@ -101,20 +101,36 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task DeleteUser(string id)
         {
-            await _context.Users.Where(u=>u.Id == id).ExecuteDeleteAsync();
+            await _context.Users
+                .Where(u => u.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(u => u.IsDeleted, true)
+                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                );
         }
+
         public async Task DeleteAllUser()
         {
             var users = await GetAllRoleUser();
+            var userIds = users.Select(user => user.Id).ToList();
+
             await _context.Users
-                .Where(u => users.Select(user => user.Id).Contains(u.Id))
-                .ExecuteDeleteAsync();
+                .Where(u => userIds.Contains(u.Id))
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(u => u.IsDeleted, true)
+                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                );
         }
+
         public async Task DeleteManyUser(List<string> listUserId)
         {
             await _context.Users
                 .Where(u => listUserId.Contains(u.Id))
-                .ExecuteDeleteAsync();
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(u => u.IsDeleted, true)
+                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                );
         }
+
     }
 }

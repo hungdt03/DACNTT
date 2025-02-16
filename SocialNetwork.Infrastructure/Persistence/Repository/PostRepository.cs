@@ -293,12 +293,19 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             await _context.Posts
                 .Where(u => listPostId.Contains(u.Id.ToString()))
-                .ExecuteDeleteAsync();
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(u => u.IsDeleted, true)
+                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                );
         }
 
         public async Task DeleteAllPost()
         {
-             await _context.Posts.ExecuteDeleteAsync();
+            await _context.Posts
+               .ExecuteUpdateAsync(setters => setters
+                   .SetProperty(u => u.IsDeleted, true)
+                   .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+               );
         }
     }
 }

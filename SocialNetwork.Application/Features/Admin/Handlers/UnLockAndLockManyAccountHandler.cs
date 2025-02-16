@@ -20,9 +20,9 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         {
             await unitOfWork.UserRepository.UnLockAndLockManyAccount(request.listUserId, request.number);
 
-            return new DataResponse<String>()
+            return new BaseResponse()
             {
-                Data = "các tài khoản thành công",
+          
                 IsSuccess = true,
                 Message = "các tài khoản thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,

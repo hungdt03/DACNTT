@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Modal, Button, Form, Input, Typography } from 'antd'
 import { toast } from 'react-toastify'
 import adminService from '../../services/adminService'
@@ -23,14 +23,28 @@ type UpdateReportDialogProps = {
     fetchReports: () => void
     tagetReport: ReportResource
 }
-
+export type UpdateReport = {
+    id: string
+    newStatus: string
+}
 const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, isVisible, onClose, fetchReports }) => {
     const [loading, setLoading] = useState(false)
-    const [status, setStatus] = useState(tagetReport.status)
+    const [status, setStatus] = useState('')
+
+    useEffect(() => {
+        if (tagetReport) {
+            setStatus(tagetReport.status)
+        }
+    }, [tagetReport])
 
     const handleStatusChange = async (newStatus: string) => {
+        const updatedPayload: UpdateReport = {
+            id: tagetReport.id,
+            newStatus: newStatus
+        }
         setLoading(true)
-        const response = await adminService.UpdateStatusReport(tagetReport.id, newStatus)
+        console.log(updatedPayload.id + '    ' + updatedPayload.newStatus)
+        const response = await adminService.UpdateReport(updatedPayload)
         setLoading(false)
         if (response.isSuccess) {
             fetchReports()
@@ -80,9 +94,12 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                         </Button>
                     ))}
                 </Form.Item>
-
                 <Form.Item label={<span style={{ fontWeight: 'bold' }}>Ghi chú giải quyết</span>}>
-                    <Input.TextArea value={tagetReport.resolutionNotes} disabled />
+                    <Typography.Paragraph
+                        style={{ background: '#f5f5f5', padding: '10px', borderRadius: '5px', whiteSpace: 'pre-line' }}
+                    >
+                        {tagetReport.resolutionNotes !== null ? tagetReport.resolutionNotes : 'Không có'}
+                    </Typography.Paragraph>
                 </Form.Item>
 
                 <Form.Item label={<span style={{ fontWeight: 'bold' }}>Trạng thái</span>}>
@@ -102,27 +119,27 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                     <Typography.Text>{tagetReport.reporter?.fullName}</Typography.Text>
                 </Form.Item>
 
-                {tagetReport.reportType === ReportType.USER && (
+                {tagetReport?.reportType === ReportType.USER && (
                     <Form.Item label={<span style={{ fontWeight: 'bold' }}>Người bị báo cáo</span>}>
-                        <Typography.Text>{tagetReport.targetUser.fullName}</Typography.Text>
+                        <Typography.Text>{tagetReport.targetUser?.fullName}</Typography.Text>
                     </Form.Item>
                 )}
 
-                {tagetReport.reportType === ReportType.POST && (
+                {tagetReport?.reportType === ReportType.POST && (
                     <Form.Item label={<span style={{ fontWeight: 'bold' }}>Bài viết liên quan</span>}>
-                        <Typography.Text>{tagetReport.targetPost.content}</Typography.Text>
+                        <Typography.Text>{tagetReport.targetPost?.content}</Typography.Text>
                     </Form.Item>
                 )}
 
-                {tagetReport.reportType === ReportType.COMMENT && (
+                {tagetReport?.reportType === ReportType.COMMENT && (
                     <Form.Item label={<span style={{ fontWeight: 'bold' }}>Bình luận liên quan</span>}>
-                        <Typography.Text>{tagetReport.targetComment.content}</Typography.Text>
+                        <Typography.Text>{tagetReport.targetComment?.content}</Typography.Text>
                     </Form.Item>
                 )}
 
-                {tagetReport.reportType === ReportType.GROUP && (
+                {tagetReport?.reportType === ReportType.GROUP && (
                     <Form.Item label={<span style={{ fontWeight: 'bold' }}>Nhóm liên quan</span>}>
-                        <Typography.Text>{tagetReport.targetGroup.name}</Typography.Text>
+                        <Typography.Text>{tagetReport.targetGroup?.name}</Typography.Text>
                     </Form.Item>
                 )}
 

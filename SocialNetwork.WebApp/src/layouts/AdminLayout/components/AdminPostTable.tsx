@@ -22,6 +22,7 @@ import adminService from '../../../services/adminService'
 import { toast } from 'react-toastify'
 import { Popconfirm } from 'antd'
 import { PostResource } from '../../../types/post'
+import { PostType } from '../../../enums/post-type'
 
 type PostsTableProps = {
     posts: PostResource[]
@@ -70,6 +71,20 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
         if (response.isSuccess) {
             toast.success('Xóa bài viết thành công')
             fetchPosts()
+        }
+    }
+    const getPostTypeLabel = (postType: string) => {
+        switch (postType) {
+            case PostType.GROUP_POST:
+                return 'Bài viết trong nhóm'
+            case PostType.ORIGINAL_POST:
+                return 'Bài viết gốc'
+            case PostType.SHARE_POST:
+                return 'Bài viết chia sẻ'
+            case PostType.GROUP_POST_SHARE:
+                return 'Bài viết chia sẻ trong nhóm'
+            default:
+                return 'Bài viết'
         }
     }
 
@@ -149,7 +164,7 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                                         </TableCell>
                                         <TableCell>{post.user.fullName}</TableCell>
 
-                                        <TableCell>{post.postType}</TableCell>
+                                        <TableCell>{getPostTypeLabel(post.postType)}</TableCell>
 
                                         <TableCell>
                                             {post.privacy === 'PUBLIC'

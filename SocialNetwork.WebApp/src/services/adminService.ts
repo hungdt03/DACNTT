@@ -1,3 +1,4 @@
+import { UpdateReport } from "../components/dialogs/UpdateReportDialog";
 import axiosInterceptor from "../configurations/axiosInterceptor";
 import { GroupResource } from "../types/group";
 import { PostResource } from "../types/post";
@@ -74,8 +75,11 @@ class AdminService {
      DeleteAllReport() : Promise<BaseResponse> {
           return axiosInterceptor.delete('/api/admin/delete-all-report')
      }
-     UpdateStatusReport(reportId : string, newSratus : string) : Promise<BaseResponse> {
-          return axiosInterceptor.delete('/api/admin/update-report/' + reportId, {data: newSratus})
+     UpdateReport(payload : UpdateReport ) : Promise<BaseResponse> {
+          return axiosInterceptor.put('/api/admin/update-report',payload)
+     }
+     GetReportById(reportId : string ) : Promise<DataResponse<ReportResource>> {
+          return axiosInterceptor.get('/api/admin/get-report-by-id/'+reportId)
      }
 }
 export default AdminService.getInstance();

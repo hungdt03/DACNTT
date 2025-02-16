@@ -114,10 +114,10 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
         // REPORT
-        [HttpDelete("update-report/{reportId}")]
-        public async Task<IActionResult> UpdateOneReport([FromRoute] Guid reportId, [FromBody] string newStatus)
+        [HttpPut("update-report")]
+        public async Task<IActionResult> UpdateReport([FromBody] UpdateReportCommand command)
         {
-            var response = await mediator.Send(new UpdateReportCommand(reportId, newStatus));
+            var response = await mediator.Send(command);
             return Ok(response);
         }
         [HttpDelete("delete-report/{reportId}")]
@@ -136,6 +136,12 @@ namespace SocialNetwork.API.Controllers
         public async Task<IActionResult> DeleteManyReport([FromBody] List<string> listReportId)
         {
             var response = await mediator.Send(new DeleteManyReportQuery(listReportId));
+            return Ok(response);
+        }
+        [HttpGet("get-report-by-id/{reportId}")]
+        public async Task<IActionResult> GetReportById([FromRoute] Guid reportId)
+        {
+            var response = await mediator.Send(new GetReportByIdQuery(reportId));
             return Ok(response);
         }
     }

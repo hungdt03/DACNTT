@@ -40,7 +40,7 @@ const AdminHeader: React.FC<HeaderProps> = ({ title, isSidebarCollapsed }) => {
                 >
                     {title.toUpperCase()}
                 </Typography>
-                <div style={{ marginLeft: 'auto', marginRight: '50px' }}>
+                <div style={{ marginLeft: 'auto' }}>
                     <Popover trigger='click' placement='bottomRight' content={<AdminAccountDialog />}>
                         <div className='relative'>
                             <button className='border-[1px] border-gray-300 rounded-full overflow-hidden'>

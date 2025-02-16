@@ -21,9 +21,9 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         {
             await unitOfWork.ReportRepository.DeleteManyReport(request.listReportId);
    
-            return new DataResponse<String>()
+            return new BaseResponse()
             {
-                Data = "",
+        
                 IsSuccess = true,
                 Message = "Xóa các báo cáo thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,

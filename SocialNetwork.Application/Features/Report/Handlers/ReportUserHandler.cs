@@ -57,7 +57,7 @@ namespace SocialNetwork.Application.Features.Report.Handlers
             {
                 Reason = request.Reason,
                 ReporterId = userId,
-                ReportType = ReportType.COMMENT,
+                ReportType = ReportType.USER,
                 Status = ReportStatus.PENDING,
                 TargetUserId = request.UserId,
             };

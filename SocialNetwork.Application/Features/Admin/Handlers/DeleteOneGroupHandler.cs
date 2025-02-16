@@ -21,9 +21,9 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         {
             await unitOfWork.GroupRepository.DeleteOneGroup(request.id);
    
-            return new DataResponse<String>()
+            return new BaseResponse()
             {
-                Data = "",
+               
                 IsSuccess = true,
                 Message = "Xóa nhóm thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
