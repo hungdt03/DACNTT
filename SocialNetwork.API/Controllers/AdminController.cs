@@ -141,6 +141,7 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new DeleteManyReportQuery(listReportId));
             return Ok(response);
         }
+        [AllowAnonymous]
         [HttpGet("get-report-by-id/{reportId}")]
         public async Task<IActionResult> GetReportById([FromRoute] Guid reportId)
         {

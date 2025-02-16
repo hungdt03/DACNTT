@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
@@ -9,6 +10,7 @@ using SocialNetwork.Application.Features.Admin.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Common;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.System;
 using System;
@@ -35,19 +37,15 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         {
             var report = await unitOfWork.ReportRepository.GetReportByIdAsync(request.Id)
                 ?? throw new AppException("không có report nào cả");
-
+            
             await unitOfWork.BeginTransactionAsync(cancellationToken);
             var userAvatar = _contextAccessor.HttpContext.User.GetAvatar();
             var content = "đang xử lý";
-            if (request.NewStatus == ReportStatus.PENDING)
-            {
-                content = "đang xử lý";
-            }
-            else if (request.NewStatus == ReportStatus.RESOLVED)
+            if (request.NewStatus == ReportStatus.RESOLVED)
             {
                 content = "đã xử lý";
             }
-            else
+            if (request.NewStatus == ReportStatus.REJECTED)
             {
                 content = "đã từ chối";
             }
@@ -62,30 +60,30 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                 Type = NotificationType.REPORT_RESPONSE,
                 DateSent = DateTimeOffset.UtcNow,
             };
-            if (report?.ReportType == "USER")
+            if (report?.ReportType == ReportType.USER)
             {
-                notification.Content = $"Chúng tôi {content} báo cáo của bạn về tài khoản {report.TargetUser.FullName}";
+                notification.Content = $"Chúng tôi {content} báo cáo của bạn về tài khoản {report.TargetUser?.FullName}";
             }
-            if (report?.ReportType == "COMMENT")
+            if (report?.ReportType == ReportType.COMMENT)
             {
-                notification.Content = $"Chúng tôi {content} báo cáo của bạn về bình luận của {report.TargetComment.User.FullName}";
+                notification.Content = $"Chúng tôi {content} báo cáo của bạn về bình luận của {report.TargetComment?.User.FullName}";
                 notification.Comment = report.TargetComment;
                 notification.CommentId = report.TargetCommentId;
             }
-            if (report?.ReportType == "POST")
+            if (report?.ReportType == ReportType.POST)
             {
-                notification.Content = $"Chúng tôi {content} báo cáo của bạn về bài viết của {report.TargetPost.User.FullName}";
+                notification.Content = $"Chúng tôi {content} báo cáo của bạn về bài viết của {report.TargetPost?.User.FullName}";
                 notification.Post = report.TargetPost;
                 notification.PostId = report.TargetPostId;
             }
-            if (report?.ReportType == "GROUP")
+            if (report?.ReportType == ReportType.GROUP)
             {
-                notification.Content = $"Chúng tôi {content} báo cáo của bạn về nhóm {report.TargetGroup.Name}";
+                notification.Content = $"Chúng tôi {content} báo cáo của bạn về nhóm {report.TargetGroup?.Name}";
                 notification.Group = report.TargetGroup;
                 notification.GroupId = report.TargetGroupId;
             }
             await unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
-            await unitOfWork.ReportRepository.UpdateReport(request.Id, request.NewStatus);
+            await unitOfWork.ReportRepository.UpdateReport(request.Id, request.NewStatus, request.NewReportSolution);
 
             await unitOfWork.CommitTransactionAsync(cancellationToken);
 

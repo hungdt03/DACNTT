@@ -58,7 +58,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.Reports
                  .Include(r => r.TargetGroup)
                  .Include(r => r.TargetComment)
+                    .ThenInclude(r => r.User)
                  .Include(r => r.TargetPost)
+                    .ThenInclude(r => r.User)
                  .Include(r => r.TargetUser)
                  .Include(r => r.Reporter)
                  .SingleOrDefaultAsync(r => r.Id == id);
@@ -111,12 +113,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 );
         }
 
-        public async Task UpdateReport(Guid id, string newStatus)
+        public async Task UpdateReport(Guid id, string newStatus, string newReportSolution)
         {
             var report = await GetReportByIdAsync(id);
             if (report == null) { return; }
             report.Status = newStatus;
+            report.ResolutionNotes = newReportSolution;
             report.DateUpdated = DateTime.UtcNow;
+            report.ResolvedAt = DateTime.UtcNow;
             _context.Reports.Update(report);
             _context.SaveChanges();
         }

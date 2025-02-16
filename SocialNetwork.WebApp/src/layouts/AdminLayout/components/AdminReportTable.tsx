@@ -100,13 +100,13 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
     const getContentReported = (report: ReportResource) => {
         switch (report.reportType) {
             case ReportType.USER:
-                return report.targetUser?.fullName || 'Không có'
+                return `Người bị báo cáo: ${report.targetUser?.fullName}` || 'Không có'
             case ReportType.GROUP:
-                return report.targetGroup?.name || 'Không có'
+                return `Nhóm bị báo cáo: ${report.targetGroup?.name}` || 'Không có'
             case ReportType.POST:
-                return report.targetPost?.content || 'Không xác định'
+                return `Bài viết bị báo cáo: ${report.targetPost?.content}` || 'Không xác định'
             case ReportType.COMMENT:
-                return report.targetComment?.content || 'Không xác định'
+                return `Bình luận bị báo cáo: ${report.targetComment?.content}` || 'Không xác định'
             default:
                 return 'Không xác định'
         }
@@ -233,7 +233,7 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                             <Popconfirm
                                                 onConfirm={() => handleConfirmDelete(report.id)}
                                                 title='Xác nhận xóa'
-                                                description='Bạn có chắc chắn muốn xóa bài viết này?'
+                                                description='Bạn có chắc chắn muốn xóa báo cáo này?'
                                                 cancelText='Không'
                                                 okText='Chắc chắn'
                                             >
@@ -269,8 +269,22 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                                         <Typography variant='body2'>{`${getTargetLabel(report.reportType) + ' bị báo cáo'}: ${getReportedAccount(report)}`}</Typography>
                                                     </Grid>
                                                     <Grid item xs={6} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`Nội dung bị báo cáo: ${getContentReported(report)}`}</Typography>
+                                                        <Typography variant='body2'>{`${getContentReported(report)}`}</Typography>
                                                     </Grid>
+                                                    {report.reportType === ReportType.POST && (
+                                                        <Grid item xs={6} sx={{ padding: '2px' }}>
+                                                            <Typography variant='body2'>{`Người đăng: ${
+                                                                report.targetPost.user.fullName
+                                                            }`}</Typography>
+                                                        </Grid>
+                                                    )}
+                                                    {report.reportType === ReportType.COMMENT && (
+                                                        <Grid item xs={6} sx={{ padding: '2px' }}>
+                                                            <Typography variant='body2'>{`Người đăng: ${
+                                                                report.targetComment.user.fullName
+                                                            }`}</Typography>
+                                                        </Grid>
+                                                    )}
                                                     <Grid item xs={6} sx={{ padding: '2px' }}>
                                                         <Typography variant='body2'>{`Ghi chú giải quyết: ${report.resolutionNotes}`}</Typography>
                                                     </Grid>

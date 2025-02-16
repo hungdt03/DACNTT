@@ -15,6 +15,6 @@ namespace SocialNetwork.Application.Interfaces
         Task DeleteOneReport(Guid id);
         Task DeleteManyReport(List<string> id);
         Task DeleteAllReport();
-        Task UpdateReport(Guid id, string newStatus);
+        Task UpdateReport(Guid id, string newStatus, string newReportSoluton);
     }
 }

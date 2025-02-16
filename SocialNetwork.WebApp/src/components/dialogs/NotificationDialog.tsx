@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import Notification from '../Notification'
 import { NotificationResource } from '../../types/notification'
-import { Empty, Modal } from 'antd'
+import { Button, Empty, Modal } from 'antd'
 import { Pagination } from '../../types/response'
 import useModal from '../../hooks/useModal'
 import MentionPostModal from '../noti-mentions/comments/MentionPostModal'
@@ -16,6 +16,7 @@ import NotificationSkeleton from '../skeletons/NotificationSkeleton'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { ReportResource } from '../../types/report'
 import adminService from '../../services/adminService'
+import { ReportType } from '../../enums/report-type'
 
 type NotificationDialogProps = {
     onCountNotification: (count: number) => void
@@ -28,12 +29,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({ onCountNotification }
     const [notifications, setNotifications] = useState<NotificationResource[]>([])
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
     const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false)
-    const {
-        isModalOpen: openReport,
-        handleCancel: cancelReport,
-        handleOk: okReport,
-        showModal: showReport
-    } = useModal()
+    const { isModalOpen: openReport, handleCancel: cancelReport, showModal: showReport } = useModal()
     const [getReport, setGetReport] = useState<ReportResource>()
     const navigate = useNavigate()
 
@@ -147,8 +143,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({ onCountNotification }
     }
     const handleReportReceiverPage = async (notification: NotificationResource) => {
         handleMarkNotificationAsRead(notification.id)
-        getReportId(notification.reportId)
         setNotification(notification)
+        await getReportId(notification.reportId)
         showReport()
     }
 
@@ -235,21 +231,41 @@ const NotificationDialog: FC<NotificationDialogProps> = ({ onCountNotification }
                     title={<p className='text-center font-bold text-lg'>Phản hồi báo cáo</p>}
                     centered
                     open={openReport}
-                    onOk={okReport}
                     onCancel={cancelReport}
-                    okText='Xong'
-                    okButtonProps={{
-                        onClick: () => cancelReport
-                    }}
+                    footer={[
+                        <Button key='ok' type='primary' onClick={cancelReport}>
+                            Xong
+                        </Button>
+                    ]}
                 >
                     <div className='flex flex-col gap-y-2'>
                         <div>
                             <span className='text-[16px] font-bold'>
                                 Xin chào bạn {notification?.recipient.fullName},
                             </span>
-                            <p className='text-sm text-gray-600'>
-                                Chúng tôi đã nhận được báo cáo của bạn về tài khoản {getReport?.targetUser.fullName}
-                            </p>
+                            {getReport?.reportType === ReportType.USER && (
+                                <p className='text-sm text-gray-600'>
+                                    Chúng tôi đã nhận được báo cáo của bạn về tài khoản:{' '}
+                                    {getReport?.targetUser.fullName}
+                                </p>
+                            )}
+                            {getReport?.reportType === ReportType.POST && (
+                                <p className='text-sm text-gray-600'>
+                                    Chúng tôi đã nhận được báo cáo của bạn về bài viết của:{' '}
+                                    {getReport?.targetPost.user.fullName}
+                                </p>
+                            )}
+                            {getReport?.reportType === ReportType.GROUP && (
+                                <p className='text-sm text-gray-600'>
+                                    Chúng tôi đã nhận được báo cáo của bạn về nhóm: {getReport?.targetGroup.name}
+                                </p>
+                            )}
+                            {getReport?.reportType === ReportType.COMMENT && (
+                                <p className='text-sm text-gray-600'>
+                                    Chúng tôi đã nhận được báo cáo của bạn về bình luận của:{' '}
+                                    {getReport?.targetComment.user.fullName}
+                                </p>
+                            )}
                             <p className='text-sm text-gray-600'>
                                 Chúng tôi đưa ra biện pháp giải quyết: {getReport?.resolutionNotes}
                             </p>

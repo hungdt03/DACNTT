@@ -15,5 +15,6 @@ namespace SocialNetwork.Application.Features.Admin.Commands
         [Required(ErrorMessage = "Vui lòng cung cấp ID của báo cáo")]
         public Guid Id { get; set; }
         public string NewStatus { get; set; }
+        public string NewReportSolution { get; set; }
     }
 }

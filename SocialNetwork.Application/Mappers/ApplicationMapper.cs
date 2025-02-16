@@ -419,6 +419,7 @@ namespace SocialNetwork.Application.Mappers
                 Recipient = notification.Recipient != null ? MapToUser(notification.Recipient) : null,
                 Title = notification.Title,
                 Type = notification.Type,
+                ReportId = notification.ReportId,
             };
         }
 
