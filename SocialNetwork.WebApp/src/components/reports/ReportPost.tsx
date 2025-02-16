@@ -7,21 +7,24 @@ import PostOtherTags from "../posts/PostOtherTags";
 import { formatTime, formatVietnamDate } from "../../utils/date";
 import { getPrivacyPost } from "../../utils/post";
 import PostMedia from "../posts/PostMedia";
+import { GroupResource } from "../../types/group";
 
 type ReportPostProps = {
     report: ReportResource;
+    group: GroupResource
     onKeep: () => void;
     onRemove: () => void;
 }
 
 const ReportPost: FC<ReportPostProps> = ({
     report,
+    group,
     onKeep,
     onRemove
 }) => {
     return <div className="p-4 rounded-md shadow bg-white flex flex-col gap-y-4">
         <span className="text-gray-500 border-[1px] p-2">
-            <Link className="font-bold text-[15px] hover:underline text-black" to={`/profile/${report.reporter.id}`}>{report.reporter.fullName + ' '}</Link>
+            <Link className="font-bold text-[15px] hover:underline text-black" to={`/groups/${group.id}/user/${report.reporter.id}`}>{report.reporter.fullName + ' '}</Link>
             đã báo cáo <strong className="text-black">bài viết</strong> này vì cho rằng: 
             <strong className="text-black">{' ' + report.reason}</strong>
         </span>

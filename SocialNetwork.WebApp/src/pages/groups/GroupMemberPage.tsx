@@ -13,6 +13,7 @@ import { message, Modal } from "antd";
 import ChooseNewAdminModal from "../../components/modals/ChooseNewAdminModal";
 import useModal from "../../hooks/useModal";
 import { MemberRole } from "../../enums/member-role";
+import Loading from "../../components/Loading";
 
 const GroupMemberPage: FC = () => {
     const { id } = useParams()
@@ -25,7 +26,8 @@ const GroupMemberPage: FC = () => {
     const [searchValue, setSearchValue] = useState('');
     const [group, setGroup] = useState<GroupResource>();
     const [selectMember, setSelectMember] = useState<GroupMemberResource>()
-    const { isModalOpen, handleCancel, handleOk, showModal } = useModal()
+    const { isModalOpen, handleCancel, handleOk, showModal } = useModal();
+    const [groupLoading, setGroupLoading] = useState(false)
 
     const { containerRef } = useInfiniteScroll({
         fetchMore: () => void fetchMoreMembers(),
@@ -37,9 +39,13 @@ const GroupMemberPage: FC = () => {
 
     const fetchGroup = async () => {
         if (id) {
+            setGroupLoading(true)
             const response = await groupService.getGroupById(id);
+            setGroupLoading(false)
             if (response.isSuccess) {
                 setGroup(response.data)
+            } else {
+                navigate('/404')
             }
         }
     }
@@ -169,6 +175,7 @@ const GroupMemberPage: FC = () => {
     }, [id]);
 
     return <div className="w-full">
+        {groupLoading && <Loading />}
         <div className="w-full flex items-center justify-center bg-white shadow sticky top-0 z-10">
             <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm mx-auto px-4 w-full py-3 flex flex-col gap-y-3">
                 <div className="flex items-center gap-x-2">
@@ -187,7 +194,8 @@ const GroupMemberPage: FC = () => {
 
         <div className="w-full h-full lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm mx-auto py-6 px-2">
             <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {group && members.map(member => <GroupMember
+                {!groupLoading && group && members.map(member => <GroupMember
+                    group={group}
                     countMember={members.length}
                     adminCount={group.adminCount}
                     onKickMember={() => handleKickMember(member.id)}

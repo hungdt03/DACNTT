@@ -7,6 +7,7 @@ import { ReactionSvgType, svgReaction } from "../../assets/svg";
 import cn from "../../utils/cn";
 import { ViewerResource } from "../../types/viewer";
 import images from "../../assets";
+import { formatTime } from "../../utils/date";
 
 type StoryViewersProps = {
     toggleMore: (show: boolean) => void;
@@ -48,6 +49,8 @@ const StoryViewers: FC<StoryViewersProps> = ({
                             </div>
                             <div className="flex flex-col">
                                 <span className="font-semibold text-xs">{viewer.user.fullName}</span>
+                                <span className="text-gray-500 text-[11px]"> {viewer.user.isOnline ? 'Đang hoạt động' :  `Hoạt động ${formatTime(new Date(viewer.user.recentOnlineTime))}`}</span>
+                               
                             </div>
                         </div>
 

@@ -17,14 +17,14 @@ const MainLeftSidebar: FC = () => {
                         <img alt="Ảnh bìa" className="w-full h-[100px] object-cover" src={user?.coverImage ?? images.cover} />
                         <div className="relative">
                             {
-                                user?.haveStory ? <Link className="h-[50px] w-[50px] p-[1px] rounded-full border-[3px] border-primary -mt-[25px]" to={`/stories/${user?.id}`}>
+                                user?.haveStory ? <Link className="h-[50px] w-[50px] inline-block p-[1px] rounded-full border-[4px] border-primary -mt-[25px]" to={`/stories/${user?.id}`}>
                                     <img alt="Avatar" className="w-full h-full object-cover flex-shrink-0 rounded-full" src={user?.avatar ?? images.user} />
                                 </Link>
                                     :
                                     <img alt="Avatar" className="h-[50px] w-[50px] object-cover flex-shrink-0 rounded-full -mt-[25px]" src={user?.avatar ?? images.user} />
                             }
 
-                            {user?.isOnline && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                            <div className="absolute bottom-2 right-1 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
                         </div>
                     </div>
                     <div className="flex flex-col items-center">

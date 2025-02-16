@@ -43,7 +43,6 @@ const MyProfileHeader: FC<MyProfileHeaderProps> = ({
             navigate(`/profile/${id}`, { replace: true });
         }
 
-        console.log(user)
     }, [tab, id, navigate]);
 
     const onAvatarChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
@@ -150,7 +149,7 @@ const MyProfileHeader: FC<MyProfileHeaderProps> = ({
         <div className="flex flex-col lg:flex-row items-center lg:items-end md:ml-10 ml-0 -mt-16 gap-x-6 lg:-mt-8 px-8">
             <div className="relative z-30 flex-shrink-0">
                 {user?.haveStory ?
-                    <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[4px] p-1 border-primary flex items-center justify-center aspect-square" to={`/stories/${user.id}`}>
+                    <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[4px] p-[2px] border-primary flex items-center justify-center aspect-square" to={`/stories/${user.id}`}>
                         <img alt="Ảnh đại diện" className="object-cover w-full h-full rounded-full" src={user?.avatar ?? images.user} />
                     </Link>
                     : <img
@@ -160,7 +159,7 @@ const MyProfileHeader: FC<MyProfileHeaderProps> = ({
                     />
                 }
 
-                {user?.isOnline && <div className="absolute bottom-0 right-8 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
+                <div className="absolute bottom-0 right-8 p-2 rounded-full border-[2px] border-white bg-green-500"></div>
                 <ImgCrop modalOk="Lưu lại" modalCancel="Hủy bỏ" modalTitle="Ảnh đại diện" showGrid showReset resetText="Bắt đầu lại" rotationSlider>
                     <Upload
                         multiple={false}

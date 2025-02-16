@@ -37,6 +37,13 @@ namespace SocialNetwork.Application.Features.Group.Handlers
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
+            var invitation = await _unitOfWork.GroupInvitationRepository.GetGroupInvitationByInviteeIdAndGroupIdAsync(joinGroupRequest.UserId, joinGroupRequest.GroupId); ;
+
+            if(invitation != null)
+            {
+                _unitOfWork.GroupInvitationRepository.RemoveGroupInvitation(invitation);
+            }
+
             _unitOfWork.JoinGroupRequestRepository.RemoveJoinGroupRequest(joinGroupRequest);
 
             var newGroupMember = new GroupMember()

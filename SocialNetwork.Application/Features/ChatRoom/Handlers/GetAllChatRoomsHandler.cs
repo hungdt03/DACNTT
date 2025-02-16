@@ -78,12 +78,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                         }
                     }
 
-                    if(!item.IsOnline)
-                    {
-                        item.RecentOnlineTime = lastOnlineTime;
-                    }
+                    item.RecentOnlineTime = lastOnlineTime;
                 }
-
               
                 var lastMessage = await _unitOfWork.MessageRepository.GetLastMessageByGroupIdAsync(chatRoom.Id);
 

@@ -11,7 +11,7 @@ export interface UserResource {
     phoneNumber: string;
     dateOfBirth: Date;
     isOnline: boolean;
-    recentOnlineTime: boolean;
+    recentOnlineTime: Date;
     postCount: number;
     followerCount: number;
     followingCount: number;

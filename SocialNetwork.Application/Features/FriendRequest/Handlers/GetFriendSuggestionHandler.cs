@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
@@ -16,11 +17,13 @@ namespace SocialNetwork.Application.Features.FriendRequest.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
 
-        public GetFriendSuggestionHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public GetFriendSuggestionHandler(IUnitOfWork unitOfWork, UserManager<Domain.Entity.System.User> userManager, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
+            _userManager = userManager;
         }
         public async Task<BaseResponse> Handle(GetFriendSuggestionsQuery request, CancellationToken cancellationToken)
         {
@@ -35,6 +38,9 @@ namespace SocialNetwork.Application.Features.FriendRequest.Handlers
             
             foreach(var user in allUsers)
             {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles != null && roles.Count > 0 && roles[0] == "ADMIN") continue;
+
                 if(userId == user.Id) continue;
                 var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id);
 

@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { GroupResource } from "../../../types/group";
 import images from "../../../assets";
-import { Book, ChartBarIcon, Home, Lock, UserCog } from "lucide-react";
+import { Book, ChartBarIcon, GitPullRequest, Home, Lock, UserCog } from "lucide-react";
 import { Badge, Divider } from "antd";
 import { GroupApprovalSummaryResource } from "../../../types/group-approval-summary";
 import groupService from "../../../services/groupService";
@@ -17,19 +17,7 @@ type MyGroupManageSidebarProps = {
 const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
     group,
 }) => {
-    const [approvalSummary, setApprovalSummary] = useState<GroupApprovalSummaryResource>();
     const location = useLocation();
-
-    const fetchGroupApprovalSummary = async () => {
-        const response = await groupService.getGroupApprovalSummary(group.id);
-        if (response.isSuccess) {
-            setApprovalSummary(response.data)
-        }
-    }
-    useEffect(() => {
-        fetchGroupApprovalSummary()
-    }, [group])
-
 
     return <>
         <div className="flex items-center gap-x-2 px-2 py-4">
@@ -53,25 +41,23 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
                 <span className="font-semibold">Trang chủ của cộng đồng</span>
             </Link>
 
-            <Badge.Ribbon text={approvalSummary?.pendingPost} color="cyan">
-                <Link to={`/groups/${group.id}/pending-posts`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-posts') && 'bg-gray-100')}>
-                    <Book size={20} />
-                    <span className="font-semibold">Bài viết đang chờ</span>
-                </Link>
-            </Badge.Ribbon>
+            <Link to={`/groups/${group.id}/pending-posts`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-posts') && 'bg-gray-100')}>
+                <Book size={20} />
+                <span className="font-semibold">Bài viết đang chờ</span>
+            </Link>
 
-            <Badge.Ribbon text={approvalSummary?.pendingRequestJoinGroup} color="green">
-                <Link to={`/groups/${group.id}/pending-members`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-members') && 'bg-gray-100')}>
-                    <UserCog size={20} />
-                    <span className="font-semibold">Yêu cầu thành viên</span>
-                </Link>
-            </Badge.Ribbon>
-            <Badge.Ribbon text={approvalSummary?.pendingReports} color="red">
-                <Link to={`/groups/${group.id}/pending-reports`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-reports') && 'bg-gray-100')}>
-                    <ChartBarIcon size={20} />
-                    <span className="font-semibold">Báo cáo đang chờ</span>
-                </Link>
-            </Badge.Ribbon>
+            <Link to={`/groups/${group.id}/pending-members`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-members') && 'bg-gray-100')}>
+                <UserCog size={20} />
+                <span className="font-semibold">Yêu cầu thành viên</span>
+            </Link>
+            {group.onlyAdminCanApprovalMember && <Link to={`/groups/${group.id}/pending-invites`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-members') && 'bg-gray-100')}>
+                <GitPullRequest size={20} />
+                <span className="font-semibold">Lời mời từ thành viên</span>
+            </Link>}
+            <Link to={`/groups/${group.id}/pending-reports`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-reports') && 'bg-gray-100')}>
+                <ChartBarIcon size={20} />
+                <span className="font-semibold">Báo cáo đang chờ</span>
+            </Link>
         </div >
     </>
 };

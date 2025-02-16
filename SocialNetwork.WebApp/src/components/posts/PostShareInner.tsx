@@ -8,6 +8,8 @@ import { formatTime, formatVietnamDate } from "../../utils/date";
 import cn from "../../utils/cn";
 import { Link } from "react-router-dom";
 import ExpandableText from "../ExpandableText";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
 
 type PostShareInnerProps = {
     post: PostResource
@@ -16,6 +18,7 @@ type PostShareInnerProps = {
 const PostShareInner: FC<PostShareInnerProps> = ({
     post
 }) => {
+    const { user } = useSelector(selectAuth)
     return <div className="flex flex-col gap-y-2 bg-white rounded-xl overflow-hidden border-[1px] border-gray-200">
         {post.medias.length > 0 && <PostMedia files={post.medias} />}
         <div className={cn("px-4 flex flex-col gap-y-2", post.medias.length > 0 ? 'py-6' : 'py-2')}>
@@ -42,6 +45,8 @@ const PostShareInner: FC<PostShareInnerProps> = ({
                                 src={post.user.avatar ?? images.user}
                             />
                         )}
+
+                         {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-3 -right-2 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                     </div>
 
                     <div className="flex flex-col gap-y-[1px]">

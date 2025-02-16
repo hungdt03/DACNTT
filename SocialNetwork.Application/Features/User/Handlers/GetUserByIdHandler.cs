@@ -38,7 +38,10 @@ namespace SocialNetwork.Application.Features.User.Handlers
             var haveStory = await unitOfWork.StoryRepository
                    .IsUserHaveStoryAsync(user.Id);
             response.HaveStory = haveStory;
-            response.Role = httpContextAccessor.HttpContext.User.GetUserRole();
+
+            var roles = await userManager.GetRolesAsync(user);
+            if (roles != null && roles.Count > 0)
+                response.Role = roles[0];
 
             return new DataResponse<UserResponse>()
             {

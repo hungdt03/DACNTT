@@ -178,7 +178,7 @@ const ChatDetails: FC<ChatDetailsProps> = ({
                         </div>}
 
                         <p className="text-xs text-gray-400">
-                            {chatRoom.isOnline ? 'Đang hoạt động' : `Hoạt động ${formatTime(chatRoom.recentOnlineTime)}`}
+                            {chatRoom.isOnline ? 'Đang hoạt động' : `Hoạt động ${formatTime(new Date(chatRoom.recentOnlineTime))}`}
                         </p>
                     </div>
                     <div className="flex items-center justify-center gap-x-4">

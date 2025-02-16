@@ -25,13 +25,14 @@ namespace SocialNetwork.Application.Features.Group.Handlers
         public async Task<BaseResponse> Handle(GetJoinGroupRequestByGroupIdQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var joinGroupRequest = await _unitOfWork.JoinGroupRequestRepository.GetJoinGroupRequestByUserIdAndGroupIdAsync(userId, request.GroupId);
+            var joinGroupRequest = await _unitOfWork.JoinGroupRequestRepository.GetJoinGroupRequestByUserIdAndGroupIdAsync(userId, request.GroupId)
+                ?? throw new NotFoundException("Không tìm thấy yêu cầu nào");
 
             return new DataResponse<JoinGroupRequestResponse>()
             {
                 IsSuccess = true,
-                Message = "Yêu cầu của bạn đang chờ phê duyệt",
-                Data = joinGroupRequest == null ? null : ApplicationMapper.MapToJoinGroupRequest(joinGroupRequest),
+                Message = "Lấy yêu cầu tham gia nhóm thành công",
+                Data = ApplicationMapper.MapToJoinGroupRequest(joinGroupRequest),
                 StatusCode = System.Net.HttpStatusCode.OK,
             };
         }

@@ -53,7 +53,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             }
             else
             {
-                DateTimeOffset? lastOnlineTime = null;
+                DateTimeOffset lastOnlineTime = DateTimeOffset.MinValue;
 
                 foreach (var member in chatRoom.Members)
                 {
@@ -70,6 +70,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     }
                 }
 
+                response.RecentOnlineTime = lastOnlineTime;
                 var chatRoomMember = await _unitOfWork.ChatRoomMemberRepository
                         .GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId);
 

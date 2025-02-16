@@ -33,6 +33,8 @@ import FriendRequestsPage from '../pages/friends/FriendRequestsPage'
 import SuggestedFriendPage from '../pages/friends/SuggestedFriendPage'
 import AdminLayout from '../layouts/AdminLayout/AdminLayout'
 import AdminGuard from './adminGuard'
+import GroupPendingInvites from '../pages/groups/GroupPendingInvites'
+import GroupMemberDetailPage from '../pages/groups/GroupMemberDetailPage'
 
 const appRouter = createBrowserRouter([
     {
@@ -115,12 +117,20 @@ const appRouter = createBrowserRouter([
                         element: <GroupPendingMembers />
                     },
                     {
+                        path: 'pending-invites',
+                        element: <GroupPendingInvites />
+                    },
+                    {
                         path: 'pending-posts',
                         element: <GroupPendingPosts />
                     },
                     {
                         path: 'pending-reports',
                         element: <GroupPendingReports />
+                    },
+                    {
+                        path: 'user/:userId',
+                        element: <GroupMemberDetailPage />
                     }
                 ]
             },

@@ -11,19 +11,22 @@ import { Link } from "react-router-dom";
 import friendRequestService from "../../../services/friendRequestService";
 import { selectAuth } from "../../../features/slices/auth-slice";
 import { FriendRequestResource } from "../../../types/friendRequest";
-import { toast } from "react-toastify";
 import { SuggestedFriendResource } from "../../../types/suggested-friend";
 import friendService from "../../../services/friendService";
 import LoadingIndicator from "../../../components/LoadingIndicator";
+import ChatUserSkeleton from "../../../components/skeletons/ChatUserSkeleton";
 
 const MainRightSidebar: FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector(selectAuth);
     const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         const fetchChatRooms = async () => {
+            setLoading(true)
             const response = await chatRoomService.getAllChatRooms();
+            setLoading(false)
             if (response.isSuccess) {
                 setChatRooms(response.data);
             }
@@ -52,7 +55,7 @@ const MainRightSidebar: FC = () => {
             <div className="p-4 rounded-md flex flex-col gap-y-4 h-full overflow-y-auto scrollbar-hide">
                 <span className="font-bold text-[17px] text-gray-700">Người liên hệ</span>
                 <div className="flex flex-col gap-y-2 h-full">
-                    {chatRooms
+                    {!loading && chatRooms
                         .filter((chatRoom) => chatRoom.isOnline)
                         .map((chatRoom) => (
                             <div
@@ -79,6 +82,8 @@ const MainRightSidebar: FC = () => {
                             </div>
                         ))}
                 </div>
+
+                {loading && <ChatUserSkeleton />}
             </div>
         </div>
     );
@@ -104,7 +109,7 @@ const FriendRequestsTab: FC<FriendRequestsTabProps> = ({
 
     const loadFriendRequests = async () => {
         setLoading(true)
-        const response = await friendRequestService.getAllFriendRequestByUserId(userId, 1, 6);
+        const response = await friendRequestService.getAllFriendRequestByUserId(1, 6);
         setLoading(false)
         if (response.isSuccess) {
             setListFriendRequests(response.data);

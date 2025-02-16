@@ -1,20 +1,9 @@
-import { Camera, CheckIcon, Upload as LucideUpload, Plus } from "lucide-react";
-import { FC, useEffect, useState } from "react";
-import ImgCrop from 'antd-img-crop';
-import images from "../../../assets";
-import { Avatar, Button, Divider, message, Modal, Tabs, TabsProps, Tooltip, Upload, UploadFile, UploadProps } from "antd";
+import { FC, useEffect } from "react";
+import { Tabs, TabsProps } from "antd";
 import ProfilePostList from "../shared/ProfilePostList";
-import { FriendResource } from "../../../types/friend";
 import { UserResource } from "../../../types/user";
-import { getBase64, isValidImage } from "../../../utils/file";
-import userService from "../../../services/userService";
-import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../app/store";
-import { setUserDetails } from "../../../features/slices/auth-slice";
-import Loading from "../../Loading";
-import { RcFile } from "antd/es/upload";
-import { Link, useNavigate, useParams } from "react-router-dom";
+
+import { useNavigate, useParams } from "react-router-dom";
 import ProfileFriendList from "../shared/ProfileFriendList";
 import ProfileFollowerList from "../shared/ProfileFollowerList";
 import ProfileFolloweeList from "../shared/ProfileFolloweesList";

@@ -18,5 +18,6 @@ namespace SocialNetwork.Application.Interfaces
 
         Task<(List<PostMedia> Videos, int TotalCount)> GetAllGroupVideosByGroupId(Guid groupId, int page, int size);
         Task<(List<PostMedia> PostMedias, int TotalCount)> GetAllGroupPostMediaByGroupIdAsync(Guid groupId, int page, int size);
+
     }
 }

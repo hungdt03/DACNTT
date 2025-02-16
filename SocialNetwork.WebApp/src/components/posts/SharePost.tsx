@@ -167,14 +167,17 @@ const SharePost: FC<SharePostProps> = ({
     return <div className="flex flex-col gap-y-3 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
-                {!post.user.haveStory
-                    ? <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
-                    : <Link className="p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
-                }
+                <div className="relative flex-shrink-0">
+                    {!post.user.haveStory
+                        ? <Avatar className="w-8 h-8 md:w-10 md:h-10" src={post.user.avatar ?? images.user} />
+                        : <Link className="inline-block p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
+                    }
+                    {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                </div>
                 <div className="flex flex-col gap-y-[1px]">
                     <div className="inline-flex items-center gap-x-1 flex-wrap text-[14px] text-gray-600">
                         <span className="font-bold">
-                            <Link to={`/profile/${post.user.id}`} className="text-[13px] md:text-sm hover:underline inline">
+                            <Link to={`/profile/${post.user.id}`} className="text-[13px] md:text-sm hover:text-gray-600 hover:underline inline">
                                 {post.user?.fullName}
                             </Link>
                         </span>

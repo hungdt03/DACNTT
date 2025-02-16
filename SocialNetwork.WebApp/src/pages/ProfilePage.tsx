@@ -6,6 +6,7 @@ import MyProfile from "../components/profiles/my-profile/MyProfile";
 import UserProfile from "../components/profiles/user-profile/UserProfile";
 import userService from "../services/userService";
 import NotAllowedComponent from "../components/NotAllowedComponent";
+import Loading from "../components/Loading";
 
 const ProfilePage: FC = () => {
     const { id } = useParams();
@@ -26,7 +27,10 @@ const ProfilePage: FC = () => {
         id && fetchIsBlockUser(id)
     }, [id])
 
-    return user?.id === id ? <MyProfile /> : id && (!isBlockUser && !loading) ? <UserProfile userId={id} /> : <NotAllowedComponent />
+    return <>
+        {loading && <Loading />}
+        {!loading && (user?.id === id ? <MyProfile /> : id && (!isBlockUser && !loading) ? <UserProfile userId={id} /> : <NotAllowedComponent />)}
+    </>
 };
 
 export default ProfilePage;

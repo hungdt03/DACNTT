@@ -108,7 +108,6 @@ const Post: FC<PostProps> = ({
 
     useEffect(() => {
         fetchReactions();
-        console.log(post.user)
     }, [post])
 
     const fetchPostById = async () => {
@@ -241,14 +240,14 @@ const Post: FC<PostProps> = ({
                 <div className="relative">
                     {!post.user.haveStory
                         ? <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
-                        : <Link className="p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
+                        : <Link className="inline-block p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
                     }
-                    {post.user.isOnline && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                    {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                 </div>
 
                 <div className="flex flex-col md:gap-y-[1px]">
                     <div className="font-bold text-gray-600">
-                        <Link className="text-[13px] md:text-sm" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                        <Link className="text-[13px] md:text-sm" to={`/${post.isGroupPost ? `groups/${post.group.id}/user` : 'profile'}/${post.user.id}`}>{post.user?.fullName}</Link>
                         {post.tags.length > 0 &&
                             (() => {
                                 const maxDisplay = 3;

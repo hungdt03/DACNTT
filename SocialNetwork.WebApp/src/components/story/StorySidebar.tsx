@@ -44,7 +44,10 @@ const StorySidebar: FC<StorySidebarProps> = ({
             </div>
             {myStory && myStory.stories.length > 0 ? <div className={cn("flex items-center justify-between hover:bg-gray-100 pr-2 rounded-md", myStory.user.id === selectStory?.user.id && 'bg-sky-50')}>
                 <Link to={`/stories/${myStory.user.id}`} className={cn("flex items-center gap-x-2 px-1 py-2")}>
-                    <img className={cn("p-[2px] rounded-full w-[50px] h-[50px] object-cover border-2 flex-shrink-0", myStory.haveSeen ? 'border-white' : 'border-primary')} src={myStory.user.avatar ?? images.user} />
+                    <div className="relative">
+                        <img className={cn("p-[2px] rounded-full w-[50px] h-[50px] object-cover border-2 flex-shrink-0", myStory.haveSeen ? 'border-white' : 'border-primary')} src={myStory.user.avatar ?? images.user} />
+                        <div className="absolute bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
+                    </div>
                     <div className="flex flex-col">
                         <span className="font-semibold text-[15px]">{myStory.user.fullName}</span>
                         <div className="flex items-center gap-x-2">

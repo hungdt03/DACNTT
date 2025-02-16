@@ -1,9 +1,9 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
-using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.DBContext;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
@@ -306,6 +306,47 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                    .SetProperty(u => u.IsDeleted, true)
                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
                );
+        }
+
+        public async Task<List<Post>> GetAllGroupPostsByGroupIdAsync(Guid groupId)
+        {
+            var posts = await _context.Posts
+                  .Where(p => p.IsGroupPost && p.GroupId == groupId)
+                 .Include(p => p.User)
+                 .Include(p => p.Group)
+                 .Include(p => p.Tags).ThenInclude(t => t.User)
+                 .Include(p => p.Comments)
+                 .Include(p => p.Medias)
+                 .Include(p => p.SharePost)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.User)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags)
+                 .ToListAsync();
+
+            return posts;
+        }
+
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllMemberGroupPostsByGroupIdAsync(Guid groupId, string userId, int page, int size)
+        {
+            var query = _context.Posts
+               .Where(p => p.IsGroupPost && p.GroupId == groupId && p.UserId == userId)
+               .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+
+            var posts = await query
+                 .Skip((page - 1) * size)
+                .Take(size)
+                .Include(p => p.Group)
+                .Include(p => p.User)
+                .Include(p => p.Tags)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.Comments)
+                .Include(p => p.Medias)
+                .ToListAsync();
+
+            return (posts, totalCount);
         }
     }
 }

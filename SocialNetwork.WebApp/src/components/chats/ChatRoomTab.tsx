@@ -37,7 +37,6 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
     const fetchChatRooms = async () => {
         setLoading(true)
         const response = await chatRoomService.getAllChatRooms();
-        console.log(response)
         setLoading(false)
         onCountChatRoom(response.data.filter(chatRoom => !chatRoom.isRead).length)
         if (response.isSuccess) {
@@ -64,9 +63,6 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
                     return updatedChatRooms
                 })
             },
-            undefined,
-            undefined,
-            undefined,
             undefined,
             undefined,
             undefined,

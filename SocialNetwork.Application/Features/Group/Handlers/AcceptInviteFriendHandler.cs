@@ -33,35 +33,46 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             if (invitation.InviteeId != userId)
                 throw new AppException("Bạn không có quyền chấp nhận lời mời này");
 
-            var joinGroupRequest = await _unitOfWork
-                .JoinGroupRequestRepository
-                .GetJoinGroupRequestByUserIdAndGroupIdAsync(userId, invitation.GroupId);
-
+            if (invitation.Status == true)
+                throw new AppException("Lời mời đang chờ phê duyệt");
+           
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            if(joinGroupRequest != null)
+            if(invitation.Group.OnlyAdminCanApprovalMember)
             {
-                _unitOfWork.JoinGroupRequestRepository.RemoveJoinGroupRequest(joinGroupRequest);
+                invitation.Status = true;
+
+            } else
+            {
+                var joinGroupRequest = await _unitOfWork
+                   .JoinGroupRequestRepository
+                   .GetJoinGroupRequestByUserIdAndGroupIdAsync(userId, invitation.GroupId);
+
+                if (joinGroupRequest != null)
+                {
+                    _unitOfWork.JoinGroupRequestRepository.RemoveJoinGroupRequest(joinGroupRequest);
+                }
+
+                _unitOfWork.GroupInvitationRepository
+                    .RemoveGroupInvitation(invitation);
+
+                var groupMember = new GroupMember()
+                {
+                    GroupId = invitation.GroupId,
+                    Role = MemberRole.MEMBER,
+                    JoinDate = DateTimeOffset.UtcNow,
+                    UserId = userId,
+                };
+
+                await _unitOfWork.GroupMemberRepository.CreateGroupMemberAsync(groupMember);
             }
 
-            _unitOfWork.GroupInvitationRepository
-                .RemoveGroupInvitation(invitation);
-
-            var groupMember = new GroupMember()
-            {
-                GroupId = invitation.GroupId,
-                Role = MemberRole.MEMBER,
-                JoinDate = DateTimeOffset.UtcNow,
-                UserId = userId,
-            };
-
-            await _unitOfWork.GroupMemberRepository.CreateGroupMemberAsync(groupMember);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             return new BaseResponse()
             {
                 IsSuccess = true,
-                Message = "Chấp nhận tham gia nhóm thành công",
+                Message = invitation.Group.OnlyAdminCanApprovalMember ? "Bạn phải chờ quản trị viên hoặc người kiểm duyệt phê duyệt" : "Chấp nhận tham gia nhóm thành công",
                 StatusCode = System.Net.HttpStatusCode.OK
             };
 
