@@ -58,6 +58,10 @@ const HomePage: FC = () => {
         const response = await postService.getPostById(postId);
         if (response.isSuccess) {
             setPosts(prevPosts => [response.data, ...prevPosts]);
+            
+            if(containerRef.current) {
+                containerRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+            }
         } else {
             toast.error(response.message);
         }

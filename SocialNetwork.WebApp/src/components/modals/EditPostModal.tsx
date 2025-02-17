@@ -3,7 +3,7 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 import images from "../../assets";
 import UploadMultipleFile, { UploadFileBinding } from "../uploads/UploadMultiFile";
 import { PrivacyType } from "../../enums/privacy";
-import {  isValidImage, isValidVideo } from "../../utils/file";
+import { isValidImage, isValidVideo } from "../../utils/file";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
@@ -14,6 +14,10 @@ import { TagResource } from "../../types/tag";
 import cn from "../../utils/cn";
 import BackgroundPostOption from "./BackgroundPostOption";
 import { getButtonPrivacyContent, getGroupButtonPrivacyContent } from "../../utils/post";
+import data from '@emoji-mart/data'; // Dữ liệu emoji được bundled
+import Picker from '@emoji-mart/react';
+import { Laugh } from "lucide-react";
+
 
 export type EditPostForm = {
     content: string;
@@ -197,6 +201,14 @@ const EditPostModal: FC<EditPostModalProps> = ({
         }
     }
 
+    const handleEmojiSelect = (emoji: { native: string }) => {
+        console.log('Vô đây')
+        setPostRequest({
+            ...postRequest,
+            content: postRequest.content + emoji.native
+        })
+    };
+
     return <div className="flex flex-col gap-y-4">
         <div className="flex items-center gap-x-2">
             <Avatar className="flex-shrink-0 w-[30px] h-[30px] sm:w-[40px] sm:h-[40px]" src={user?.avatar ?? images.user} />
@@ -246,11 +258,13 @@ const EditPostModal: FC<EditPostModalProps> = ({
                             if (value.length > 300) {
                                 isUseBackground = false
                             }
+
                             setPostRequest({
                                 ...postRequest,
                                 content: value,
                                 background: isUseBackground ? postRequest.background : undefined
                             })
+                            
                             setIsEdited(true)
                         }}
                         contentEditable
@@ -273,6 +287,14 @@ const EditPostModal: FC<EditPostModalProps> = ({
             <div className="sm:p-2 px-2 py-1 rounded-md border-[1px] border-gray-200 flex justify-between items-center">
                 <span className="sm:text-sm text-[13px]">Thêm vào bài viết của bạn</span>
                 <div className="flex items-center gap-x-1">
+                    <Tooltip title='Emoji'>
+                        <Popover content={<Picker onEmojiSelect={handleEmojiSelect} theme='light' data={data} />} trigger={'click'}>
+                            <button className="p-1 rounded-full cursor-pointer">
+                                <Laugh strokeWidth={2} className="text-orange-400" size={26} />
+                            </button>
+                        </Popover>
+                    </Tooltip>
+
                     <Tooltip title='Phông nền'>
                         <Popover trigger='click' content={<BackgroundPostOption
                             onChange={background => {
@@ -294,7 +316,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                             }}
                         />}>
                             <button className={cn((postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.removeMedias.length < post.medias.length || postRequest.content.trim().length > 120) && 'cursor-not-allowed')} disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.removeMedias.length < post.medias.length || postRequest.content.trim().length > 120} onClick={() => setIsUseBackground(!isUseBackground)}>
-                                <img className="sm:w-[30px] sm:h-[30xp] w-[25px] h-[25px]" src={images.AaBackground} />
+                                <img className="sm:w-[30px] sm:h-[30xp] w-[25px] h-[25px] object-cover" src={images.AaBackground} />
                             </button>
                         </Popover>
                     </Tooltip>

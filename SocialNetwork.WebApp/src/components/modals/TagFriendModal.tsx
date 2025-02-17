@@ -35,18 +35,16 @@ const TagFriendModal: FC<TagFriendModalProps> = ({
         setLoading(true)
         const repsonse = await friendService.getAllMyFriends(page, size);
 
-        setTimeout(() => {
-            setLoading(false)
-            if (repsonse.isSuccess) {
-                const newFriends = repsonse.data.filter(item => !friends.some(f => f.id === item.id));
-                const filteredFriends = tags?.length
-                    ? newFriends.filter(item => !tags.some(tag => tag.user.id === item.id))
-                    : newFriends;
+        setLoading(false)
+        if (repsonse.isSuccess) {
+            const newFriends = repsonse.data.filter(item => !friends.some(f => f.id === item.id));
+            const filteredFriends = tags?.length
+                ? newFriends.filter(item => !tags.some(tag => tag.user.id === item.id))
+                : newFriends;
 
-                setFriends(prev => [...prev, ...filteredFriends]);
-                setPagination(repsonse.pagination)
-            }
-        }, 3000)
+            setFriends(prev => [...prev, ...filteredFriends]);
+            setPagination(repsonse.pagination)
+        }
     }
 
 

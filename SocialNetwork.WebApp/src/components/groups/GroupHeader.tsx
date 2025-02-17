@@ -363,7 +363,9 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                 </Button>
                             )
                         )}
-                        <Popover trigger={'click'} content={<div className="flex flex-col">
+
+                        
+                        {group.isMember && <Popover trigger={'click'} content={<div className="flex flex-col">
                             <Link to={`/groups/${group.id}/my-content/`} className="p-2 rounded-md hover:bg-gray-100 hover:text-black">Nội dung của bạn</Link>
                             {group.isMine && 
                                 <Popconfirm onConfirm={handleRemoveGroup} title='Giải tán nhóm' description='Bạn có chắc là muốn giải tán nhóm?'>
@@ -374,6 +376,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                             <Button icon={<MoreHorizontal size={16} />} type="primary">
                             </Button>
                         </Popover>
+                        }
                     </div>
 
                 </div>

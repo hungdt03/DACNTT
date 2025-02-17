@@ -133,6 +133,9 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 await _signalRService.SendNotificationToSpecificUser(noti.Recipient.UserName, ApplicationMapper.MapToNotification(noti));
             }
 
+            //var savedSharePost = await _unitOfWork.PostRepository
+            //    .GetPostByIdAsync(sharePost.Id);
+
             return new DataResponse<PostResponse>
             {
                 IsSuccess = true,

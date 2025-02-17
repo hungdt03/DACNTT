@@ -2,21 +2,30 @@ import { Tabs} from "antd";
 import { FC } from "react";
 import ChatRoomTab from "../chats/ChatRoomTab";
 import PendingChatTab from "../chats/PendingChatTab";
+import { ChatRoomResource } from "../../types/chatRoom";
 
 
 type MessengerDialogProps = {
-    onCountChatRoom: (count: number) => void
+    chatRooms: ChatRoomResource[];
+    loading: boolean;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    onFetchChatRooms: () => void
+    onUpdateChatRooms: (chatRooms: ChatRoomResource[]) => void
 }
 
 const MessengerDialog: FC<MessengerDialogProps> = ({
-    onCountChatRoom
+    chatRooms,
+    loading,
+    setLoading,
+    onFetchChatRooms,
+    onUpdateChatRooms
 }) => {
 
     return <Tabs
         items={[{
             key: "1",
             label: "Hội thoại",
-            children: <ChatRoomTab onCountChatRoom={onCountChatRoom} />,
+            children: <ChatRoomTab onUpdateChatRooms={onUpdateChatRooms} chatRooms={chatRooms} loading={loading} setLoading={setLoading} onFetchChatRooms={onFetchChatRooms} />,
         },
         {
             key: "2",

@@ -60,9 +60,18 @@ namespace SocialNetwork.Application.Features.Search.Handlers
 
             foreach (var user in users)
             {
-                if (user.Id == userId) continue;
                 var mapUser = ApplicationMapper.MapToUser(user);
 
+                if (user.Id == userId)
+                {
+                    var userItem = new SearchUserSuggestResponse()
+                    {
+                        User = mapUser,
+                    };
+                    userResponse.Add(userItem);
+                    continue;
+                };
+               
                 var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id, FriendShipStatus.ACCEPTED);
                 var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(user.Id, FriendShipStatus.ACCEPTED);
                 var mutualFriendsCount = userFriends.Count(f => myFriendsIds.Contains(f.UserId == user.Id ? f.FriendId : f.UserId));

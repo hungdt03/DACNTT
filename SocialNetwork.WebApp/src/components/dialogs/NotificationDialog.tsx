@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, useState } from 'react'
 import Notification from '../Notification'
 import { NotificationResource } from '../../types/notification'
 import { Button, Empty, Modal } from 'antd'
@@ -8,87 +8,51 @@ import MentionPostModal from '../noti-mentions/comments/MentionPostModal'
 import { NotificationType } from '../../enums/notification-type'
 import MentionSharePostModal from '../noti-mentions/sharings/MentionSharePostModal'
 import { useNavigate } from 'react-router-dom'
-import { inititalValues } from '../../utils/pagination'
 import notificationService from '../../services/notificationService'
-import SignalRConnector from '../../app/signalR/signalr-connection'
 import { toast } from 'react-toastify'
 import NotificationSkeleton from '../skeletons/NotificationSkeleton'
-import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
 import { ReportResource } from '../../types/report'
 import adminService from '../../services/adminService'
 import { ReportType } from '../../enums/report-type'
 
 type NotificationDialogProps = {
-    onCountNotification: (count: number) => void
+    notifications: NotificationResource[];
+    pagination: Pagination;
+    loading: boolean;
+    isInitialLoadComplete: boolean;
+    onFinishInitialLoad: () => void;
+    onFetchNextPage: (nextPage: number) => void
+    onUpdateNotifications: (notifications: NotificationResource[]) => void
 }
 
-const NotificationDialog: FC<NotificationDialogProps> = ({ onCountNotification }) => {
+const NotificationDialog: FC<NotificationDialogProps> = ({ 
+    notifications,
+    pagination,
+    loading,
+    isInitialLoadComplete,
+    onFinishInitialLoad,
+    onFetchNextPage,
+    onUpdateNotifications
+ }) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal()
     const [notification, setNotification] = useState<NotificationResource>()
-    const [loading, setLoading] = useState(false)
-    const [notifications, setNotifications] = useState<NotificationResource[]>([])
-    const [pagination, setPagination] = useState<Pagination>(inititalValues)
-    const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false)
+
     const { isModalOpen: openReport, handleCancel: cancelReport, showModal: showReport } = useModal()
     const [getReport, setGetReport] = useState<ReportResource>()
     const navigate = useNavigate()
 
-    const { containerRef } = useInfiniteScroll({
-        fetchMore: () => void fetchMoreNotificatiions(),
-        hasMore: pagination.hasMore,
-        loading,
-        rootMargin: '50px',
-        triggerId: 'noti-scroll-trigger'
-    })
     const getReportId = async (reportId: string) => {
         const response = await adminService.GetReportById(reportId)
         if (response.isSuccess) {
             setGetReport(response.data)
         }
     }
-    const fetchMoreNotificatiions = async () => {
-        if (!pagination.hasMore || loading || !isInitialLoadComplete) return
-        fetchNotifications(pagination.page + 1)
-    }
-
-    const fetchNotifications = async (page: number) => {
-        setLoading(true)
-        const response = await notificationService.getAllNotifications({ page, size: pagination.size })
-        setLoading(false)
-        if (response.isSuccess) {
-            setNotifications((prev) => {
-                const newNotifications = response.data.filter(
-                    (notification) => !prev.some((n) => n.id === notification.id)
-                )
-                return [...prev, ...newNotifications]
-            })
-            setPagination(response.pagination)
-        }
-    }
-
-    useEffect(() => {
-        fetchNotifications(pagination.page)
-        SignalRConnector.events(
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            // ON NOTIFICATION RECEIVED
-            (notification: NotificationResource) => {
-                toast.info(notification.content)
-                setNotifications((prev) => [notification, ...prev])
-            }
-        )
-    }, [])
-
-    useEffect(() => {
-        onCountNotification(notifications.filter((noti) => !noti.isRead).length)
-    }, [notifications])
 
     const handleDeleteNotification = async (notificationId: string) => {
         const response = await notificationService.deleteNotification(notificationId)
         if (response.isSuccess) {
-            setNotifications((prev) => [...prev.filter((n) => n.id !== notificationId)])
+            const updateNotifications = [...notifications.filter((n) => n.id !== notificationId)]
+            onUpdateNotifications(updateNotifications)
             toast.success(response.message)
         }
     }
@@ -96,11 +60,12 @@ const NotificationDialog: FC<NotificationDialogProps> = ({ onCountNotification }
     const handleMarkNotificationAsRead = async (notificationId: string) => {
         const response = await notificationService.markNotificationAsRead(notificationId)
         if (response.isSuccess) {
-            setNotifications((prev) => {
-                return prev.map((notification) =>
-                    notification.id === notificationId ? { ...notification, isRead: true } : notification
-                )
-            })
+            const updateNotifications = notifications.map((notification) =>
+                notification.id === notificationId ? { ...notification, isRead: true } : notification
+            )
+
+            onUpdateNotifications(updateNotifications)
+           
         } else {
             toast.error(response.message)
         }
@@ -151,7 +116,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({ onCountNotification }
     return (
         <>
             <div
-                ref={containerRef}
+                id='notification-dialog-element'
                 className='flex flex-col gap-y-3 pt-2 px-2 max-h-[600px] min-w-[400px] overflow-y-auto custom-scrollbar'
             >
                 <span className='font-semibold text-lg'>Thông báo của bạn</span>
@@ -181,8 +146,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({ onCountNotification }
                         <button
                             className='w-full text-center text-sm py-1 bg-gray-200 rounded-md'
                             onClick={() => {
-                                fetchNotifications(pagination.page + 1)
-                                setIsInitialLoadComplete(true)
+                                onFetchNextPage(pagination.page + 1)
+                                onFinishInitialLoad()
                             }}
                         >
                             Tải thêm ...
@@ -226,6 +191,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({ onCountNotification }
                     )}
                 </Modal>
             )}
+
             {openReport && (
                 <Modal
                     title={<p className='text-center font-bold text-lg'>Phản hồi báo cáo</p>}

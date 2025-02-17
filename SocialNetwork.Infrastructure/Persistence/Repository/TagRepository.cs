@@ -24,5 +24,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Tags.SingleOrDefaultAsync(t => t.Id == id);
         }
+
+        public async Task<Tag?> GetTagByPostIdAndUserIdAsync(Guid postId, string userId)
+        {
+            return await _context.Tags.SingleOrDefaultAsync(t => t.UserId == userId && t.PostId == postId);
+        }
     }
 }

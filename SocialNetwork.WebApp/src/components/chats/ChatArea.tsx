@@ -19,6 +19,8 @@ import cn from "../../utils/cn";
 import LoadingIndicator from "../LoadingIndicator";
 import userService from "../../services/userService";
 import { BlockResource } from "../../types/block";
+import { useElementInfinityScroll } from "../../hooks/useElementInfinityScroll";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 
 type ChatAreaProps = {
     chatRoom: ChatRoomResource;
@@ -54,19 +56,22 @@ const ChatArea: FC<ChatAreaProps> = ({
     });
 
     const [loading, setLoading] = useState(false)
-    const containerRef = useRef<HTMLDivElement>(null);
-    const observerRef = useRef<IntersectionObserver | null>(null);
 
     const fetchMessages = async (page: number, size: number) => {
         setLoading(true)
         const response = await messageService.getAllMessagesByChatRoomId(chatRoom.id, page, size);
         setLoading(false)
         if (response.isSuccess) {
-            setMessages(prevMessages => [...response.data, ...prevMessages])
+            setMessages(prev => {
+                const existingIds = new Set(prev.map(item => item.id));
+                const news = response.data.filter(item => !existingIds.has(item.id));
+                return [...news, ...prev];
+            });
+            
             setPagination(response.pagination)
 
             if (containerRef.current) {
-                containerRef.current.scrollBy({ top: 50, behavior: 'instant' });
+                containerRef.current.scrollBy({ top: 100, behavior: 'smooth' });
             }
         }
     }
@@ -90,7 +95,7 @@ const ChatArea: FC<ChatAreaProps> = ({
 
     const handleUnblock = async (userId: string) => {
         const response = await userService.unblockUser(userId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message)
             setBlockUser(undefined)
         } else {
@@ -109,7 +114,7 @@ const ChatArea: FC<ChatAreaProps> = ({
             (message) => {
                 if (message.chatRoomId === chatRoom.id) {
 
-                    if(message.isRemove && message.memberId === user?.id) {
+                    if (message.isRemove && message.memberId === user?.id) {
                         onFetch()
                     }
                     setPendingMessages((prev) =>
@@ -281,6 +286,7 @@ const ChatArea: FC<ChatAreaProps> = ({
             }
         } else {
             msgPayload.sentAt = tempMessage.sentAt
+
             try {
                 await SignalRConnector.sendMessage(msgPayload);
 
@@ -288,7 +294,7 @@ const ChatArea: FC<ChatAreaProps> = ({
                     setIsShowPrevent(false)
                 }
             } catch (error) {
-                alert(error)
+                message.error(error as string)
             }
         }
 
@@ -303,33 +309,22 @@ const ChatArea: FC<ChatAreaProps> = ({
 
     const handleReadMessage = async () => {
         const response = await messageService.readMessage(chatRoom.id);
-        console.log(response.message)
+        console.log(response)
     }
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            entries => {
-                if (entries[0].isIntersecting) {
-                    pagination.hasMore && !loading && fetchMessages(pagination.page + 1, pagination.size)
+    const fetchNextPage = () => {
+        if (!pagination.hasMore || loading) return;
+        fetchMessages(pagination.page + 1, pagination.size)
+    }
 
-                }
-            },
-            { root: containerRef.current, rootMargin: '0px' }
-        );
+    const { containerRef } = useInfiniteScroll({
+        triggerId: 'messenger-scroll-trigger',
+        fetchMore: () => fetchNextPage(),
+        loading: loading,
+        hasMore: pagination.hasMore,
+        rootMargin: '0px'
+    })
 
-        observerRef.current = observer;
-
-        const triggerElement = document.getElementById('messenger-scroll-trigger');
-        if (triggerElement) {
-            observer.observe(triggerElement);
-        }
-
-        return () => {
-            if (observerRef.current && triggerElement) {
-                observer.unobserve(triggerElement);
-            }
-        };
-    }, [pagination, loading]);
 
     const renderMessageBox = () => {
         if (chatRoom.isPrivate) {
@@ -349,7 +344,7 @@ const ChatArea: FC<ChatAreaProps> = ({
                 );
             }
         }
-        
+
         return (
             <div className="w-full px-4 py-4 shadow">
                 {isShowPrevent && (

@@ -13,17 +13,80 @@ import { Pagination } from "../../types/response";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import AccountDialog from "../../components/dialogs/AccountDialog";
+import { ChatRoomResource } from "../../types/chatRoom";
+import chatRoomService from "../../services/chatRoomService";
 
 const Navbar: FC = () => {
     const { user } = useSelector(selectAuth);
 
-    const [countUnreadChatRoom, setCountUnreadChatRoom] = useState<number>(0)
-    const [countUnreadNotification, setCountUnreadNotification] = useState<number>(0)
+    // NOTIFICATION SECTION
+    const [loading, setLoading] = useState(false)
+    const [notifications, setNotifications] = useState<NotificationResource[]>([])
+    const [pagination, setPagination] = useState<Pagination>(inititalValues)
+    const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
+
+    // CHATROOM SECTION
+    const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
+    const [chatRoomLoading, setChatRoomLoading] = useState(false);
+
+    // NOTIFICATION
+    const fetchMoreNotificatiions = async () => {
+        if (!pagination.hasMore || loading || !isInitialLoadComplete) return;
+        fetchNotifications(pagination.page + 1)
+    }
+
+    const fetchNotifications = async (page: number) => {
+        setLoading(true)
+        const response = await notificationService.getAllNotifications({ page, size: pagination.size })
+        setLoading(false)
+        if (response.isSuccess) {
+            setNotifications((prev) => {
+                const newNotifications = response.data.filter(
+                    (notification) => !prev.some((n) => n.id === notification.id)
+                )
+                return [...prev, ...newNotifications]
+            })
+            setPagination(response.pagination)
+        }
+    }
+
+    // CHATROOM
+
+    const fetchChatRooms = async () => {
+        setChatRoomLoading(true)
+        const response = await chatRoomService.getAllChatRooms();
+        setChatRoomLoading(false)
+        if (response.isSuccess) {
+            setChatRooms(response.data)
+        }
+    }
+
+    useEffect(() => {
+        fetchChatRooms()
+        fetchNotifications(pagination.page)
+        SignalRConnector.events(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            // ON NOTIFICATION RECEIVED
+            (notification: NotificationResource) => {
+                toast.info(notification.content)
+                setNotifications((prev) => [notification, ...prev])
+            }
+        )
+    }, [])
 
     return <div className="flex items-center gap-x-2 md:gap-x-3 flex-shrink-0">
-        <Badge count={countUnreadNotification}>
+        <Badge count={notifications.filter(n => !n.isRead).length}>
             <Popover trigger='click' placement="topRight" content={<NotificationDialog
-                onCountNotification={(count) => setCountUnreadNotification(count)}
+                notifications={notifications}
+                pagination={pagination}
+                isInitialLoadComplete={isInitialLoadComplete}
+                loading={loading}
+                onFetchNextPage={fetchMoreNotificatiions}
+                onFinishInitialLoad={() => setIsInitialLoadComplete(true)}
+                onUpdateNotifications={(notifications) => setNotifications(notifications)}
             />}>
                 <button className="p-[10px] md:p-3 rounded-md bg-gray-100">
                     <Bell className="text-gray-500 md:hidden" size={15} />
@@ -31,8 +94,14 @@ const Navbar: FC = () => {
                 </button>
             </Popover>
         </Badge>
-        <Badge count={countUnreadChatRoom}>
-            <Popover trigger='click' placement="bottomRight" content={<MessengerDialog onCountChatRoom={count => setCountUnreadChatRoom(count)} />}>
+        <Badge count={1}>
+            <Popover trigger='click' placement="bottomRight" content={<MessengerDialog
+                chatRooms={chatRooms}
+                loading={chatRoomLoading}
+                setLoading={setChatRoomLoading}
+                onFetchChatRooms={fetchChatRooms}
+                onUpdateChatRooms={(chatRooms) => setChatRooms(chatRooms)}
+            />}>
                 <button className="p-[10px] md:p-3 rounded-md bg-gray-100">
                     <MessageSquare className="text-gray-500 md:hidden" size={15} />
                     <MessageSquare className="hidden md:block text-gray-500" size={18} />

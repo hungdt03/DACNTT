@@ -2,9 +2,25 @@ import { FC } from "react";
 import { StoryResource } from "../../types/story";
 import { StoryType } from "../../enums/story-type.";
 import { formatTime } from "../../utils/date";
-import { Ellipsis, Pause, Play } from "lucide-react";
+import { Ellipsis, Lock, Pause, Play, User } from "lucide-react";
 import { Popover } from "antd";
 import { Link } from "react-router-dom";
+import { PrivacyType } from "../../enums/privacy";
+import { GlobeAsiaAustraliaIcon } from "@heroicons/react/24/outline";
+
+
+export const getStoryPrivacyButton = (privacy: PrivacyType) => {
+    switch (privacy) {
+        case PrivacyType.PRIVATE:
+            return <Lock className="text-white" size={14} />
+        case PrivacyType.FRIENDS:
+            return <User className="text-white" size={14} />;
+        case PrivacyType.PUBLIC:
+            return <GlobeAsiaAustraliaIcon className="text-white" width={14} />;
+        default:
+            return null;
+    }
+};
 
 export const getTopReactions = (reactions?: string[], top: number = 3) => {
     const counts = reactions?.reduce((acc, reaction) => {
@@ -58,12 +74,18 @@ const StoryContent: FC<StoryContentProps> = ({
                     >
                         {story.user.fullName}
                     </Link>
-                    <span
-                        className="text-[11px]"
-                        style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)" }}
-                    >
-                        {formatTime(new Date(story.createdDate))}
-                    </span>
+                    <div className="flex items-center gap-x-1">
+                        <span
+                            className="text-[11px]"
+                            style={{ textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)" }}
+                        >
+                            {formatTime(new Date(story.createdDate))}
+                        </span>
+
+                        <button>
+                            {getStoryPrivacyButton(story.privacy as PrivacyType)}
+                        </button>
+                    </div>
                 </div>
             </div>
 

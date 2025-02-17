@@ -1,114 +1,101 @@
-import { FC, useState } from "react";
+import { FC, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { message } from "antd";
 import CreateStorySidebar from "../components/story/editors/CreateStorySidebar";
 import CreateStoryOption from "../components/story/editors/CreateStoryOption";
 import StoryTextPreview from "../components/story/editors/StoryTextPreview";
-import dataBackgroundStory from '../data/data-background-story.json'
-import StoryImageEditor from "../components/story/editors/StoryImageEditor";
-import { StoryType } from "../enums/story-type.";
+import Loading from "../components/Loading";
+import dataBackgroundStory from '../data/data-background-story.json';
 import { PrivacyType } from "../enums/privacy";
 import storyService from "../services/storyService";
-import { message } from "antd";
-import Loading from "../components/Loading";
-import { useNavigate } from "react-router-dom";
+import { StoryType } from "../enums/story-type.";
+import CropperImageEditor from "../components/story/editors/CropperImageEditor";
 
-export type StoryOption = 'text' | 'image' | undefined;
-
-export type StoryRequest = {
-    content?: string;
-    background: string;
-    fontFamily?: string;
-    type: StoryType;
-    privacy: PrivacyType;
-}
+export type StoryOption = "text" | "image" | undefined;
 
 const CreateStoryPage: FC = () => {
     const [option, setOption] = useState<StoryOption>(undefined);
-    const [background, setBackground] = useState<string>(dataBackgroundStory[0].background)
-    const [fontFamily, setFontFamily] = useState<string>('');
-    const [content, setContent] = useState<string>('');
-    const [image, setImage] = useState<File>();
+    const [image, setImage] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
-
     const [openTool, setOpenTool] = useState(false);
 
-    const showDrawer = () => {
-        setOpenTool(true);
-    };
+    const [storyData, setStoryData] = useState({
+        background: dataBackgroundStory[0].background,
+        fontFamily: "",
+        content: "",
+        privacy: PrivacyType.PUBLIC,
+    });
 
-    const closeDrawer = () => {
-        setOpenTool(false);
-    };
+    const navigate = useNavigate();
 
-    const navigate = useNavigate()
-
-    const handleCreateStory = async () => {
-        const payload: StoryRequest = {
-            background,
-            content,
-            fontFamily,
-            privacy: PrivacyType.PUBLIC,
-            type: StoryType.STORY_TEXT
+    const handleCreateStory = useCallback(async (type: StoryType, backgroundUrl?: string) => {
+        setLoading(true);
+        const payload = {
+            ...storyData,
+            background: backgroundUrl ?? storyData.background,
+            type,
         };
 
-        setLoading(true)
         const response = await storyService.createStory(payload);
-        setLoading(false)
-        if(response.isSuccess) {
-            message.success(response.message)
-            navigate('/')
+        setLoading(false);
+
+        if (response.isSuccess) {
+            message.success(response.message);
+            navigate("/");
         } else {
-            message.error(response.message)
+            message.error(response.message);
         }
-    }
+    }, [storyData, navigate]);
 
-    const handleCreateStoryImage = async (backgroundUrl: string) => {
-        const payload: StoryRequest = {
-            background: backgroundUrl,
-            privacy: PrivacyType.PUBLIC,
-            type: StoryType.STORY_IMAGE
-        };
+    return (
+        <div className="h-screen w-screen grid grid-cols-12 gap-4 overflow-hidden">
+            {loading && <Loading />}
 
-        setLoading(true)
-        const response = await storyService.createStory(payload);
-        setLoading(false)
-        if(response.isSuccess) {
-            navigate('/')
-            message.success(response.message)
-        } else {
-            message.error(response.message)
-        }
-    }
+            {/* Sidebar chỉnh sửa story */}
+            <div className="lg:col-span-4 xl:col-span-3 lg:block hidden">
+                <CreateStorySidebar
+                    onSubmit={() => handleCreateStory(StoryType.STORY_TEXT)}
+                    onFontFamilySelect={(fontFamily) => setStoryData(prev => ({ ...prev, fontFamily }))}
+                    onSelectBackground={(background) => setStoryData(prev => ({ ...prev, background }))}
+                    onPrivacySelect={(privacy) => setStoryData(prev => ({ ...prev, privacy }))}
+                    content={storyData.content}
+                    onChange={(value) => setStoryData(prev => ({ ...prev, content: value }))}
+                    option={option}
+                    isOpenTool={openTool}
+                    onCloseTool={() => setOpenTool(false)}
+                />
+            </div>
 
-    return <div className="h-screen w-screen grid grid-cols-12 gap-4">
-        {loading && <Loading />}
-        <div className="lg:col-span-4 xl:col-span-3 lg:block hidden">
-            <CreateStorySidebar 
-                onSubmit={() => handleCreateStory()} 
-                onFontFamilySelect={(fontFamily) => setFontFamily(fontFamily)} 
-                onSelectBackground={(background: string) => setBackground(background)} 
-                content={content} 
-                onChange={(value) => setContent(value)} 
-                option={option}
-                isOpenTool={openTool}
-                onCloseTool={closeDrawer}
-            />
+            {/* Nội dung chính */}
+            <div className="lg:col-span-8 xl:col-span-9 col-span-12 flex items-center justify-center">
+                {!option && (
+                    <CreateStoryOption
+                        onImage={(file) => {
+                            setOption("image");
+                            setImage(file);
+                        }}
+                        onText={() => setOption("text")}
+                    />
+                )}
+
+                {option === "text" && (
+                    <StoryTextPreview 
+                        onOpenTool={() => setOpenTool(true)} 
+                        fontFamily={storyData.fontFamily} 
+                        background={storyData.background} 
+                        content={storyData.content} 
+                    />
+                )}
+
+                {option === "image" && image && (
+                    <CropperImageEditor
+                        fileImage={URL.createObjectURL(image)}
+                        onFinish={(backgroundUrl) => handleCreateStory(StoryType.STORY_IMAGE, backgroundUrl)}
+                    />
+                )}
+            </div>
         </div>
-        <div className="lg:col-span-8 xl:col-span-9 col-span-12 flex items-center justify-center">
-            {!option && <CreateStoryOption
-                onImage={(fileImage) => {
-                    setOption('image')
-                    setImage(fileImage)
-                }}
-                onText={() => setOption('text')}
-            />}
-
-            {option === 'text' && <StoryTextPreview onOpenTool={showDrawer} fontFamily={fontFamily} background={background} content={content} />}
-            {option === 'image' && image && <StoryImageEditor onFinish={handleCreateStoryImage} fileImage={URL.createObjectURL(image)} />}
-        </div>
-
-    </div>
-
-    
+    );
 };
 
 export default CreateStoryPage;

@@ -50,7 +50,7 @@ const SearchPage: FC = () => {
     }
 
     return <div className="flex flex-col gap-y-2 md:gap-y-6 max-w-screen-md w-full mx-auto p-2 md:p-4 rounded-lg">
-      
+        {searchParam.get('type') === 'top' && <div className="text-gray-500 md:text-[16px] text-sm text-center">{message}</div>}
         {!searchFilter || searchFilter === 'top' && <div className="flex flex-col gap-y-4">
             {searchResult.users.length > 0 && <SearchUserBlock searchValue={searchValue} users={searchResult.users} />}
             {searchResult.groups.length > 0 && <SearchGroupBlock searchValue={searchValue} groups={searchResult.groups} />}

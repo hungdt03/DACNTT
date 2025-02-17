@@ -1,4 +1,4 @@
-import { Avatar, Image, Upload, UploadFile, UploadProps } from "antd";
+import { Avatar, Image, message, Upload, UploadFile, UploadProps } from "antd";
 import { FC, useEffect, useRef, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons'
 import { CameraIcon, SendHorizonal } from "lucide-react";
@@ -20,6 +20,8 @@ import { $createTextNode, $getRoot, $getSelection, $isRangeSelection, EditorStat
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { editorConfig, extractContentAndStyle, loadContent, loadContentEmpty } from "../../utils/comment";
+import { isValidImage, isValidVideo } from "../../utils/file";
+import { COMMENT_MAX_SIZE_IN_BYTES } from "./BoxSendComment";
 
 
 
@@ -104,6 +106,21 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
         multiple: false,
         fileList,
         onChange(info) {
+            const isValidFile = (file: UploadFile) => {
+                return isValidImage(file.originFileObj as File) || isValidVideo(file.originFileObj as File);
+            };
+    
+            const totalSize = info.fileList.reduce((acc, file) => acc + (file.originFileObj as File).size, 0);
+            const invalidFile = info.fileList.find(file => !isValidFile(file));
+    
+            if (invalidFile) {
+                message.error('Vui lòng chọn tệp ảnh hoặc video hợp lệ!');
+                return;
+            } else if (totalSize > COMMENT_MAX_SIZE_IN_BYTES) {
+                message.error('Vui lòng chọn tệp có kích thước từ 10MB trở xuống!');
+                return;
+            } 
+
             setFileList(info.fileList)
         },
         beforeUpload(_) {
