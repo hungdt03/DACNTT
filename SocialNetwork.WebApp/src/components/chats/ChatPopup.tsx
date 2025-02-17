@@ -20,6 +20,7 @@ import { AppDispatch } from "../../app/store";
 import { Pagination } from "../../types/response";
 import { BlockResource } from "../../types/block";
 import userService from "../../services/userService";
+import LoadingIndicator from "../LoadingIndicator";
 
 export type MessageRequest = {
     content: string;
@@ -50,6 +51,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
     const [blockUser, setBlockUser] = useState<BlockResource>()
 
+    const [loading, setLoading] = useState(false)
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         size: 10,
@@ -68,9 +70,16 @@ const ChatPopup: FC<ChatPopupProps> = ({
     const dispatch = useDispatch<AppDispatch>()
 
     const fetchMessages = async (page: number, size: number) => {
+        setLoading(true)
         const response = await messageService.getAllMessagesByChatRoomId(room.id, page, size);
+        setLoading(false)
         if (response.isSuccess) {
-            setMessages(prevMessages => [...response.data, ...prevMessages])
+            setMessages(prev => {
+                const existingIds = new Set(prev.map(item => item.id));
+                const news = response.data.filter(item => !existingIds.has(item.id));
+                return [...news, ...prev];
+            });
+            
             setPagination(response.pagination)
         }
     }
@@ -95,7 +104,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
         }
     }
 
-    
+
     const handleBlockUser = async (userId: string) => {
         const response = await userService.blockUser(userId);
         if (response.isSuccess) {
@@ -182,7 +191,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
     }, []);
 
     useEffect(() => {
-        console.log(room)
         room.isPrivate && room.friend && getBlock(room.friend?.id)
         setIsShowPrevent(room.isPrivate && !room.isAccept && !!room.lastMessage)
     }, [room])
@@ -376,7 +384,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                     <div className="flex flex-col flex-shrink-0">
                         <b className={cn("text-sm", isRead && 'text-black')}>{room.isPrivate ? room.friend?.fullName : room.name}</b>
                         <div className={cn("text-[12px] flex items-center gap-x-2", isRead && 'text-gray-400')}>
-                            {room.isOnline ? 'Đang hoạt động' :  `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
+                            {room.isOnline ? 'Đang hoạt động' : `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
                             <span><DownOutlined className="text-gray-500" /></span>
                         </div>
                     </div>
@@ -408,13 +416,15 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 <Avatar src={room.imageUrl} size={'large'} />
                 <span className="text-sm text-gray-600 font-bold">{room.name}</span>
             </div>}
+
+            {loading && <LoadingIndicator />}
             {pagination.hasMore && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-primary my-2 text-xs">Tải thêm tin nhắn</button>}
             {[...messages, ...pendingMessages].map(message => <Message chatRoom={room} key={message.id} message={message} isMe={message.senderId === user?.id} />)}
             <div ref={messagesEndRef}></div>
         </div>
 
         {renderMessageBox()}
-       
+
     </div >
 
 };

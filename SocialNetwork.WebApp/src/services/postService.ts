@@ -1,4 +1,3 @@
-import { date } from 'yup';
 import { EditSharePostRequest } from '../components/modals/EditSharePostModal';
 import { SharePostRequest } from '../components/modals/SharePostModal';
 import axiosInterceptor from '../configurations/axiosInterceptor'
@@ -27,6 +26,10 @@ class PostService {
 
     changePrivacy(postId: string, privacyType: PrivacyType) : Promise<BaseResponse> {
         return axiosInterceptor.post('/api/posts/change-privacy', { postId, privacyType })
+    }
+
+    revokeTag(postId: string) : Promise<BaseResponse> {
+        return axiosInterceptor.put('/api/posts/revoke-tag/' + postId)
     }
 
     editPost(postId: string, payload: FormData): Promise<BaseResponse> {

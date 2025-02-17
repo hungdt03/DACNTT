@@ -4,7 +4,7 @@ import images from "../../assets";
 import UploadMultipleFile from "../uploads/UploadMultiFile";
 import TagFriendModal from "./TagFriendModal";
 import { PrivacyType } from "../../enums/privacy";
-import { imageTypes, isValidImage, isValidVideo, videoTypes } from "../../utils/file";
+import { isValidImage, isValidVideo } from "../../utils/file";
 import { PostPrivacryOption } from "../posts/PostPrivacryOption";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
@@ -15,7 +15,9 @@ import { FriendResource } from "../../types/friend";
 import cn from "../../utils/cn";
 import BackgroundPostOption from "./BackgroundPostOption";
 import { GroupResource } from "../../types/group";
-import { GroupPrivacy } from "../../enums/group-privacy";
+import data from '@emoji-mart/data'; // Dữ liệu emoji được bundled
+import Picker from '@emoji-mart/react';
+import { Laugh } from "lucide-react";
 
 
 export type PostForm = {
@@ -86,8 +88,6 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
     const handleCreatePost = () => {
         const formData = new FormData();
 
-        console.log(postRequest)
-
         postRequest.images.forEach(file => {
             if (file.originFileObj) {
                 formData.append('images', file.originFileObj, file.name);
@@ -124,13 +124,21 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         }
     }
 
+
+    const handleEmojiSelect = (emoji: { native: string }) => {
+        setPostRequest({
+            ...postRequest,
+            content: postRequest.content + emoji.native
+        })
+    };
+
     const handleShowUploadBtn = () => {
         setShowUpload(!showUpload)
     }
 
     return <div className="flex flex-col gap-y-4 max-h-[600px] overflow-y-auto custom-scrollbar">
         <div className="flex items-center gap-x-2">
-            <Avatar className="flex-shrink-0 w-[30px] h-[30px] sm:w-[40px] sm:h-[40px]"  src={user?.avatar ?? images.user} />
+            <Avatar className="flex-shrink-0 w-[30px] h-[30px] sm:w-[40px] sm:h-[40px]" src={user?.avatar ?? images.user} />
             <div className="flex flex-col items-start gap-y-[1px] mb-1">
                 <div className="text-[14px] font-semibold text-gray-700">
                     {user?.fullName}
@@ -201,6 +209,15 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
             <div className="sm:p-2 px-2 py-1 rounded-md border-[1px] border-gray-200 flex justify-between items-center">
                 <span className="sm:text-sm text-[13px]">Thêm vào bài viết của bạn</span>
                 <div className="flex items-center sm:gap-x-1">
+
+                    <Tooltip title='Emoji'>
+                        <Popover content={<Picker onEmojiSelect={handleEmojiSelect} theme='light' data={data} />} trigger={'click'}>
+                            <button className="p-1 rounded-full cursor-pointer">
+                                <Laugh strokeWidth={2} className="text-orange-400" size={26} />
+                            </button>
+                        </Popover>
+                    </Tooltip>
+
                     <Tooltip title='Phông nền'>
                         <Popover trigger='click' content={<BackgroundPostOption
                             onChange={background => {
@@ -218,7 +235,12 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                                 })
                             }}
                         />}>
-                            <button className={cn(postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200 && 'cursor-not-allowed')} disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200} onClick={() => setIsUseBackground(!isUseBackground)}>
+                            <button className={cn(postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200 && 'cursor-not-allowed')} disabled={postRequest.images.length > 0 || postRequest.videos.length > 0 || postRequest.content.trim().length > 200} onClick={() => {
+                                if(!isUseBackground) {
+                                    setShowUpload(false)
+                                }
+                                setIsUseBackground(!isUseBackground)
+                            }}>
                                 <img className="sm:w-[30px] sm:h-[30xp] object-cover w-[25px] h-[25px]" src={images.AaBackground} />
                             </button>
                         </Popover>

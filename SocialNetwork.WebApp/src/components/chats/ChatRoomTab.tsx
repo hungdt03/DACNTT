@@ -16,52 +16,47 @@ import messageService from "../../services/messageService";
 import SignalRConnector from '../../app/signalR/signalr-connection'
 import useDebounce from "../../hooks/useDebounce";
 import { selectAuth } from "../../features/slices/auth-slice";
-
+import { MessageResource } from "../../types/message";
 
 type ChatRoomTabProps = {
-    onCountChatRoom: (count: number) => void
+    loading: boolean;
+    chatRooms: ChatRoomResource[];
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>
+    onUpdateChatRooms: (chatRooms: ChatRoomResource[]) => void;
+    onFetchChatRooms: () => void
 }
 
 const ChatRoomTab: FC<ChatRoomTabProps> = ({
-    onCountChatRoom
+    loading,
+    chatRooms,
+    setLoading,
+    onUpdateChatRooms,
+    onFetchChatRooms
 }) => {
     const dispatch = useDispatch<AppDispatch>()
-    const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
-    const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const { user } = useSelector(selectAuth)
 
     const { handleCancel, handleOk, isModalOpen, showModal } = useModal();
 
-    const fetchChatRooms = async () => {
-        setLoading(true)
-        const response = await chatRoomService.getAllChatRooms();
-        setLoading(false)
-        onCountChatRoom(response.data.filter(chatRoom => !chatRoom.isRead).length)
-        if (response.isSuccess) {
-            setChatRooms(response.data)
+    const updateChatRoom = (message: MessageResource, chatRooms: ChatRoomResource[]) => {
+        const updatedChatRooms = [...chatRooms]
+        const findIndex = updatedChatRooms.findIndex(chatRoom => chatRoom.id === message.chatRoomId);
+        if (findIndex !== -1) {
+            updatedChatRooms[findIndex].lastMessage = message.content ? message.content : `${message.sender.fullName} đã gửi ${message.medias.length} tập tin`;
+            updatedChatRooms[findIndex].lastMessageDate = message.sentAt;
+            updatedChatRooms[findIndex].isRead = message.senderId === user?.id;
         }
+
+        return updatedChatRooms
     }
 
-    useEffect(() => { 
-
-        fetchChatRooms()
-
+    useEffect(() => {
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
-                setChatRooms(prev => {
-                    const updatedChatRooms = [...prev]
-                    const findIndex = updatedChatRooms.findIndex(chatRoom => chatRoom.id === message.chatRoomId);
-                    if (findIndex !== -1) {
-                        updatedChatRooms[findIndex].lastMessage = message.content ? message.content : `${message.sender.fullName} đã gửi ${message.medias.length} tập tin`;
-                        updatedChatRooms[findIndex].lastMessageDate = message.sentAt;
-                        updatedChatRooms[findIndex].isRead = message.senderId === user?.id;
-                    }
-
-                    return updatedChatRooms
-                })
+                onUpdateChatRooms(updateChatRoom(message, chatRooms))
             },
             undefined,
             undefined,
@@ -76,7 +71,7 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
             const response = await chatRoomService.searchChatRoomByName(debouncedSearchTerm);
             setLoading(false)
             if (response.isSuccess) {
-                setChatRooms(response.data);
+                onUpdateChatRooms(response.data);
             }
         };
 
@@ -92,9 +87,8 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
 
     const handleSelectChat = async (chatRoom: ChatRoomResource) => {
         await readMessage(chatRoom)
-
-        setChatRooms(prev => {
-            const updateList = [...prev]
+     
+            const updateList = [...chatRooms]
             const findIndex = updateList.findIndex(item => item.id === chatRoom.id);
             if (findIndex !== -1) {
                 updateList[findIndex] = {
@@ -102,8 +96,7 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
                     isRead: true
                 }
             }
-            return updateList;
-        })
+            onUpdateChatRooms(updateList)
     }
 
     return <>
@@ -162,7 +155,7 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
         >
             <CreateGroupChatModal
                 onSuccess={() => {
-                    fetchChatRooms()
+                    onFetchChatRooms()
                     handleOk()
                 }}
             />

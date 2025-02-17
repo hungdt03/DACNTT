@@ -1,12 +1,14 @@
 ﻿
 
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Common.Helpers;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Post.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Domain.Entity.System;
@@ -17,11 +19,15 @@ namespace SocialNetwork.Application.Features.Post.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly ISignalRService _signalRService;
 
-        public EditPostHandler(IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService)
+        public EditPostHandler(IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService, IHttpContextAccessor contextAccessor, ISignalRService signalRService)
         {
             _unitOfWork = unitOfWork;
             _cloudinaryService = cloudinaryService;
+            _contextAccessor = contextAccessor;
+            _signalRService = signalRService;
         }
 
         public async Task<BaseResponse> Handle(EditPostCommand request, CancellationToken cancellationToken)
@@ -95,6 +101,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 }));
             }
 
+            var notifications = new List<Domain.Entity.System.Notification>();
             var tags = new List<Tag>();
             if (request.Post.TagIds != null && request.Post.TagIds.Count > 0)
             {
@@ -108,6 +115,22 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     {
                         UserId = tagUser.Id,
                     });
+
+                    var notification = new Domain.Entity.System.Notification
+                    {
+                        PostId = post.Id,
+                        Content = $"{post.User.FullName} đã gắn thẻ bạn trong một bài viết",
+                        DateSent = DateTimeOffset.UtcNow,
+                        ImageUrl = post.User.Avatar,
+                        IsRead = false,
+                        Title = "Gắn thẻ bài viết",
+                        Type = NotificationType.ASSIGN_POST_TAG,
+                        RecipientId = tagUser.Id,
+                        Recipient = tagUser
+                    };
+
+                    await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+                    notifications.Add(notification);
                 }
 
             }
@@ -119,6 +142,11 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             post.Background = request.Post.Background;
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            foreach (var noti in notifications)
+            {
+                await _signalRService.SendNotificationToSpecificUser(noti.Recipient.UserName, ApplicationMapper.MapToNotification(noti));
+            }
 
             return new BaseResponse
             {

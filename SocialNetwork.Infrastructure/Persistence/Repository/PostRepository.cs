@@ -43,7 +43,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
-                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags).ThenInclude(o => o.User)
                  .ToListAsync();
 
             return posts;     
@@ -107,7 +107,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                   .Include(p => p.OriginalPost).ThenInclude(o => o.User)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
-                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags).ThenInclude(o => o.User)
                 .ToListAsync();
 
             return (posts, totalCount);
@@ -156,10 +156,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.Comments)
                 .Include(p => p.Group)
                 .Include(p => p.SharePost)
-                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.User)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
-                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags).ThenInclude(o => o.User)
                 .SingleOrDefaultAsync(p => p.Id == id);
         }
 
@@ -185,7 +185,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                   .Include(p => p.OriginalPost).ThenInclude(o => o.User)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
-                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags).ThenInclude(o => o.User)
                 .ToListAsync();
 
             return (posts, totalCount);

@@ -1,6 +1,5 @@
 import { FC } from "react";
 import StoryReaction from "./StoryReaction";
-import cn from "../../utils/cn";
 import { ReactionType } from "../../enums/reaction";
 import { ChevronDoubleDownIcon } from "@heroicons/react/24/outline";
 
@@ -19,7 +18,6 @@ const StoryReplyBox: FC<StoryReplyBoxProps> = ({
                 <span>Thu gọn</span>
                 <ChevronDoubleDownIcon width={20} height={20} />
             </button>
-            <input placeholder="Trả lời" className={cn("bg-black border-white w-full outline-white text-white border-[2px] rounded-3xl px-3 py-2")} />
             <StoryReaction onSelect={(reaction: ReactionType) => onReact(reaction)} />
         </div>
     </div>

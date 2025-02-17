@@ -1,3 +1,4 @@
+
 import { GroupPrivacy } from "../enums/group-privacy";
 
 export const getGroupPrivacyTitle = (privacy: GroupPrivacy) => {
@@ -8,3 +9,4 @@ export const getGroupPrivacyTitle = (privacy: GroupPrivacy) => {
             return 'Công khai'
     }
 };
+

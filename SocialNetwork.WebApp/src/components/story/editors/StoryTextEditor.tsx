@@ -19,16 +19,17 @@ type StoryTextEditorProps = {
     onChange: (value: string) => void;
     onSelectBackground: (backgound: string) => void;
     onFontFamilySelect: (fontFamily: string) => void;
+   
 }
 
 const StoryTextEditor: FC<StoryTextEditorProps> = ({
     value,
     onChange,
     onSelectBackground,
-    onFontFamilySelect
+    onFontFamilySelect,
 }) => {
     const [selectFont, setSelectFont] = useState<number>(0);
-    const [selectBackground, setSelectBackground] = useState<number>(0)
+    const [selectBackground, setSelectBackground] = useState<number>(0);
 
     const handleSelectFont = (index: number) => {
         setSelectFont(index);
@@ -40,11 +41,13 @@ const StoryTextEditor: FC<StoryTextEditorProps> = ({
         onSelectBackground(dataBackgroundStory[index].background)
     }
 
-    return <div className="flex flex-col gap-y-4 w-full">
+    return <div className="flex flex-col gap-y-3 w-full">
+     
+
         <textarea value={value} onChange={e => {
-            if(e.target.value.trim().length > 400) return;
+            if (e.target.value.trim().length > 400) return;
             onChange(e.target.value)
-        }} className="outline-none border-[1px] border-gray-300 p-2 rounded-md whitespace-pre-wrap" placeholder="Bắt đầu nhập" rows={4}></textarea>
+        }} className="outline-none border-[1px] border-gray-300 p-2 rounded-md whitespace-pre-wrap" placeholder="Bắt đầu nhập" rows={3}></textarea>
 
         <Dropdown menu={{
             items: fontStyles.map((font, index) => ({

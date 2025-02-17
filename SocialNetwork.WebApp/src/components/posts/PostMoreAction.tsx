@@ -1,9 +1,10 @@
-import { Bookmark, Edit,  Flag,  FlagOff, Trash } from "lucide-react"
+import { Bookmark, Edit,  Flag,  FlagOff, Tags, Trash } from "lucide-react"
 import { FC } from "react"
 
 type PostMoreActionProps = {
     isMine: boolean;
     isAdmin?: boolean;
+    isHasTag?: boolean;
     isSaved?: boolean;
     isPostGroup?: boolean;
     onEditPost?: () => void;
@@ -12,10 +13,12 @@ type PostMoreActionProps = {
     onReportPost?: () => void;
     onSavedPost?: () => void;
     onRemoveSavedPost?: () => void;
+    onRevokeTag?: () => void;
 }
 
 export const PostMoreAction: FC<PostMoreActionProps> = ({
     isMine,
+    isHasTag,
     isSaved,
     isPostGroup,
     isAdmin,
@@ -24,7 +27,8 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
     onReportPost,
     onReportPostGroup,
     onSavedPost,
-    onRemoveSavedPost
+    onRemoveSavedPost,
+    onRevokeTag
 }) => {
 
     return <div className="flex flex-col items-start rounded-md md:text-sm text-xs">
@@ -47,6 +51,7 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
                 <Bookmark size={17} className="text-gray-500" />
                 Lưu bài viết
             </button>}
+
             {!isAdmin && isPostGroup ? <>
                 <button onClick={onReportPostGroup} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
                     <FlagOff size={17} className="text-gray-500" />
@@ -59,6 +64,11 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
             </> : !isPostGroup && <button onClick={onReportPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
                 <Trash size={17} className="text-gray-500" />
                 Báo cáo bài viết
+            </button>}
+
+            {isHasTag && <button onClick={onRevokeTag} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+                <Tags size={17} className="text-gray-500" />
+                Gỡ thẻ
             </button>}
         </>}
     </div>

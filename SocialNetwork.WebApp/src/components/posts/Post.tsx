@@ -238,6 +238,16 @@ const Post: FC<PostProps> = ({
         }
     }
 
+    const handleRevokeTag = async () => {
+        const response = await postService.revokeTag(post.id);
+        if(response.isSuccess) {
+            fetchPostById()
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -250,8 +260,8 @@ const Post: FC<PostProps> = ({
                 </div>
 
                 <div className="flex flex-col md:gap-y-[1px]">
-                    <div className="font-bold text-gray-600">
-                        <Link className="text-[13px] md:text-sm" to={`/${post.isGroupPost ? `groups/${post.group.id}/user` : 'profile'}/${post.user.id}`}>{post.user?.fullName}</Link>
+                    <div className="text-gray-600 text-[13px] md:text-sm">
+                        <Link className="font-bold text-[13px] md:text-sm" to={`/${post.isGroupPost ? `groups/${post.group.id}/user` : 'profile'}/${post.user.id}`}>{post.user?.fullName}</Link>
                         {post.tags.length > 0 &&
                             (() => {
                                 const maxDisplay = 3;
@@ -263,7 +273,7 @@ const Post: FC<PostProps> = ({
                                     <>
                                         {' cùng với '}
                                         {displayedTags.map((tag, index) => (
-                                            <Link className="hover:underline" to={`/profile/${tag.user.id}`} key={tag.id}>
+                                            <Link className="font-bold hover:underline text-sm" to={`/profile/${tag.user.id}`} key={tag.id}>
                                                 {tag.user.fullName}
                                                 {index < displayedTags.length - 1 ? ', ' : ''}
                                             </Link>
@@ -287,6 +297,8 @@ const Post: FC<PostProps> = ({
                 onEditPost={showEditPostModal}
                 onDeletePost={handleDeletePost}
                 onReportPost={showReport}
+                isHasTag={!!post.tags.find(s => s.user.id === user?.id)}
+                onRevokeTag={handleRevokeTag}
                 onReportPostGroup={showReportAdmin}
                 onSavedPost={() => handleSavedPost(post.id)}
                 onRemoveSavedPost={() => handleRemoveSavedPost(post.id)}

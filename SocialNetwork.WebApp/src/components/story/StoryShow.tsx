@@ -14,7 +14,6 @@ import StoryViewers from "./StoryViewers";
 import StoryReplyBox from "./StoryReplyBox";
 import StoryCollapsed from "./StoryCollapsed";
 import { useSearchParams } from "react-router-dom";
-import LoadingIndicator from "../LoadingIndicator";
 
 export type ReactStory = {
     storyId: string;

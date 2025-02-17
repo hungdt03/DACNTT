@@ -27,7 +27,8 @@ const StoryTextPreview: FC<StoryTextPreviewProps> = ({
         <div className="bg-gray-950 rounded-xl w-full h-full flex items-center justify-center">
             <div style={{
                 aspectRatio: 9 / 16,
-                background: background
+                background: background,
+                fontFamily: fontFamily
             }} className="rounded-xl h-[95%] w-1/3 flex flex-col items-start justify-center px-6 overflow-hidden py-10">
                 <p
                     className={`text-white w-full text-center break-words font-semibold text-xl overflow-hidden" }`}

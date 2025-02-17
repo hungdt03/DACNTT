@@ -159,6 +159,15 @@ namespace SocialNetwork.Infrastructure.SignalR
                     {
                         await Groups.AddToGroupAsync(Context.ConnectionId, chatRoom.UniqueName);
                     });
+                } else if (senderMember != null && recipientMember != null && senderMember.IsAccepted)
+                {
+                    var block = await unitOfWork.BlockListRepository
+                        .GetBlockListByUserIdAndUserIdAsync(senderMember.UserId, recipientMember.UserId);
+
+                    if (block != null)
+                    {
+                        throw new AppException("Bạn không thể nhắn tin cho người này");
+                    } 
                 }
             }
 

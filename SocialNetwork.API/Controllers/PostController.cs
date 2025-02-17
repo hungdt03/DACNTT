@@ -63,6 +63,14 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+
+        [HttpPut("revoke-tag/{postId}")]
+        public async Task<IActionResult> RevokeTag([FromRoute] Guid postId)
+        {
+            var response = await _mediator.Send(new RevokeTagByPostIdCommand(postId));
+            return Ok(response);
+        }
+
         // SAVED POSTS
 
         [HttpGet("saved-posts")]
