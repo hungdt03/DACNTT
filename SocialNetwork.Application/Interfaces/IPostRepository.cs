@@ -26,5 +26,6 @@ namespace SocialNetwork.Application.Interfaces
 
         Task DeleteManyPost(List<string> listPostId);
         Task DeleteAllPost();
+        Task<int> CountAllPost();
     }
 }

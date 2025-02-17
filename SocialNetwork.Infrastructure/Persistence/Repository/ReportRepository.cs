@@ -124,5 +124,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context.Reports.Update(report);
             _context.SaveChanges();
         }
+        public async Task<int> CountAllReport()
+        {
+            return await _context.Reports.CountAsync();
+        }
     }
 }

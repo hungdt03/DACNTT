@@ -131,6 +131,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                     .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
                 );
         }
-
+        public async Task<int> CountAllUser()
+        {
+            return await _context.Users.CountAsync();
+        }
+        public async Task<int> CountAllUserIsLock()
+        {
+            return await _context.Users.Where(u => u.IsLock == true).CountAsync();
+        }
     }
 }

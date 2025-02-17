@@ -48,6 +48,7 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
             user.Avatar = configuration["ServerHost"] + ShareConstant.PREFIX_FILE_API + ShareConstant.AVATAR_FILENAME;
             user.CoverImage = configuration["ServerHost"] + ShareConstant.PREFIX_FILE_API + ShareConstant.COVER_FILENAME;
             user.IsVerification = false;
+            user.DateJoined = DateTime.Now;
 
             var result = await userManager.CreateAsync(user, request.Password);
 

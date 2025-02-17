@@ -15,5 +15,7 @@ namespace SocialNetwork.Application.Interfaces
         Task UnLockAndLockManyAccount(List<string> users, string number);
         Task<User?> GetUserByIdAsync(string userId);
         Task<(IEnumerable<User> Users, int TotalCount)> GetAllUsersContainsKeyAsync(string key, int page, int size);
+        Task<int> CountAllUser();
+        Task<int> CountAllUserIsLock();
     }
 }

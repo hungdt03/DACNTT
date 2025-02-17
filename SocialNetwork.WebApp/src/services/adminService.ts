@@ -36,6 +36,12 @@ class AdminService {
      DeleteAllAccount() : Promise<BaseResponse> {
           return axiosInterceptor.delete('/api/admin/delete-all-user')
      }
+     CountAllUser() : Promise<DataResponse<number>> {
+          return axiosInterceptor.get('/api/admin/count-all-user')
+     }
+     CountAllUserIsLock() : Promise<DataResponse<number>> {
+          return axiosInterceptor.get('/api/admin/count-all-user-islock')
+     }
      //POSt
      getAllPost() : Promise<DataResponse<PostResource[]>> {
           return axiosInterceptor.get('/api/admin/get-all-post')
@@ -49,6 +55,9 @@ class AdminService {
      DeleteAllPost() : Promise<BaseResponse> {
           return axiosInterceptor.delete('/api/admin/delete-all-post')
      }
+     CountAllPost() : Promise<DataResponse<number>> {
+          return axiosInterceptor.get('/api/admin/count-all-post')
+     }
      //GROUP
      getAllGroup() : Promise<DataResponse<GroupResource[]>> {
           return axiosInterceptor.get('/api/admin/get-all-group')
@@ -61,6 +70,9 @@ class AdminService {
      }
      DeleteAllGroup() : Promise<BaseResponse> {
           return axiosInterceptor.delete('/api/admin/delete-all-group')
+     }
+     CountAllGroup() : Promise<DataResponse<number>> {
+          return axiosInterceptor.get('/api/admin/count-all-group')
      }
      //REPORT
      getAllReport() : Promise<DataResponse<ReportResource[]>> {
@@ -80,6 +92,9 @@ class AdminService {
      }
      GetReportById(reportId : string ) : Promise<DataResponse<ReportResource>> {
           return axiosInterceptor.get('/api/admin/get-report-by-id/'+reportId)
+     }
+     CountAllReport() : Promise<DataResponse<number>> {
+          return axiosInterceptor.get('/api/admin/count-all-report')
      }
 }
 export default AdminService.getInstance();

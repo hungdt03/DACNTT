@@ -78,7 +78,25 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new DeleteManyUserQuery(listUserId));
             return Ok(response);
         }
+        [HttpGet("count-all-user")]
+        public async Task<IActionResult> CountAllUser()
+        {
+            var response = await mediator.Send(new CountAllUserQuery());
+            return Ok(response);
+        }
+        [HttpGet("count-all-user-islock")]
+        public async Task<IActionResult> CountAllUserIsLock()
+        {
+            var response = await mediator.Send(new CountAllUserIsLockQuery());
+            return Ok(response);
+        }
         // POST
+        [HttpGet("count-all-post")]
+        public async Task<IActionResult> CountAllPost()
+        {
+            var response = await mediator.Send(new CountAllPostQuery());
+            return Ok(response);
+        }
         [HttpDelete("delete-post/{postId}")]
         public async Task<IActionResult> DeleteOnePost([FromRoute] Guid postId)
         {
@@ -98,6 +116,12 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
         // GROUP
+        [HttpGet("count-all-group")]
+        public async Task<IActionResult> CountAllGroup()
+        {
+            var response = await mediator.Send(new CountAllGroupQuery());
+            return Ok(response);
+        }
         [HttpDelete("delete-group/{groupId}")]
         public async Task<IActionResult> DeleteOneGroup([FromRoute] Guid groupId)
         {
@@ -117,6 +141,12 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
         // REPORT
+        [HttpGet("count-all-report")]
+        public async Task<IActionResult> CountAllReport()
+        {
+            var response = await mediator.Send(new CountAllReportQuery());
+            return Ok(response);
+        }
         [HttpPut("update-report")]
         public async Task<IActionResult> UpdateReport([FromBody] UpdateReportCommand command)
         {

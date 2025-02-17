@@ -410,5 +410,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
             return (posts, totalCount);
         }
+        public async Task<int> CountAllPost()
+        {
+            return await _context.Posts.CountAsync();
+        }
     }
 }

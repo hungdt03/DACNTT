@@ -101,5 +101,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             _context.Groups.Remove(group);
         }
+        public async Task<int> CountAllGroup()
+        {
+            return await _context.Groups.CountAsync();
+        }
     }
 }

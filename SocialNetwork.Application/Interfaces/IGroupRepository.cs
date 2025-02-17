@@ -15,5 +15,6 @@ namespace SocialNetwork.Application.Interfaces
         Task DeleteOneGroup(Guid id);
         Task DeletManyGroup(List<string> listGroupId);
         Task DeleteAllGroup();
+        Task<int> CountAllGroup();
     }
 }
