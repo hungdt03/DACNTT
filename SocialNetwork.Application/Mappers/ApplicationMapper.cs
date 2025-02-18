@@ -29,6 +29,7 @@ namespace SocialNetwork.Application.Mappers
                 IsOnline = user.IsOnline,
                 IsShowStory = true,
                 IsShowStatus = true,
+                PhoneNumber = user.PhoneNumber
             };
         }
         public static List<UserResponse> MapToListUser(List<User> users)

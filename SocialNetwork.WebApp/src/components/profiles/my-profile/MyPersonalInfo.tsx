@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { BriefcaseBusiness, Cake, Delete, Edit3, GraduationCap, Home, MapPin, Plus } from "lucide-react";
+import { BriefcaseBusiness, Cake, ChartArea, Delete, Edit3, GraduationCap, Home, Mail, MapPin, MessageCircleCode, Phone, Plus } from "lucide-react";
 import useModal from "../../../hooks/useModal";
 import { Modal, message } from "antd";
 import ModifyUserEducation from "../../modals/ModifyUserEducation";
@@ -106,6 +106,18 @@ const MyPersonalInfo: FC<MyPersonalInfoProps> = ({
 
     return <>
         <div className="flex flex-col gap-y-4">
+            {user.email && <div className="flex flex-col gap-y-3 text-[14px] md:text-[16px]">
+                <div className="flex items-center gap-x-3">
+                    <Mail className="flex-shrink-0 text-gray-400" size={20} />
+                    <span>{user.email}</span>
+                </div>
+            </div>}
+            {user.phoneNumber && <div className="flex flex-col gap-y-3 text-[14px] md:text-[16px]">
+                <div className="flex items-center gap-x-3">
+                    <Phone className="flex-shrink-0 text-gray-400" size={20} />
+                    <span>{user.phoneNumber}</span>
+                </div>
+            </div>}
             <div className="flex flex-col gap-y-3">
                 <div className="flex items-center gap-x-3 text-[14px] md:text-[16px]">
                     <Cake className="flex-shrink-0 text-gray-400" size={20} />

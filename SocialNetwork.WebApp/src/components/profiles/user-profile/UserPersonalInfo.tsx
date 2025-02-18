@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { BriefcaseBusiness, Cake, DotSquareIcon, GraduationCap, Home, MapPin, School, Workflow } from "lucide-react";
+import { BriefcaseBusiness, Cake, DotSquareIcon, GraduationCap, Home, Mail, MapPin, MessageCircleCode, Phone, School, Workflow } from "lucide-react";
 import { UserResource } from "../../../types/user";
 import { UserSchoolResource } from "../../../types/userSchool";
 import userService from "../../../services/userService";
@@ -61,6 +61,18 @@ const UserPersonalInfo: FC<UserPersonalInfoProps> = ({
     }, [user])
 
     return <div className="flex flex-col gap-y-4">
+        {user.email && <div className="flex flex-col gap-y-3 text-[14px] md:text-[16px]">
+            <div className="flex items-center gap-x-3">
+                <Mail className="flex-shrink-0 text-gray-400" size={20} />
+                <span>{user.email}</span>
+            </div>
+        </div>}
+        {user.phoneNumber && <div className="flex flex-col gap-y-3 text-[14px] md:text-[16px]">
+            <div className="flex items-center gap-x-3">
+                <Phone className="flex-shrink-0 text-gray-400" size={20} />
+                <span>{user.phoneNumber}</span>
+            </div>
+        </div>}
         {user.dateOfBirth && <div className="flex flex-col gap-y-3 text-[14px] md:text-[16px]">
             <div className="flex items-center gap-x-3">
                 <Cake className="flex-shrink-0 text-gray-400" size={20} />

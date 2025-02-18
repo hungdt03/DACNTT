@@ -1,9 +1,6 @@
-﻿using CloudinaryDotNet.Actions;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SocialNetwork.API.Filters;
-using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Application.Features.Admin.Queries;
 using SocialNetwork.Application.Features.Post.Commands;

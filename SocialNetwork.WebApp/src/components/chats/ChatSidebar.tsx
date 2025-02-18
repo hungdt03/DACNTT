@@ -125,7 +125,7 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
         }
 
         fetchChatRooms();
-    }, [chatRoom])
+    }, [])
 
     useEffect(() => {
         const searchChatRoom = async () => {
