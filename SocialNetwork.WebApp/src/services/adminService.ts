@@ -1,3 +1,4 @@
+import { MonthlyRegistrationStatsResource } from './../types/monthly-registration-stats';
 import { UpdateReport } from "../components/dialogs/UpdateReportDialog";
 import axiosInterceptor from "../configurations/axiosInterceptor";
 import { GroupResource } from "../types/group";
@@ -5,6 +6,7 @@ import { PostResource } from "../types/post";
 import { ReportResource } from "../types/report";
 import { BaseResponse, DataResponse } from "../types/response";
 import { UserResource } from "../types/user";
+import { UserScoreResource } from "../types/userScore";
 
 
 class AdminService {
@@ -41,6 +43,18 @@ class AdminService {
      }
      CountAllUserIsLock() : Promise<DataResponse<number>> {
           return axiosInterceptor.get('/api/admin/count-all-user-islock')
+     }
+     GetAllUserConnection() : Promise<DataResponse<number>> {
+          return axiosInterceptor.get('/api/admin/get-all-user-connection')
+     }
+     GetTop10UserScore() : Promise<DataResponse<UserScoreResource[]>> {
+          return axiosInterceptor.get('/api/admin/get-top-10-user-score')
+     }
+     GetYear() : Promise<DataResponse<number[]>> {
+          return axiosInterceptor.get('/api/admin/get-year')
+     }
+     GetRegistrationStatsByYear(year : number) : Promise<DataResponse<MonthlyRegistrationStatsResource[]>> {
+          return axiosInterceptor.get('/api/admin/get-registration-stats-by-year/'+year)
      }
      //POSt
      getAllPost() : Promise<DataResponse<PostResource[]>> {

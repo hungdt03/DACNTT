@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.DBContext;
@@ -138,6 +139,44 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<int> CountAllUserIsLock()
         {
             return await _context.Users.Where(u => u.IsLock == true).CountAsync();
+        }
+        public async Task<List<int>> GetRegistrationYears()
+        {
+            var years = await _context.Users
+                .Select(user => user.DateJoined.Year)
+                .Distinct()
+                .OrderBy(year => year)
+                .ToListAsync();
+
+            return years;
+        }
+        public async Task<List<MonthlyRegistrationStatsResponse>> GetRegistrationStatsByYear(int year)
+        {
+            var monthlyStats = await _context.Users
+                .Where(user => user.DateJoined.Year == year)
+                .GroupBy(user => user.DateJoined.Month) 
+                .Select(group => new MonthlyRegistrationStatsResponse
+                {
+                    Month = group.Key, 
+                    Year = year,
+                    Count = group.Count() 
+                })
+                .OrderBy(stat => stat.Month) 
+                .ToListAsync();
+            for (int month = 1; month <= 12; month++)
+            {
+                if (!monthlyStats.Any(stat => stat.Month == month))
+                {
+                    monthlyStats.Add(new MonthlyRegistrationStatsResponse
+                    {
+                        Month = month,
+                        Year = year,
+                        Count = 0
+                    });
+                }
+            }
+
+            return monthlyStats;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SocialNetwork.Domain.Entity.System;
+﻿using SocialNetwork.Application.Contracts.Requests;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Interfaces
 {
@@ -17,5 +18,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<(IEnumerable<User> Users, int TotalCount)> GetAllUsersContainsKeyAsync(string key, int page, int size);
         Task<int> CountAllUser();
         Task<int> CountAllUserIsLock();
+        Task<List<int>> GetRegistrationYears();
+        Task<List<MonthlyRegistrationStatsResponse>> GetRegistrationStatsByYear(int year);
     }
 }

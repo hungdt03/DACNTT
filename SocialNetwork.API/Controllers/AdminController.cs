@@ -90,6 +90,29 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new CountAllUserIsLockQuery());
             return Ok(response);
         }
+        [HttpGet("get-all-user-connection")]
+        public async Task<IActionResult> GetAllConnections() {
+            var response = await mediator.Send(new GetAllUserConnectionQuery());
+            return Ok(response);
+        }
+        [HttpGet("get-top-10-user-score")]
+        public async Task<IActionResult> GetTop10UserScore()
+        {
+            var response = await mediator.Send(new GetTop10UserActiveQuery());
+            return Ok(response);
+        }
+        [HttpGet("get-year")]
+        public async Task<IActionResult> GetYear()
+        {
+            var response = await mediator.Send(new GetRegistrationYearsQuery());
+            return Ok(response);
+        }
+        [HttpGet("get-registration-stats-by-year/{year}")]
+        public async Task<IActionResult> GetRegistrationStatsByYear([FromRoute] int year)
+        {
+            var response = await mediator.Send(new GetRegistrationStatsByYearsQuery(year));
+            return Ok(response);
+        }
         // POST
         [HttpGet("count-all-post")]
         public async Task<IActionResult> CountAllPost()

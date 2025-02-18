@@ -23,6 +23,7 @@ import { toast } from 'react-toastify'
 import { Popconfirm } from 'antd'
 import { PostResource } from '../../../types/post'
 import { PostType } from '../../../enums/post-type'
+import { PostPrivacryOption } from '../../../components/posts/PostPrivacryOption'
 
 type PostsTableProps = {
     posts: PostResource[]
@@ -171,7 +172,11 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                                                 ? 'Công khai'
                                                 : post.privacy === 'PRIVATE'
                                                   ? 'Riêng tư'
-                                                  : 'Khác'}
+                                                  : post.privacy === 'GROUP_PUBLIC'
+                                                    ? 'Công khai'
+                                                    : post.privacy === 'GROUP_PRIVATE'
+                                                      ? 'Riêng tư'
+                                                      : 'Khác'}
                                         </TableCell>
 
                                         <TableCell sx={{ textAlign: 'center' }}>

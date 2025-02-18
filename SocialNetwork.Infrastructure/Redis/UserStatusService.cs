@@ -54,5 +54,29 @@ namespace SocialNetwork.Infrastructure.Redis
                 await db.KeyDeleteAsync(key);
             }
         }
+        public async Task<int> GetAllConnectionsAsync()
+        {
+            var db = _redis.GetDatabase();
+            var endPoints = _redis.GetEndPoints();
+
+            if (endPoints.Length == 0)
+            {
+                throw new InvalidOperationException("Không tìm thấy endpoint Redis.");
+            }
+
+            var server = _redis.GetServer(endPoints.First());
+            var keys = server.Keys(pattern: "user_connections:*");
+
+            var connectionTasks = keys.Select(async key =>
+            {
+                var connections = await db.SetMembersAsync(key);
+                return connections.Select(conn => conn.ToString());
+            });
+
+            var allConnections = await Task.WhenAll(connectionTasks);
+
+            // Trả về tổng số kết nối duy nhất
+            return allConnections.SelectMany(connList => connList).Distinct().Count();
+        }
     }
 }

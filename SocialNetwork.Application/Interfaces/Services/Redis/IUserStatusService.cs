@@ -14,6 +14,7 @@ namespace SocialNetwork.Application.Interfaces.Services.Redis
         // Kiểm tra xem người dùng có kết nối hay không
         public Task<bool> HasConnectionsAsync(string userId);
         public Task ClearAllConnectionsAsync();
+        public Task<int> GetAllConnectionsAsync();
 
     }
 }
