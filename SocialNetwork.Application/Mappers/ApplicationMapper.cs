@@ -1,5 +1,6 @@
 ﻿
 using SocialNetwork.Application.DTOs;
+using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
 using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Domain.Entity.MessageInfo;
@@ -48,6 +49,14 @@ namespace SocialNetwork.Application.Mappers
                 IsLock = user.IsLock,
                 RecentOnlineTime = user.RecentOnlineTime,
                 IsOnline = user.IsOnline
+            }).ToList();
+        }
+        public static List<ScoreResponse> MapToUserScore(List<UserScoreCommand> userScores)
+        {
+            return userScores.Select(user => new ScoreResponse
+            {
+                Score = user.Score,
+                User = user.User
             }).ToList();
         }
 
