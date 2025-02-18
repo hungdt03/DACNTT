@@ -35,7 +35,6 @@ namespace SocialNetwork.Application.Features.Story.Handlers
             foreach (var group in groupedStories)
             {
                 var userStories = group.ToList();
-                if (userStories.Count == 0) continue;
                 if (group.Key == userId)
                 {
                     bool haveAnyViewers = false;
@@ -77,6 +76,8 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
                         takeStories.Add(story);
                     }
+
+                    if (!takeStories.Any()) continue;
 
                     bool haveSeen = false;
                     foreach (var story in takeStories)

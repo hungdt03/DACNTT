@@ -1,4 +1,5 @@
 import { MediaType } from "../enums/media";
+import { MessageType } from "../enums/message-type";
 import { UserResource } from "./user";
 
 export type MessageResource = {
@@ -11,9 +12,12 @@ export type MessageResource = {
     chatRoomId: string;
     status: string;
     reads?: ReadStatusResource[];
+    messageType?: MessageType
 
     isRemove?: boolean;
     memberId?: string;
+
+    isFetch?: boolean;
 }
 
 export type ReadStatusResource = {

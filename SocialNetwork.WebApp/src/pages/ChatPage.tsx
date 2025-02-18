@@ -17,7 +17,6 @@ const ChatPage: FC = () => {
     const fetchChatRoom = async () => {
         if (id) {
             const response = await chatRoomService.getChatRoomById(id);
-            console.log(response)
             if (response.isSuccess) {
                 setCurrentChatRoom(response.data)
             }

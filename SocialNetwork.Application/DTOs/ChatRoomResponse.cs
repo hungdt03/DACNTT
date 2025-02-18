@@ -13,12 +13,16 @@ namespace SocialNetwork.Application.DTOs
         public string LastMessage { get; set; }
         public DateTimeOffset? LastMessageDate { get; set; }
 
-        // For current user
-        public bool IsMember { get; set; }
-        public bool IsAdmin { get; set; }
+        // For private room
+        public bool IsConnect {  get; set; }
+        public bool IsFriend { get; set; }
         public bool IsPrivate { get; set; }
         public bool IsAccept { get; set; }
         public bool IsRecipientAccepted { get; set; }
+
+        // For more than two members
+        public bool IsMember { get; set; }
+        public bool IsAdmin { get; set; }
 
         public ICollection<UserResponse> Members { get; set; }
         public UserResponse Friend {  get; set; }

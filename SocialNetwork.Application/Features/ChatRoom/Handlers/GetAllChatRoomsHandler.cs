@@ -9,6 +9,7 @@ using SocialNetwork.Application.Features.ChatRoom.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 {
@@ -56,6 +57,17 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                         var haveStory = await _unitOfWork.StoryRepository
                            .IsUserHaveStoryAsync(friend.UserId);
                             item.Friend.HaveStory = haveStory;
+                    }
+
+                    var friendShip = await _unitOfWork.FriendShipRepository
+                        .GetFriendShipByUserIdAndFriendIdAsync(userId, friend.UserId);
+
+                    if(friendShip != null && friendShip.IsConnect && friendShip.Status != FriendShipStatus.ACCEPTED)
+                    {
+                        item.IsConnect = true;
+                    } else if(friendShip != null && friendShip.Status != FriendShipStatus.ACCEPTED)
+                    {
+                        item.IsFriend = true;
                     }
 
                     item.IsMember = true;

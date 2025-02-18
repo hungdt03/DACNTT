@@ -32,11 +32,14 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
         public async Task<BaseResponse> Handle(KickMemberInChatRoomCommand request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-
+          
             var chatRoomMember = await _unitOfWork
                 .ChatRoomMemberRepository
                 .GetChatRoomMemberById(request.MemberId)
                 ?? throw new NotFoundException("ID của thành viên không tồn tại");
+
+            var chatRoom = await _unitOfWork.ChatRoomRepository
+                .GetChatRoomByIdAsync(chatRoomMember.ChatRoomId) ?? throw new NotFoundException("Không tìm thấy phòng chat");
 
             var userInChatRoom = await _unitOfWork.ChatRoomMemberRepository
                 .GetChatRoomMemberByRoomIdAndUserId(chatRoomMember.ChatRoomId, userId);
@@ -59,6 +62,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             _unitOfWork.ChatRoomMemberRepository.DeleteMember(chatRoomMember);
             await _unitOfWork.MessageRepository.CreateMessageAsync(message);
 
+            chatRoom.LastMessage = $"{userFullname} đã xóa {chatRoomMember.User.FullName} khỏi nhóm";
+            chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
             chatRoomMember.IsLeader = false;
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);

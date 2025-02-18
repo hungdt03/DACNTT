@@ -21,13 +21,13 @@ const MessageMoreThanTwoMedia: FC<MessageMoreThanTwoMediaProps> = ({
 
 
     return <>
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-3 gap-1 my-2">
             {medias.map((item, index) => {
                 return item.mediaType === MediaType.VIDEO ? (
                     <video
                         src={item.mediaUrl}
                         key={item.id}
-                        className="w-16 h-16 object-cover rounded-lg"
+                        className="w-[54px] h-[54px] object-cover rounded-lg"
                         onClick={() => handlePreview(index)}
                         // controls
                     />
@@ -36,7 +36,7 @@ const MessageMoreThanTwoMedia: FC<MessageMoreThanTwoMediaProps> = ({
                         key={item.id}
                         src={item.mediaUrl}
                         alt={`Post Media ${index}`}
-                        className="w-16 h-16 object-cover rounded-lg"
+                        className="w-[54px] h-[54px] object-cover rounded-lg"
                         onClick={() => handlePreview(index)}
                     />
                 )

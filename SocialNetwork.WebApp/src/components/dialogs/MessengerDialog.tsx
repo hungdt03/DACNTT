@@ -1,4 +1,4 @@
-import { Tabs} from "antd";
+import { Tabs } from "antd";
 import { FC } from "react";
 import ChatRoomTab from "../chats/ChatRoomTab";
 import PendingChatTab from "../chats/PendingChatTab";
@@ -21,18 +21,20 @@ const MessengerDialog: FC<MessengerDialogProps> = ({
     onUpdateChatRooms
 }) => {
 
-    return <Tabs
-        items={[{
-            key: "1",
-            label: "Hội thoại",
-            children: <ChatRoomTab onUpdateChatRooms={onUpdateChatRooms} chatRooms={chatRooms} loading={loading} setLoading={setLoading} onFetchChatRooms={onFetchChatRooms} />,
-        },
-        {
-            key: "2",
-            label: "Đang chờ",
-            children: <PendingChatTab />,
-        },]}
-    />
+    return <div className="max-h-[600px] overflow-y-auto custom-scrollbar">
+        <Tabs
+            items={[{
+                key: "1",
+                label: "Hội thoại",
+                children: <ChatRoomTab onUpdateChatRooms={onUpdateChatRooms} chatRooms={chatRooms} loading={loading} setLoading={setLoading} onFetchChatRooms={onFetchChatRooms} />,
+            },
+            {
+                key: "2",
+                label: "Đang chờ",
+                children: <PendingChatTab />,
+            },]}
+        />
+    </div>
 };
 
 export default MessengerDialog;

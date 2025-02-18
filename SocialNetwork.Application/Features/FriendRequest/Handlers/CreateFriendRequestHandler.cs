@@ -58,6 +58,8 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
 
             } else
             {
+                existedRequest.UserId = userId;
+                existedRequest.FriendId = request.ReceiverId;
                 existedRequest.Status = FriendShipStatus.PENDING;
             }
 

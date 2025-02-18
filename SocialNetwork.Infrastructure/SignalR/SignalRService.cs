@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Interfaces.Services.Redis;
+using SocialNetwork.Domain.Entity.ChatRoomInfo;
 
 namespace SocialNetwork.Infrastructure.SignalR
 {
@@ -63,6 +64,11 @@ namespace SocialNetwork.Infrastructure.SignalR
         public async Task SendActionGroupToSpecificUser(string username, Guid chatRoomId)
         {
             await hubContext.Clients.User(username).SendAsync("FetchChatRoom", chatRoomId);
+        }
+
+        public async Task SendMessageToSpecificUser(string username, MessageResponse message)
+        {
+            await hubContext.Clients.User(username).SendAsync("NewMessage", message);
         }
     }
 }

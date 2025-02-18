@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { CloseOutlined, MinusOutlined, DownOutlined } from '@ant-design/icons'
 import images from "../../assets";
 import Message from "./messages/Message";
@@ -15,13 +15,14 @@ import { MediaType } from "../../enums/media";
 import { formatTime } from "../../utils/date";
 import { Link } from "react-router-dom";
 import cn from "../../utils/cn";
-import { remove, setChatRoomAccepted, setChatRoomRead } from "../../features/slices/chat-popup-slice";
+import { setChatRoomAccepted, setChatRoomRead } from "../../features/slices/chat-popup-slice";
 import { AppDispatch } from "../../app/store";
 import { Pagination } from "../../types/response";
 import { BlockResource } from "../../types/block";
 import userService from "../../services/userService";
 import LoadingIndicator from "../LoadingIndicator";
 import chatRoomService from "../../services/chatRoomService";
+import { FriendRequestResource } from "../../types/friendRequest";
 
 export type MessageRequest = {
     content: string;
@@ -81,7 +82,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 const news = response.data.filter(item => !existingIds.has(item.id));
                 return [...news, ...prev];
             });
-            
+
             setPagination(response.pagination)
         }
     }
@@ -109,7 +110,9 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
     const fetchRoom = async () => {
         const response = await chatRoomService.getChatRoomById(roomParam.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
+            console.log(response.data)
+            console.log(response.data.isPrivate && !response.data.isAccept && !!response.data.lastMessage)
             setRoom(response.data)
         }
     }
@@ -127,9 +130,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
 
     useEffect(() => {
-
         fetchMessages(pagination.page, pagination.size);
-
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
@@ -157,6 +158,11 @@ const ChatPopup: FC<ChatPopupProps> = ({
                     if (message.senderId !== user?.id)
                         setIsRead(false)
 
+                    if(message.isFetch) {
+                        setIsShowPrevent(false)
+                        dispatch(setChatRoomAccepted(room.id));
+                        fetchRoom()
+                    }
                 }
             },
             // ON READ STATUS RECEIVE
@@ -198,7 +204,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
             },
             undefined,
             (chatRoomId: string) => {
-                if(room.id === chatRoomId) {
+                if (room.id === chatRoomId) {
                     fetchRoom()
                 }
             }
@@ -207,6 +213,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
     useEffect(() => {
         room.isPrivate && room.friend && getBlock(room.friend?.id)
+
         setIsShowPrevent(room.isPrivate && !room.isAccept && !!room.lastMessage)
     }, [room])
 
@@ -299,23 +306,15 @@ const ChatPopup: FC<ChatPopupProps> = ({
             const sentAt = tempMessage.sentAt.toISOString();
             formData.append('sentAt', sentAt);
 
-            const response = await messageService.sendMessage(formData);
-            if (response.isSuccess) {
-                if (isShowPrevent) {
-                    setIsShowPrevent(false)
-                    dispatch(setChatRoomAccepted(room.id));
-                }
-            }
+            await messageService.sendMessage(formData);
+            
         } else {
 
             msgPayload.sentAt = tempMessage.sentAt
 
             try {
                 await SignalRConnector.sendMessage(msgPayload)
-                if (isShowPrevent) {
-                    setIsShowPrevent(false)
-                    dispatch(setChatRoomAccepted(room.id));
-                }
+                
             } catch (error) {
                 alert(error)
             }
@@ -393,7 +392,7 @@ const ChatPopup: FC<ChatPopupProps> = ({
                             alt="Avatar"
                             className="w-[40px] h-[40px] rounded-full object-cover"
                         />
-                        {room.isOnline && !room.isPrivate || (room.isPrivate && room.friend?.isShowStatus) && <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
+                        {room.isOnline && (!room.isPrivate || (room.isPrivate && room.friend?.isShowStatus)) && <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
                     </div>
 
                     <div className="flex flex-col flex-shrink-0">
@@ -426,14 +425,20 @@ const ChatPopup: FC<ChatPopupProps> = ({
             {!pagination.hasMore && room.isPrivate && room.friend && <div className="flex flex-col gap-y-1 items-center">
                 <Avatar src={room.friend.avatar} size={'large'} />
                 <span className="text-sm text-gray-600 font-bold">{room.friend.fullName}</span>
+                <span className="text-xs text-gray-600">
+                    {!room.isFriend && !room.isConnect && 'Các bạn không phải là bạn bè'}
+                    {room.isFriend && 'Các bạn là bạn bè'}
+                    {!room.isFriend && room.isConnect && 'Các bạn hiện đã được kết nối với nhau'}
+                </span>
             </div>}
+
             {!pagination.hasMore && !room.isPrivate && <div className="flex flex-col gap-y-1 items-center">
                 <Avatar src={room.imageUrl} size={'large'} />
                 <span className="text-sm text-gray-600 font-bold">{room.name}</span>
             </div>}
 
             {loading && <LoadingIndicator />}
-            {pagination.hasMore && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-primary my-2 text-xs">Tải thêm tin nhắn</button>}
+            {pagination.hasMore && !loading && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-primary my-2 text-xs">Tải thêm tin nhắn</button>}
             {[...messages, ...pendingMessages].map(message => <Message chatRoom={room} key={message.id} message={message} isMe={message.senderId === user?.id} />)}
             <div ref={messagesEndRef}></div>
         </div>

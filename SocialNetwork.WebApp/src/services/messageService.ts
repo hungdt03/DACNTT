@@ -1,7 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { MessageResource } from '../types/message';
-import { BaseResponse, PaginationResponse } from '../types/response';
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
 class MessageService {
     private static instance: MessageService;
@@ -23,7 +23,7 @@ class MessageService {
         })
     }
 
-    sendMessage(formData: FormData): Promise<BaseResponse> {
+    sendMessage(formData: FormData): Promise<DataResponse<MessageResource>> {
         return axiosInterceptor.post('/api/messages', formData)
     }
 

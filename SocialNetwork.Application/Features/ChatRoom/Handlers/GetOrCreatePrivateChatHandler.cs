@@ -44,8 +44,11 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             var memberIds = new List<string>() { userId, receiver.Id };
             var chatRoom = await _unitOfWork.ChatRoomRepository
                 .GetPrivateChatRoomByMemberIds(memberIds);
-           
-            if(chatRoom == null)
+
+            var friendShip = await _unitOfWork.FriendShipRepository
+                   .GetFriendShipByUserIdAndFriendIdAsync(userId, receiver.Id, FriendShipStatus.ACCEPTED);
+
+            if (chatRoom == null)
             {
                 chatRoom = new Domain.Entity.ChatRoomInfo.ChatRoom();
                 chatRoom.IsPrivate = true;
@@ -67,15 +70,11 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     IsAccepted = false,
                 };
 
-                var friendShip = await _unitOfWork.FriendShipRepository
-                   .GetFriendShipByUserIdAndFriendIdAsync(userId, receiver.Id, FriendShipStatus.ACCEPTED);
-
                 if (friendShip != null)
                 {
                     user.IsAccepted = true;
                     me.IsAccepted = true;
                 }
-
 
                 var members = new List<ChatRoomMember>
                 {
@@ -105,8 +104,20 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                        .IsUserHaveStoryAsync(receiver.Id);
 
                 response.Friend.HaveStory = haveStory;
+                response.IsConnect = true;
+                response.Friend.IsShowStatus = true;
+                response.Friend.HaveStory = true;
+            } else
+            {
+                response.Friend.IsShowStatus = false;
+                response.Friend.HaveStory = false;
             }
-           
+         
+            if (friendShip != null)
+            {
+                response.IsFriend = true;
+            }
+         
             response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId)?.IsAccepted ?? false;
             response.IsRecipientAccepted = recipient.IsAccepted;
             response.RecentOnlineTime = receiver.RecentOnlineTime;

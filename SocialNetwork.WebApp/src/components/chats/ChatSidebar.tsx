@@ -29,21 +29,24 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const { user } = useSelector(selectAuth);
     const navigate = useNavigate();
+    const [isChatRoomsLoaded, setIsChatRoomsLoaded] = useState(false);
 
-     const getChatRoomById = async (chatRoomId: string): Promise<ChatRoomResource | undefined> => {
-            const response = await chatRoomService.getChatRoomById(chatRoomId);
-            if (response.isSuccess) {
-                return response.data;
-            }
-    
-            return undefined;
+    const getChatRoomById = async (chatRoomId: string): Promise<ChatRoomResource | undefined> => {
+        const response = await chatRoomService.getChatRoomById(chatRoomId);
+        if (response.isSuccess) {
+            return response.data;
         }
-    
+
+        return undefined;
+    }
+
 
     useEffect(() => {
+        if (!isChatRoomsLoaded) return;
         SignalRConnector.events(
             // ON MESSAGE RECEIVE
             (message) => {
+                console.log(message)
                 const findChatRoom = chatRooms.find(c => c.id === message.chatRoomId);
                 if (findChatRoom) {
                     setChatRooms(prev => {
@@ -75,8 +78,15 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
                 } else {
                     getChatRoomById(message.chatRoomId)
                         .then(data => {
-                            if(data) {
-                                setChatRooms(prev => [data, ...prev])
+                            if (data) {
+                                console.log(data)
+
+                                setChatRooms(prev => {
+                                    const findExisted = prev.find(m => m.id === data.id);
+                                    if(!findExisted)
+                                        return [data, ...prev]
+                                    return prev
+                                })
                             }
                         });
                 }
@@ -101,7 +111,7 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
 
         return () => SignalRConnector.unsubscribeEvents()
 
-    }, [chatRoom]);
+    }, [isChatRoomsLoaded, chatRoom]);
 
     useEffect(() => {
         const fetchChatRooms = async () => {
@@ -110,6 +120,7 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
             setLoading(false)
             if (response.isSuccess) {
                 setChatRooms(response.data);
+                setIsChatRoomsLoaded(true);
             }
         }
 

@@ -18,6 +18,9 @@ namespace SocialNetwork.Application.DTOs
         public bool IsRemove { get; set; }
         public string MemberId { get; set; }
 
+        // For finish starting chatroom
+        public bool IsFetch { get; set; }
+
     }
 
     public class ReadStatus

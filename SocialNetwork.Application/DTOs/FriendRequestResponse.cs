@@ -8,6 +8,7 @@ namespace SocialNetwork.Application.DTOs
         public string ReceiverId { get; set; }
         public string SenderId { get; set; }
         public string Status { get; set; }
+        public bool IsConnect {  get; set; }
         public DateTimeOffset SentAt { get; set; }
     }
 }

@@ -149,7 +149,7 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
             setChatRoom(response.data)
             dispatch(add(response.data))
         } else {
-            message.error(response.message)
+            message.error('Vui lòng refresh trang và thử lại')
         }
     }
 

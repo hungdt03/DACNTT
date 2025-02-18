@@ -19,8 +19,6 @@ import cn from "../../utils/cn";
 import LoadingIndicator from "../LoadingIndicator";
 import userService from "../../services/userService";
 import { BlockResource } from "../../types/block";
-import { useElementInfinityScroll } from "../../hooks/useElementInfinityScroll";
-import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 
 type ChatAreaProps = {
     chatRoom: ChatRoomResource;
@@ -67,12 +65,8 @@ const ChatArea: FC<ChatAreaProps> = ({
                 const news = response.data.filter(item => !existingIds.has(item.id));
                 return [...news, ...prev];
             });
-            
-            setPagination(response.pagination)
 
-            if (containerRef.current) {
-                containerRef.current.scrollBy({ top: 100, behavior: 'smooth' });
-            }
+            setPagination(response.pagination)
         }
     }
 
@@ -103,6 +97,10 @@ const ChatArea: FC<ChatAreaProps> = ({
         }
     }
 
+    useEffect(() => {
+        if (messagesEndRef.current)
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }, [messages])
 
     useEffect(() => {
         chatRoom.isPrivate && chatRoom.friend && getBlock(chatRoom.friend?.id)
@@ -137,8 +135,7 @@ const ChatArea: FC<ChatAreaProps> = ({
                         return updatedMessages;
                     });
 
-                    if (messagesEndRef.current)
-                        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+
                 }
             },
             // ON READ STATUS RECEIVE
@@ -175,12 +172,12 @@ const ChatArea: FC<ChatAreaProps> = ({
             },
             undefined,
             (chatRoomId: string) => {
-                if(chatRoom.id === chatRoomId) {
+                if (chatRoom.id === chatRoomId) {
                     onFetch()
                 }
             },
             (chatRoomId: string) => {
-                if(chatRoom.id === chatRoomId) {
+                if (chatRoom.id === chatRoomId) {
                     onFetch()
                 }
             }
@@ -200,7 +197,6 @@ const ChatArea: FC<ChatAreaProps> = ({
     }, [chatRoom]);
 
     useEffect(() => {
-
         setIsShowPrevent(chatRoom.isPrivate && !chatRoom.isAccept && !!chatRoom.lastMessage)
     }, [chatRoom])
 
@@ -289,9 +285,27 @@ const ChatArea: FC<ChatAreaProps> = ({
             formData.append('sentAt', sentAt);
 
             const response = await messageService.sendMessage(formData);
-            if (response.isSuccess) {
-                if (isShowPrevent) {
-                    setIsShowPrevent(false)
+            if (response.isSuccess && response.data) {
+                const message = response.data
+                if (message.chatRoomId === chatRoom.id) {
+                    if (message.isRemove && message.memberId === user?.id) {
+                        onFetch()
+                    }
+                    setPendingMessages((prev) =>
+                        prev.filter((m) => m.sentAt.getTime() !== new Date(message.sentAt).getTime())
+                    );
+                    setMessages((prev) => {
+                        const updatedMessages = [...prev, message];
+                        if (message.senderId !== user?.id) {
+                            const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === message.senderId));
+                            if (findIndex !== -1) {
+                                updatedMessages[findIndex].reads = [
+                                    ...(updatedMessages[findIndex]?.reads?.filter(r => r.userId !== message.senderId) || [])
+                                ];
+                            }
+                        }
+                        return updatedMessages;
+                    });
                 }
             }
         } else {
@@ -299,10 +313,6 @@ const ChatArea: FC<ChatAreaProps> = ({
 
             try {
                 await SignalRConnector.sendMessage(msgPayload);
-
-                if (isShowPrevent) {
-                    setIsShowPrevent(false)
-                }
             } catch (error) {
                 message.error(error as string)
             }
@@ -318,23 +328,8 @@ const ChatArea: FC<ChatAreaProps> = ({
     }
 
     const handleReadMessage = async () => {
-        const response = await messageService.readMessage(chatRoom.id);
-        console.log(response)
+        await messageService.readMessage(chatRoom.id);
     }
-
-    const fetchNextPage = () => {
-        if (!pagination.hasMore || loading) return;
-        fetchMessages(pagination.page + 1, pagination.size)
-    }
-
-    const { containerRef } = useInfiniteScroll({
-        triggerId: 'messenger-scroll-trigger',
-        fetchMore: () => fetchNextPage(),
-        loading: loading,
-        hasMore: pagination.hasMore,
-        rootMargin: '0px'
-    })
-
 
     const renderMessageBox = () => {
         if (chatRoom.isPrivate) {
@@ -404,18 +399,24 @@ const ChatArea: FC<ChatAreaProps> = ({
             </div>
         </div>
 
-        <div ref={containerRef} className="flex flex-col h-full gap-y-3 w-full overflow-y-auto custom-scrollbar p-4">
+        <div className="flex flex-col h-full gap-y-3 w-full overflow-y-auto custom-scrollbar p-4">
             {!pagination.hasMore && chatRoom.isPrivate && chatRoom.friend && <div className="flex flex-col gap-y-1 items-center">
                 <Avatar src={chatRoom.friend.avatar} className="w-[80px] h-[80px]" />
                 <span className="text-sm text-gray-600 font-bold">{chatRoom.friend.fullName}</span>
+                <span className="text-xs text-gray-600">
+                    {!chatRoom.isFriend && !chatRoom.isConnect && 'Các bạn không phải là bạn bè'}
+                    {chatRoom.isFriend && 'Các bạn là bạn bè'}
+                    {!chatRoom.isFriend && chatRoom.isConnect && 'Các bạn hiện đã được kết nối với nhau'}
+                </span>
             </div>}
+
             {!pagination.hasMore && !chatRoom.isPrivate && <div className="flex flex-col gap-y-1 items-center">
                 <Avatar src={chatRoom.imageUrl ?? images.group} className="w-[80px] h-[80px]" />
                 <span className="text-sm text-gray-600 font-bold">{chatRoom.name}</span>
             </div>}
-            {loading && <LoadingIndicator />}
-            <div id="messenger-scroll-trigger" className="w-full h-1" />
 
+            {loading && <LoadingIndicator />}
+            {pagination.hasMore && !loading && <button onClick={() => fetchMessages(pagination.page + 1, pagination.size)} className="w-full text-gray-500 my-2 text-sm">Tải thêm tin nhắn</button>}
             {[...messages, ...pendingMessages].map(message => <Message chatRoom={chatRoom} key={message.id} message={message} isMe={message.senderId === user?.id} />)}
             <div ref={messagesEndRef}></div>
         </div>

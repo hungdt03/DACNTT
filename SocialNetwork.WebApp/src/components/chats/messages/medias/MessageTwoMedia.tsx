@@ -27,7 +27,7 @@ const MessageTwoMedia: FC<MessageTwoMediaProps> = ({
                     <video
                         key={item.id}
                         src={item.mediaUrl}
-                        className="w-28 h-28 rounded-lg object-cover"
+                        className="w-16 h-16 rounded-lg object-cover aspect-square"
                         onClick={() => handlePreview(index)}
                         controls
                     />
@@ -36,7 +36,7 @@ const MessageTwoMedia: FC<MessageTwoMediaProps> = ({
                         key={item.id}
                         src={item.mediaUrl}
                         alt={`Post Media ${index + 1}`}
-                        className="w-28 h-28 rounded-lg object-cover"
+                        className="w-16 h-16 rounded-lg object-cover aspect-square"
                         onClick={() => handlePreview(index)}
                     />
                 )

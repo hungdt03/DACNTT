@@ -49,6 +49,9 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 SentAt = DateTimeOffset.UtcNow,
             };
 
+            chatRoom.LastMessage = $"{userFullname} đã thay đổi tên nhóm thành {request.Name}";
+            chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
+
             await _unitOfWork.MessageRepository.CreateMessageAsync(message);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

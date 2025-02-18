@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
+using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services.Redis;
@@ -68,8 +69,24 @@ namespace SocialNetwork.Infrastructure.SignalR
             if(!chatRoom.IsPrivate)
             {
                 var chatRoomMember = await unitOfWork
-                    .ChatRoomMemberRepository.GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId)
-                    ?? throw new HubException("Bạn không phải là thành viên của nhóm chat");
+                    .ChatRoomMemberRepository.GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId);
+
+                if(chatRoomMember == null)
+                {
+                    var errorMessage = new MessageResponse()
+                    {
+                        Id = Guid.NewGuid(),
+                        ChatRoomId = chatRoom.Id,
+                        Content = "Bạn không còn là thành viên của nhóm nữa",
+                        MessageType = MessageType.ERROR,
+                        SentAt = messageRequest.SentAt,
+                        SenderId = userId,
+                        Sender = ApplicationMapper.MapToUser(senderUser)
+                    };
+
+                    await Clients.Caller.SendAsync("NewMessage", errorMessage);
+                    return;
+                }
             }
             
             await unitOfWork.BeginTransactionAsync();
@@ -159,6 +176,7 @@ namespace SocialNetwork.Infrastructure.SignalR
                     {
                         await Groups.AddToGroupAsync(Context.ConnectionId, chatRoom.UniqueName);
                     });
+
                 } else if (senderMember != null && recipientMember != null && senderMember.IsAccepted)
                 {
                     var block = await unitOfWork.BlockListRepository
@@ -177,7 +195,9 @@ namespace SocialNetwork.Infrastructure.SignalR
             
             if(systemMessage != null)
             {
-                await Clients.Group(chatRoom.UniqueName).SendAsync("NewMessage", ApplicationMapper.MapToMessage(systemMessage));
+                var mapSystemMsg = ApplicationMapper.MapToMessage(systemMessage);
+                mapSystemMsg.IsFetch = true;
+                await Clients.Group(chatRoom.UniqueName).SendAsync("NewMessage", mapSystemMsg);
             }
            
         }

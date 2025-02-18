@@ -29,6 +29,9 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
 
+            var chatRoom = await _unitOfWork.ChatRoomRepository
+                .GetChatRoomByIdAsync(request.ChatRoomId) ?? throw new NotFoundException("Không tìm thấy phòng chat");
+
             var chatRoomMember = await _unitOfWork
                 .ChatRoomMemberRepository.GetChatRoomMemberByRoomIdAndUserId(request.ChatRoomId, userId)
                 ?? throw new AppException("ID nhóm không hợp lệ");
@@ -57,6 +60,8 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             await _unitOfWork.MessageRepository.CreateMessageAsync(message);
 
+            chatRoom.LastMessageDate = DateTimeOffset.UtcNow;
+            chatRoom.LastMessage = $"{userFullName} đã rời nhóm";
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             await _signalRService.SendMessageToSpecificGroup(chatRoomMember.ChatRoom.UniqueName, ApplicationMapper.MapToMessage(message));

@@ -9,6 +9,7 @@ using SocialNetwork.Application.Features.ChatRoom.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity;
 
 namespace SocialNetwork.Application.Features.ChatRoom.Handlers
@@ -54,6 +55,19 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                        .IsUserHaveStoryAsync(friend.UserId);
                     response.Friend.HaveStory = haveStory;
                 }
+
+                var friendShip = await _unitOfWork.FriendShipRepository
+                       .GetFriendShipByUserIdAndFriendIdAsync(userId, friend.UserId);
+
+                if (friendShip != null && friendShip.IsConnect && friendShip.Status != FriendShipStatus.ACCEPTED)
+                {
+                    response.IsConnect = true;
+                }
+                else if (friendShip != null && friendShip.Status != FriendShipStatus.ACCEPTED)
+                {
+                    response.IsFriend = true;
+                }
+
 
                 response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId).IsAccepted;
                 response.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;

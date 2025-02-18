@@ -100,7 +100,7 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
     }
 
     return <>
-        <div className="flex flex-col gap-y-3 w-[380px]">
+        <div className="flex flex-col gap-y-3 w-[380px] h-full">
             <div className="flex items-center justify-between">
                 <span className="font-bold text-gray-700 px-1 text-[15px]">Đoạn chat</span>
                 <button onClick={showModal} className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100">
@@ -111,12 +111,12 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
                 <Search size={16} />
                 <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="outline-none border-none bg-gray-100 w-full" placeholder="Tìm kiếm cuộc hội thoại" />
             </div>
-            <div className="flex flex-col gap-y-2 p-2 max-h-[70vh] overflow-y-auto custom-scrollbar ww-full">
+            <div className="flex flex-col gap-y-2 p-2 h-full w-full">
                 {loading ? <ChatUserSkeleton />
                     : chatRooms.map(chatRoom => <div onClick={() => handleSelectChat(chatRoom)} key={chatRoom.id} className="relative flex items-center gap-x-3 py-2 px-3 hover:bg-gray-100 rounded-md cursor-pointer">
                         <div className="relative">
                             <Avatar className="w-12 flex-shrink-0 h-12 object-cover" src={chatRoom.friend?.avatar ?? images.group} />
-                            {chatRoom.isOnline && !chatRoom.isPrivate || (chatRoom.isPrivate && chatRoom.friend?.isShowStatus) && <div className="absolute right-0 bottom-0 w-3 h-3 rounded-full bg-green-500 border-[2px] border-white"></div>}
+                            {chatRoom.isOnline && (!chatRoom.isPrivate || (chatRoom.isPrivate && chatRoom.friend?.isShowStatus)) && <div className="absolute right-0 bottom-0 w-3 h-3 rounded-full bg-green-500 border-[2px] border-white"></div>}
                         </div>
                         <div className="flex flex-col items-start gap-y-1">
                             <span className="font-semibold text-[16px] text-sm">{chatRoom.isPrivate ? chatRoom.friend?.fullName : chatRoom.name}</span>

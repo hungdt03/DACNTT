@@ -6,6 +6,7 @@ namespace SocialNetwork.Application.Interfaces.Services
     {
         Task SendNotificationToSpecificUser(string username, NotificationResponse notification);
         Task SendMessageToSpecificGroup(string groupName, MessageResponse message);
+        Task SendMessageToSpecificUser(string username, MessageResponse message);
         Task SendBlockSignalToSpecificUser(string username, Guid chatRoomId);
         Task SendActionGroupToSpecificUser(string username, Guid chatRoomId);
         Task SendReadStatusToSpecificGroup(string groupName, MessageResponse message, string userId);

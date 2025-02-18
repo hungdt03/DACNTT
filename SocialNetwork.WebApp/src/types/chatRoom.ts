@@ -12,11 +12,15 @@ export type ChatRoomResource  = {
     isRead: boolean;
     isOnline: boolean;
     recentOnlineTime: Date;
+    isPrivate: boolean;
 
-    // 
+    // For chatRoom has more than 2 members
     isMember: boolean;
     isAdmin: boolean;
-    isPrivate: boolean;
+   
+    // For private chatroom
     isAccept: boolean;
     isRecipientAccepted: boolean;
+    isConnect: boolean;
+    isFriend: boolean;
 }

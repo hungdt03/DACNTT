@@ -4,6 +4,7 @@ import { formatTimeMessage } from "../../../utils/date";
 import MessageMedia from "./MessageMedia";
 import { Check } from "lucide-react";
 import { Tooltip } from "antd";
+import { MessageType } from "../../../enums/message-type";
 
 type MessageFromMeProps = {
     message: MessageResource;
@@ -17,11 +18,22 @@ const MessageFromMe: FC<MessageFromMeProps> = ({
     return <div className="flex justify-end w-full">
         <div className="flex flex-col items-end gap-y-1 max-w-[70%] w-full">
             <div className="flex justify-end w-full">
-                <Tooltip placement="left" title={<span className="text-[12px]">{message.status === 'sending' ? 'Đang gửi' : `${formatTimeMessage(new Date(message.sentAt))}`}</span>}>
+                <Tooltip
+                    placement="left"
+                    className="flex flex-col items-end"
+                    title={<span className="text-[12px]">{message.status === 'sending' ? 'Đang gửi' : `${formatTimeMessage(new Date(message.sentAt))}`}</span>}
+                >
                     {message.medias && <MessageMedia medias={message.medias} />}
-                    {message.content && <p className="bg-sky-500 text-[13px] inline-block text-white p-2 rounded-lg break-words">
-                        {message.content}
-                    </p>}
+                    {message.content && (
+                        <p
+                            className={`inline-block text-white text-sm p-2 rounded-lg break-words ${message.messageType === MessageType.ERROR
+                                    ? 'bg-red-500'  // Màu đỏ cho lỗi
+                                    : 'bg-sky-500'  // Màu xanh dương cho tin nhắn thành công
+                                }`}
+                        >
+                            {message.content}
+                        </p>
+                    )}
                 </Tooltip>
             </div>
 

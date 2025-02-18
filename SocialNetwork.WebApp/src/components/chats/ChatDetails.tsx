@@ -251,7 +251,6 @@ const MemberCollapse: FC<MemberCollapseProps> = ({
     user
 }) => {
 
-
     const handleKickMember = async (memberId: string) => {
         const response = await chatRoomService.kickMember(memberId);
         if (response.isSuccess) {
