@@ -93,15 +93,22 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             } 
 
             var response = ApplicationMapper.MapToChatRoom(chatRoom);
+
+            var recipient = chatRoom.Members.FirstOrDefault(s => s.UserId != userId);
+            if (recipient == null) throw new AppException("Có lỗi xảy ra, vui lòng thử lại");
+
             response.Friend = ApplicationMapper.MapToUser(receiver);
-            response.IsOnline = receiver.IsOnline;
+            if (recipient.IsAccepted)
+            {
+                response.IsOnline = receiver.IsOnline;
+                var haveStory = await _unitOfWork.StoryRepository
+                       .IsUserHaveStoryAsync(receiver.Id);
 
-            var haveStory = await _unitOfWork.StoryRepository
-                   .IsUserHaveStoryAsync(receiver.Id);
-
-            response.Friend.HaveStory = haveStory;
+                response.Friend.HaveStory = haveStory;
+            }
+           
             response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId)?.IsAccepted ?? false;
-            response.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;
+            response.IsRecipientAccepted = recipient.IsAccepted;
             response.RecentOnlineTime = receiver.RecentOnlineTime;
 
             return new DataResponse<ChatRoomResponse>()
