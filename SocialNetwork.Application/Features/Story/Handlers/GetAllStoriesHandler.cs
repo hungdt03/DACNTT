@@ -8,7 +8,6 @@ using SocialNetwork.Application.Features.Story.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using SocialNetwork.Domain.Entity.StoryInfo;
 
 namespace SocialNetwork.Application.Features.Story.Handlers
 {
@@ -36,6 +35,7 @@ namespace SocialNetwork.Application.Features.Story.Handlers
             foreach (var group in groupedStories)
             {
                 var userStories = group.ToList();
+                if (userStories.Count == 0) continue;
                 if (group.Key == userId)
                 {
                     bool haveAnyViewers = false;
