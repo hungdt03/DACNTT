@@ -21,6 +21,7 @@ import { Pagination } from "../../types/response";
 import { BlockResource } from "../../types/block";
 import userService from "../../services/userService";
 import LoadingIndicator from "../LoadingIndicator";
+import chatRoomService from "../../services/chatRoomService";
 
 export type MessageRequest = {
     content: string;
@@ -38,7 +39,7 @@ type ChatPopupProps = {
 }
 
 const ChatPopup: FC<ChatPopupProps> = ({
-    room,
+    room: roomParam,
     onClose,
     onMinimize,
 }) => {
@@ -46,8 +47,9 @@ const ChatPopup: FC<ChatPopupProps> = ({
     const { user } = useSelector(selectAuth);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messages, setMessages] = useState<MessageResource[]>([])
-    const [isRead, setIsRead] = useState(room.isOnline);
-    const [isShowPrevent, setIsShowPrevent] = useState(false)
+    const [isRead, setIsRead] = useState(roomParam.isRead);
+    const [isShowPrevent, setIsShowPrevent] = useState(false);
+    const [room, setRoom] = useState<ChatRoomResource>(roomParam);
 
     const [blockUser, setBlockUser] = useState<BlockResource>()
 
@@ -98,18 +100,26 @@ const ChatPopup: FC<ChatPopupProps> = ({
         const response = await userService.unblockUser(userId);
         if (response.isSuccess) {
             message.success(response.message)
-            setBlockUser(undefined)
+            getBlock(userId)
+            fetchRoom()
         } else {
             message.error(response.message)
         }
     }
 
+    const fetchRoom = async () => {
+        const response = await chatRoomService.getChatRoomById(roomParam.id);
+        if(response.isSuccess) {
+            setRoom(response.data)
+        }
+    }
 
     const handleBlockUser = async (userId: string) => {
         const response = await userService.blockUser(userId);
         if (response.isSuccess) {
             message.success(response.message)
-            dispatch(remove(room.id))
+            getBlock(userId)
+            fetchRoom()
         } else {
             message.error(response.message)
         }
@@ -187,6 +197,11 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 groupName === room.uniqueName && setTyping('')
             },
             undefined,
+            (chatRoomId: string) => {
+                if(room.id === chatRoomId) {
+                    fetchRoom()
+                }
+            }
         );
     }, []);
 
@@ -378,13 +393,13 @@ const ChatPopup: FC<ChatPopupProps> = ({
                             alt="Avatar"
                             className="w-[40px] h-[40px] rounded-full object-cover"
                         />
-                        {room.isOnline && <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
+                        {room.isOnline && !room.isPrivate || (room.isPrivate && room.friend?.isShowStatus) && <span className="absolute bottom-0 right-0 w-[12px] h-[12px] rounded-full border-2 border-white bg-green-500"></span>}
                     </div>
 
                     <div className="flex flex-col flex-shrink-0">
                         <b className={cn("text-sm", isRead && 'text-black')}>{room.isPrivate ? room.friend?.fullName : room.name}</b>
                         <div className={cn("text-[12px] flex items-center gap-x-2", isRead && 'text-gray-400')}>
-                            {room.isOnline ? 'Đang hoạt động' : `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
+                            {room.isOnline && !room.isPrivate || (room.isPrivate && room.friend?.isShowStatus) ? 'Đang hoạt động' : !room.isPrivate || (room.isPrivate && room.friend?.isShowStatus) && `Hoạt động ${formatTime(new Date(room.recentOnlineTime))}`}
                             <span><DownOutlined className="text-gray-500" /></span>
                         </div>
                     </div>

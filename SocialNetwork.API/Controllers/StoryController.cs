@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Features.Story.Commands;
 using SocialNetwork.Application.Features.Story.Queries;
 using SocialNetwork.Domain.Entity;
@@ -21,6 +22,7 @@ namespace SocialNetwork.API.Controllers
             _mediator = mediator;
         }
 
+        [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost]
         public async Task<IActionResult> CreateStory([FromBody] CreateStoryCommand command)
         {

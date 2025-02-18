@@ -36,13 +36,25 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
             if (friend != null)
             {
+                var checkBlock = await _unitOfWork.BlockListRepository
+                       .GetBlockListByUserIdAndUserIdAsync(friend.UserId, userId);
+
                 response.Friend = ApplicationMapper.MapToUser(friend.User);
-                response.Friend.IsOnline = response.IsOnline = friend.User.IsOnline;
+                response.IsOnline = friend.User.IsOnline;
 
-                var haveStory = await _unitOfWork.StoryRepository
+                if (checkBlock != null)
+                {
+                    response.Friend.HaveStory = false;
+                    response.Friend.IsShowStatus = false;
+                    response.Friend.IsOnline = false;
+                }
+                else
+                {
+                    var haveStory = await _unitOfWork.StoryRepository
                        .IsUserHaveStoryAsync(friend.UserId);
+                    response.Friend.HaveStory = haveStory;
+                }
 
-                response.Friend.HaveStory = haveStory;
                 response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId).IsAccepted;
                 response.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;
                 

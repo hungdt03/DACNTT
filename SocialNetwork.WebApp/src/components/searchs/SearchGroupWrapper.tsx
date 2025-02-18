@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import searchService from "../../services/searchService";
 import SearchGroupItem from "./SearchGroupItem";
 import { SearchGroupSuggestResource } from "../../types/search/search-group-suggest";
@@ -18,7 +18,9 @@ const SearchGroupWrapper: FC<SearchGroupWrapperProps> = ({
     const [suggestGroups, setSuggestGroups] = useState<SearchGroupSuggestResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('')
+    const [message, setMessage] = useState('');
+
+    const navigate = useNavigate();
 
     const fetchSuggestGroups = async (value: string, page: number, size: number) => {
         setLoading(true)
@@ -37,9 +39,14 @@ const SearchGroupWrapper: FC<SearchGroupWrapperProps> = ({
 
     }, [searchParam])
 
+    const handleRedirectToGroupPage = async (url: string, groupId: string) => {
+        await searchService.addSeachGroup(groupId);
+        navigate(url)
+    }
+
     return <div className="flex flex-col gap-y-4 w-full h-full custom-scrollbar overflow-y-auto">
         {!loading && suggestGroups.length === 0 && <div className="text-gray-500 md:text-[16px] text-sm text-center">{message}</div>}
-        {suggestGroups.map(suggestGroup => <SearchGroupItem key={suggestGroup.group.id} suggestGroup={suggestGroup} />)}
+        {suggestGroups.map(suggestGroup => <SearchGroupItem onClick={() => handleRedirectToGroupPage(`/groups/${suggestGroup.group.id}`, suggestGroup.group.id)} key={suggestGroup.group.id} suggestGroup={suggestGroup} />)}
         {loading && <LoadingIndicator />}
 
     </div>

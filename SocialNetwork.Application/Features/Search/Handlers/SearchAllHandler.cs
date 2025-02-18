@@ -60,6 +60,13 @@ namespace SocialNetwork.Application.Features.Search.Handlers
 
             foreach (var user in users)
             {
+                if(user.Id != userId)
+                {
+                    var blockUser = await _unitOfWork.BlockListRepository
+                        .GetBlockListByUserIdAndUserIdAsync(user.Id, userId);
+                    if (blockUser != null) continue;
+                }
+            
                 var mapUser = ApplicationMapper.MapToUser(user);
 
                 if (user.Id == userId)
@@ -94,13 +101,13 @@ namespace SocialNetwork.Application.Features.Search.Handlers
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            var searchHistory = new SearchHistory()
-            {
-                SearchText = request.Query,
-                UserId = userId,
-            };
+            //var searchHistory = new SearchHistory()
+            //{
+            //    SearchText = request.Query,
+            //    UserId = userId,
+            //};
 
-            await _unitOfWork.SearchRepository.CreateSearchHistoryAsync(searchHistory);
+            //await _unitOfWork.SearchRepository.CreateSearchHistoryAsync(searchHistory);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

@@ -10,7 +10,7 @@ namespace SocialNetwork.Application.Contracts.Requests
     {
         [Required(ErrorMessage = "Nội dung không được để trống")]
         public string Content { get; set; }
-        [PrivacyValidation]
+        [PostPrivacyValidation]
         public string Privacy { get; set; } = PrivacyConstant.PUBLIC;
         public List<Guid>? RemoveMediaIds { get; set; }
         public List<Guid>? RemoveTagIds { get; set; }

@@ -23,7 +23,6 @@ function App() {
             try {
                 const response = await authService.getPrincipal();
                 if (response.isSuccess) {
-                    console.log(response.data)
                     dispatch(initialize({ isAuthenticated: true, user: response.data }));
                 } else {
                     dispatch(initialize({

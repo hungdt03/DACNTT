@@ -26,5 +26,7 @@ namespace SocialNetwork.Application.DTOs
         public string Location { get; set; }
         public DateTimeOffset DateJoined { get; set; }
         public bool IsLock { get; set; }
+        public bool IsShowStatus { get; set; }
+        public bool IsShowStory { get; set; }
     }
 }

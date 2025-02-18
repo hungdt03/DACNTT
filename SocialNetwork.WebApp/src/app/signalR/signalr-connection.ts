@@ -16,9 +16,8 @@ class SignalRConnector {
         onTypingMessage?: (groupName: string, content: string) => void,
         onStopTypingMessage?: (groupName: string) => void,
         onNotificationReceived?: (notification: NotificationResource) => void,
-        // onIncomingCall?: (payload: IncomingCallPayload) => void,
-        // onCallAccepted?: (signalData: any) => void,
-        // onLeaveCall?: () => void,
+        onBlockSignalReceive?: (chatRoomId: string) => void,
+        onActionGroupSignalReceive?: (chatRoomId: string) => void,
     ) => void
 
     private static instance: SignalRConnector;
@@ -36,7 +35,7 @@ class SignalRConnector {
 
         this.connection.start().catch(err => console.log(err));
 
-        this.events = (onMessageReceived, onReadStatusReceived, onTypingMessage, onStopTypingMessage, onNotificationReceived) => {
+        this.events = (onMessageReceived, onReadStatusReceived, onTypingMessage, onStopTypingMessage, onNotificationReceived, onBlockSignalReceive, onActionGroupSignalReceive) => {
             this.connection.on("NewMessage", (message: MessageResource) => {
                 onMessageReceived?.(message);
             });
@@ -55,6 +54,14 @@ class SignalRConnector {
 
             this.connection.on("NewNotification", (notification: NotificationResource) => {
                 onNotificationReceived?.(notification);
+            });
+
+            this.connection.on("FetchBlock", (chatRoomId: string) => {
+                onBlockSignalReceive?.(chatRoomId)
+            })
+
+            this.connection.on("FetchChatRoom", (chatRoomId: string) => {
+                onActionGroupSignalReceive?.(chatRoomId);
             });
         };
 

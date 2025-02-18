@@ -45,9 +45,7 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
             // ON MESSAGE RECEIVE
             (message) => {
                 const findChatRoom = chatRooms.find(c => c.id === message.chatRoomId);
-                console.log(chatRooms)
                 if (findChatRoom) {
-                    console.log('Find chatRoom')
                     setChatRooms(prev => {
                         const updatedList = [...prev];
 
@@ -75,7 +73,6 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
                     });
 
                 } else {
-                    console.log('not found chatRoom')
                     getChatRoomById(message.chatRoomId)
                         .then(data => {
                             if(data) {

@@ -28,16 +28,32 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
         public async Task<BaseResponse> Handle(ViewStoryCommand request, CancellationToken cancellationToken)
         {
-            var story = await _unitOfWork.StoryRepository.GetStoryByIdAsync(request.StoryId)
-                ?? throw new NotFoundException("Tin không tồn tại");
+            var story = await _unitOfWork.StoryRepository.GetStoryByIdAsync(request.StoryId);
+
+            if(story == null || story.Privacy == PrivacyConstant.PRIVATE)
+            {
+                throw new NotFoundException("Không tìm thấy tin");
+            }
+
+            var userId = _contextAccessor.HttpContext.User.GetUserId();
+
+            if (userId == story.UserId)
+                throw new AppException("Không thể xem story của chính mình");
+
+            var blockUser = await _unitOfWork.BlockListRepository
+              .GetBlockListByUserIdAndUserIdAsync(userId, story.UserId);
+
+            if(blockUser != null) throw new AppException("Bạn không thể xem tin này");
+
+            var friendShip = await _unitOfWork.FriendShipRepository
+                .GetFriendShipByUserIdAndFriendIdAsync(userId, story.UserId);
+
+            if (friendShip == null || !friendShip.IsConnect)
+                throw new AppException("Bạn không thể xem tin này");
 
             if (story.ExpiresAt < DateTimeOffset.UtcNow)
                 throw new AppException("Tin không còn nữa");
 
-            var userId = _contextAccessor.HttpContext.User.GetUserId();
-
-            if (userId == story.UserId) throw new AppException("Không thể xem story của chính mình");
-            
             var isExistedViewer = await _unitOfWork.ViewerRepository.IsViewerExisted(userId, request.StoryId);
 
             if (isExistedViewer) throw new AppException("Tin này đã được xem trước đó");

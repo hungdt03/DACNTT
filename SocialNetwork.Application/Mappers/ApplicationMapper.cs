@@ -27,6 +27,8 @@ namespace SocialNetwork.Application.Mappers
                 Gender = user.Gender,
                 RecentOnlineTime = user.RecentOnlineTime,
                 IsOnline = user.IsOnline,
+                IsShowStory = true,
+                IsShowStatus = true,
             };
         }
         public static List<UserResponse> MapToListUser(List<User> users)
@@ -48,7 +50,9 @@ namespace SocialNetwork.Application.Mappers
                 Location = user.Location != null ? user.Location.Address : null,
                 IsLock = user.IsLock,
                 RecentOnlineTime = user.RecentOnlineTime,
-                IsOnline = user.IsOnline
+                IsOnline = user.IsOnline,
+                IsShowStory = true,
+                IsShowStatus = true,
             }).ToList();
         }
         public static List<ScoreResponse> MapToUserScore(List<UserScoreCommand> userScores)

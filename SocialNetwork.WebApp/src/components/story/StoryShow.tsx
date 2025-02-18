@@ -54,12 +54,14 @@ const StoryShow: FC<StoryShowProps> = ({
     const handleViewStory = async (storyId: string) => {
         const response = await storyService.viewStory(storyId);
         if (response.isSuccess) {
-            message.success(response.message)
+            console.log(response.message)
         }
     }
 
     const fetchViewers = async (storyId: string) => {
+        setLoading(true)
         const response = await storyService.getMyStoryViews(storyId);
+        setLoading(false)
         if (response.isSuccess) {
             setViewers(response.data)
         }
@@ -72,7 +74,7 @@ const StoryShow: FC<StoryShowProps> = ({
         } as ReactStory);
 
         if (response.isSuccess) {
-            message.success(response.message)
+            console.log(response)
         } else {
             message.error(response.message)
         }

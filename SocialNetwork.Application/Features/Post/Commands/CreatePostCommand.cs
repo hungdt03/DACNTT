@@ -12,7 +12,7 @@ namespace SocialNetwork.Application.Features.Post.Commands
     {
         [Required(ErrorMessage = "Nội dung không được để trống")]
         public string Content { get; set; }
-        [PrivacyValidation]
+        [PostPrivacyValidation]
         public string Privacy { get; set; } = PrivacyConstant.PUBLIC;
         public string? Background {  get; set; }
         public Guid? GroupId { get; set; }

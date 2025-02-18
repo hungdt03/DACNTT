@@ -33,7 +33,7 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            _unitOfWork.FriendShipRepository.DeleteFriendShip(friendRequest);
+            friendRequest.Status = FriendShipStatus.NONE;
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

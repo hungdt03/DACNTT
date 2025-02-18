@@ -12,6 +12,12 @@ import { StoryType } from "../enums/story-type.";
 import CropperImageEditor from "../components/story/editors/CropperImageEditor";
 
 export type StoryOption = "text" | "image" | undefined;
+export type StoryRequest = {
+    background: string;
+    fontFamily: string;
+    content: string;
+    privacy: PrivacyType
+}
 
 const CreateStoryPage: FC = () => {
     const [option, setOption] = useState<StoryOption>(undefined);
@@ -19,7 +25,7 @@ const CreateStoryPage: FC = () => {
     const [loading, setLoading] = useState(false);
     const [openTool, setOpenTool] = useState(false);
 
-    const [storyData, setStoryData] = useState({
+    const [storyData, setStoryData] = useState<StoryRequest>({
         background: dataBackgroundStory[0].background,
         fontFamily: "",
         content: "",

@@ -7,7 +7,9 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.BlockList.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.BlockList.Handlers
 {
@@ -16,17 +18,18 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly UserManager<Domain.Entity.System.User> _userManager;
+        private readonly ISignalRService _signalRService;
 
-        public AddBlockUserHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager)
+        public AddBlockUserHandler(IUnitOfWork unitOfWork, ISignalRService signalRService, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             _userManager = userManager;
+            _signalRService = signalRService;
         }
 
         public async Task<BaseResponse> Handle(AddBlockUserCommand request, CancellationToken cancellationToken)
         {
-          
             var blockeeUser = await _userManager.FindByIdAsync(request.UserId)
                 ?? throw new NotFoundException("Thông tin người bị chặn không tồn tại");
 
@@ -56,6 +59,11 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
             await _unitOfWork.BlockListRepository.CreateNewBlockAsync(newBlock);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            var chatRoom = await _unitOfWork.ChatRoomRepository
+               .GetPrivateChatRoomByMemberIds(new List<string> { userId, blockeeUser.Id });
+
+            await _signalRService.SendBlockSignalToSpecificUser(blockeeUser.UserName, chatRoom.Id);
 
             return new BaseResponse()
             {

@@ -27,6 +27,7 @@ const StoryWrapper: FC = () => {
         const fetchUserStories = async () => {
             setLoading(true)
             const response = await storyService.getAllStories();
+            console.log(response)
             setLoading(false)
             if (response.isSuccess) {
                 setUserStories(response.data)
@@ -36,7 +37,7 @@ const StoryWrapper: FC = () => {
         fetchUserStories()
     }, [])
 
-    return userStories.length > 0 && !loading ? <div className="relative w-full h-[160px] md:h-[200px]">
+    return <div className="relative w-full h-[160px] md:h-[200px]">
             <Swiper
                 modules={[Navigation]}
                 slidesPerView={4.75} // Mặc định cho desktop
@@ -126,7 +127,10 @@ const StoryWrapper: FC = () => {
             >
                 <ChevronRight />
             </button>
-        </div> : <CreateStoryArea />
+
+            {!loading && userStories.length === 0 && <CreateStoryArea />}
+        </div> 
+        
     }
 
 export default StoryWrapper;

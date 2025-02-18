@@ -75,12 +75,21 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var response = new List<PostResponse>();
             foreach (var item in takePosts)
             {
+                var check = false;
                 if(item.UserId != userId)
                 {
                     var checkIsBlock = await unitOfWork.BlockListRepository
                         .CheckIsBlockAsync(item.UserId, userId);
 
                     if (checkIsBlock) continue;
+
+                    var friendShip = await unitOfWork.FriendShipRepository
+                        .GetFriendShipByUserIdAndFriendIdAsync(item.UserId, userId);
+
+                    if(item.Privacy == PrivacyConstant.PUBLIC && (friendShip == null || !friendShip.IsConnect))
+                    {
+                        check = true;
+                    }
                 }
 
                 var mapPost = ApplicationMapper.MapToPost(item);
@@ -91,9 +100,18 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     mapPost.Shares = shares;
                 };
 
-                var haveStory = await unitOfWork.StoryRepository
-                 .IsUserHaveStoryAsync(item.UserId);
-                mapPost.User.HaveStory = haveStory;
+                if(check)
+                {
+                    mapPost.User.HaveStory = false;
+                    mapPost.User.IsShowStatus = false;
+                    mapPost.User.IsShowStory = false;
+                    mapPost.User.IsOnline = false;
+                } else
+                {
+                    var haveStory = await unitOfWork.StoryRepository
+                        .IsUserHaveStoryAsync(item.UserId);
+                    mapPost.User.HaveStory = haveStory;
+                }
 
                 var savedPost = await unitOfWork.SavedPostRepository
                     .GetSavedPostByPostIdAndUserId(item.Id, userId);

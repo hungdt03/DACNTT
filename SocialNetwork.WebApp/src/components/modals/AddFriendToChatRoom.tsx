@@ -31,6 +31,7 @@ const AddFriendToChatRoom: FC<AddFriendToChatRoomProps> = ({
     const fetchFriends = async (query: string, page: number, size: number, reset = false) => {
         setLoading(true)
         const response = await friendService.getAllInvitableConnectedUsers(chatRoomId, query, page, size);
+        console.log(response)
         setLoading(false)
         if (response.isSuccess) {
             setFriends(prev => {
