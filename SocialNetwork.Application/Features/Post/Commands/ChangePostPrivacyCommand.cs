@@ -12,7 +12,7 @@ namespace SocialNetwork.Application.Features.Post.Commands
         public Guid PostId { get; set; }
 
         [Required(ErrorMessage = "Quyền riêng tư của bài viết không được để trống")]
-        [PrivacyValidation]
+        [PostPrivacyValidation]
         public string PrivacyType { get; set; }
 
         public ChangePostPrivacyCommand(Guid postId, string privacyType)

@@ -35,7 +35,6 @@ const UserProfile: FC<UserProfileProps> = ({
         }
     }
 
-
     useEffect(() => {
         fetchFriends(userId)
     }, [userId])
@@ -65,20 +64,22 @@ const UserProfile: FC<UserProfileProps> = ({
                 if (notification.type === NotificationType.FRIEND_REQUEST_SENT || notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
                     fetchFriendRequestData(userId)
                 }
-            }
+            },
+            (_) => fetchUserData(userId)
         )
 
-    }, [])
+    }, [userId])
 
     const fetchUserData = async (userId: string) => {
         try {
             const userResponse = await userService.getUserById(userId);
             if (userResponse.isSuccess) {
-                console.log(userResponse)
                 if(userResponse.data.role == Role.ADMIN) {
                     navigate('/404')
                 }
                 setUser(userResponse.data);
+            } else {
+                navigate('/404')
             }
         } catch (error) {
             console.error("Error fetching user data:", error);
@@ -88,7 +89,6 @@ const UserProfile: FC<UserProfileProps> = ({
     const fetchFriendRequestData = async (userId: string) => {
         try {
             const friendRequestResponse = await friendRequestService.getFriendRequestByUserId(userId);
-            console.log(friendRequestResponse)
             if (friendRequestResponse.isSuccess) {
                 setFriendRequest(friendRequestResponse.data);
             } else {
@@ -100,7 +100,7 @@ const UserProfile: FC<UserProfileProps> = ({
     };
 
     return <div className="flex flex-col h-full w-full overflow-y-auto custom-scrollbar bg-slate-100">
-        {loading && <Loading />}
+        {loading && <Loading title="Đang tải thông tin..." />}
         <div className="bg-white shadow">
             {user && <UserProfileHeader 
                 friendRequest={friendRequest} 

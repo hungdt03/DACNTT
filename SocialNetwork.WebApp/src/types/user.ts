@@ -23,4 +23,6 @@ export interface UserResource {
     dateJoined: Date;
     role: Role
     isLock : boolean;
+    isShowStatus: boolean;
+    isShowStory: boolean;
 }

@@ -8,6 +8,7 @@ import searchService from "../services/searchService";
 import SearchUserBlock from "../components/searchs/blocks/SearchUserBlock";
 import SearchGroupBlock from "../components/searchs/blocks/SearchGroupBlock";
 import SearchPostBlock from "../components/searchs/blocks/SearchPostBlock";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 type SearchFilterType = 'top' | 'post' | 'user' | 'group'
 
@@ -15,7 +16,8 @@ const SearchPage: FC = () => {
     const [searchParam] = useSearchParams();
     const [searchValue, setSearchValue] = useState('')
     const [searchFilter, setSearchFilter] = useState<SearchFilterType>('top');
-    const [message, setMessage] = useState('')
+    const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false)
 
     const [searchResult, setSearchResult] = useState<SearchAllResource>({
         groups: [],
@@ -42,7 +44,9 @@ const SearchPage: FC = () => {
     }, [searchParam]);
 
     const handleSearchTop = async (query: string) => {
+        setLoading(true)
         const response = await searchService.searchAll(query);
+        setLoading(false)
         if (response.isSuccess) {
             setSearchResult(response.data)
             setMessage(response.message)
@@ -56,6 +60,8 @@ const SearchPage: FC = () => {
             {searchResult.groups.length > 0 && <SearchGroupBlock searchValue={searchValue} groups={searchResult.groups} />}
             {searchResult.posts.length > 0 && <SearchPostBlock searchValue={searchValue} posts={searchResult.posts} />}
         </div>}
+
+        {(searchParam.get('type') === 'top' || !searchParam.get('type')) && loading && <LoadingIndicator title="Đang tìm kiếm" />}
 
         {searchFilter === 'group' && <SearchGroupWrapper searchValue={searchValue} />}
         {searchFilter === 'user' && <SearchUserWrapper searchValue={searchValue} />}

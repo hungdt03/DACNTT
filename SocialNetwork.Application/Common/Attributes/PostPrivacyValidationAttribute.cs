@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SocialNetwork.Application.Common.Attributes
 {
-    public class PrivacyValidationAttribute : ValidationAttribute
+    public class PostPrivacyValidationAttribute : ValidationAttribute
     {
         private static readonly string[] AllowedValues =
         {

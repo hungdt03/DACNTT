@@ -54,5 +54,15 @@ namespace SocialNetwork.Infrastructure.SignalR
                 await hubContext.Groups.RemoveFromGroupAsync(connection, groupName);
             });
         }
+
+        public async Task SendBlockSignalToSpecificUser(string username, Guid chatRoomId)
+        {
+            await hubContext.Clients.User(username).SendAsync("FetchBlock", chatRoomId);
+        }
+
+        public async Task SendActionGroupToSpecificUser(string username, Guid chatRoomId)
+        {
+            await hubContext.Clients.User(username).SendAsync("FetchChatRoom", chatRoomId);
+        }
     }
 }

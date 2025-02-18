@@ -8,6 +8,7 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.BlockList.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.BlockList.Handlers
@@ -17,12 +18,14 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly UserManager<Domain.Entity.System.User> _userManager;
+        private readonly ISignalRService _signalRService;
 
-        public RemoveBlockUserHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager)
+        public RemoveBlockUserHandler(IUnitOfWork unitOfWork, ISignalRService signalRService, IHttpContextAccessor contextAccessor, UserManager<Domain.Entity.System.User> userManager)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             _userManager = userManager;
+            _signalRService = signalRService;
         }
 
         public async Task<BaseResponse> Handle(RemoveBlockUserCommand request, CancellationToken cancellationToken)
@@ -50,6 +53,11 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
 
             _unitOfWork.BlockListRepository.RemoveBlockList(blockUser);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            var chatRoom = await _unitOfWork.ChatRoomRepository
+                .GetPrivateChatRoomByMemberIds(new List<string> { userId, user.Id });
+
+            await _signalRService.SendBlockSignalToSpecificUser(user.UserName, chatRoom.Id);
 
             return new BaseResponse()
             {

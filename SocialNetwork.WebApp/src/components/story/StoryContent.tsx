@@ -54,12 +54,21 @@ const StoryContent: FC<StoryContentProps> = ({
     onDelete
 }) => {
     return <div
-        className="w-full h-full flex items-center justify-center"
+        className="relative w-full h-full flex items-center justify-center"
         style={{
             background: story.type === StoryType.STORY_TEXT ? story.background : `url(${story.background})`,
             backgroundSize: 'cover'
         }}
     >
+        <div
+            className="absolute inset-x-0 top-0 z-0"
+            style={{
+                height: "30%", // Hoặc dùng calc() để linh hoạt hơn: "calc(100% / 2.2)"
+                background: "linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0))",
+                pointerEvents: "none", // Đảm bảo không chặn tương tác bên dưới
+            }}
+        />
+
         <div className="absolute z-[1000] left-0 top-5 right-0 flex justify-between px-3">
             <div className="flex items-center gap-x-2">
                 <div className="relative">
@@ -98,6 +107,7 @@ const StoryContent: FC<StoryContentProps> = ({
                 </Popover>}
             </div>
         </div>
+
         <p style={{
             fontFamily: story.fontFamily,
         }} className="text-white text-center break-words break-all font-semibold px-4 py-8 text-[20px]">

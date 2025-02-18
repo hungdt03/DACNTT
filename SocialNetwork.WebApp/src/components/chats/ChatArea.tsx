@@ -174,6 +174,16 @@ const ChatArea: FC<ChatAreaProps> = ({
                 groupName === chatRoom.uniqueName && setTyping('')
             },
             undefined,
+            (chatRoomId: string) => {
+                if(chatRoom.id === chatRoomId) {
+                    onFetch()
+                }
+            },
+            (chatRoomId: string) => {
+                if(chatRoom.id === chatRoomId) {
+                    onFetch()
+                }
+            }
         );
 
         setMsgPayload(prev => ({

@@ -7,10 +7,18 @@ import sad from './svg/reactions/sad.svg'
 import wow from './svg/reactions/wow.svg'
 
 import loading from './svg/loading/loading.svg'
+import { ReactionType } from '../enums/reaction'
 
-const svgReaction = {
-    like, angry, haha, love, sad, wow, care
-} as const;
+const svgReaction: Record<ReactionType, string> = {
+    LIKE: like,
+    LOVE: love,
+    WOW: wow,
+    HAHA: haha,
+    SAD: sad,
+    ANGRY: angry,
+    CARE: care
+};
+
 
 export type ReactionSvgType = keyof typeof svgReaction; 
 

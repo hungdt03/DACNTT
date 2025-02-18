@@ -12,7 +12,7 @@ const StoryReplyBox: FC<StoryReplyBoxProps> = ({
     onReact,
     toggleMore
 }) => {
-    return <div className="relative w-full h-full bg-gray-950 bg-opacity-40">
+    return <div className="w-full h-full bg-black bg-opacity-30">
         <div className="flex flex-col absolute left-0 right-0 bottom-0 gap-y-4 items-center py-8 px-4 w-full">
             <button onClick={() => toggleMore(false)} className="text-white text-sm flex gap-x-1 py-2">
                 <span>Thu gọn</span>

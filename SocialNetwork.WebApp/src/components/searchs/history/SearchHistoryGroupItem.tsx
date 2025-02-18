@@ -14,8 +14,8 @@ const SearchHistoryGroupItem: FC<SearchHistoryGroupItemProps> = ({
     searchHistory,
     onRemove
 }) => {
-    return <div className="hover:text-black px-1 py-2 rounded-md hover:bg-gray-100 flex items-center justify-between cursor-pointer px-2">
-        <Link to={`/groups/${searchHistory.group.id}`}  className="flex items-center gap-x-2">
+    return <div className="hover:text-black px-2 py-2 rounded-md hover:bg-gray-100 flex items-center justify-between cursor-pointer">
+        <Link to={`/groups/${searchHistory.group.id}`}  className="flex items-center gap-x-2 hover:text-black">
             <span className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center">
                 <History size={14} strokeWidth={3} className="text-gray-500" />
             </span>
@@ -24,9 +24,8 @@ const SearchHistoryGroupItem: FC<SearchHistoryGroupItemProps> = ({
                 <img src={searchHistory.group.coverImage ?? images.cover} className="w-[32px] h-[32px] rounded-md" />
                 <div className="flex flex-col">
                     <span className="text-sm font-semibold line-clamp-1">{searchHistory.group.name}</span>
-                    {/* <span className="text-gray-600 text-xs line-clamp-1">
-                    {suggest.isMember ? 'Nhóm của bạn' : `${searchHistory.countFriendMembers} người bạn của bạn đã tham gia`}
-                </span> */}
+                    <span className="text-gray-600 text-xs line-clamp-1">
+                </span>
                 </div>
             </div>
         </Link>

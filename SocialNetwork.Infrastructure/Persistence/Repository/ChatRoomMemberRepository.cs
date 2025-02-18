@@ -53,6 +53,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.ChatRoomMembers
                  .Include(c => c.ChatRoom)
+                 .Include(c => c.User)
                 .SingleOrDefaultAsync(s => s.UserId == userId && s.ChatRoomId == chatRoomId);
         }
 

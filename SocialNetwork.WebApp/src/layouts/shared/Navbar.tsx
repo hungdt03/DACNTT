@@ -31,7 +31,7 @@ const Navbar: FC = () => {
 
     // NOTIFICATION
     const fetchMoreNotificatiions = async () => {
-        if (!pagination.hasMore || loading || !isInitialLoadComplete) return;
+        if (!pagination.hasMore || loading) return;
         fetchNotifications(pagination.page + 1)
     }
 
@@ -85,7 +85,10 @@ const Navbar: FC = () => {
                 isInitialLoadComplete={isInitialLoadComplete}
                 loading={loading}
                 onFetchNextPage={fetchMoreNotificatiions}
-                onFinishInitialLoad={() => setIsInitialLoadComplete(true)}
+                onFinishInitialLoad={() => {
+                    setIsInitialLoadComplete(true)
+                    fetchMoreNotificatiions()
+                }}
                 onUpdateNotifications={(notifications) => setNotifications(notifications)}
             />}>
                 <button className="p-[10px] md:p-3 rounded-md bg-gray-100">

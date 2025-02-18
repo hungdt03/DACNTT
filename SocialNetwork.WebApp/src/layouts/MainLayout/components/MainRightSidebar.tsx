@@ -56,7 +56,7 @@ const MainRightSidebar: FC = () => {
                 <span className="font-bold text-[17px] text-gray-700">Người liên hệ</span>
                 <div className="flex flex-col gap-y-2 h-full">
                     {!loading && chatRooms
-                        .filter((chatRoom) => chatRoom.isOnline)
+                        .filter((chatRoom) => chatRoom.isOnline && (!chatRoom.isPrivate || (chatRoom.isPrivate && chatRoom.friend?.isShowStatus)) )
                         .map((chatRoom) => (
                             <div
                                 key={chatRoom.id}

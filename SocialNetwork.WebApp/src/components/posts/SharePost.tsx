@@ -237,7 +237,7 @@ const SharePost: FC<SharePostProps> = ({
         <div className="flex items-center justify-between md:text-sm text-[13px]">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
                 <Avatar.Group>
-                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="md:w-5 w-3 h-3 md:h-5 mx-[5px]" />)}
+                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType as ReactionSvgType]} className="md:w-5 w-3 h-3 md:h-5 mx-[5px]" />)}
                 </Avatar.Group>
                 <span className="hover:underline">{reactions?.length === 0 ? '' : reactions?.length}</span>
             </button>

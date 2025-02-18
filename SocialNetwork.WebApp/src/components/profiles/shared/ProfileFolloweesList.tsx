@@ -24,17 +24,15 @@ const ProfileFolloweeList: FC<ProfileFolloweeListProps> = ({
         setLoading(true)
         const response = await followService.getAllFolloweesByUserId(userId, page, size);
 
-        setTimeout(() => {
-            setLoading(false)
-            if (response.isSuccess) {
-                setPagination(response.pagination)
-                setFollowees(prev => {
-                    const existingIds = new Set(prev.map(item => item.id));
-                    const newFollowees = response.data.filter(item => !existingIds.has(item.id));
-                    return [...prev, ...newFollowees];
-                });
-            }
-        }, 2000)
+        setLoading(false)
+        if (response.isSuccess) {
+            setPagination(response.pagination)
+            setFollowees(prev => {
+                const existingIds = new Set(prev.map(item => item.id));
+                const newFollowees = response.data.filter(item => !existingIds.has(item.id));
+                return [...prev, ...newFollowees];
+            });
+        }
     }
 
     const fetchMore = () => {

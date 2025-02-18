@@ -37,8 +37,28 @@ namespace SocialNetwork.Application.Features.Search.Handlers
 
             foreach ( var user in users )
             {
-                if (user.Id == userId) continue;
+                if (user.Id != userId)
+                {
+                    var blockUser = await _unitOfWork.BlockListRepository
+                        .GetBlockListByUserIdAndUserIdAsync(user.Id, userId);
+                    if (blockUser != null) continue;
+                }
+
                 var mapUser = ApplicationMapper.MapToUser(user);
+                if (user.Id == userId)
+                {
+                    var searchUserItem = new SearchUserSuggestResponse()
+                    {
+                        IsFriend = false,
+                        CountMutualFriends = 0,
+                        PlainText = true,
+                        User = mapUser,
+                    };
+
+                    searchUsers.Add(searchUserItem);
+
+                    continue;
+                }
 
                 var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id, FriendShipStatus.ACCEPTED);
                 var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(user.Id, FriendShipStatus.ACCEPTED);

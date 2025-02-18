@@ -9,6 +9,7 @@ using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.User.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.User.Handlers
@@ -32,12 +33,39 @@ namespace SocialNetwork.Application.Features.User.Handlers
                 ?? throw new AppException("Thông tin user không tồn tại");
 
             var response = ApplicationMapper.MapToUser(user);
+
+            var userId = httpContextAccessor.HttpContext.User.GetUserId();
+            var check = true;
+
+            if(userId != user.Id)
+            {
+                var isBlock = await unitOfWork.BlockListRepository
+                    .GetBlockListByUserIdAndUserIdAsync(userId, user.Id);
+
+                if (isBlock != null)
+                    throw new NotFoundException("Không tìm thấy thông tin user");
+
+                var friendShip = await unitOfWork.FriendShipRepository
+                    .GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id);
+
+                if(friendShip == null || (!friendShip.IsConnect && friendShip.Status != FriendShipStatus.ACCEPTED))
+                {
+                    response.IsOnline = false;
+                    response.HaveStory = false;
+                    check = false;
+                }
+            }
+
             response.FriendCount = await unitOfWork.FriendShipRepository.CountFriendsByUserIdAsync(request.UserId);
             response.FollowerCount = await unitOfWork.FollowRepository.CountFollowersByUserIdAsync(request.UserId);
             response.FollowingCount = await unitOfWork.FollowRepository.CountFolloweesByUserIdAsync(request.UserId);
-            var haveStory = await unitOfWork.StoryRepository
-                   .IsUserHaveStoryAsync(user.Id);
-            response.HaveStory = haveStory;
+            
+           if(check)
+            {
+                var haveStory = await unitOfWork.StoryRepository
+                  .IsUserHaveStoryAsync(user.Id);
+                response.HaveStory = haveStory;
+            }
 
             var roles = await userManager.GetRolesAsync(user);
             if (roles != null && roles.Count > 0)

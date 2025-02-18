@@ -11,8 +11,6 @@ using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
-using SocialNetwork.Domain.Entity.MessageInfo;
-using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 {
@@ -104,6 +102,13 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 var mapMessage = ApplicationMapper.MapToMessage(messages[i]);
                 await _signalRService.SendMessageToSpecificGroup(chatRoom.UniqueName, mapMessage);
             }
+
+            foreach(var mem in listRoomMembers)
+            {
+                await _signalRService.SendActionGroupToSpecificUser(mem.User.UserName, chatRoom.Id);
+            } 
+
+            
 
             return new BaseResponse()
             {

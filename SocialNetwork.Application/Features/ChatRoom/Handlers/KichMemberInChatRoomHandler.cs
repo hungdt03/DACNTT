@@ -66,8 +66,10 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             var mapMessage = ApplicationMapper.MapToMessage(message);
             mapMessage.IsRemove = true;
             mapMessage.MemberId = chatRoomMember.UserId;
+
             await _signalRService.SendMessageToSpecificGroup(chatRoomMember.ChatRoom.UniqueName, mapMessage);
             await _signalRService.LeaveGroup(chatRoomMember.UserId, chatRoomMember.ChatRoom.UniqueName);
+            await _signalRService.SendActionGroupToSpecificUser(chatRoomMember.User.UserName, chatRoomMember.ChatRoomId);
 
             return new BaseResponse()
             {

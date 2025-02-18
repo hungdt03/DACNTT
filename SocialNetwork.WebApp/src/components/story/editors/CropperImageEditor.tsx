@@ -4,6 +4,7 @@ import "cropperjs/dist/cropper.css";
 import { Button } from "antd";
 import { uploadBase64Image } from "../../../services/cloudinary";
 import LoadingIndicator from "../../LoadingIndicator";
+import Loading from "../../Loading";
 
 type CropperImageEditorProps = {
     fileImage: string;
@@ -57,7 +58,7 @@ const CropperImageEditor: React.FC<CropperImageEditorProps> = ({
             </Button>
         </div>
 
-        {loading && <LoadingIndicator title="Đang tải ảnh lên" />}
+        {loading && <Loading title="Đang tải ảnh lên" />}
     </div>
 };
 

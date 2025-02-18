@@ -1,20 +1,20 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import images from "../../assets";
 import { getGroupPrivacyTitle } from "../../utils/privacy";
 import { SearchGroupSuggestResource } from "../../types/search/search-group-suggest";
-import { Avatar, message } from "antd";
-import { Link } from "react-router-dom";
-import groupService from "../../services/groupService";
+import { Avatar } from "antd";
 
 type SearchGroupItemProps = {
-    suggestGroup: SearchGroupSuggestResource
+    suggestGroup: SearchGroupSuggestResource;
+    onClick: () => void
 }
 
 const SearchGroupItem: FC<SearchGroupItemProps> = ({
-    suggestGroup
+    suggestGroup,
+    onClick
 }) => {
 
-    return <Link to={`/groups/${suggestGroup.group.id}`} className="p-4 rounded-md bg-white flex items-center justify-between shadow">
+    return <div onClick={onClick}  className="cursor-pointer p-4 rounded-md bg-white flex items-center justify-between shadow">
         <div className="flex items-center gap-x-3">
             <img src={suggestGroup.group.coverImage ?? images.cover} className="w-[55px] h-[55px] rounded-md border-[1px] border-gray-100" />
             <div className="flex flex-col">
@@ -40,7 +40,7 @@ const SearchGroupItem: FC<SearchGroupItemProps> = ({
                 </div>}
             </div>
         </div>
-    </Link>
+    </div>
 };
 
 export default SearchGroupItem;

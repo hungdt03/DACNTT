@@ -9,6 +9,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Entity.System;
 using System.Data;
 
 namespace SocialNetwork.Application.Features.Auth.Handlers
@@ -43,13 +44,21 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
 
             var tokens = await tokenService.GenerateTokenAsync(user);
             var mapUser = ApplicationMapper.MapToUser(user);
+
+            mapUser.FriendCount = await unitOfWork.FriendShipRepository.CountFriendsByUserIdAsync(user.Id);
+            mapUser.FollowerCount = await unitOfWork.FollowRepository.CountFollowersByUserIdAsync(user.Id);
+            mapUser.FollowingCount = await unitOfWork.FollowRepository.CountFolloweesByUserIdAsync(user.Id);
+
             mapUser.IsOnline = await userStatusService.HasConnectionsAsync(user.Id);
+
             mapUser.Role = "USER";
+
             var roles = await userManager.GetRolesAsync(user);
             if (roles != null && roles.Count == 1)
             {
                 mapUser.Role = roles[0];
             }
+
             var response = new AuthResponse
             {
                 Token = tokens,

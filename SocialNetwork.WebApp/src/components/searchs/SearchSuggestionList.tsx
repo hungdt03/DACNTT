@@ -10,7 +10,7 @@ import searchService from "../../services/searchService";
 import SearchHistoryGroupItem from "./history/SearchHistoryGroupItem";
 import SearchHistoryUserItem from "./history/SearchHistoryUserItem";
 import SearchHistoryTextItem from "./history/SearchHistoryTextItem";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import LoadingIndicator from "../LoadingIndicator";
 
@@ -26,6 +26,7 @@ const SearchSuggestionList: FC<SearchSuggestionListProps> = ({
     const [pagination, setPagination] = useState(inititalValues);
     const [loading, setLoading] = useState(false)
     const [searchHistories, setSearchHistories] = useState<SearchHistoryResource[]>([]);
+    const [searchParam] = useSearchParams()
 
     const navigate = useNavigate();
 
@@ -39,7 +40,6 @@ const SearchSuggestionList: FC<SearchSuggestionListProps> = ({
 
 
     const fetchSearchHistories = async (page: number, size: number) => {
-        console.log('Fetching ...')
         setLoading(true)
         const response = await searchService.getUserSearchHistories(page, size);
         setLoading(false)
@@ -91,7 +91,7 @@ const SearchSuggestionList: FC<SearchSuggestionListProps> = ({
     }
 
     return <div ref={containerRef} className="flex flex-col gap-y-1 max-h-[550px] overflow-y-auto custom-scrollbar">
-        {searchValue.trim().length < 1 && searchHistories.length === 0 && !loading && <p className="text-center text-gray-400 text-[15px]">Không có tìm kiếm nào</p>}
+        {searchValue.trim().length < 1 && !searchParam.get('q') && searchHistories.length === 0 && !loading && <p className="text-center text-gray-400 text-[15px]">Không có tìm kiếm nào</p>}
         {searchValue.trim().length < 1 && searchHistories.map(searchHistory => {
             if (searchHistory.group)
                 return <SearchHistoryGroupItem onRemove={() => handleRemoveHistory(searchHistory.id)} key={searchHistory.id} searchHistory={searchHistory} />

@@ -18,7 +18,7 @@ const StoryViewers: FC<StoryViewersProps> = ({
     toggleMore,
     viewers
 }) => {
-    return <div className={cn("w-full h-full bg-black bg-opacity-45")}>
+    return <div className={cn("w-full h-full")}>
         <div className="w-full h-[70px]">
         </div>
         <div className="w-full h-full rounded-t-xl shadow-lg p-4 z-[2100] bg-white">
@@ -49,15 +49,15 @@ const StoryViewers: FC<StoryViewersProps> = ({
                             </div>
                             <div className="flex flex-col">
                                 <span className="font-semibold text-xs">{viewer.user.fullName}</span>
-                                <span className="text-gray-500 text-[11px]"> {viewer.user.isOnline ? 'Đang hoạt động' :  `Hoạt động ${formatTime(new Date(viewer.user.recentOnlineTime))}`}</span>
-                               
+                                <span className="text-gray-500 text-[11px]"> {viewer.user.isOnline ? 'Đang hoạt động' : `Hoạt động ${formatTime(new Date(viewer.user.recentOnlineTime))}`}</span>
+
                             </div>
                         </div>
 
                         <Avatar.Group>
                             {getTopReactions(viewer.reactions, 3).map(reaction =>
                                 <Badge size="small" count={reaction.count} key={reaction.reactionType}>
-                                    <img width={16} height={16} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="mx-[5px]" />
+                                    <img width={16} height={16} alt={reaction.reactionType} src={svgReaction[reaction.reactionType as ReactionSvgType]} className="mx-[5px]" />
                                 </Badge>
                             )}
                         </Avatar.Group>

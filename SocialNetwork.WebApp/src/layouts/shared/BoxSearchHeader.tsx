@@ -14,7 +14,8 @@ const BoxSearchHeader: FC = () => {
     const [searchValue, setSearchValue] = useState('');
     const [openPopover, setOpenPopover] = useState(false);
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const [searchClick, setSearchClick] = useState(false)
 
     const [searchSuggestions, setSearchSuggestions] = useState<SearchAllSuggestResource>({
         groups: [],
@@ -27,15 +28,12 @@ const BoxSearchHeader: FC = () => {
     const [searchParam] = useSearchParams();
     useClickOutside(searchResultRef, () => setOpenPopover(false), inputRef);
 
-
     useEffect(() => {
         const paramSearch = searchParam.get('q')
         if (paramSearch) {
             setSearchValue(paramSearch)
         }
     }, [searchParam]);
-
-
 
     const debouncedValue = useDebounce(searchValue, 300);
 
@@ -44,6 +42,7 @@ const BoxSearchHeader: FC = () => {
             handleSearchSuggestion(debouncedValue.trim())
         }
     }, [debouncedValue]);
+
 
     const handleSearchSuggestion = async (value: string) => {
         setLoading(true)
@@ -56,10 +55,11 @@ const BoxSearchHeader: FC = () => {
     }
 
     const handleClickSuggestText = async (value: string) => {
-        const response = await searchService.addSearchTextPlain(value);
-        if (response.isSuccess) {
-            navigate(`/search/?q=${encodeURIComponent(value)}`)
-        }
+        setSearchClick(true)
+       
+        setSearchClick(false)
+        navigate(`/search/?q=${encodeURIComponent(value)}`)
+        setOpenPopover(false)
     }
 
     return <Popover placement="bottomLeft" arrow={false} open={openPopover} content={<div className="w-[280px] md:w-[380px]" ref={searchResultRef}>
@@ -68,7 +68,7 @@ const BoxSearchHeader: FC = () => {
                 <LoadingIndicator />
             </div>
                 : searchValue.trim() && !searchSuggestions?.groups.length && !searchSuggestions.users.length
-                    ? <SearchTextPlain onClick={() => handleClickSuggestText(searchValue)} searchValue={searchValue} />
+                    ? <SearchTextPlain disabled={searchClick} onClick={() => handleClickSuggestText(searchValue)} searchValue={searchValue} />
                     : <SearchSuggestionList searchValue={searchValue} suggestion={searchSuggestions} />
         }
     </div>}>
@@ -77,13 +77,16 @@ const BoxSearchHeader: FC = () => {
             <input
                 ref={inputRef}
                 value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
+                onChange={(e) => {
+                    setSearchValue(e.target.value)
+                }}
                 onFocus={() => setOpenPopover(true)}
                 className="w-full md:block border-none outline-none text-sm md:text-[16px] bg-gray-100"
                 placeholder="Tìm kiếm ở đây ..."
-                onKeyDown={(e) => {
-                    if (e.key === "Enter" && debouncedValue.trim().length > 1) {
-                        navigate(`/search/?q=${encodeURIComponent(debouncedValue.trim())}`)
+                onKeyDown={async (e) => {
+                    if (e.key === "Enter" && searchValue.trim().length > 1) {
+                        await searchService.addSearchTextPlain(searchValue);
+                        navigate(`/search/?q=${encodeURIComponent(searchValue.trim())}`)
                     }
                 }}
             />

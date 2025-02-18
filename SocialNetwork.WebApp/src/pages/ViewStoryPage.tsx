@@ -7,27 +7,35 @@ import StorySidebar from "../components/story/StorySidebar";
 import StoryShow from "../components/story/StoryShow";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { MoveLeft, Plus } from "lucide-react";
+import LoadingIndicator from "../components/LoadingIndicator";
 
 const ViewStoryPage: FC = () => {
     const { userId } = useParams();
 
+    const [loading, setLoading] = useState(false)
+    const [sidebarLoading, setSidebarLoading] = useState(false)
     const [userStory, setUserStory] = useState<UserStoryResource>();
     const [userStories, setUserStories] = useState<UserStoryResource[]>([]);
-    const [myStory, setMyStory] = useState<UserStoryResource>()
+    const [myStory, setMyStory] = useState<UserStoryResource>();
 
     const { user } = useSelector(selectAuth);
     const navigate = useNavigate()
 
     const fetchStories = async () => {
         if (!userId) return;
+        setLoading(true)
         const response = await storyService.getUserStoryByUserId(userId);
+        console.log(response)
+        setLoading(false)
         if (response.isSuccess) {
             setUserStory(response.data)
         }
     }
 
     const fetchUserStories = async () => {
+        setSidebarLoading(true)
         const response = await storyService.getAllStories();
+        setSidebarLoading(false)
         if (response.isSuccess) {
             setUserStories(response.data);
             const findMyStory = response.data.find(s => s.user.id === user?.id)
@@ -85,26 +93,33 @@ const ViewStoryPage: FC = () => {
 
     return <div className="grid grid-cols-12 h-screen">
         <div className="lg:col-span-4 xl:col-span-3 lg:block hidden bg-white h-full overflow-y-auto">
-            <StorySidebar myStory={myStory} selectStory={userStory} onRefresh={fetchUserStories} userStories={userStories} />
+            {sidebarLoading && <div className="w-full h-full flex items-center justify-center">
+                <LoadingIndicator title="Đang tải..." />
+            </div>}
+            {!sidebarLoading && <StorySidebar myStory={myStory} selectStory={userStory} onRefresh={fetchUserStories} userStories={userStories} />}
         </div>
         <div className="lg:col-span-8 xl:col-span-9 col-span-12 h-full bg-black flex justify-center items-center">
-            {userStory && userStory.stories.length > 0
-                ? <div className="overflow-hidden">
+            {userStory && userStory.stories.length > 0 && !loading &&
+                < div className="overflow-hidden">
                     <Link to='/' className="lg:hidden flex items-center gap-x-2 text-white text-sm p-1">
                         <MoveLeft className="text-white" />
                         Trang chủ
                     </Link>
                     <StoryShow onDelete={handleDeleteStory} onEnd={handleNextStory} story={userStory} />
                 </div>
-                : <Link to='/stories/create' className="flex flex-col gap-y-2 items-center">
-                    <button className="bg-sky-100 w-10 h-10 rounded-full text-primary flex items-center justify-center">
-                        <Plus strokeWidth={3} size={16} />
-                    </button>
-                    <span className="text-[16px] font-bold text-white">Tạo tin mới</span>
-                </Link>
             }
+
+            {!loading && userStory?.stories.length === 0 && <Link to='/stories/create' className="flex flex-col gap-y-2 items-center">
+                <button className="bg-sky-100 w-10 h-10 rounded-full text-primary flex items-center justify-center">
+                    <Plus strokeWidth={3} size={16} />
+                </button>
+                <span className="text-[16px] font-bold text-white">Tạo tin mới</span>
+            </Link>}
+
+            {loading && <LoadingIndicator title="Đang tải tin..." />}
+
         </div>
-    </div>
+    </div >
 };
 
 export default ViewStoryPage;

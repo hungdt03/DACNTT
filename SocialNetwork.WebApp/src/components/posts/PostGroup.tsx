@@ -223,7 +223,7 @@ const PostGroup: FC<PostGroupProps> = ({
         <div className="flex items-center justify-between text-sm">
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
                 <Avatar.Group>
-                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType]} className="w-5 h-5 mx-[5px]" />)}
+                    {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType as ReactionSvgType]} className="w-5 h-5 mx-[5px]" />)}
                 </Avatar.Group>
                 <span className="hover:underline">{reactions?.length === 0 ? '' : reactions?.length}</span>
             </button>
@@ -250,19 +250,19 @@ const PostGroup: FC<PostGroupProps> = ({
         </div>
         <Divider className='mt-0 mb-2' />
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Bài viết của Bùi Việt</p>} width='700px' classNames={{
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Bài viết của Bùi Việt</p>} width='700px' classNames={{
             footer: 'hidden'
         }} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             {isModalOpen && <PostModal post={post} />}
         </Modal>
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Cảm xúc bài viết</p>} width='600px' footer={[]} open={openReactionModal} onOk={okReactionModal} onCancel={cancelReactionModal}>
             <PostReactionModal reactions={reactions} />
         </Modal>
 
         {/*======== MODAL EDIT POST ====== */}
 
-        <Modal title={<p className="text-center font-semibold text-xl">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
+        <Modal title={<p className="text-center font-bold text-lg">Chỉnh sửa bài viết</p>} footer={[]} open={isEditPostOpen} onOk={handleEditPostOk} onCancel={editPostCancel}>
             <EditPostModal
                 onSubmit={handleEditPostAsync}
                 post={post}
@@ -270,7 +270,7 @@ const PostGroup: FC<PostGroupProps> = ({
         </Modal>
 
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-semibold text-xl">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Chia sẻ bài viết</p>} footer={[]} open={openSharePost} onOk={okSharePost} onCancel={cancelSharePost}>
             <SharePostModal
                 onSuccess={(data, msg) => {
                     okSharePost()
@@ -284,7 +284,7 @@ const PostGroup: FC<PostGroupProps> = ({
 
         <Modal
             style={{ top: 20 }}
-            title={<p className="text-center font-semibold text-xl">Những người đã chia sẻ bài viết</p>}
+            title={<p className="text-center font-bold text-lg">Những người đã chia sẻ bài viết</p>}
             width='500px'
             centered
             open={openListShare}

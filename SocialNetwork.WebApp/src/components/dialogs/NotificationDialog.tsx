@@ -14,6 +14,7 @@ import NotificationSkeleton from '../skeletons/NotificationSkeleton'
 import { ReportResource } from '../../types/report'
 import adminService from '../../services/adminService'
 import { ReportType } from '../../enums/report-type'
+import { useElementInfinityScroll } from '../../hooks/useElementInfinityScroll'
 
 type NotificationDialogProps = {
     notifications: NotificationResource[];
@@ -21,7 +22,7 @@ type NotificationDialogProps = {
     loading: boolean;
     isInitialLoadComplete: boolean;
     onFinishInitialLoad: () => void;
-    onFetchNextPage: (nextPage: number) => void
+    onFetchNextPage: () => void
     onUpdateNotifications: (notifications: NotificationResource[]) => void
 }
 
@@ -47,6 +48,13 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
             setGetReport(response.data)
         }
     }
+
+    useElementInfinityScroll({
+        elementId: 'notification-dialog-element',
+        hasMore: pagination.hasMore,
+        isLoading: loading,
+        onLoadMore: () => isInitialLoadComplete && onFetchNextPage(),
+    })
 
     const handleDeleteNotification = async (notificationId: string) => {
         const response = await notificationService.deleteNotification(notificationId)
@@ -146,7 +154,6 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         <button
                             className='w-full text-center text-sm py-1 bg-gray-200 rounded-md'
                             onClick={() => {
-                                onFetchNextPage(pagination.page + 1)
                                 onFinishInitialLoad()
                             }}
                         >

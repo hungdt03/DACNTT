@@ -43,7 +43,12 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                     };
                     response.Add(userItem);
                     continue;
-                };
+                }  else
+                {
+                    var blockUser = await _unitOfWork.BlockListRepository
+                           .GetBlockListByUserIdAndUserIdAsync(user.Id, userId);
+                    if (blockUser != null) continue;
+                }
 
                 var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id, FriendShipStatus.ACCEPTED);
                 var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(user.Id, FriendShipStatus.ACCEPTED);

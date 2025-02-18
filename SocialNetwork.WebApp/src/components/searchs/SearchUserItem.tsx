@@ -4,13 +4,15 @@ import { SearchUserSuggestResource } from "../../types/search/search-user-sugges
 import { Link } from "react-router-dom";
 
 type SearchUserItemProps = {
-    suggestUser: SearchUserSuggestResource
+    suggestUser: SearchUserSuggestResource;
+    onClick: () => void
 }
 
 const SearchUserItem: FC<SearchUserItemProps> = ({
-    suggestUser
+    suggestUser,
+    onClick
 }) => {
-    return <Link to={`/profile/${suggestUser.user.id}`} className="flex items-center justify-between p-2 md:p-4 bg-white border-[1px] rounded-lg">
+    return <div onClick={onClick} className="cursor-pointer flex items-center justify-between p-2 md:p-4 bg-white border-[1px] rounded-lg">
         <div className="flex items-center gap-x-3">
             <img src={suggestUser.user.avatar ?? images.cover} className="md:w-[55px] md:h-[55px] w-[40px] h-[40px] rounded-full border-[1px] border-gray-100" />
             <div className="flex flex-col">
@@ -20,7 +22,7 @@ const SearchUserItem: FC<SearchUserItemProps> = ({
                 </span>
             </div>
         </div>
-    </Link>
+    </div>
 };
 
 export default SearchUserItem;

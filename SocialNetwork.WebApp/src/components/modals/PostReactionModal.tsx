@@ -96,7 +96,7 @@ const PostReactionModal: FC<PostReactionModalProps> = ({
                             <div className="relative">
                                 <Avatar size='large' src={reaction.user.avatar} />
                                 <img
-                                    src={svgReaction[reaction.reactionType.toLowerCase() as ReactionSvgType] || svgReaction.like}
+                                    src={svgReaction[reaction.reactionType] || svgReaction.LIKE}
                                     className="w-4 h-4 cursor-pointer absolute bottom-0 right-0"
                                     alt={reaction.reactionType}
                                 />
@@ -113,7 +113,7 @@ const PostReactionModal: FC<PostReactionModalProps> = ({
                 label: (
                     <div className="flex items-center gap-x-2">
                         <img
-                            src={svgReaction[reactionType.toLowerCase() as ReactionSvgType] || svgReaction.like}
+                            src={svgReaction[reactionType as ReactionSvgType] || svgReaction.LIKE}
                             className="w-5 h-5 cursor-pointer"
                             alt={reactionType}
                         />
@@ -127,7 +127,7 @@ const PostReactionModal: FC<PostReactionModalProps> = ({
                                 <div className="relative">
                                     <Avatar size='large' src={reaction.user.avatar} />
                                     <img
-                                        src={svgReaction[reactionType.toLowerCase() as ReactionSvgType] || svgReaction.like}
+                                        src={svgReaction[reactionType as ReactionSvgType] || svgReaction.LIKE}
                                         className="w-4 h-4 cursor-pointer absolute bottom-0 right-0"
                                         alt={reactionType}
                                     />
