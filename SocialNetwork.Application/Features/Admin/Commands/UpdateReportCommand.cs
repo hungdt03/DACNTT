@@ -16,5 +16,6 @@ namespace SocialNetwork.Application.Features.Admin.Commands
         public Guid Id { get; set; }
         public string NewStatus { get; set; }
         public string NewReportSolution { get; set; }
+        public bool IsDelete { get; set; }
     }
 }

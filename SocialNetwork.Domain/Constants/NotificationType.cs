@@ -18,6 +18,7 @@ namespace SocialNetwork.Domain.Constants
                 public const string INVITE_ROLE_GROUP = "INVITE_ROLE_GROUP";
                 public const string APPROVAL_GROUP_INVITATION = "APPROVAL_GROUP_INVITATION";
                 public const string REPORT_RESPONSE = "REPORT_RESPONSE";
+                public const string REPORT_DELETE_RESPONSE = "REPORT_DELETE_RESPONSE";
 
-        }
+    }
 }

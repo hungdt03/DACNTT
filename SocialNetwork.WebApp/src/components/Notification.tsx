@@ -53,6 +53,7 @@ type NotificationProps = {
     onPostReactionNotification: () => void
     onGroupNotification: () => void
     onReportUserNotification: () => void
+    onReportDeleteNotification: () => void
 }
 
 const Notification: FC<NotificationProps> = ({
@@ -66,7 +67,8 @@ const Notification: FC<NotificationProps> = ({
     onAcceptRequestFriendNotification,
     onPostReactionNotification,
     onGroupNotification,
-    onReportUserNotification
+    onReportUserNotification,
+    onReportDeleteNotification
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false)
     const [acceptedFriendRequest, setAcceptedFriendRequest] = useState<'accepted' | 'cancel' | 'none'>('none')
@@ -177,6 +179,8 @@ const Notification: FC<NotificationProps> = ({
             onGroupNotification()
         } else if (notification.type === NotificationType.REPORT_RESPONSE) {
             onReportUserNotification()
+        } else if (notification.type === NotificationType.REPORT_DELETE_RESPONSE) {
+            onReportDeleteNotification()
         }
     }
 
