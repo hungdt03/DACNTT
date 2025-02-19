@@ -51,7 +51,7 @@ const PostShareInner: FC<PostShareInnerProps> = ({
 
                     <div className="flex flex-col gap-y-[1px]">
                         <div className="text-[14px] text-gray-600">
-                            <Link to={`/profile/${post.user.id}`} className="font-bold text-[13px] md:text-sm hover:underline">{post.user?.fullName}</Link>
+                            <Link to={`/profile/${post.user.id}`} className="font-bold text-[13px] md:text-sm hover:text-gray-600 hover:underline">{post.user?.fullName}</Link>
                             {post.tags.length > 0 &&
                                 (() => {
                                     const maxDisplay = 3;
@@ -62,7 +62,7 @@ const PostShareInner: FC<PostShareInnerProps> = ({
                                         <>
                                             {' cùng với '}
                                             {displayedTags.map((tag, index) => (
-                                                <Link className="font-bold hover:underline" to={`/profile/${tag.id}`} key={tag.id}>
+                                                <Link className="font-bold hover:text-gray-600 hover:underline" to={`/profile/${tag.id}`} key={tag.id}>
                                                     {tag.user.fullName}
                                                     {index < displayedTags.length - 1 ? ', ' : ''}
                                                 </Link>

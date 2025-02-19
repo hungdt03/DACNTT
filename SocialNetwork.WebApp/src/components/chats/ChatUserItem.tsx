@@ -20,7 +20,7 @@ const ChatUserItem: FC<ChatUserItemProps> = ({
 
     return <div onClick={onClick} className={cn("cursor-pointer flex items-center gap-x-3 px-3 py-3 rounded-sm w-full hover:bg-gray-100", isActive && 'bg-gray-100')}>
         <div className="relative">
-            {chatRoom.isPrivate &&  chatRoom.friend?.haveStory
+            {chatRoom.isPrivate && chatRoom.friend?.haveStory
                 ? <Link to={`/stories/${chatRoom.friend.id}`} className="inline-block rounded-full p-[1px] border-[2px] border-primary"><Avatar size='default' src={chatRoom.isPrivate ? chatRoom.friend?.avatar : images.group} /></Link>
                 : <Avatar size='large' className="flex-shrink-0" src={chatRoom.isPrivate ? chatRoom.friend?.avatar : chatRoom.imageUrl} />
             }

@@ -274,7 +274,7 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                                     {report.reportType === ReportType.POST && (
                                                         <Grid item xs={6} sx={{ padding: '2px' }}>
                                                             <Typography variant='body2'>{`Người đăng: ${
-                                                                report.targetPost.user.fullName
+                                                                report.targetPost.user?.fullName
                                                             }`}</Typography>
                                                         </Grid>
                                                     )}

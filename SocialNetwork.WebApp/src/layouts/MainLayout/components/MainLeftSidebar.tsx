@@ -23,7 +23,7 @@ const MainLeftSidebar: FC = () => {
                                     <img alt="Avatar" className="h-[50px] w-[50px] object-cover flex-shrink-0 rounded-full -mt-[25px]" src={user?.avatar ?? images.user} />
                             }
 
-                            <div className="absolute bottom-2 right-1 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
+                            <div className="absolute bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
                         </div>
                     </div>
                     <div className="flex flex-col items-center">

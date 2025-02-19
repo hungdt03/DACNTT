@@ -39,13 +39,24 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     postItem.Shares = shares;
                 };
 
+                if(post.UserId != userId)
+                {
+                    var friendShip = await _unitOfWork.FriendShipRepository
+                       .GetFriendShipByUserIdAndFriendIdAsync(post.UserId, userId);
+
+                    if(friendShip == null || !friendShip.IsConnect)
+                    {
+                        postItem.User.IsShowStatus = false;
+                        postItem.User.IsOnline = false;
+                    }
+                }
+
                 var haveStory = await _unitOfWork.StoryRepository
-                    .IsUserHaveStoryAsync(post.UserId);
+                       .IsUserHaveStoryAsync(post.UserId);
                 postItem.User.HaveStory = haveStory;
 
                 var savedPost = await _unitOfWork.SavedPostRepository
                  .GetSavedPostByPostIdAndUserId(post.Id, userId);
-
                 postItem.IsSaved = savedPost != null;
 
                 response.Add(postItem);

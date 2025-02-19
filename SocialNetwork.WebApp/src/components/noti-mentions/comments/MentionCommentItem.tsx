@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import BoxReplyComment, { BoxReplyCommentType, NodeContent } from "../../comments/BoxReplyComment";
 import { CommentMentionPagination } from "../../../utils/pagination";
 import { Pagination } from "../../../types/response";
+import { extractContentFromJSON } from "../../comments/CommentItem";
 
 type MentionCommentItemProps = {
     activeCommentId?: string;
@@ -25,34 +26,7 @@ type MentionCommentItemProps = {
     replyComment: (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void
 }
 
-const extractContentFromJSON = (commentJSON: string): JSX.Element => {
-    try {
-        const nodeContents = JSON.parse(commentJSON) as NodeContent[];
 
-        return (
-            <>
-                {nodeContents.map((item, index) => {
-                    if (item.id) {
-                        return (
-                            <Link
-                                key={index + item.id}
-                                to={`/profile/${item.id}`}
-                                style={{ fontWeight: 'bold' }}
-                                className="hover:text-black"
-                            >
-                                {item.content}
-                            </Link>
-                        );
-                    } else {
-                        return <span key={index + item.content}>{item.content || ' '}</span>;
-                    }
-                })}
-            </>
-        );
-    } catch (e) {
-        return <>{commentJSON}</>;
-    }
-};
 
 export const MentionCommentItem: FC<MentionCommentItemProps> = (
     (
@@ -136,7 +110,13 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
             <div className={cn("relative flex flex-col pl-4", comment.parentCommentId !== null ? "gap-y-5" : "gap-y-3")}>
                 {/* Comment nội dung */}
                 <div id={`comment-id-${comment.id}`} className="relative flex items-start gap-x-2">
-                    <Avatar className="flex-shrink-0" src={comment.user.avatar ?? images.user} />
+                    <div className="relative">
+                        {!comment.user.haveStory
+                            ? <Avatar className="flex-shrink-0 w-[25px] h-[25px] md:w-[32px] md:h-[32px]" src={comment.user.avatar ?? images.user} />
+                            : <Link className="p-[1px] border-[2px] inline-block border-primary rounded-full" to={`/stories/${comment.user.id}`}><Avatar className="flex-shrink-0 w-[24px] h-[24px] md:w-[30px] md:h-[30px]" src={comment.user.avatar ?? images.user} /> </Link>
+                        }
+                        {comment.user.isShowStatus && comment.user.isOnline && <div className="absolute -bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                    </div>
                     <div className="flex flex-col gap-y-2">
                         <div
                             className={cn(

@@ -261,7 +261,7 @@ const Post: FC<PostProps> = ({
 
                 <div className="flex flex-col md:gap-y-[1px]">
                     <div className="text-gray-600 text-[13px] md:text-sm">
-                        <Link className="font-bold text-[13px] md:text-sm" to={`/${post.isGroupPost ? `groups/${post.group.id}/user` : 'profile'}/${post.user.id}`}>{post.user?.fullName}</Link>
+                        <Link className="font-bold text-[13px] hover:text-gray-600 hover:underline md:text-sm" to={`/${post.isGroupPost ? `groups/${post.group.id}/user` : 'profile'}/${post.user.id}`}>{post.user?.fullName}</Link>
                         {post.tags.length > 0 &&
                             (() => {
                                 const maxDisplay = 3;

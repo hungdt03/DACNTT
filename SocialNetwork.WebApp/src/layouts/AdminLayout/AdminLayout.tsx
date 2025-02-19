@@ -8,8 +8,10 @@ import GroupsPage from '../../pages/admin/GroupsPage'
 import ReportsPage from '../../pages/admin/ReportsPage'
 import StatisticsPage from '../../pages/admin/StatisticsPage'
 import { Flex, Layout } from 'antd'
+import useTitle from '../../hooks/useTitle'
 
 const AdminLayout: FC = () => {
+    useTitle('Trang quản trị')
     const [currentTab, setCurrentTab] = useState('Bảng thống kê')
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false)
 

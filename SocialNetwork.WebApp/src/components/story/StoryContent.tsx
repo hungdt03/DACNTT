@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { StoryResource } from "../../types/story";
 import { StoryType } from "../../enums/story-type.";
 import { formatTime } from "../../utils/date";
@@ -53,6 +53,7 @@ const StoryContent: FC<StoryContentProps> = ({
     onPlay,
     onDelete
 }) => {
+
     return <div
         className="relative w-full h-full flex items-center justify-center"
         style={{
@@ -73,7 +74,7 @@ const StoryContent: FC<StoryContentProps> = ({
             <div className="flex items-center gap-x-2">
                 <div className="relative">
                     <img className="rounded-full w-[40px] h-[40px] object-cover" src={story.user.avatar} />
-                    <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
+                    {story.user.isShowStatus && story.user.isOnline && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                 </div>
                 <div className="flex flex-col text-white">
                     <Link

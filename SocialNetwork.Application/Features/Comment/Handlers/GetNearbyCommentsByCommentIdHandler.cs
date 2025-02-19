@@ -1,7 +1,9 @@
 ﻿
 
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Exceptions;
@@ -9,21 +11,56 @@ using SocialNetwork.Application.Features.Comment.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Entity;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.Comment.Handlers
 {
     public class GetNearbyCommentsByCommentIdHandler : IRequestHandler<GetNearbyCommentsByCommentIdQuery, BaseResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public GetNearbyCommentsByCommentIdHandler(IUnitOfWork unitOfWork)
+        private readonly IHttpContextAccessor _contextAccessor;
+        public GetNearbyCommentsByCommentIdHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
+            _contextAccessor = contextAccessor;
+        }
+
+        private async Task<List<CommentResponse>> MapToListComments(List<Domain.Entity.PostInfo.Comment> comments)
+        {
+            var userId = _contextAccessor.HttpContext.User.GetUserId();
+            var response = new List<CommentResponse>();
+            foreach (var comment in comments)
+            {
+                var commentItem = ApplicationMapper.MapToComment(comment);
+                if (userId != comment.UserId)
+                {
+                    var block = await _unitOfWork.BlockListRepository
+                    .GetBlockListByUserIdAndUserIdAsync(userId, comment.UserId);
+
+                    if (block != null) continue;
+
+                    var friendShip = await _unitOfWork.FriendShipRepository
+                      .GetFriendShipByUserIdAndFriendIdAsync(comment.UserId, userId);
+
+                    if (friendShip == null || !friendShip.IsConnect)
+                    {
+                        commentItem.User.IsShowStatus = false;
+                        commentItem.User.IsOnline = false;
+                    }
+                }
+
+                var haveStory = await _unitOfWork.StoryRepository
+                          .IsUserHaveStoryAsync(comment.UserId);
+                commentItem.User.HaveStory = haveStory;
+
+                response.Add(commentItem);
+            }
+
+            return response;
         }
 
         public async Task<BaseResponse> Handle(GetNearbyCommentsByCommentIdQuery request, CancellationToken cancellationToken)
         {
-
             var comment = await _unitOfWork.CommentRepository
                 .GetCommentByIdAsync(request.CommentId)
                     ?? await _unitOfWork.CommentRepository
@@ -50,7 +87,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                     .Take(pageSize)                    
                     .ToList();
 
-                response = nearbyComments.Select(ApplicationMapper.MapToComment).ToList();
+                response = await MapToListComments(nearbyComments);
                 isHavePrev = rootCurrentPage > 1;
                 isHaveNext = (rootCurrentPage * pageSize) < rootComments.Count;
 
@@ -74,7 +111,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                     .Take(5)
                     .ToList();
 
-                response = nearbyRootComments.Select(ApplicationMapper.MapToComment).ToList();
+                response = await MapToListComments(nearbyRootComments); 
 
                 isHavePrev = rootCurrentPage > 1;
                 isHaveNext = (rootCurrentPage * pageSize) < rootComments.Count;
@@ -104,7 +141,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                         currentComment.Pagination.HavePrevPage = isChildHavePrev;
                         currentComment.Pagination.NextPage = currentComment.Pagination.PrevPage = currentPage;
                         currentComment.Replies ??= new List<CommentResponse>();
-                        currentComment.Replies = nearbyChildComments.Select(ApplicationMapper.MapToComment).ToList();
+                        currentComment.Replies = await MapToListComments(nearbyChildComments);
                         break;
                     } 
 
@@ -122,7 +159,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                     currentComment.Pagination.HaveNextPage = isChildHaveNext;
                     currentComment.Pagination.HavePrevPage = isChildHavePrev;
                     currentComment.Pagination.NextPage = currentComment.Pagination.PrevPage = currentPage;
-                    currentComment.Replies = nearbyParentComment.Select(ApplicationMapper.MapToComment).ToList();
+                    currentComment.Replies = await MapToListComments(nearbyParentComment);
                     currentComment = currentComment.Replies.Find(cmt => cmt.Id == findParentCommentId);
                     currentComment.IsHaveChildren = haveChildren = true;
                 }

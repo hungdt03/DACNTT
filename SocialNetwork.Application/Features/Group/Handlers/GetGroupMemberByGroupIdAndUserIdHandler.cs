@@ -8,6 +8,7 @@ using SocialNetwork.Application.Features.Group.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.Group.Handlers
 {
@@ -36,9 +37,26 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             if (meInGroup == null && member.Group.Privacy == GroupPrivacy.PRIVATE)
                 throw new AppException("Quyền truy cập bị từ chối");
 
+            var mapMember = ApplicationMapper.MapToGroupMember(member);
+            if (userId != request.UserId)
+            {
+                var friendShip = await _unitOfWork.FriendShipRepository
+                    .GetFriendShipByUserIdAndFriendIdAsync(userId, request.UserId);
+
+                if(friendShip == null || !friendShip.IsConnect)
+                {
+                    mapMember.User.IsShowStatus = false;
+                    mapMember.User.IsOnline = false;
+                }
+            }
+
+            var haveStory = await _unitOfWork.StoryRepository
+                   .IsUserHaveStoryAsync(member.UserId);
+            mapMember.User.HaveStory = haveStory;
+
             return new DataResponse<GroupMemberResponse>()
             {
-                Data = ApplicationMapper.MapToGroupMember(member),
+                Data = mapMember,
                 IsSuccess = true,
                 Message = "Lấy thông tin thành viên thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,

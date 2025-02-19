@@ -58,6 +58,9 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
                     if (block != null) continue;
 
+                    var friendShip = await _unitOfWork.FriendShipRepository
+                               .GetFriendShipByUserIdAndFriendIdAsync(userId, group.Key);
+
                     var takeStories = new List<StoryResponse>();
                     foreach (var story in userStories)
                     {
@@ -65,24 +68,26 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
                         if (story.Privacy == PrivacyConstant.FRIENDS)
                         {
-                            var friendShip = await _unitOfWork.FriendShipRepository
-                                .GetFriendShipByUserIdAndFriendIdAsync(userId, group.Key, FriendShipStatus.ACCEPTED);
-
-                            if (friendShip == null)
+                            if (friendShip == null || friendShip.Status != FriendShipStatus.ACCEPTED)
                             {
                                 continue;
                             }
                         }
 
+                        if (friendShip == null || !friendShip.IsConnect)
+                        {
+                            story.User.IsShowStatus = false;
+                            story.User.IsOnline = false;
+                        }
+
                         takeStories.Add(story);
                     }
 
-                    if (!takeStories.Any()) continue;
+                    if (takeStories.Count == 0) continue;
 
                     bool haveSeen = false;
                     foreach (var story in takeStories)
                     {
-
                         haveSeen = await _unitOfWork.ViewerRepository.IsAnViewersByStoryIdAndUserIdAsync(story.Id, userId);
                         if (!haveSeen) break;
                     }

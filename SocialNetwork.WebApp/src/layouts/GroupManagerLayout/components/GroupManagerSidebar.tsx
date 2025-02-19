@@ -48,7 +48,7 @@ const GroupManagerSidebar: FC = () => {
                 <img alt="Lời mời" className="w-6 h-6" src={images.invites} />
                 <span className="text-[15px]">Lời mời đang chờ</span>
             </Link>
-            <Link to='/groups/create' className="hover:text-black mt-2 w-full py-2 rounded-md text-center bg-sky-50 hover:bg-sky-100 text-primary font-semibold">
+            <Link to='/groups/create' className="hover:text-primary mt-2 w-full py-2 rounded-md text-center bg-sky-50 hover:bg-sky-100 text-primary font-semibold">
                 Tạo nhóm mới
             </Link>
         </div>

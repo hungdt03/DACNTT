@@ -201,6 +201,11 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
             }
 
             var response = ApplicationMapper.MapToComment(savedComment);
+
+            var haveStory = await _unitOfWork.StoryRepository
+                        .IsUserHaveStoryAsync(comment.UserId);
+            response.User.HaveStory = haveStory;
+
             return new DataResponse<CommentResponse>()
             {
                 Data = response,

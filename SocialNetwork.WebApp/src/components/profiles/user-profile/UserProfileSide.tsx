@@ -31,9 +31,7 @@ const UserProfileSide: FC<UserProfileSideProps> = ({
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
             <span className="font-bold text-[15px] md:text-lg text-gray-700">Bạn bè</span>
 
-            {friends.length === 0 ? <div className="w-full h-full flex items-center justify-center py-2">
-                <Empty description='Chưa có bạn bè nào' />
-            </div> :
+            {
                 <div className="grid grid-cols-3 gap-2">
                     {friends.map(friend => (
                         <Link to={`/profile/${friend.id}`} key={friend.id} className="flex flex-col items-start gap-1 cursor-pointer">

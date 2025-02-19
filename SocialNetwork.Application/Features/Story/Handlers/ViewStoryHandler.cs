@@ -48,11 +48,21 @@ namespace SocialNetwork.Application.Features.Story.Handlers
             var friendShip = await _unitOfWork.FriendShipRepository
                 .GetFriendShipByUserIdAndFriendIdAsync(userId, story.UserId);
 
-            if (friendShip == null || !friendShip.IsConnect)
+            if ((friendShip == null || !friendShip.IsConnect) && story.Privacy != PrivacyConstant.PUBLIC)
                 throw new AppException("Bạn không thể xem tin này");
 
             if (story.ExpiresAt < DateTimeOffset.UtcNow)
                 throw new AppException("Tin không còn nữa");
+
+            if ((friendShip == null || !friendShip.IsConnect) && story.Privacy == PrivacyConstant.PUBLIC)
+            {
+                return new BaseResponse()
+                {
+                    IsSuccess = true,
+                    Message = "Xem tin thành công",
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                };
+            }
 
             var isExistedViewer = await _unitOfWork.ViewerRepository.IsViewerExisted(userId, request.StoryId);
 

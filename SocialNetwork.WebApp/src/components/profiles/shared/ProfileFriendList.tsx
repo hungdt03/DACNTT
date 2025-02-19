@@ -60,7 +60,7 @@ const ProfileFriendList: FC<ProfileFriendListProps> = ({
                 <div className="relative">
                     <img className="w-[50px] h-[50px] rounded-md border-[1px] border-gray-50"
                         src={friend.avatar ?? images.photo} />
-                    {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-0 right-1 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                    {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-0 -right-1 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                 </div>
                 <div className="flex flex-col">
                     <span className="font-semibold">{friend.fullName}</span>

@@ -28,7 +28,7 @@ const GroupMemberLeftSide: FC<GroupMemberLeftSideProps> = ({
 
     const handleReportMember = async () => {
         const response = await reportService.reportUser(member.user.id, reason, group.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
             setReason('')
             handleOk()
@@ -37,18 +37,24 @@ const GroupMemberLeftSide: FC<GroupMemberLeftSideProps> = ({
         }
     }
 
-
     return <div className="col-span-5 h-full overflow-y-auto scrollbar-hide flex flex-col gap-y-2 lg:gap-y-4">
         <div className="p-4 rounded-md bg-white shadow flex flex-col gap-y-2">
             <span className="text-lg font-bold">Giới thiệu</span>
             <div className="flex flex-col items-center gap-y-3">
-                <img className="w-[80px] h-[80px] object-cover rounded-full" src={member.user.avatar} />
+                <div className="relative">
+                    {!member.user.haveStory
+                        ? <img className="w-[80px] h-[80px] object-cover rounded-full border-[1px]" src={member.user.avatar} />
+                        : <Link className="inline-block p-[1px] border-[4px] border-primary rounded-full" to={`/stories/${member.user.id}`}><img className="w-[78px] h-[78px] p-[2px] object-cover rounded-full border-[1px]" src={member.user.avatar} /></Link>
+                    }
+
+                    {member.user.isShowStatus && member.user.isOnline && <div className="absolute bottom-0 right-0 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
+                </div>
                 <span className="text-xl font-bold">{member.user.fullName}</span>
                 <Tag color="green">{getRoleGroupTitle(member.role as MemberRole)}</Tag>
             </div>
             <div className="flex items-start gap-x-3">
                 <UserGroupIcon width={25} className="flex-shrink-0" color="gray" />
-               <span>Tham gia nhóm vào ngày {formatDateStandard(new Date(member.joinDate))}</span>
+                <span>Tham gia nhóm vào ngày {formatDateStandard(new Date(member.joinDate))}</span>
             </div>
             <div className="flex justify-center items-center gap-x-3">
                 <Link to={`/profile/${member.user.id}`}>

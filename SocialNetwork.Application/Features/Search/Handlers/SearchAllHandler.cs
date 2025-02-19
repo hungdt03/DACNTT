@@ -8,6 +8,7 @@ using SocialNetwork.Application.Features.Search.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Domain.Entity.UserInfo;
 
 namespace SocialNetwork.Application.Features.Search.Handlers
@@ -60,14 +61,18 @@ namespace SocialNetwork.Application.Features.Search.Handlers
 
             foreach (var user in users)
             {
-                if(user.Id != userId)
+                var mapUser = ApplicationMapper.MapToUser(user);
+                if (user.Id != userId)
                 {
                     var blockUser = await _unitOfWork.BlockListRepository
                         .GetBlockListByUserIdAndUserIdAsync(user.Id, userId);
                     if (blockUser != null) continue;
+
                 }
-            
-                var mapUser = ApplicationMapper.MapToUser(user);
+
+                var haveStory = await _unitOfWork.StoryRepository
+                   .IsUserHaveStoryAsync(user.Id);
+                mapUser.HaveStory = haveStory;
 
                 if (user.Id == userId)
                 {
@@ -79,18 +84,25 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                     continue;
                 };
                
-                var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id, FriendShipStatus.ACCEPTED);
                 var userFriends = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(user.Id, FriendShipStatus.ACCEPTED);
                 var mutualFriendsCount = userFriends.Count(f => myFriendsIds.Contains(f.UserId == user.Id ? f.FriendId : f.UserId));
                 var top3MutualFriends = userFriends.Where(f => myFriendsIds.Contains(f.UserId == user.Id ? f.FriendId : f.UserId)).Select(f => f.UserId == user.Id ? f.Friend : f.User).Take(3);
                 var follower = await _unitOfWork.FollowRepository.GetFollowByFollowerIdAndFolloweeIdAsync(userId, user.Id);
+
+                var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, user.Id);
+
+                if (friendShip == null || !friendShip.IsConnect)
+                {
+                    mapUser.IsShowStatus = false;
+                    mapUser.IsOnline = false;
+                }
 
                 var item = new SearchUserSuggestResponse()
                 {
                     User = mapUser,
                     CountMutualFriends = mutualFriendsCount,
                     IsFollow = follower != null,
-                    IsFriend = friendShip != null,
+                    IsFriend = friendShip != null && friendShip.Status == FriendShipStatus.ACCEPTED,
                     MutualFriends = top3MutualFriends.Select(u => ApplicationMapper.MapToFriend(u)).ToList(),
                 };
 
@@ -100,14 +112,6 @@ namespace SocialNetwork.Application.Features.Search.Handlers
             var countResult = groupResponse.Count + userResponse.Count + postTotalCount;
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
-            //var searchHistory = new SearchHistory()
-            //{
-            //    SearchText = request.Query,
-            //    UserId = userId,
-            //};
-
-            //await _unitOfWork.SearchRepository.CreateSearchHistoryAsync(searchHistory);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

@@ -13,6 +13,7 @@ import { Button } from "antd";
 import { Role } from "../../enums/role";
 import useTitle from "../../hooks/useTitle";
 import LoadingIndicator from "../../components/LoadingIndicator";
+import Loading from "../../components/Loading";
 
 
 export type SignInRequest = {
@@ -45,7 +46,7 @@ const SignInPage: FC = () => {
     }
 
     return <div className="flex flex-col gap-y-6 justify-center h-full px-8 py-20">
-        {loading && <LoadingIndicator title="Đang đăng nhập" />}
+        {loading && <Loading title="Đang đăng nhập" />}
         <div className="flex flex-col items-center md:items-start gap-y-4 md:gap-y-0">
             <img src={images.facebook} className="w-[40px] h-[40px] md:hidden" />
             <span className="font-bold text-2xl text-left text-sky-600">ĐĂNG NHẬP</span>

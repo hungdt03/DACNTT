@@ -28,6 +28,8 @@ import ListSharePostModal from "../modals/ListSharePostModal";
 import EditPostModal from "../modals/EditPostModal";
 import { GroupPrivacy } from "../../enums/group-privacy";
 import ExpandableText from "../ExpandableText";
+import ReportPostModal from "../modals/reports/ReportPostModal";
+import reportService from "../../services/reportService";
 
 type PostGroupProps = {
     post: PostResource;
@@ -47,6 +49,8 @@ const PostGroup: FC<PostGroupProps> = ({
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
     const { handleCancel: cancelListShare, isModalOpen: openListShare, handleOk: okListShare, showModal: showListShare } = useModal();
+    const { handleCancel: cancelReportAdmin, isModalOpen: openReportAdmin, handleOk: okReportAdmin, showModal: showReportAdmin } = useModal();
+    const { handleCancel: cancelReport, isModalOpen: openReport, handleOk: okReport, showModal: showReport } = useModal();
 
     const { user } = useSelector(selectAuth);
 
@@ -54,7 +58,7 @@ const PostGroup: FC<PostGroupProps> = ({
     const [reactions, setReactions] = useState<ReactionResource[]>();
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
-
+    const [reason, setReason] = useState('')
 
     const fetchReactions = async () => {
         const response = await reactionService.getAllReactionsByPostId(post.id);
@@ -149,12 +153,60 @@ const PostGroup: FC<PostGroupProps> = ({
         }
     }
 
+    const handleReportPost = async (reason: string) => {
+        const response = await reportService.reportPost(post.id, reason, post.group?.id);
+        if (response.isSuccess) {
+            message.success(response.message)
+            okReportAdmin()
+            setReason('')
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleSavedPost = async (postId: string) => {
+        const response = await postService.addSavedPost(postId);
+        if (response.isSuccess) {
+            message.success(response.message);
+            setPost(prev => ({
+                ...prev,
+                isSaved: true
+            }))
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleRemoveSavedPost = async (postId: string) => {
+        const response = await postService.removeSavedPostByPostId(postId);
+        if (response.isSuccess) {
+            message.success(response.message)
+            setPost(prev => ({
+                ...prev,
+                isSaved: false
+            }))
+        } else {
+            message.error(response.message)
+        }
+    }
+
+
+    const handleRevokeTag = async () => {
+        const response = await postService.revokeTag(post.id);
+        if (response.isSuccess) {
+            fetchPostById()
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
                 <div className="relative">
-                    <img className="w-10 h-10 rounded-md object-cover" src={post.group.coverImage ?? images.cover} />
+                    <img className="w-10 h-10 rounded-md object-cover" src={post.group?.coverImage ?? images.cover} />
 
                     {!post.user.haveStory
                         ? <Avatar className="w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} />
@@ -164,8 +216,8 @@ const PostGroup: FC<PostGroupProps> = ({
                     {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-2 -right-2 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                 </div>
                 <div className="flex flex-col gap-y-[1px]">
-                    <div className="font-semibold text-[15px] text-gray-800">
-                        <Link to={`/groups/${post.group.id}`} className="font-bold text-sm">{post.group?.name}</Link>
+                    <div className="font-semibold text-[15px] text-gray-600">
+                        <Link to={`/groups/${post.group.id}`} className="font-bold text-[15px] hover:underline hover:text-gray-600">{post.group?.name}</Link>
                         {post.tags.length > 0 &&
                             (() => {
                                 const maxDisplay = 3;
@@ -177,7 +229,7 @@ const PostGroup: FC<PostGroupProps> = ({
                                     <>
                                         {' cùng với '}
                                         {displayedTags.map((tag, index) => (
-                                            <Link className="hover:underline" to={`/profile/${tag.user.id}`} key={tag.id}>
+                                            <Link className="hover:underline hover:text-gray-600 font-bold" to={`/profile/${tag.user.id}`} key={tag.id}>
                                                 {tag.user.fullName}
                                                 {index < displayedTags.length - 1 ? ', ' : ''}
                                             </Link>
@@ -190,8 +242,7 @@ const PostGroup: FC<PostGroupProps> = ({
                             })()}
                     </div>
                     <div className="flex items-center gap-x-2">
-
-                        <Link className="font-semibold text-[13px] md:text-sm text-gray-600" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                        <Link className="font-bold hover:underline text-[13px] text-gray-600 hover:text-gray-600" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
                             <span className="text-[12px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
@@ -203,6 +254,15 @@ const PostGroup: FC<PostGroupProps> = ({
             <Popover className="flex-shrink-0" content={<PostMoreAction
                 onEditPost={showEditPostModal}
                 onDeletePost={handleDeletePost}
+                onReportPost={showReport}
+                isHasTag={!!post.tags.find(s => s.user.id === user?.id)}
+                onRevokeTag={handleRevokeTag}
+                onReportPostGroup={showReportAdmin}
+                onSavedPost={() => handleSavedPost(post.id)}
+                onRemoveSavedPost={() => handleRemoveSavedPost(post.id)}
+                isAdmin={post.group?.isMine}
+                isPostGroup={post.group != undefined}
+                isSaved={post.isSaved}
                 isMine={post.user.id === user?.id}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
@@ -295,6 +355,50 @@ const PostGroup: FC<PostGroupProps> = ({
             }}
         >
             <ListSharePostModal post={post} />
+        </Modal>
+      
+        {/* REPORT TO ADMIN OF GROUP */}
+        <Modal
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Báo cáo bài viết tới quản trị viên nhóm</p>}
+            centered
+            open={openReportAdmin}
+            onOk={okReportAdmin}
+            onCancel={cancelReportAdmin}
+            okText='Gửi báo cáo'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason),
+                disabled: reason.trim().length < 20
+            }}
+        >
+            <ReportPostModal
+                value={reason}
+                onChange={(newValue) => setReason(newValue)}
+                title="Tại sao bạn báo cáo bài viết này"
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+            />
+        </Modal>
+
+        {/* REPORT TO ADMIN OF APPLICATION*/}
+        <Modal
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Báo cáo bài viết</p>}
+            centered
+            open={openReport}
+            onOk={okReport}
+            onCancel={cancelReport}
+            okText='Gửi báo cáo'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason),
+                disabled: reason.trim().length < 20
+            }}
+        >
+            <ReportPostModal
+                value={reason}
+                onChange={(newValue) => setReason(newValue)}
+                title="Tại sao bạn báo cáo bài viết này"
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+            />
         </Modal>
     </div>
 };

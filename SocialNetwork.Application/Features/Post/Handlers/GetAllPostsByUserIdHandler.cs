@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
+using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Post.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
@@ -25,6 +26,12 @@ namespace SocialNetwork.Application.Features.Post.Handlers
         public async Task<BaseResponse> Handle(GetAllPostByUserIdQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
+
+            var block = await _unitOfWork.BlockListRepository
+                .GetBlockListByUserIdAndUserIdAsync(userId, request.UserId);
+
+            if (block != null) throw new AppException("Bạn không thể xem bài viết của người này");
+
             var (posts, totalCount) = await _unitOfWork.PostRepository
                 .GetAllPostsByUserIdAsync(request.UserId, request.Page, request.Size, request.Search, request.SortOrder, request.ContentType, request.FromDate, request.ToDate);
 
@@ -37,6 +44,22 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     var shares = await _unitOfWork.PostRepository.CountSharesByPostIdAsync(post.Id);
                     postItem.Shares = shares;
                 };
+
+                if(post.UserId != userId)
+                {
+                    var friendShip = await _unitOfWork.FriendShipRepository
+                       .GetFriendShipByUserIdAndFriendIdAsync(post.UserId, userId);
+
+                    if(friendShip == null || !friendShip.IsConnect)
+                    {
+                        postItem.User.IsShowStatus = false;
+                        postItem.User.IsOnline = false;
+                    } 
+                }
+
+                var haveStory = await _unitOfWork.StoryRepository
+                        .IsUserHaveStoryAsync(post.UserId);
+                postItem.User.HaveStory = haveStory;
 
                 var savedPost = await _unitOfWork.SavedPostRepository
                   .GetSavedPostByPostIdAndUserId(post.Id, userId);

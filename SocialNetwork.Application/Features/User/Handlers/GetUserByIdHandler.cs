@@ -35,7 +35,6 @@ namespace SocialNetwork.Application.Features.User.Handlers
             var response = ApplicationMapper.MapToUser(user);
 
             var userId = httpContextAccessor.HttpContext.User.GetUserId();
-            var check = true;
 
             if(userId != user.Id)
             {
@@ -51,21 +50,16 @@ namespace SocialNetwork.Application.Features.User.Handlers
                 if(friendShip == null || (!friendShip.IsConnect && friendShip.Status != FriendShipStatus.ACCEPTED))
                 {
                     response.IsOnline = false;
-                    response.HaveStory = false;
-                    check = false;
                 }
             }
 
             response.FriendCount = await unitOfWork.FriendShipRepository.CountFriendsByUserIdAsync(request.UserId);
             response.FollowerCount = await unitOfWork.FollowRepository.CountFollowersByUserIdAsync(request.UserId);
             response.FollowingCount = await unitOfWork.FollowRepository.CountFolloweesByUserIdAsync(request.UserId);
-            
-           if(check)
-            {
-                var haveStory = await unitOfWork.StoryRepository
-                  .IsUserHaveStoryAsync(user.Id);
-                response.HaveStory = haveStory;
-            }
+
+            var haveStory = await unitOfWork.StoryRepository
+                    .IsUserHaveStoryAsync(user.Id);
+            response.HaveStory = haveStory;
 
             var roles = await userManager.GetRolesAsync(user);
             if (roles != null && roles.Count > 0)

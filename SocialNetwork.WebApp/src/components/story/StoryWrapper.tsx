@@ -27,7 +27,6 @@ const StoryWrapper: FC = () => {
         const fetchUserStories = async () => {
             setLoading(true)
             const response = await storyService.getAllStories();
-            console.log(response)
             setLoading(false)
             if (response.isSuccess) {
                 setUserStories(response.data)
@@ -41,11 +40,11 @@ const StoryWrapper: FC = () => {
         <div className={`relative w-full ${userStories.length > 0 ? "h-[160px] md:h-[200px]" : "h-auto"}`}>
             {/* Hiển thị skeleton khi loading */}
             {loading && (
-                Array.from({ length: 4 }).map((_, index) => (
-                    <SwiperSlide key={`skeleton-${index}`}>
-                        <StorySkeleton />
-                    </SwiperSlide>
-                ))
+                <div className="flex items-center gap-x-3 pb-4">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                        <StorySkeleton key={index} />
+                    ))}
+                </div>
             )}
 
             {/* Hiển thị Swiper khi có story */}

@@ -22,7 +22,7 @@ type ProfilePostFilterProps = {
 const ProfilePostFilter: FC<ProfilePostFilterProps> = ({ onChange }) => {
     const [searchValue, setSearchValue] = useState("");
     const [filter, setFilter] = useState<ProfilePostFilter>({
-        sortOrder: "asc",
+        sortOrder: "desc",
     });
 
     const debouncedSearch = useDebounce(searchValue, 300);

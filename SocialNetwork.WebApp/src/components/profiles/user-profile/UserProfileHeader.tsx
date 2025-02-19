@@ -42,7 +42,8 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
     const [isFollow, setIsFollow] = useState(false);
     const [reason, setReason] = useState('');
     const navigate = useNavigate();
-    const [chatRoom, setChatRoom] = useState<ChatRoomResource>()
+    const [chatRoom, setChatRoom] = useState<ChatRoomResource>();
+    const [loading, setLoading] = useState(false)
 
     const dispatch = useDispatch<AppDispatch>()
 
@@ -144,7 +145,9 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
     }, [targetUser])
 
     const handleGetOrCreateChatRoom = async () => {
+        setLoading(true)
         const response = await chatRoomService.getOrCreateChatRoom(targetUser.id);
+        setLoading(false)
         if (response.isSuccess) {
             setChatRoom(response.data)
             dispatch(add(response.data))
@@ -160,7 +163,7 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
 
         <div className="flex flex-col lg:flex-row items-center lg:items-end md:ml-10 ml-0 -mt-16 gap-x-6 lg:-mt-8 px-8">
             <div className="relative flex-shrink-0 z-30">
-                {targetUser.isShowStory && targetUser?.haveStory ?
+                {targetUser?.haveStory ?
                     <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[4px] p-[2px] border-primary flex items-center justify-center aspect-square" to={`/stories/${targetUser.id}`}>
                         <img alt="Ảnh đại diện" className="object-cover aspect-square rounded-full" src={targetUser?.avatar ?? images.user} />
                     </Link>
@@ -232,7 +235,7 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
 
                 }
 
-                <Button onClick={handleGetOrCreateChatRoom} type="primary" icon={<MessageSquareText className="mb-1" size={16} />}>
+                <Button loading={loading} onClick={handleGetOrCreateChatRoom} type="primary" icon={<MessageSquareText className="mb-1" size={16} />}>
                     Nhắn tin
                 </Button>
 

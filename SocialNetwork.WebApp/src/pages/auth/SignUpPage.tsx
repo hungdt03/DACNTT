@@ -12,6 +12,7 @@ import otpService from "../../services/otpService";
 import OTPVerification from "../../components/OTPVerification";
 import useTitle from "../../hooks/useTitle";
 import LoadingIndicator from "../../components/LoadingIndicator";
+import Loading from "../../components/Loading";
 
 export type SignUpRequest = {
     fullName: string;
@@ -88,7 +89,7 @@ const SignUpPage: FC = () => {
     }, [isModalOpen])
 
     return <div className="flex flex-col gap-y-6 justify-center h-full p-8">
-        {loading && <LoadingIndicator title="Đang đăng kí" />}
+        {loading && <Loading title="Đang xử lí" />}
         <div className="flex flex-col items-center md:items-start gap-y-4 md:gap-y-0">
             <img src={images.facebook} className="w-[40px] h-[40px] md:hidden" />
             <span className="font-bold text-2xl text-left text-sky-600">ĐĂNG KÍ TÀI KHOẢN</span>

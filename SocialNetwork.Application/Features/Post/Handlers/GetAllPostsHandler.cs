@@ -31,13 +31,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var filteredPosts = new List<Domain.Entity.PostInfo.Post>();
             foreach (var post in allPosts)
             {
-                if(post.GroupId.HasValue)
-                {
-                    var member = await unitOfWork.GroupMemberRepository
-                        .GetGroupMemberByGroupIdAndUserId(post.GroupId.Value, userId);
-                    if (member == null || post.IsGroupPost && post.ApprovalStatus != ApprovalStatus.APPROVED) continue;
-                }
-
+               
                 bool isMe = post.UserId == userId;
               
                 if (!isMe)
@@ -56,8 +50,15 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                         {
                             filteredPosts.Add(post);
                         }
-                    }
+                    } else if(post.IsGroupPost && post.Group != null && post.GroupId.HasValue)
+                    {
+                        var member = await unitOfWork.GroupMemberRepository
+                            .GetGroupMemberByGroupIdAndUserId(post.GroupId.Value, userId);
 
+                        if (member == null || post.ApprovalStatus != ApprovalStatus.APPROVED) continue;
+
+                        filteredPosts.Add(post);
+                    }
                 }
                 else
                 {
@@ -86,7 +87,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     var friendShip = await unitOfWork.FriendShipRepository
                         .GetFriendShipByUserIdAndFriendIdAsync(item.UserId, userId);
 
-                    if(item.Privacy == PrivacyConstant.PUBLIC && (friendShip == null || !friendShip.IsConnect))
+                    if((item.Privacy == PrivacyConstant.PUBLIC || item.Privacy == PrivacyConstant.GROUP_PUBLIC || item.Privacy == PrivacyConstant.GROUP_PRIVATE) && (friendShip == null || !friendShip.IsConnect))
                     {
                         check = true;
                     }
@@ -102,20 +103,16 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
                 if(check)
                 {
-                    mapPost.User.HaveStory = false;
                     mapPost.User.IsShowStatus = false;
-                    mapPost.User.IsShowStory = false;
                     mapPost.User.IsOnline = false;
-                } else
-                {
-                    var haveStory = await unitOfWork.StoryRepository
-                        .IsUserHaveStoryAsync(item.UserId);
-                    mapPost.User.HaveStory = haveStory;
                 }
+
+                var haveStory = await unitOfWork.StoryRepository
+                        .IsUserHaveStoryAsync(item.UserId);
+                mapPost.User.HaveStory = haveStory;
 
                 var savedPost = await unitOfWork.SavedPostRepository
                     .GetSavedPostByPostIdAndUserId(item.Id, userId);
-
                 mapPost.IsSaved = savedPost != null;
 
                 response.Add(mapPost);

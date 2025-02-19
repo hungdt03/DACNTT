@@ -8,6 +8,7 @@ using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Features.Search.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.Search.Handlers
 {
@@ -27,7 +28,29 @@ namespace SocialNetwork.Application.Features.Search.Handlers
 
             var (searchHistories, totalCount) = await _unitOfWork.SearchRepository.GetAllSearchHistoryByUserIdAsync(userId, request.Page, request.Size);
 
-            var response = searchHistories.Select(ApplicationMapper.MapToSearch).ToList();
+            var response = new List<SearchHistoryResponse>();
+            foreach (var searchHistory in searchHistories)
+            {
+                var searchHistoryItem = ApplicationMapper.MapToSearch(searchHistory);
+
+                if(searchHistory.SearchUserId != null)
+                {
+                    if(searchHistory.SearchUserId != userId)
+                    {
+                        var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, searchHistory.SearchUserId);
+                        if (friendShip == null || !friendShip.IsConnect)
+                        {
+                            searchHistoryItem.User.IsShowStatus = false;
+                            searchHistoryItem.User.IsOnline = false;
+                        }
+                    }
+
+                    var haveStory = await _unitOfWork.StoryRepository
+                        .IsUserHaveStoryAsync(searchHistory.SearchUserId);
+
+                    searchHistoryItem.User.HaveStory = haveStory;
+                }
+            }
 
             return new PaginationResponse<List<SearchHistoryResponse>>()
             {

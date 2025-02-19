@@ -38,6 +38,10 @@ namespace SocialNetwork.Application.Features.Friend.Handlers
 
                 if(friendItem.Id != userId)
                 {
+                    var block = await _unitOfWork.BlockListRepository
+                       .GetBlockListByUserIdAndUserIdAsync(userId, friendItem.Id);
+                    if (block != null) continue;
+
                     var friendsOfTemp = await _unitOfWork.FriendShipRepository.GetAllFriendShipsAsyncByUserId(friendItem.Id, FriendShipStatus.ACCEPTED);
                     var mutualFriendsCount = friendsOfTemp.Count(f =>  myFriendsIds.Contains(f.UserId == friendItem.Id ? f.FriendId : f.UserId));
                     resource.MutualFriends = mutualFriendsCount;

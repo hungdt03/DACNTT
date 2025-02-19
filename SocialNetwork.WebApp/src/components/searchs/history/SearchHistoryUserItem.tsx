@@ -21,11 +21,17 @@ const SearchHistoryUserItem: FC<SearchHistoryUserItemProps> = ({
             </span>
 
             <div className="flex items-center gap-x-2">
-                <img src={searchHistory.user.avatar ?? images.cover} className="w-[35px] h-[35px] rounded-full border-[1px] border-gray-100" />
+                <div className="relative">
+                    {!searchHistory.user.haveStory
+                        ? <img src={searchHistory.user.avatar ?? images.cover} className="md:w-[35px] md:h-[35px] w-[35px] h-[35px] rounded-full border-[1px] border-gray-100" />
+                        : <Link className="p-[1px] border-[2px] inline-block border-primary rounded-full" to={`/stories/${searchHistory.user.id}`}><img src={searchHistory.user.avatar ?? images.cover} className="md:w-[35px] md:h-[35px] w-[35px] h-[35px] rounded-full border-[1px] border-gray-100" /></Link>
+                    }
+                    {searchHistory.user.isShowStatus && searchHistory.user.isOnline && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                </div>
                 <div className="flex flex-col">
                     <span className="text-sm font-semibold line-clamp-1">{searchHistory.user.fullName}</span>
                     <span className="text-gray-600 text-xs line-clamp-1">
-                </span>
+                    </span>
                 </div>
             </div>
         </Link>

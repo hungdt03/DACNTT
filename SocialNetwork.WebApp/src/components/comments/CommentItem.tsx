@@ -107,9 +107,9 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 <div className="relative">
                     {!comment.user.haveStory
                         ? <Avatar className="flex-shrink-0 w-[25px] h-[25px] md:w-[32px] md:h-[32px]" src={comment.user.avatar ?? images.user} />
-                        : <Link className="p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${comment.user.id}`}><Avatar className="flex-shrink-0 w-[25px] h-[25px] md:w-[30px] md:h-[30px]" src={comment.user.avatar ?? images.user} /> </Link>
+                        : <Link className="p-[1px] border-[2px] inline-block border-primary rounded-full" to={`/stories/${comment.user.id}`}><Avatar className="flex-shrink-0 w-[24px] h-[24px] md:w-[30px] md:h-[30px]" src={comment.user.avatar ?? images.user} /> </Link>
                     }
-                    {comment.user.isOnline && <div className="absolute -bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                    {comment.user.isShowStatus && comment.user.isOnline && <div className="absolute -bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                 </div>
                 <div className="flex flex-col gap-y-2">
                     <div className="flex items-center gap-x-2 group">

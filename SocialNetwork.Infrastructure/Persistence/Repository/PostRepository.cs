@@ -1,5 +1,7 @@
 ﻿
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
@@ -10,9 +12,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
     public class PostRepository : IPostRepository
     {
         private readonly AppDbContext _context;
-        public PostRepository(AppDbContext context)
+        private readonly IHttpContextAccessor _contextAccessor;
+
+        public PostRepository(AppDbContext context, IHttpContextAccessor contextAccessor)
         {
             _context = context;
+            _contextAccessor = contextAccessor;
         }
 
         public async Task<int> CountSharesByPostIdAsync(Guid postId)
@@ -43,6 +48,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Tags).ThenInclude(o => o.User)
+                 .Where(p => (p.IsGroupPost && p.Group != null) || !p.IsGroupPost)
                  .ToListAsync();
 
             return posts;     
@@ -50,9 +56,35 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsByUserIdAsync(string userId, int page, int size, string search, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate)
         {
+            var currentUserId = _contextAccessor?.HttpContext?.User.GetUserId();
+
+            if(currentUserId == userId)
+            {
+                return await GetAllMyPostsAsync(userId, page, size, search, sortOrder, contentType, fromDate, toDate);
+            }
+
+            var friendShip = await _context.FriendShips
+               .Include(f => f.User)
+               .Include(f => f.Friend)
+               .SingleOrDefaultAsync(s =>
+                    ((s.UserId == userId && s.FriendId == currentUserId)
+                    || (s.UserId == currentUserId && s.FriendId == userId))
+                    && s.Status.Equals(FriendShipStatus.ACCEPTED));
+
             var query = _context.Posts
-                .Where(p => p.UserId == userId && p.GroupId == null)
-                .AsQueryable();
+                .Include(p => p.Tags).Include(p => p.User)
+                .Where(p => 
+                   (p.UserId == userId || (friendShip != null && (p.Privacy == PrivacyConstant.PUBLIC || p.UserId == currentUserId) && p.Tags != null && p.Tags.Any(tag => tag.UserId == userId)))
+                   && p.GroupId == null
+               );
+
+            if(friendShip == null)
+            {
+                query = query.Where(p => p.Privacy == PrivacyConstant.PUBLIC);
+            } else
+            {
+                query = query.Where(p => p.Privacy == PrivacyConstant.FRIENDS || p.Privacy == PrivacyConstant.PUBLIC);
+            }
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -87,21 +119,21 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             if (sortOrder.Equals("desc", StringComparison.OrdinalIgnoreCase))
             {
                 query = query.OrderByDescending(p => p.DateCreated);
+            } else
+            {
+                query = query.OrderBy(p => p.DateCreated);
             }
 
             var totalCount = await query.CountAsync();
 
             var posts = await query
-                //.AsNoTracking()
-                .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)
                 .Include(p => p.Group)
                 .Include(p => p.User)
-                .Include(p => p.Tags)
-                    .ThenInclude(p => p.User)
                 .Include(p => p.Comments)
                 .Include(p => p.Medias)
+                .Include(p => p.Tags).ThenInclude(p => p.User)
                 .Include(p => p.SharePost)
                   .Include(p => p.OriginalPost).ThenInclude(o => o.User)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
@@ -124,7 +156,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             var totalCount = await query.Where(p => p.SharePostId == postId || p.OriginalPostId == postId).CountAsync();
 
             var posts = await query
-                //.AsNoTracking()
                 .Where(p => p.SharePostId == postId || p.OriginalPostId == postId)
                 .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
@@ -164,8 +195,15 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsByGroupIdAsync(Guid groupId, int page, int size)
         {
+            var userId = _contextAccessor?.HttpContext?.User.GetUserId();
+
+            var blockedUsers = await _context.BlockLists
+               .Where(b => b.BlockerId == userId || b.BlockeeId == userId)
+               .Select(b => b.BlockerId == userId ? b.BlockeeId : b.BlockerId)
+               .ToListAsync();
+
             var query = _context.Posts
-                .Where(p => p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.APPROVED && p.GroupId == groupId)
+                .Where(p => p.IsGroupPost && !blockedUsers.Contains(p.UserId) && p.ApprovalStatus == ApprovalStatus.APPROVED && p.GroupId == groupId)
                 .AsQueryable();
 
             var totalCount = await query.CountAsync();
@@ -192,11 +230,22 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<(List<Post> Posts, int TotalCount)> GetAllGroupPostsByUserIdAsync(string userId, int page, int size)
         {
+            var blockedUsers = await _context.BlockLists
+                .Where(b => b.BlockerId == userId || b.BlockeeId == userId)
+                .Select(b => b.BlockerId == userId ? b.BlockeeId : b.BlockerId)
+                .ToListAsync();
+
             var query = _context.Posts
-                .Where(p => p.ApprovalStatus == ApprovalStatus.APPROVED && p.IsGroupPost && p.Group != null && p.Group.Members != null && p.Group.Members.Any(m => m.UserId == userId))
                 .Include(p => p.Group)
-                    .ThenInclude(p => p.Members)
-                .AsQueryable();
+                .ThenInclude(p => p.Members)
+                .Where(p =>
+                   ((p.IsGroupPost && p.Group != null) || !p.IsGroupPost)
+                   && !blockedUsers.Contains(p.UserId)
+                   && p.ApprovalStatus == ApprovalStatus.APPROVED
+                   && p.IsGroupPost
+                   && p.Group != null
+                   && p.Group.Members != null
+                   && p.Group.Members.Any(m => m.UserId == userId));
 
             var totalCount = await query.CountAsync();
 
@@ -204,7 +253,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .OrderByDescending(p => p.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)
-                .Include(p => p.Group)
                 .Include(p => p.User)
                 .Include(p => p.Tags)
                     .ThenInclude(p => p.User)
@@ -477,7 +525,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                   .Include(p => p.OriginalPost).ThenInclude(o => o.User)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
-              
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags).ThenInclude(o => o.User)
                 .ToListAsync();
 
             return (posts, totalCount);

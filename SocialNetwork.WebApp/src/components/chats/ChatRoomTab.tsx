@@ -17,6 +17,7 @@ import SignalRConnector from '../../app/signalR/signalr-connection'
 import useDebounce from "../../hooks/useDebounce";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { MessageResource } from "../../types/message";
+import { Link } from "react-router-dom";
 
 type ChatRoomTabProps = {
     loading: boolean;
@@ -87,16 +88,16 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
 
     const handleSelectChat = async (chatRoom: ChatRoomResource) => {
         await readMessage(chatRoom)
-     
-            const updateList = [...chatRooms]
-            const findIndex = updateList.findIndex(item => item.id === chatRoom.id);
-            if (findIndex !== -1) {
-                updateList[findIndex] = {
-                    ...updateList[findIndex],
-                    isRead: true
-                }
+
+        const updateList = [...chatRooms]
+        const findIndex = updateList.findIndex(item => item.id === chatRoom.id);
+        if (findIndex !== -1) {
+            updateList[findIndex] = {
+                ...updateList[findIndex],
+                isRead: true
             }
-            onUpdateChatRooms(updateList)
+        }
+        onUpdateChatRooms(updateList)
     }
 
     return <>
@@ -115,7 +116,11 @@ const ChatRoomTab: FC<ChatRoomTabProps> = ({
                 {loading ? <ChatUserSkeleton />
                     : chatRooms.map(chatRoom => <div onClick={() => handleSelectChat(chatRoom)} key={chatRoom.id} className="relative flex items-center gap-x-3 py-2 px-3 hover:bg-gray-100 rounded-md cursor-pointer">
                         <div className="relative">
-                            <Avatar className="w-12 flex-shrink-0 h-12 object-cover" src={chatRoom.friend?.avatar ?? images.group} />
+                            {chatRoom.isPrivate && chatRoom.friend?.haveStory
+                                ? <Link to={`/stories/${chatRoom.friend.id}`} className="inline-block rounded-full p-[1px] border-[2px] border-primary"><Avatar size='default' src={chatRoom.isPrivate ? chatRoom.friend?.avatar : images.group} /></Link>
+                                : <Avatar size='large' className="flex-shrink-0" src={chatRoom.isPrivate ? chatRoom.friend?.avatar : chatRoom.imageUrl} />
+                            }
+
                             {chatRoom.isOnline && (!chatRoom.isPrivate || (chatRoom.isPrivate && chatRoom.friend?.isShowStatus)) && <div className="absolute right-0 bottom-0 w-3 h-3 rounded-full bg-green-500 border-[2px] border-white"></div>}
                         </div>
                         <div className="flex flex-col items-start gap-y-1">

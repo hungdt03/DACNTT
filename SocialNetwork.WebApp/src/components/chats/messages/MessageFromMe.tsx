@@ -26,7 +26,7 @@ const MessageFromMe: FC<MessageFromMeProps> = ({
                     {message.medias && <MessageMedia medias={message.medias} />}
                     {message.content && (
                         <p
-                            className={`inline-block text-white text-sm p-2 rounded-lg break-words ${message.messageType === MessageType.ERROR
+                            className={`inline-block text-white text-sm p-2 rounded-lg break-all break-words ${message.messageType === MessageType.ERROR
                                     ? 'bg-red-500'  // Màu đỏ cho lỗi
                                     : 'bg-sky-500'  // Màu xanh dương cho tin nhắn thành công
                                 }`}
