@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Layout, Card, Row, Col, Statistic, Button, Space, Select } from 'antd'
+import { Layout, Card, Row, Col, Statistic, Select } from 'antd'
 import { StockOutlined, WarningOutlined, UserOutlined, TeamOutlined } from '@ant-design/icons'
 import { Pie, Line, Bar } from '@ant-design/plots'
 import adminService from '../../services/adminService'
@@ -8,8 +8,6 @@ const { Content } = Layout
 const { Option } = Select
 
 const StatisticsPage: React.FC = () => {
-    const [selectedMonth, setSelectedMonth] = useState<number | null>(null)
-    const [selectedYear, setSelectedYear] = useState<number | null>(null)
     const [countAllUser, setCountAllUser] = useState<number>(0)
     const [countAllPost, setCountAllPost] = useState<number>(0)
     const [countAllGroup, setCountAllGroup] = useState<number>(0)
@@ -21,7 +19,7 @@ const StatisticsPage: React.FC = () => {
     const [top10UserScore, setTop10UserScore] = useState<{ name: string; score: number }[]>([])
     const [registrationStats, setRegistrationStats] = useState<{ year: number; month: number; count: number }[]>([])
     const [registrationYear, setRegistrationYear] = useState<number[]>([])
-    console.log(registrationStats)
+
     const fetchTop10UserScore = async () => {
         const response = await adminService.GetTop10UserScore()
         if (response.isSuccess && response.data) {
@@ -103,19 +101,6 @@ const StatisticsPage: React.FC = () => {
         }
     }
 
-    const handleMonthChange = (value: number) => {
-        setSelectedMonth(value)
-    }
-
-    const handleYearChange = (value: number) => {
-        setSelectedYear(value)
-    }
-
-    const resetFilters = () => {
-        setSelectedMonth(null)
-        setSelectedYear(null)
-    }
-
     useEffect(() => {
         fetchAndUpdateInventoryData()
         fetchCountAllGroup()
@@ -124,44 +109,10 @@ const StatisticsPage: React.FC = () => {
         fetchGetAllUserConnection()
         fetchTop10UserScore()
         fetchRegistrationYear()
-        resetFilters()
     }, [])
-
-    const filteredExpenseData = registrationStats.filter(
-        (item) =>
-            (!selectedMonth ||
-                new Date(`2023-${selectedMonth}-01`).getMonth() + 1 ===
-                    new Date(`2023-${item.month}-01`).getMonth() + 1) &&
-            (!selectedYear || item.year === selectedYear)
-    )
-
-    const totalAccountInteraction = filteredExpenseData.reduce((total, item) => total + item.count, 0)
-
     return (
         <Layout style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
             <Content style={{ flex: 1, overflow: 'hidden' }}>
-                <Row gutter={[16, 16]} style={{ marginBottom: '10px', justifyContent: 'center', textAlign: 'center' }}>
-                    <Col>
-                        <Space>
-                            <Select placeholder='Chọn tháng' style={{ width: 120 }} onChange={handleMonthChange}>
-                                {[...Array(12)].map((_, i) => (
-                                    <Option key={i + 1} value={i + 1}>{`Tháng ${i + 1}`}</Option>
-                                ))}
-                            </Select>
-                            <Select placeholder='Chọn năm' style={{ width: 120 }} onChange={handleYearChange}>
-                                {[2022, 2023, 2024].map((year) => (
-                                    <Option key={year} value={year}>
-                                        {year}
-                                    </Option>
-                                ))}
-                            </Select>
-                            <Button onClick={resetFilters}>Cài lại</Button>
-                            <Button type='primary' style={{ width: 120 }}>
-                                Lọc
-                            </Button>
-                        </Space>
-                    </Col>
-                </Row>
                 <Row gutter={[16, 16]} style={{ marginTop: '10px', marginBottom: '10px' }}>
                     <Col span={4}>
                         <Card style={{ borderRadius: '10px', textAlign: 'center', height: 100 }}>
@@ -219,7 +170,7 @@ const StatisticsPage: React.FC = () => {
                                     title='Tài khoản có lượt tương tác cao nhất'
                                     style={{ borderRadius: '10px', textAlign: 'center', height: '180px' }}
                                 >
-                                    <Statistic value={totalAccountInteraction || 0} prefix={<UserOutlined />} />
+                                    <Statistic value={1000} prefix={<UserOutlined />} />
                                 </Card>
                             </Col>
                         </Row>

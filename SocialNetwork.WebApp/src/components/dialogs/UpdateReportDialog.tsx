@@ -27,10 +27,12 @@ export type UpdateReport = {
     id: string
     newStatus: string
     newReportSolution: string
+    isDelete: boolean
 }
 const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, isVisible, onClose, fetchReports }) => {
     const [loading, setLoading] = useState(false)
     const [status, setStatus] = useState('')
+    const [btnCheckDelete, setBtnCheckDelete] = useState(false)
     const [reportSoluton, setReportSoluton] = useState('')
 
     useEffect(() => {
@@ -44,16 +46,42 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
         const updatedPayload: UpdateReport = {
             id: tagetReport.id,
             newStatus: status,
-            newReportSolution: reportSoluton
+            newReportSolution: reportSoluton,
+            isDelete: btnCheckDelete
         }
-        setLoading(true)
-        const response = await adminService.UpdateReport(updatedPayload)
-        setLoading(false)
-        if (response.isSuccess) {
-            fetchReports()
-            toast.success('Cập nhật trạng thái thành công')
+
+        if (btnCheckDelete && tagetReport.reportType === ReportType.POST) {
+            setLoading(true)
+            const response = await adminService.UpdateReport(updatedPayload)
+            const rp = await adminService.DeleteOnePost(tagetReport.targetPost.id)
+            setLoading(false)
+            if (response.isSuccess && rp.isSuccess) {
+                fetchReports()
+                toast.success('Cập nhật trạng thái và gỡ bài viết thành công')
+            } else {
+                toast.error(response.message)
+            }
+        } else if (btnCheckDelete && tagetReport.reportType === ReportType.COMMENT) {
+            setLoading(true)
+            const response = await adminService.UpdateReport(updatedPayload)
+            const rp = await adminService.DeleteOneComment(tagetReport.targetComment.id)
+            setLoading(false)
+            if (response.isSuccess && rp.isSuccess) {
+                fetchReports()
+                toast.success('Cập nhật trạng thái và gỡ bình luận thành công')
+            } else {
+                toast.error(response.message)
+            }
         } else {
-            toast.error(response.message)
+            setLoading(true)
+            const response = await adminService.UpdateReport(updatedPayload)
+            setLoading(false)
+            if (response.isSuccess) {
+                fetchReports()
+                toast.success('Cập nhật trạng thái thành công')
+            } else {
+                toast.error(response.message)
+            }
         }
     }
 
@@ -165,6 +193,25 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                         >
                             <Typography.Text>{tagetReport.targetPost?.content}</Typography.Text>
                         </Form.Item>
+                        <Form.Item
+                            label={<span style={{ fontWeight: 'bold' }}>Gỡ bài viết</span>}
+                            style={{ marginBottom: '10px' }}
+                        >
+                            <Button
+                                type={btnCheckDelete ? 'primary' : 'default'}
+                                onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                style={{ marginRight: 4 }}
+                            >
+                                Có
+                            </Button>
+                            <Button
+                                type={!btnCheckDelete ? 'primary' : 'default'}
+                                onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                style={{ marginRight: 4 }}
+                            >
+                                Không
+                            </Button>
+                        </Form.Item>
                     </>
                 )}
 
@@ -181,6 +228,25 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                             style={{ marginBottom: '10px' }}
                         >
                             <Typography.Text>{tagetReport.targetComment?.content}</Typography.Text>
+                        </Form.Item>
+                        <Form.Item
+                            label={<span style={{ fontWeight: 'bold' }}>Gỡ bình luận</span>}
+                            style={{ marginBottom: '10px' }}
+                        >
+                            <Button
+                                type={!btnCheckDelete ? 'primary' : 'default'}
+                                onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                style={{ marginRight: 4 }}
+                            >
+                                Có
+                            </Button>
+                            <Button
+                                type={btnCheckDelete ? 'primary' : 'default'}
+                                onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                style={{ marginRight: 4 }}
+                            >
+                                Không
+                            </Button>
                         </Form.Item>
                     </>
                 )}

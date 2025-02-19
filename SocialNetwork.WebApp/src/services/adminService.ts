@@ -110,5 +110,9 @@ class AdminService {
      CountAllReport() : Promise<DataResponse<number>> {
           return axiosInterceptor.get('/api/admin/count-all-report')
      }
+     // COMMENT
+     DeleteOneComment(commentId : string) : Promise<BaseResponse> {
+          return axiosInterceptor.delete('/api/comments/' + commentId)
+     }
 }
 export default AdminService.getInstance();

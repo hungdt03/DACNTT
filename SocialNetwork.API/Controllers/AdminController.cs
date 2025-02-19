@@ -198,5 +198,12 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetReportByIdQuery(reportId));
             return Ok(response);
         }
+        //COMMENT
+        [HttpDelete("delete-comment")]
+        public async Task<IActionResult> DeleteOneComment([FromBody] List<string> listReportId)
+        {
+            var response = await mediator.Send(new DeleteManyReportQuery(listReportId));
+            return Ok(response);
+        }
     }
 }

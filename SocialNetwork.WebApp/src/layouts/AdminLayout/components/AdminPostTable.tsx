@@ -23,7 +23,6 @@ import { toast } from 'react-toastify'
 import { Popconfirm } from 'antd'
 import { PostResource } from '../../../types/post'
 import { PostType } from '../../../enums/post-type'
-import { PostPrivacryOption } from '../../../components/posts/PostPrivacryOption'
 
 type PostsTableProps = {
     posts: PostResource[]

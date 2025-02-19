@@ -17,16 +17,16 @@ import { ReportType } from '../../enums/report-type'
 import { useElementInfinityScroll } from '../../hooks/useElementInfinityScroll'
 
 type NotificationDialogProps = {
-    notifications: NotificationResource[];
-    pagination: Pagination;
-    loading: boolean;
-    isInitialLoadComplete: boolean;
-    onFinishInitialLoad: () => void;
+    notifications: NotificationResource[]
+    pagination: Pagination
+    loading: boolean
+    isInitialLoadComplete: boolean
+    onFinishInitialLoad: () => void
     onFetchNextPage: () => void
     onUpdateNotifications: (notifications: NotificationResource[]) => void
 }
 
-const NotificationDialog: FC<NotificationDialogProps> = ({ 
+const NotificationDialog: FC<NotificationDialogProps> = ({
     notifications,
     pagination,
     loading,
@@ -34,11 +34,12 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     onFinishInitialLoad,
     onFetchNextPage,
     onUpdateNotifications
- }) => {
+}) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal()
     const [notification, setNotification] = useState<NotificationResource>()
 
     const { isModalOpen: openReport, handleCancel: cancelReport, showModal: showReport } = useModal()
+    const { isModalOpen: openReportDelete, handleCancel: cancelReportDelete, showModal: showReportDelete } = useModal()
     const [getReport, setGetReport] = useState<ReportResource>()
     const navigate = useNavigate()
 
@@ -53,7 +54,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         elementId: 'notification-dialog-element',
         hasMore: pagination.hasMore,
         isLoading: loading,
-        onLoadMore: () => isInitialLoadComplete && onFetchNextPage(),
+        onLoadMore: () => isInitialLoadComplete && onFetchNextPage()
     })
 
     const handleDeleteNotification = async (notificationId: string) => {
@@ -73,7 +74,6 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
             )
 
             onUpdateNotifications(updateNotifications)
-           
         } else {
             toast.error(response.message)
         }
@@ -120,6 +120,16 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         await getReportId(notification.reportId)
         showReport()
     }
+    const handleReportDeleteReceiverPage = async (noti: NotificationResource) => {
+        console.log(noti.reportId)
+        console.log(noti.id)
+        handleMarkNotificationAsRead(noti.id)
+        setNotification(notification)
+        await getReportId(noti.reportId)
+        console.log(noti.reportId)
+        console.log(getReport)
+        showReportDelete()
+    }
 
     return (
         <>
@@ -129,20 +139,21 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
             >
                 <span className='font-semibold text-lg'>Thông báo của bạn</span>
                 <div className='flex flex-col gap-y-2'>
-                    {notifications.map((notification) => (
+                    {notifications.map((notifi) => (
                         <Notification
-                            onShareNotification={() => handleOpenMentionShare(notification)}
-                            onCommentNotification={() => handleOpenMentionComment(notification)}
-                            onStoryNotification={() => handleRedirectToStoryPage(notification)}
-                            onDelete={() => handleDeleteNotification(notification.id)}
-                            onMarkAsRead={() => handleMarkNotificationAsRead(notification.id)}
-                            key={notification.id}
-                            notification={notification}
-                            onRequestFriendNotification={() => handleRedirectToProfileSenderPage(notification)}
-                            onAcceptRequestFriendNotification={() => handleRedirectToProfileReceiverPage(notification)}
-                            onPostReactionNotification={() => handleOpenMentionComment(notification)}
-                            onGroupNotification={() => handleRedirectToGroupPage(notification)}
-                            onReportUserNotification={() => handleReportReceiverPage(notification)}
+                            onShareNotification={() => handleOpenMentionShare(notifi)}
+                            onCommentNotification={() => handleOpenMentionComment(notifi)}
+                            onStoryNotification={() => handleRedirectToStoryPage(notifi)}
+                            onDelete={() => handleDeleteNotification(notifi.id)}
+                            onMarkAsRead={() => handleMarkNotificationAsRead(notifi.id)}
+                            key={notifi.id}
+                            notification={notifi}
+                            onRequestFriendNotification={() => handleRedirectToProfileSenderPage(notifi)}
+                            onAcceptRequestFriendNotification={() => handleRedirectToProfileReceiverPage(notifi)}
+                            onPostReactionNotification={() => handleOpenMentionComment(notifi)}
+                            onGroupNotification={() => handleRedirectToGroupPage(notifi)}
+                            onReportUserNotification={() => handleReportReceiverPage(notifi)}
+                            onReportDeleteNotification={() => handleReportDeleteReceiverPage(notifi)}
                         />
                     ))}
 
@@ -201,7 +212,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
 
             {openReport && (
                 <Modal
-                    title={<p className='text-center font-bold text-lg'>Phản hồi báo cáo</p>}
+                    title={<p className='text-center font-bold text-lg'>{notification?.title}</p>}
                     centered
                     open={openReport}
                     onCancel={cancelReport}
@@ -212,37 +223,141 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                     ]}
                 >
                     <div className='flex flex-col gap-y-2'>
-                        <div>
-                            <span className='text-[16px] font-bold'>
-                                Xin chào bạn {notification?.recipient.fullName},
-                            </span>
-                            {getReport?.reportType === ReportType.USER && (
-                                <p className='text-sm text-gray-600'>
-                                    Chúng tôi đã nhận được báo cáo của bạn về tài khoản:{' '}
-                                    {getReport?.targetUser.fullName}
-                                </p>
+                        <span className='text-[16px] font-bold'>
+                            Xin chào, <span className='text-blue-600'>{notification?.recipient?.fullName}</span>
+                        </span>
+
+                        <p className='text-sm text-gray-600'>
+                            <strong>Chúng tôi đã xem xét báo cáo của bạn và xin thông báo:</strong>
+                        </p>
+
+                        <p className='text-sm text-gray-600'>
+                            {(() => {
+                                switch (getReport?.reportType) {
+                                    case ReportType.USER:
+                                        return (
+                                            <>
+                                                Báo cáo của bạn về tài khoản
+                                                <strong className='text-blue-600'>
+                                                    {' '}
+                                                    "{getReport?.targetUser?.fullName}"
+                                                </strong>
+                                                đã được <strong>xử lý</strong>.
+                                            </>
+                                        )
+                                    case ReportType.POST:
+                                        return (
+                                            <>
+                                                Báo cáo của bạn về bài viết của
+                                                <strong className='text-blue-600'>
+                                                    {' '}
+                                                    "{getReport?.targetPost?.user?.fullName}"
+                                                </strong>
+                                                đã được <strong>xử lý</strong>.
+                                            </>
+                                        )
+                                    case ReportType.GROUP:
+                                        return (
+                                            <>
+                                                Báo cáo của bạn về nhóm
+                                                <strong className='text-blue-600'>
+                                                    {' '}
+                                                    "{getReport?.targetGroup?.name}"
+                                                </strong>
+                                                đã được <strong>xử lý</strong>.
+                                            </>
+                                        )
+                                    case ReportType.COMMENT:
+                                        return (
+                                            <>
+                                                Báo cáo của bạn về bình luận của
+                                                <strong className='text-blue-600'>
+                                                    {' '}
+                                                    "{getReport?.targetComment?.user?.fullName}"
+                                                </strong>
+                                                đã được <strong>xử lý</strong>.
+                                            </>
+                                        )
+                                    default:
+                                        return <strong>Báo cáo của bạn đã được xử lý.</strong>
+                                }
+                            })()}
+                        </p>
+
+                        <p className='text-sm text-gray-600'>
+                            <strong>📌 Kết quả xử lý: </strong>
+                            {getReport?.resolutionNotes ? (
+                                <span className='text-green-600'>{getReport?.resolutionNotes}</span>
+                            ) : (
+                                'Chúng tôi đã thực hiện các biện pháp cần thiết theo chính sách cộng đồng.'
                             )}
+                        </p>
+                        <p className='text-sm text-gray-600'>
+                            Cảm ơn bạn đã giúp chúng tôi xây dựng một <strong>cộng đồng an toàn và lành mạnh!</strong>{' '}
+                            🚀
+                        </p>
+                    </div>
+                </Modal>
+            )}
+            {openReportDelete && (
+                <Modal
+                    title={<p className='text-center font-bold text-lg'>📌 Thông báo Xóa Nội Dung Vi Phạm</p>}
+                    centered
+                    open={openReportDelete}
+                    onCancel={cancelReportDelete}
+                    footer={[
+                        <Button key='ok' type='primary' onClick={cancelReportDelete}>
+                            Xong
+                        </Button>
+                    ]}
+                >
+                    <div className='flex flex-col gap-y-3 text-gray-700'>
+                        <span className='text-[16px] font-bold'>
+                            Chào <span className='text-blue-600'>{notification?.recipient?.fullName}</span>,
+                        </span>
+
+                        <p className='text-sm'>
+                            Chúng tôi xin thông báo rằng bài viết/bình luận của bạn đã bị xóa do vi phạm các tiêu chuẩn
+                            cộng đồng của nền tảng.
+                        </p>
+
+                        <p className='text-sm'>
+                            <strong>🛑 Nội dung bị xóa:</strong>
                             {getReport?.reportType === ReportType.POST && (
-                                <p className='text-sm text-gray-600'>
-                                    Chúng tôi đã nhận được báo cáo của bạn về bài viết của:{' '}
-                                    {getReport?.targetPost.user.fullName}
-                                </p>
-                            )}
-                            {getReport?.reportType === ReportType.GROUP && (
-                                <p className='text-sm text-gray-600'>
-                                    Chúng tôi đã nhận được báo cáo của bạn về nhóm: {getReport?.targetGroup.name}
-                                </p>
+                                <span className='block text-red-600'>
+                                    📌 Bài viết: "{getReport?.targetPost?.content?.slice(0, 100)}..."
+                                </span>
                             )}
                             {getReport?.reportType === ReportType.COMMENT && (
-                                <p className='text-sm text-gray-600'>
-                                    Chúng tôi đã nhận được báo cáo của bạn về bình luận của:{' '}
-                                    {getReport?.targetComment.user.fullName}
-                                </p>
+                                <span className='block text-red-600'>
+                                    📌 Bình luận: "{getReport?.targetComment?.content?.slice(0, 100)}..."
+                                </span>
                             )}
-                            <p className='text-sm text-gray-600'>
-                                Chúng tôi đưa ra biện pháp giải quyết: {getReport?.resolutionNotes}
-                            </p>
-                        </div>
+                        </p>
+
+                        <p className='text-sm'>
+                            <strong>📜 Lý do vi phạm:</strong>
+                        </p>
+                        <ul className='text-sm list-disc list-inside'>
+                            <li>🔹 Nội dung chứa thông tin sai lệch/gây hiểu lầm</li>
+                            <li>🔹 Ngôn từ kích động, thù địch hoặc xúc phạm</li>
+                            <li>🔹 Vi phạm quyền riêng tư hoặc quấy rối người khác</li>
+                            <li>🔹 Nội dung không phù hợp với cộng đồng</li>
+                        </ul>
+
+                        <p className='text-sm'>
+                            Chúng tôi khuyến khích bạn đọc lại <strong>Chính sách Cộng đồng</strong> để tránh vi phạm
+                            trong tương lai. Nếu bạn cho rằng đây là một sự nhầm lẫn, bạn có thể gửi yêu cầu xem xét
+                            lại.
+                        </p>
+
+                        <p className='text-sm'>
+                            Cảm ơn bạn đã đồng hành cùng chúng tôi trong việc xây dựng một{' '}
+                            <strong>cộng đồng lành mạnh!</strong> 🚀
+                        </p>
+
+                        <p className='text-sm font-semibold'>Trân trọng,</p>
+                        <p className='text-sm font-semibold'>🚀 [SocialNetwork] – Đội ngũ Hỗ trợ</p>
                     </div>
                 </Modal>
             )}
