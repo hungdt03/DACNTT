@@ -126,8 +126,18 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 foreach(var tag in request.TagIds)
                 {
                     if (tags.Any(t => t.UserId == tag)) continue;
+
+                    var block = await _unitOfWork
+                        .BlockListRepository.GetBlockListByUserIdAndUserIdAsync(userId, tag);
+
+                    if (block != null) throw new AppException($"Không thể gắn thẻ tài khoản có ID={tag}");
+
                     var tagUser = await _unitOfWork.UserRepository.GetUserByIdAsync(tag)
                         ?? throw new NotFoundException("Không tìm thấy thẻ user");
+
+                    var friendShip = await _unitOfWork.FriendShipRepository
+                        .GetFriendShipByUserIdAndFriendIdAsync(userId, tag, FriendShipStatus.ACCEPTED)
+                        ?? throw new AppException($"Không thể gắn thẻ tài khoản có ID={tag}");
 
                     tags.Add(new Tag()
                     {

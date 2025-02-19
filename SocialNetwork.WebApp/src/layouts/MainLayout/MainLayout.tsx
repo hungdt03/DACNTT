@@ -5,9 +5,11 @@ import MainLeftSidebar from "./components/MainLeftSidebar";
 import MainRightSidebar from "./components/MainRightSidebar";
 import PopupWrapper from "../../components/chats/PopupWrapper";
 import MinimizePopupWrapper from "../../components/chats/MinimizePopupWrapper";
+import useTitle from "../../hooks/useTitle";
 
 const MainLayout: FC = () => {
-
+    useTitle('Trang chủ');
+    
     return <div className="flex flex-col w-screen h-screen overflow-y-hidden">
         <Header />
         <div className="bg-slate-100 w-full h-full">

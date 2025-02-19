@@ -7,8 +7,10 @@ import chatRoomService from "../services/chatRoomService";
 import ChatSidebar from "../components/chats/ChatSidebar";
 import cn from "../utils/cn";
 import NotAllowedComponent from "../components/NotAllowedComponent";
+import useTitle from "../hooks/useTitle";
 
 const ChatPage: FC = () => {
+    useTitle('Nhắn tin')
     const { id } = useParams()
     const [currentChatRoom, setCurrentChatRoom] = useState<ChatRoomResource | null>(null);
     const [showChatDetails, setShowChatDetails] = useState(true);

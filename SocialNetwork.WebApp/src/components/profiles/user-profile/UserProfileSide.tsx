@@ -44,7 +44,7 @@ const UserProfileSide: FC<UserProfileSideProps> = ({
                                     style={{ height: '100%', width: '100%' }}
                                     className="border-[1px] w-full h-full object-cover border-gray-200 rounded-md aspect-square"
                                 />
-                                {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-4 right-4 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
+                                {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-0 -right-1 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
                             </div>
                             <span className="text-sm font-semibold line-clamp-1">{friend.fullName}</span>
                             {currentUser?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}

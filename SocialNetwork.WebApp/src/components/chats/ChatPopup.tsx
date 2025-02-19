@@ -426,8 +426,8 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 <Avatar src={room.friend.avatar} size={'large'} />
                 <span className="text-sm text-gray-600 font-bold">{room.friend.fullName}</span>
                 <span className="text-xs text-gray-600">
-                    {!room.isFriend && !room.isConnect && 'Các bạn không phải là bạn bè'}
                     {room.isFriend && 'Các bạn là bạn bè'}
+                    {!room.isFriend && !room.isConnect && 'Các bạn không phải là bạn bè'}
                     {!room.isFriend && room.isConnect && 'Các bạn hiện đã được kết nối với nhau'}
                 </span>
             </div>}

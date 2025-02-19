@@ -193,7 +193,7 @@ const SharePost: FC<SharePostProps> = ({
                                         <span> cùng với </span>
                                         {displayedTags.map((tag, index) => (
                                             <span key={tag.id}>
-                                                <Link to={`/profile/${tag.user.id}`} className="text-sm font-bold hover:underline inline">
+                                                <Link to={`/profile/${tag.user.id}`} className="text-sm hover:text-gray-600 font-bold hover:underline inline">
                                                     {tag.user.fullName}
                                                 </Link>
                                                 {index < displayedTags.length - 1 ? ", " : ""}

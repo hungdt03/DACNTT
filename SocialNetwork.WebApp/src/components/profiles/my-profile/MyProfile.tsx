@@ -6,6 +6,7 @@ import friendService from "../../../services/friendService";
 import MyProfileContent from "./MyProfileContent";
 import MyProfileSide from "./MyProfileSide";
 import MyProfileHeader from "./MyProfileHeader";
+import useTitle from "../../../hooks/useTitle";
 
 const MyProfile: FC = () => {
     const { user } = useSelector(selectAuth);
@@ -17,6 +18,9 @@ const MyProfile: FC = () => {
             setFriends(response.data)
         }
     }
+
+ 
+    useTitle(user?.fullName ?? 'Trang cá nhân')
 
     useEffect(() => {
         fetchFriends()

@@ -273,7 +273,7 @@ const Post: FC<PostProps> = ({
                                     <>
                                         {' cùng với '}
                                         {displayedTags.map((tag, index) => (
-                                            <Link className="font-bold hover:underline text-sm" to={`/profile/${tag.user.id}`} key={tag.id}>
+                                            <Link className="font-bold hover:underline hover:text-gray-600 text-sm" to={`/profile/${tag.user.id}`} key={tag.id}>
                                                 {tag.user.fullName}
                                                 {index < displayedTags.length - 1 ? ', ' : ''}
                                             </Link>

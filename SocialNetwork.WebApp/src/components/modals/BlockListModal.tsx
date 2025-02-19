@@ -24,18 +24,16 @@ const BlockListModal: FC = () => {
     const fetchBlockUsers = async (page: number, size: number) => {
         setLoading(true)
         const response = await userService.getAllBlockUsers(page, size);
-        setTimeout(() => {
-            setLoading(false)
+        setLoading(false)
 
-            if (response.isSuccess) {
-                setPagination(response.pagination)
-                setBlockUsers(prevUsers => {
-                    const existingIds = new Set(prevUsers.map(user => user.id));
-                    const newUsers = response.data.filter(post => !existingIds.has(post.id));
-                    return [...prevUsers, ...newUsers];
-                })
-            }
-        }, 2000)
+        if (response.isSuccess) {
+            setPagination(response.pagination)
+            setBlockUsers(prevUsers => {
+                const existingIds = new Set(prevUsers.map(user => user.id));
+                const newUsers = response.data.filter(post => !existingIds.has(post.id));
+                return [...prevUsers, ...newUsers];
+            })
+        }
 
     }
 

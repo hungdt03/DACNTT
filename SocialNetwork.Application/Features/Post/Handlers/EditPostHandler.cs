@@ -3,6 +3,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Common.Helpers;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Post.Commands;
@@ -101,6 +102,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 }));
             }
 
+            var userId = _contextAccessor.HttpContext.User.GetUserId();
             var notifications = new List<Domain.Entity.System.Notification>();
             var tags = new List<Tag>();
             if (request.Post.TagIds != null && request.Post.TagIds.Count > 0)
@@ -108,8 +110,19 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 foreach (var tag in request.Post.TagIds)
                 {
                     if (post.Tags.Any(t => t.UserId == tag)) continue;
+
+                    var block = await _unitOfWork
+                        .BlockListRepository.GetBlockListByUserIdAndUserIdAsync(userId, tag);
+
+                    if (block != null) throw new AppException($"Không thể gắn thẻ tài khoản có ID={tag}");
+
                     var tagUser = await _unitOfWork.UserRepository.GetUserByIdAsync(tag)
                         ?? throw new NotFoundException("Không tìm thấy thẻ user");
+
+                    var friendShip = await _unitOfWork.FriendShipRepository
+                        .GetFriendShipByUserIdAndFriendIdAsync(userId, tag, FriendShipStatus.ACCEPTED)
+                        ?? throw new AppException($"Không thể gắn thẻ tài khoản có ID={tag}");
+
 
                     tags.Add(new Tag()
                     {

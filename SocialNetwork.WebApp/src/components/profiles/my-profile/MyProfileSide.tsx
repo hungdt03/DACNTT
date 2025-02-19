@@ -69,27 +69,23 @@ const MyProfileSide: FC<MyProfileSideProps> = ({
 
         <div className="p-4 bg-white rounded-md shadow flex flex-col gap-y-3">
             <span className="font-bold text-[15px] md:text-lg text-gray-700">Bạn bè</span>
-            {friends.length === 0 ? <div className="w-full h-full flex items-center justify-center py-2">
-                <Empty description='Chưa có bạn bè nào' />
-            </div> :
-                <div className="grid grid-cols-3 gap-2">
-                    {friends.map(friend => (
-                        <Link to={`/profile/${friend.id}`} key={friend.id} className="flex flex-col items-start gap-1 cursor-pointer">
-                            <div className="relative">
-                                <Image
-                                    preview={false}
-                                    src={friend.avatar ?? images.cover}
-                                    style={{ height: '100%', width: '100%' }}
-                                    className="border-[1px] w-full h-full object-cover border-gray-200 rounded-md aspect-square"
-                                />
-                                {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-4 right-4 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
-                            </div>
-                            <span className="text-sm font-semibold line-clamp-1">{friend.fullName}</span>
-                            {user?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}
-                        </Link>
-                    ))}
-                </div>
-            }
+            <div className="grid grid-cols-3 gap-2">
+                {friends.map(friend => (
+                    <Link to={`/profile/${friend.id}`} key={friend.id} className="flex flex-col items-start gap-1 cursor-pointer">
+                        <div className="relative">
+                            <Image
+                                preview={false}
+                                src={friend.avatar ?? images.cover}
+                                style={{ height: '100%', width: '100%' }}
+                                className="border-[1px] w-full h-full object-cover border-gray-200 rounded-md aspect-square"
+                            />
+                            {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-0 -right-1 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
+                        </div>
+                        <span className="text-sm font-semibold line-clamp-1">{friend.fullName}</span>
+                        {user?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}
+                    </Link>
+                ))}
+            </div>
             {friends.length > 9 && <button className="bg-sky-50 py-1 w-full text-primary rounded-md hover:bg-sky-100 transition-all ease-linear duration-150">Xem tất cả</button>}
         </div>
 

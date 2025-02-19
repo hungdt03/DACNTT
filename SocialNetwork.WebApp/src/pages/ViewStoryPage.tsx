@@ -8,8 +8,11 @@ import StoryShow from "../components/story/StoryShow";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { MoveLeft, Plus } from "lucide-react";
 import LoadingIndicator from "../components/LoadingIndicator";
+import useTitle from "../hooks/useTitle";
+import { message } from "antd";
 
 const ViewStoryPage: FC = () => {
+    useTitle('Tin')
     const { userId } = useParams();
 
     const [loading, setLoading] = useState(false)
@@ -25,10 +28,11 @@ const ViewStoryPage: FC = () => {
         if (!userId) return;
         setLoading(true)
         const response = await storyService.getUserStoryByUserId(userId);
-        console.log(response)
         setLoading(false)
         if (response.isSuccess) {
             setUserStory(response.data)
+        } else {
+            message.warning(response.message)
         }
     }
 
@@ -40,7 +44,7 @@ const ViewStoryPage: FC = () => {
             setUserStories(response.data);
             const findMyStory = response.data.find(s => s.user.id === user?.id)
             setMyStory(findMyStory)
-        }
+        } 
     }
 
     useEffect(() => {

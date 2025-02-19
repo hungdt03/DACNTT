@@ -10,6 +10,7 @@ import { PrivacyType } from "../enums/privacy";
 import storyService from "../services/storyService";
 import { StoryType } from "../enums/story-type.";
 import CropperImageEditor from "../components/story/editors/CropperImageEditor";
+import useTitle from "../hooks/useTitle";
 
 export type StoryOption = "text" | "image" | undefined;
 export type StoryRequest = {
@@ -20,6 +21,7 @@ export type StoryRequest = {
 }
 
 const CreateStoryPage: FC = () => {
+    useTitle('Tạo tin mới')
     const [option, setOption] = useState<StoryOption>(undefined);
     const [image, setImage] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);

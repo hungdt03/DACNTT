@@ -11,6 +11,9 @@ import { AppDispatch } from "../../app/store";
 import { signIn } from "../../features/slices/auth-slice";
 import { Button } from "antd";
 import { Role } from "../../enums/role";
+import useTitle from "../../hooks/useTitle";
+import LoadingIndicator from "../../components/LoadingIndicator";
+
 
 export type SignInRequest = {
     email: string;
@@ -18,6 +21,7 @@ export type SignInRequest = {
 }
 
 const SignInPage: FC = () => {
+    useTitle('Đăng nhập')
     const dispatch = useDispatch<AppDispatch>();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate()
@@ -28,11 +32,11 @@ const SignInPage: FC = () => {
         setLoading(false)
         if (response.isSuccess) {
             dispatch(signIn(response.data))
-            // if(response.data.user.role === Role.ADMIN) {
-            //     navigate('/admin')
-            // } else {
-            //     navigate('/')
-            // }
+            if (response.data.user.role === Role.ADMIN) {
+                navigate('/admin')
+            } else {
+                navigate('/')
+            }
 
             toast.success(response.message)
         } else {
@@ -40,9 +44,12 @@ const SignInPage: FC = () => {
         }
     }
 
-    return <div className="flex flex-col gap-y-6 items-center justify-center h-full p-8">
-        <img alt="facebook" className="w-20 h-20" src={images.facebook} />
-        <span className="font-bold text-2xl text-primary">ĐĂNG NHẬP</span>
+    return <div className="flex flex-col gap-y-6 justify-center h-full px-8 py-20">
+        {loading && <LoadingIndicator title="Đang đăng nhập" />}
+        <div className="flex flex-col items-center md:items-start gap-y-4 md:gap-y-0">
+            <img src={images.facebook} className="w-[40px] h-[40px] md:hidden" />
+            <span className="font-bold text-2xl text-left text-sky-600">ĐĂNG NHẬP</span>
+        </div>
 
         <Formik<SignInRequest>
             initialValues={{
@@ -58,7 +65,7 @@ const SignInPage: FC = () => {
                         <label htmlFor="email" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
                             Email
                         </label>
-                        <Field name="email" id='email' placeholder="Địa chỉ email" className={cn('border-[1px] outline-none px-6 py-2 rounded-3xl transition-all ease-linear duration-150', (errors.email && touched.email) ? 'border-red-500' : 'border-primary')} />
+                        <Field name="email" id='email' placeholder="Địa chỉ email" className={cn('border-[1px] outline-none px-6 py-2 rounded-lg transition-all ease-linear duration-150', (errors.email && touched.email) ? 'border-red-500' : 'border-primary')} />
                         {errors.email && touched.email && <div className="text-sm pl-3 text-red-500">{errors.email}</div>}
                     </div>
 
@@ -66,17 +73,17 @@ const SignInPage: FC = () => {
                         <label htmlFor="password" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
                             Mật khẩu
                         </label>
-                        <Field name="password" type='password' id='password' placeholder='Mật khẩu' className={cn('border-[1px] outline-none px-6 py-2 rounded-3xl transition-all ease-linear duration-150', (errors.email && touched.email) ? 'border-red-500' : 'border-primary')} />
+                        <Field name="password" type='password' id='password' placeholder='Mật khẩu' className={cn('border-[1px] outline-none px-6 py-2 rounded-lg transition-all ease-linear duration-150', (errors.email && touched.email) ? 'border-red-500' : 'border-primary')} />
                         {errors.password && touched.password && <div className="text-sm pl-3 text-red-500">{errors.password}</div>}
 
                     </div>
                     <div className="w-full flex justify-end">
                         <Link to='/forgot-password' className="text-primary font-semibold text-sm">Quên mật khẩu?</Link>
                     </div>
-                    <Button htmlType="submit" loading={loading} className="w-full mt-2 px-3 rounded-3xl text-white bg-primary">Đăng nhập</Button>
+                    <button disabled={loading} className="w-full mt-2 px-3 py-2 rounded-lg text-white bg-sky-600">Đăng nhập</button>
                     <div className="flex items-center gap-x-2 justify-center">
-                        <span>Chưa có tài khoản?</span>
-                        <Link className="text-primary" to='/sign-up'>Đăng kí</Link>
+                        <span className="text-sm text-gray-500">Chưa có tài khoản?</span>
+                        <Link className="text-sky-600 text-sm font-bold hover:underline" to='/sign-up'>Đăng kí</Link>
                     </div>
                 </Form>
             )}

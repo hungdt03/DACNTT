@@ -67,6 +67,8 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
             }
 
+            if (!takeStories.Any()) throw new AppException("Người này không có tin nào");
+
             bool haveSeen = false;
             foreach (var story in takeStories)
             {

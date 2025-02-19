@@ -6,6 +6,7 @@ namespace SocialNetwork.Application.Interfaces
     {
         Task CreatePostAsync(Post post);
         Task<List<Post>> GetAllPostsAsync();
+        Task<(List<Post> Posts, int TotalCount)> GetAllMyPostsAsync(string userId, int page, int size, string search, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate);
         Task<(List<Post> Posts, int TotalCount)> GetAllPostsByUserIdAsync(string userId, int page, int size, string search, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate);
         Task<int> CountPostsByUserIdAsync(string userId);
         Task<int> CountSharePostsByUserIdAsync(string userId);

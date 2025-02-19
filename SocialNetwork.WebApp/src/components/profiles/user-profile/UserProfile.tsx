@@ -14,6 +14,7 @@ import UserProfileSide from "./UserProfileSide";
 import UserProfileHeader from "./UserProfileHeader";
 import { Role } from "../../../enums/role";
 import { useNavigate } from "react-router-dom";
+import useTitle from "../../../hooks/useTitle";
 
 type UserProfileProps = {
     userId: string
@@ -53,6 +54,8 @@ const UserProfile: FC<UserProfileProps> = ({
 
         fetchData(userId);
     }, [userId]);
+
+    useTitle(user?.fullName ?? 'Trang cá nhân')
 
     useEffect(() => {
         SignalRConnector.events(

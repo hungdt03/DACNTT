@@ -13,6 +13,7 @@ import LoadingIndicator from "../components/LoadingIndicator";
 type SearchFilterType = 'top' | 'post' | 'user' | 'group'
 
 const SearchPage: FC = () => {
+
     const [searchParam] = useSearchParams();
     const [searchValue, setSearchValue] = useState('')
     const [searchFilter, setSearchFilter] = useState<SearchFilterType>('top');

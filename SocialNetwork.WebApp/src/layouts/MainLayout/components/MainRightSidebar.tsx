@@ -68,7 +68,7 @@ const MainRightSidebar: FC = () => {
                                         {chatRoom.isPrivate && chatRoom.friend?.haveStory ? (
                                             <Link
                                                 to={`/stories/${chatRoom.friend.id}`}
-                                                className="inline-block rounded-full p-[1px] border-[2px] border-primary"
+                                                className="inline-block rounded-full p-[1px] border-[2px] border-[#27a1aa]"
                                             >
                                                 <Avatar size="default" src={chatRoom.isPrivate ? chatRoom.friend?.avatar : images.group} />
                                             </Link>

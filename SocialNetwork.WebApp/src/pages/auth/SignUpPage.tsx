@@ -1,4 +1,4 @@
-import { FC,  useEffect,  useRef,  useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Formik, Form, Field } from 'formik';
 import { Link, useNavigate } from "react-router-dom";
 
@@ -10,6 +10,8 @@ import { Button, Modal } from "antd";
 import useModal from "../../hooks/useModal";
 import otpService from "../../services/otpService";
 import OTPVerification from "../../components/OTPVerification";
+import useTitle from "../../hooks/useTitle";
+import LoadingIndicator from "../../components/LoadingIndicator";
 
 export type SignUpRequest = {
     fullName: string;
@@ -20,6 +22,7 @@ export type SignUpRequest = {
 
 
 const SignUpPage: FC = () => {
+    useTitle('Đăng kí')
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
@@ -63,14 +66,14 @@ const SignUpPage: FC = () => {
         }
 
         return response;
-       
+
     }
 
     const handleResendOTP = async () => {
         setResendLoading(true)
         const response = await otpService.resendOtpVerifyAccount(email);
         setResendLoading(false)
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             toast.success(response.message)
             verifyOtpRef.current?.startCountdown(5 * 60);
         } else {
@@ -79,16 +82,17 @@ const SignUpPage: FC = () => {
     }
 
     useEffect(() => {
-        if(isModalOpen && verifyOtpRef.current) {
+        if (isModalOpen && verifyOtpRef.current) {
             verifyOtpRef.current.startCountdown(5 * 60)
         }
     }, [isModalOpen])
 
-    return <div className="flex flex-col gap-y-6 items-center justify-center h-full p-8">
-
-        <img alt="facebook" className="w-20 h-20" src={images.facebook} />
-        <span className="font-bold text-2xl text-primary">ĐĂNG KÍ TÀI KHOẢN</span>
-
+    return <div className="flex flex-col gap-y-6 justify-center h-full p-8">
+        {loading && <LoadingIndicator title="Đang đăng kí" />}
+        <div className="flex flex-col items-center md:items-start gap-y-4 md:gap-y-0">
+            <img src={images.facebook} className="w-[40px] h-[40px] md:hidden" />
+            <span className="font-bold text-2xl text-left text-sky-600">ĐĂNG KÍ TÀI KHOẢN</span>
+        </div>
         <Formik<SignUpRequest>
             initialValues={{
                 email: '',
@@ -105,7 +109,7 @@ const SignUpPage: FC = () => {
                         <label htmlFor="fullName" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
                             Họ và tên
                         </label>
-                        <Field name="fullName" id='fullName' placeholder="Họ và tên" className='border-[1px] outline-none px-6 py-2 rounded-3xl border-primary' />
+                        <Field name="fullName" id='fullName' placeholder="Họ và tên" className='border-[1px] outline-none px-6 py-2 rounded-lg border-primary' />
                         {errors.fullName && touched.fullName && <div className="text-sm pl-3 text-red-500">{errors.fullName}</div>}
                     </div>
                     <div className="flex flex-col gap-y-1">
@@ -113,9 +117,9 @@ const SignUpPage: FC = () => {
                             Email
                         </label>
                         <Field onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            handleChange(e); 
-                            setEmail(e.target.value); 
-                        }} name="email" id='email' placeholder="Địa chỉ email" className='border-[1px] outline-none px-6 py-2 rounded-3xl border-primary' />
+                            handleChange(e);
+                            setEmail(e.target.value);
+                        }} name="email" id='email' placeholder="Địa chỉ email" className='border-[1px] outline-none px-6 py-2 rounded-lg border-primary' />
                         {errors.email && touched.email && <div className="text-sm pl-3 text-red-500">{errors.email}</div>}
                     </div>
 
@@ -123,7 +127,7 @@ const SignUpPage: FC = () => {
                         <label htmlFor="password" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
                             Mật khẩu
                         </label>
-                        <Field name="password" id='password' type='password' placeholder='Mật khẩu' className='border-[1px] outline-none px-6 py-2 rounded-3xl border-primary' />
+                        <Field name="password" id='password' type='password' placeholder='Mật khẩu' className='border-[1px] outline-none px-6 py-2 rounded-lg border-primary' />
                         {errors.password && touched.password && <div className="text-sm pl-3 text-red-500">{errors.password}</div>}
 
                     </div>
@@ -131,14 +135,14 @@ const SignUpPage: FC = () => {
                         <label htmlFor="confirmPassword" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
                             Nhập lại mật khẩu
                         </label>
-                        <Field name="confirmPassword" id='confirmPassword' type='password' placeholder='Xác nhận mật khẩu' className='border-[1px] outline-none px-6 py-2 rounded-3xl border-primary' />
+                        <Field name="confirmPassword" id='confirmPassword' type='password' placeholder='Xác nhận mật khẩu' className='border-[1px] outline-none px-6 py-2 rounded-lg border-primary' />
                         {errors.confirmPassword && touched.confirmPassword && <div className="text-sm pl-3 text-red-500">{errors.confirmPassword}</div>}
 
                     </div>
-                    <Button htmlType="submit" type="primary" loading={loading} shape="round">Đăng kí</Button>
+                    <button disabled={loading} className="mt-3 px-6 py-2 text-white rounded-lg bg-sky-600">Đăng kí</button>
                     <div className="flex items-center gap-x-2 justify-center">
-                        <span>Đã có tài khoản?</span>
-                        <Link className="text-primary" to='/sign-in'>Đăng nhập</Link>
+                        <span className="text-gray-500 text-sm">Đã có tài khoản?</span>
+                        <Link className="text-sky-600 font-bold text-sm hover:underline" to='/sign-in'>Đăng nhập</Link>
                     </div>
                 </Form>
             )}
@@ -161,14 +165,14 @@ const SignUpPage: FC = () => {
                 onClick: () => verifyOtpRef.current && void handleVerifyOTP()
             }}
         >
-           {email && <OTPVerification 
-                 otp={otp}
-                 otpError={errorOtp}
-                 onOtpChange={(value) => setOtp(value)}
-                 ref={verifyOtpRef}
-                 email={email}
-                 resendLoading={resendLoading}
-                 onResend={handleResendOTP}
+            {email && <OTPVerification
+                otp={otp}
+                otpError={errorOtp}
+                onOtpChange={(value) => setOtp(value)}
+                ref={verifyOtpRef}
+                email={email}
+                resendLoading={resendLoading}
+                onResend={handleResendOTP}
 
             />}
         </Modal>

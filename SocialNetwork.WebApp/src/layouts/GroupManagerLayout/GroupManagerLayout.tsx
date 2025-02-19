@@ -4,8 +4,10 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import GroupManagerSidebar from "./components/GroupManagerSidebar";
 import { Bars3BottomRightIcon } from "@heroicons/react/24/outline";
 import { Drawer } from "antd";
+import useTitle from "../../hooks/useTitle";
 
 const GroupManagerLayout: FC = () => {
+    useTitle('Quản lí nhóm')
     const location = useLocation();
     const navigate = useNavigate();
     const [open, setOpen] = useState(false)

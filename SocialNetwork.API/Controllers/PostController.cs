@@ -5,11 +5,9 @@ using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Features.Post.Commands;
-using SocialNetwork.Application.Features.Post.Handlers;
 using SocialNetwork.Application.Features.Post.Queries;
 using SocialNetwork.Application.Features.SavedPost.Commands;
 using SocialNetwork.Application.Features.SavedPost.Queries;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -131,24 +129,43 @@ namespace SocialNetwork.API.Controllers
         // GET POST FOR USER PAGE
 
         [HttpGet("principal")]
-        public async Task<IActionResult> GetAllPostsByPrincipal([FromQuery] int page = 1, [FromQuery] int size = 8, [FromQuery] string search = "", [FromQuery] string sortOrder = "asc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset fromDate = default, [FromQuery] DateTimeOffset toDate = default)
+        public async Task<IActionResult> GetAllPostsByPrincipal([FromQuery] int page = 1, [FromQuery] int size = 8, [FromQuery] string search = "", [FromQuery] string sortOrder = "desc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset? fromDate = default, [FromQuery] DateTimeOffset? toDate = default)
         {
+            if (fromDate == default)
+            {
+                fromDate = null;
+            }
+
+            if (toDate == default)
+            {
+                toDate = null;
+            }
+
+
             var userId = HttpContext.User.GetUserId();
             var response = await _mediator.Send(new GetAllPostByUserIdQuery(userId, page, size, search, sortOrder, contentType, fromDate, toDate));
             return Ok(response);
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetAllPostsByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 8, [FromQuery] string search = "", [FromQuery] string sortOrder = "asc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset fromDate = default, [FromQuery] DateTimeOffset toDate = default)
+        public async Task<IActionResult> GetAllPostsByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 8, [FromQuery] string search = "", [FromQuery] string sortOrder = "desc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset? fromDate = default, [FromQuery] DateTimeOffset? toDate = default)
         {
             if (fromDate == default)
             {
-                fromDate = DateTimeOffset.UtcNow;
+                fromDate = null;
             }
 
             if (toDate == default)
             {
-                toDate = DateTimeOffset.UtcNow;
+                toDate = null;
+            }
+
+            var currentUserId = HttpContext.User.GetUserId();
+
+            if(currentUserId == userId)
+            {
+                var responseForPrincipal = await _mediator.Send(new GetAllMyPostsQuery(page, size, contentType, sortOrder, search, fromDate, toDate));
+                return Ok(responseForPrincipal);
             }
 
             var response = await _mediator.Send(new GetAllPostByUserIdQuery(userId, page, size, contentType, sortOrder, search, fromDate, toDate));
@@ -179,11 +196,11 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet("group/pending/{groupId}")]
-        public async Task<IActionResult> GetAllPendingPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8, [FromQuery] string query = "", [FromQuery] string? userId = null, [FromQuery] string sortOrder = "asc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset date = default)
+        public async Task<IActionResult> GetAllPendingPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 8, [FromQuery] string query = "", [FromQuery] string? userId = null, [FromQuery] string sortOrder = "asc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset? date = default)
         {
             if (date == default)
             {
-                date = DateTimeOffset.UtcNow;
+                date = null;
             }
 
             var response = await _mediator.Send(new GetAllPendingPostsByGroupIdQuery(groupId, page, size, sortOrder, query, userId, contentType, date));

@@ -8,17 +8,18 @@ import useModal from "../../hooks/useModal";
 import authService from "../../services/authService";
 import { toast } from "react-toastify";
 import ResetPassword from "../../components/ResetPassword";
-import VerifyOTP from "../../components/VerifyOTP";
 import { Field, Form, Formik } from "formik";
 import forgotPasswordSchema from "../../schemas/forgotPasswordSchema";
 import otpService from "../../services/otpService";
 import OTPVerification from "../../components/OTPVerification";
+import useTitle from "../../hooks/useTitle";
 
 export type ForgotPasswordFormik = {
     email: string;
 }
 
 const ForgotPasswordPage: FC = () => {
+    useTitle('Quên mật khẩu')
     const { isModalOpen, showModal, handleCancel, handleOk } = useModal();
 
     const [mailLoading, setMailLoading] = useState(false)
@@ -78,7 +79,7 @@ const ForgotPasswordPage: FC = () => {
         setResendLoading(true)
         const response = await otpService.resendOtpVerifyForgotPassword(email);
         setResendLoading(false)
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             toast.success(response.message)
             verifyOtpRef.current?.startCountdown(5 * 60);
         } else {
@@ -88,14 +89,16 @@ const ForgotPasswordPage: FC = () => {
 
     useEffect(() => {
         if (isModalOpen && verifyOtpRef.current) {
-            verifyOtpRef.current.startCountdown(5 * 60); 
+            verifyOtpRef.current.startCountdown(5 * 60);
         }
     }, [isModalOpen])
 
     return <>
-        <div className="flex flex-col gap-y-6 items-center justify-center h-full p-8">
-            <img alt="facebook" className="w-20 h-20" src={images.facebook} />
-            <span className="font-bold text-2xl text-primary">QUÊN MẬT KHẨU</span>
+        <div className="flex flex-col gap-y-6 justify-center h-full px-8 py-36">
+            <div className="flex flex-col items-center md:items-start gap-y-4 md:gap-y-0">
+                <img src={images.facebook} className="w-[40px] h-[40px] md:hidden" />
+                <span className="font-bold text-2xl text-left text-sky-600">QUÊN MẬT KHẨU</span>
+            </div>
 
             <div className="flex flex-col gap-y-1 w-full">
                 <Formik<ForgotPasswordFormik>
@@ -112,11 +115,11 @@ const ForgotPasswordPage: FC = () => {
                                 <label htmlFor="email" className="mb-1 pl-3 text-[16px] font-medium text-sky-700">
                                     Email
                                 </label>
-                                <Field name="email" id='email' placeholder="Địa chỉ email" className={cn('border-[1px] outline-none px-6 py-2 rounded-3xl transition-all ease-linear duration-150', (errors.email && touched.email) ? 'border-red-500' : 'border-primary')} />
+                                <Field name="email" id='email' placeholder="Địa chỉ email" className={cn('border-[1px] outline-none px-6 py-2 rounded-lg transition-all ease-linear duration-150', (errors.email && touched.email) ? 'border-red-500' : 'border-primary')} />
                                 {errors.email && touched.email && <div className="text-sm pl-3 text-red-500">{errors.email}</div>}
                             </div>
                             <div className="flex justify-end">
-                                <Button loading={mailLoading} htmlType="submit" type="primary" shape="round">Gửi</Button>
+                                <Button loading={mailLoading} htmlType="submit" type="primary" size="large">Gửi</Button>
                             </div>
                         </Form>
                     )}
@@ -129,7 +132,7 @@ const ForgotPasswordPage: FC = () => {
         </div>
 
         <Modal
-             style={{
+            style={{
                 top: 20
             }}
             title={<p className="text-center font-bold text-lg">Khôi phục mật khẩu</p>}
@@ -149,14 +152,14 @@ const ForgotPasswordPage: FC = () => {
             }}
         >
             {!verifyOtp ? <OTPVerification
-                 otp={otp}
-                 otpError={errorOtp}
-                 onOtpChange={(value) => setOtp(value)}
-                 ref={verifyOtpRef}
-                 email={email}
-                 resendLoading={resendLoading}
-                 onResend={handleResendOTP}
-             /> :
+                otp={otp}
+                otpError={errorOtp}
+                onOtpChange={(value) => setOtp(value)}
+                ref={verifyOtpRef}
+                email={email}
+                resendLoading={resendLoading}
+                onResend={handleResendOTP}
+            /> :
                 <ResetPassword loading={false} onSubmit={handleResetPassword} />
             }
         </Modal>

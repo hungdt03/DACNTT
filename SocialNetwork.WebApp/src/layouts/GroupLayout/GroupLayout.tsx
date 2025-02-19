@@ -9,10 +9,12 @@ import { JoinGroupRequestResource } from "../../types/join-group";
 import Loading from "../../components/Loading";
 import NotAllowedComponent from "../../components/NotAllowedComponent";
 import { GroupInvitationResource } from "../../types/group-invitation";
+import useTitle from "../../hooks/useTitle";
 
 const NOT_ALLOWED_ROUTES = ['/pending-reports', '/pending-posts', '/pending-members', '/pending-invites', '/user']
 
 const GroupLayout: FC = () => {
+    
     const { id } = useParams();
     const location = useLocation();
 
@@ -25,6 +27,8 @@ const GroupLayout: FC = () => {
     const [loadingInvite, setLoadingInvite] = useState(false)
 
     const navigate = useNavigate();
+
+    useTitle(group?.name ?? 'Nhóm')
 
     const fetchRequestJoin = async () => {
         if (id) {

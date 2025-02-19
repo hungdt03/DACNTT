@@ -37,100 +37,86 @@ const StoryWrapper: FC = () => {
         fetchUserStories()
     }, [])
 
-    return <div className="relative w-full h-[160px] md:h-[200px]">
-            <Swiper
-                modules={[Navigation]}
-                slidesPerView={4.75} // Mặc định cho desktop
-                spaceBetween={8}
-                breakpoints={{
-                    1024: { // Laptop
-                        slidesPerView: 4.75,
-                        spaceBetween: 8,
-                    },
-                    768: { // Tablet
-                        slidesPerView: 5,
-                        spaceBetween: 8,
-                    },
-                    540: { // Tablet
-                        slidesPerView: 5.5,
-                        spaceBetween: 8,
-                    },
-                    380: { // Mobile 
-                        slidesPerView: 4.25,
-                        spaceBetween: 8,
-                    },
-                    300: { // Mobile 
-                        slidesPerView: 3.5,
-                        spaceBetween: 8,
-                    },
+    return (
+        <div className={`relative w-full ${userStories.length > 0 ? "h-[160px] md:h-[200px]" : "h-auto"}`}>
+            {/* Hiển thị skeleton khi loading */}
+            {loading && (
+                Array.from({ length: 4 }).map((_, index) => (
+                    <SwiperSlide key={`skeleton-${index}`}>
+                        <StorySkeleton />
+                    </SwiperSlide>
+                ))
+            )}
 
-                }}
-                onSlideChange={(swiper) => setShowPrev(swiper.isBeginning === false)}
-                navigation={{
-                    nextEl: nextRef.current,
-                    prevEl: prevRef.current,
-                }}
-                onBeforeInit={(swiper) => {
-                    if (typeof swiper.params.navigation !== 'boolean') {
-                        swiper.params.navigation!.prevEl = prevRef.current;
-                        swiper.params.navigation!.nextEl = nextRef.current;
-                    }
-                }}
-            >
-                <SwiperSlide>
-                    <StoryCreator />
-                </SwiperSlide>
-                {loading ? (
-                    // Hiển thị 4 StorySkeleton khi đang loading
-                    Array.from({ length: 4 }).map((_, index) => (
-                        <SwiperSlide key={`skeleton-${index}`}>
-                            <StorySkeleton />
+            {/* Hiển thị Swiper khi có story */}
+            {!loading && userStories.length > 0 ? (
+                <Swiper
+                    modules={[Navigation]}
+                    slidesPerView={4.75}
+                    spaceBetween={8}
+                    breakpoints={{
+                        1024: { slidesPerView: 4.75, spaceBetween: 8 },
+                        768: { slidesPerView: 5, spaceBetween: 8 },
+                        540: { slidesPerView: 5.5, spaceBetween: 8 },
+                        380: { slidesPerView: 4.25, spaceBetween: 8 },
+                        300: { slidesPerView: 3.5, spaceBetween: 8 },
+                    }}
+                    onSlideChange={(swiper) => setShowPrev(swiper.isBeginning === false)}
+                    navigation={{
+                        nextEl: nextRef.current,
+                        prevEl: prevRef.current,
+                    }}
+                    onBeforeInit={(swiper) => {
+                        if (typeof swiper.params.navigation !== 'boolean') {
+                            swiper.params.navigation!.prevEl = prevRef.current;
+                            swiper.params.navigation!.nextEl = nextRef.current;
+                        }
+                    }}
+                >
+                    {/* Story Creator */}
+                    <SwiperSlide>
+                        <StoryCreator />
+                    </SwiperSlide>
+
+                    {/* Hiển thị stories của chính user */}
+                    {userStories.filter((s) => s.user.id === user?.id).map((story, index) => (
+                        <SwiperSlide key={`user-${index}`}>
+                            <StoryItem story={story} />
                         </SwiperSlide>
-                    ))
-                ) : (
-                    // Hiển thị các story khi không loading
-                    <>
-                        {userStories
-                            .filter((s) => s.user.id === user?.id)
-                            .map((story, index) => (
-                                <SwiperSlide key={`user-${index}`}>
-                                    <StoryItem
-                                        story={story}
-                                    />
-                                </SwiperSlide>
-                            ))}
-                        {userStories
-                            .filter((s) => s.user.id !== user?.id)
-                            .map((story, index) => (
-                                <SwiperSlide key={`other-${index}`}>
-                                    <StoryItem
+                    ))}
 
-                                        story={story}
-                                    />
-                                </SwiperSlide>
-                            ))}
-                    </>
-                )}
+                    {/* Hiển thị stories của người khác */}
+                    {userStories.filter((s) => s.user.id !== user?.id).map((story, index) => (
+                        <SwiperSlide key={`other-${index}`}>
+                            <StoryItem story={story} />
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
+            ) : (
+                // Không có story nào -> Hiển thị CreateStoryArea
+                <CreateStoryArea />
+            )}
 
-            </Swiper>
+            {/* Nút điều hướng chỉ hiển thị khi có stories */}
+            {userStories.length > 0 && (
+                <>
+                    <button
+                        ref={prevRef}
+                        className={`absolute w-10 h-10 flex bg-sky-50 text-primary hover:bg-sky-100 items-center justify-center shadow rounded-full left-2 top-1/2 -translate-y-1/2 z-10 ${showPrev ? "block" : "hidden"}`}
+                    >
+                        <ChevronLeft />
+                    </button>
+                    <button
+                        ref={nextRef}
+                        className="absolute w-10 h-10 flex bg-sky-50 text-primary hover:bg-sky-100 items-center justify-center shadow rounded-full right-2 top-1/2 -translate-y-1/2 z-10"
+                    >
+                        <ChevronRight />
+                    </button>
+                </>
+            )}
+        </div>
+    );
 
-            <button
-                ref={prevRef}
-                className={`absolute w-10 h-10 flex bg-sky-50 text-primary hover:bg-sky-100 items-center justify-center shadow rounded-full left-2 top-1/2 -translate-y-1/2 z-10 ${showPrev ? 'block' : 'hidden'
-                    }`}
-            >
-                <ChevronLeft />
-            </button>
-            <button
-                ref={nextRef}
-                className="absolute w-10 h-10 flex bg-sky-50 text-primary hover:bg-sky-100 items-center justify-center shadow rounded-full right-2 top-1/2 -translate-y-1/2 z-10"
-            >
-                <ChevronRight />
-            </button>
-
-            {!loading && userStories.length === 0 && <CreateStoryArea />}
-        </div> 
-        
-    }
+}
 
 export default StoryWrapper;

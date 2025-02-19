@@ -1,6 +1,8 @@
 import { FC } from "react";
 import images from "../../../assets";
 import { CaseSensitive, Images } from "lucide-react";
+import { isValidImage } from "../../../utils/file";
+import { message } from "antd";
 
 type CreateStoryOptionProps = {
     onText?: () => void;
@@ -27,6 +29,12 @@ const CreateStoryOption: FC<CreateStoryOptionProps> = ({
         <input accept="image/*" 
             onChange={(e) => {
                 const file = e.target.files?.[0]; 
+
+                if (file && !isValidImage(file)) {
+                    message.error('Vui lòng chọn file ảnh')
+                    return false;
+                }
+
                 if (file && onImage) {
                     onImage(file);
                 }

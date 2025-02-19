@@ -4,7 +4,6 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Infrastructure.DBContext;
-using System.Linq;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -413,6 +412,75 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<int> CountAllPost()
         {
             return await _context.Posts.CountAsync();
+        }
+
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllMyPostsAsync(string userId, int page, int size, string search, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        {
+            var query = _context.Posts
+                   .Include(o => o.Tags)
+                   .ThenInclude(t => t.User)
+               .Where(p =>
+                   (p.UserId == userId || (p.Tags != null && p.Tags.Any(tag => tag.UserId == userId)))
+                   && p.GroupId == null
+               );
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(p => p.Content.ToLower().Contains(search.ToLower()));
+            }
+
+            if (fromDate.HasValue)
+            {
+                var startDate = fromDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date >= startDate);
+            }
+
+            if (toDate.HasValue)
+            {
+                var endDate = toDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date <= endDate);
+            }
+
+
+            if (contentType != "ALL")
+            {
+                query = contentType switch
+                {
+                    PostContentType.TEXT => query.Where(p => (p.Medias == null || p.Medias.Count == 0) && p.Background == null && p.OriginalPostId == null),
+                    PostContentType.MEDIA => query.Where(p => p.Medias != null && p.Medias.Count > 0),
+                    PostContentType.BACKGROUND => query.Where(p => p.Background != null),
+                    PostContentType.SHARE => query.Where(p => p.OriginalPostId != null),
+                    _ => query
+                };
+            }
+
+            if (sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.OrderBy(p => p.DateCreated);
+            } else
+            {
+                query = query.OrderByDescending(p => p.DateCreated);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var posts = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .Include(p => p.Group)
+                .Include(p => p.User)
+                .Include(p => p.Tags)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.Comments)
+                .Include(p => p.Medias)
+                .Include(p => p.SharePost)
+                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
+              
+                .ToListAsync();
+
+            return (posts, totalCount);
         }
     }
 }
