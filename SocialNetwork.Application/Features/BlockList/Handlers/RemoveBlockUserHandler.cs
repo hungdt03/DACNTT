@@ -42,22 +42,30 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
            
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
+
+            var chatRoom = await _unitOfWork.ChatRoomRepository
+                .GetPrivateChatRoomByMemberIds(new List<string> { userId, user.Id });
+
             var friendShip = await _unitOfWork
                 .FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(request.UserId, userId);
 
             if (friendShip != null)
             {
                 friendShip.Status = FriendShipStatus.NONE;
-                friendShip.IsConnect = true;
+
+                if (chatRoom?.LastMessage != null)
+                {
+                    friendShip.IsConnect = true;
+                }
             }
 
             _unitOfWork.BlockListRepository.RemoveBlockList(blockUser);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            var chatRoom = await _unitOfWork.ChatRoomRepository
-                .GetPrivateChatRoomByMemberIds(new List<string> { userId, user.Id });
-
-            await _signalRService.SendBlockSignalToSpecificUser(user.UserName, chatRoom.Id);
+            if(chatRoom != null)
+            {
+                await _signalRService.SendBlockSignalToSpecificUser(user.UserName, chatRoom.Id);
+            }
 
             return new BaseResponse()
             {

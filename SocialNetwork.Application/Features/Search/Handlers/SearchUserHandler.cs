@@ -34,13 +34,11 @@ namespace SocialNetwork.Application.Features.Search.Handlers
 
             foreach (var user in users)
             {
-               
                 if (user.Id != userId)
                 {
                     var blockUser = await _unitOfWork.BlockListRepository
                           .GetBlockListByUserIdAndUserIdAsync(user.Id, userId);
                     if (blockUser != null) continue;
-                  
                 }
 
                 var mapUser = ApplicationMapper.MapToUser(user);

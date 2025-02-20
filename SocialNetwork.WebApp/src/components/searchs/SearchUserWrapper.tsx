@@ -19,7 +19,6 @@ const SearchUserWrapper: FC<SearchUserWrapperProps> = ({
     const [suggestUsers, setSuggestUsers] = useState<SearchUserSuggestResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
 
     const navigate = useNavigate();
 
@@ -30,7 +29,6 @@ const SearchUserWrapper: FC<SearchUserWrapperProps> = ({
         if (response.isSuccess) {
             setSuggestUsers(response.data);
             setPagination(response.pagination);
-            setMessage(response.message)
         }
     }
 
@@ -46,7 +44,6 @@ const SearchUserWrapper: FC<SearchUserWrapperProps> = ({
     }
 
     return <div className="flex flex-col gap-y-4 w-full h-full custom-scrollbar overflow-y-auto">
-        {!loading && suggestUsers.length === 0 && <div className="text-gray-500 md:text-[16px] text-sm text-center">{message}</div>}
         {suggestUsers.map(suggestUser => <SearchUserItem onClick={() => handleRedirectToUserPage(`/profile/${suggestUser.user.id}`, suggestUser.user.id)} key={suggestUser.user.id} suggestUser={suggestUser} />)}
         {loading && <LoadingIndicator />}
     </div>

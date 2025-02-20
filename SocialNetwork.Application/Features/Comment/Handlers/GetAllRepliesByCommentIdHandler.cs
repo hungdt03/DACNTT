@@ -38,8 +38,6 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                     var block = await _unitOfWork.BlockListRepository
                     .GetBlockListByUserIdAndUserIdAsync(userId, comment.UserId);
 
-                    if(block != null) continue;
-
                     var friendShip = await _unitOfWork.FriendShipRepository
                       .GetFriendShipByUserIdAndFriendIdAsync(comment.UserId, userId);
 
@@ -48,11 +46,27 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                         commentItem.User.IsShowStatus = false;
                         commentItem.User.IsOnline = false;
                     }
+
+                    if(block != null)
+                    {
+                        commentItem.User.IsShowStory = false;
+                        commentItem.User.HaveStory = false;
+                        commentItem.User.IsBlock = true;
+                    } else
+                    {
+                        var haveStory = await _unitOfWork.StoryRepository
+                          .IsUserHaveStoryAsync(comment.UserId);
+                        commentItem.User.HaveStory = haveStory;
+
+                    }
+                } else
+                {
+                    var haveStory = await _unitOfWork.StoryRepository
+                          .IsUserHaveStoryAsync(comment.UserId);
+                    commentItem.User.HaveStory = haveStory;
+
                 }
 
-                var haveStory = await _unitOfWork.StoryRepository
-                          .IsUserHaveStoryAsync(comment.UserId);
-                commentItem.User.HaveStory = haveStory;
 
                 response.Add(commentItem);
             }

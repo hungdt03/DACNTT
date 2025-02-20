@@ -48,7 +48,7 @@ const StoryWrapper: FC = () => {
             )}
 
             {/* Hiển thị Swiper khi có story */}
-            {!loading && userStories.length > 0 ? (
+            {!loading && userStories.length > 0 && (
                 <Swiper
                     modules={[Navigation]}
                     slidesPerView={4.75}
@@ -91,7 +91,9 @@ const StoryWrapper: FC = () => {
                         </SwiperSlide>
                     ))}
                 </Swiper>
-            ) : (
+            ) }
+            
+            {!loading && userStories.length === 0 && (
                 // Không có story nào -> Hiển thị CreateStoryArea
                 <CreateStoryArea />
             )}

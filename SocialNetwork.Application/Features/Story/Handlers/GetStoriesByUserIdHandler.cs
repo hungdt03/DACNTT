@@ -43,14 +43,14 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
             var mapUser = ApplicationMapper.MapToUser(user);
             var takeStories = new List<Domain.Entity.StoryInfo.Story>();
-            var isShowStatus = true;
+            Domain.Entity.UserInfo.FriendShip? friendShip = null;
           
             if (userId == request.UserId)
             {
                 takeStories = [.. stories];
             } else
             {
-                var friendShip = await _unitOfWork.FriendShipRepository
+               friendShip = await _unitOfWork.FriendShipRepository
                     .GetFriendShipByUserIdAndFriendIdAsync(user.Id, userId);
 
                 foreach (var story in stories)
@@ -73,7 +73,6 @@ namespace SocialNetwork.Application.Features.Story.Handlers
                 {
                     mapUser.IsShowStatus = false;
                     mapUser.IsOnline = false;
-                    isShowStatus = false;
                 }
             }
 
@@ -87,8 +86,13 @@ namespace SocialNetwork.Application.Features.Story.Handlers
 
                 if(userId != request.UserId)
                 {
-                    storyItem.User.IsShowStatus = isShowStatus;
-                    storyItem.User.IsOnline = isShowStatus;
+
+                    if (friendShip == null || !friendShip.IsConnect)
+                    {
+                        storyItem.User.IsShowStatus = false;
+                        storyItem.User.IsOnline = false;
+                    }
+                   
                 }
              
                 mapStories.Add(storyItem);

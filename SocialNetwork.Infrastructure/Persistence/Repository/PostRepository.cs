@@ -6,6 +6,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Infrastructure.DBContext;
+using System.Linq;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -196,6 +197,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsByGroupIdAsync(Guid groupId, int page, int size)
         {
             var userId = _contextAccessor?.HttpContext?.User.GetUserId();
+            var meInGroup = await _context.GroupMembers
+                .SingleOrDefaultAsync(s => s.UserId == userId && s.GroupId == groupId);
 
             var blockedUsers = await _context.BlockLists
                .Where(b => b.BlockerId == userId || b.BlockeeId == userId)
@@ -203,7 +206,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                .ToListAsync();
 
             var query = _context.Posts
-                .Where(p => p.IsGroupPost && !blockedUsers.Contains(p.UserId) && p.ApprovalStatus == ApprovalStatus.APPROVED && p.GroupId == groupId)
+                .Where(p => 
+                    p.IsGroupPost && 
+                    (!blockedUsers.Contains(p.UserId) || (meInGroup != null && meInGroup.Role != MemberRole.MEMBER)) 
+                    && p.ApprovalStatus == ApprovalStatus.APPROVED 
+                    && p.GroupId == groupId)
                 .AsQueryable();
 
             var totalCount = await query.CountAsync();
@@ -231,21 +238,21 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<(List<Post> Posts, int TotalCount)> GetAllGroupPostsByUserIdAsync(string userId, int page, int size)
         {
             var blockedUsers = await _context.BlockLists
-                .Where(b => b.BlockerId == userId || b.BlockeeId == userId)
-                .Select(b => b.BlockerId == userId ? b.BlockeeId : b.BlockerId)
-                .ToListAsync();
+                 .Where(b => b.BlockerId == userId || b.BlockeeId == userId)
+                 .Select(b => b.BlockerId == userId ? b.BlockeeId : b.BlockerId)
+                 .ToListAsync();
 
             var query = _context.Posts
                 .Include(p => p.Group)
                 .ThenInclude(p => p.Members)
-                .Where(p =>
-                   ((p.IsGroupPost && p.Group != null) || !p.IsGroupPost)
-                   && !blockedUsers.Contains(p.UserId)
-                   && p.ApprovalStatus == ApprovalStatus.APPROVED
-                   && p.IsGroupPost
-                   && p.Group != null
-                   && p.Group.Members != null
-                   && p.Group.Members.Any(m => m.UserId == userId));
+                .Where(p => p.Group != null
+                    && (
+                        (_context.GroupMembers
+                            .Where(m => m.UserId == userId && m.GroupId == p.GroupId.Value)
+                            .Any(m => m.Role != MemberRole.MEMBER)
+                        ) || !blockedUsers.Contains(p.UserId)
+                    )
+                    && p.ApprovalStatus == ApprovalStatus.APPROVED);
 
             var totalCount = await query.CountAsync();
 
@@ -329,9 +336,26 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsContainsKey(string key, int page, int size)
         {
+            var userId = _contextAccessor?.HttpContext?.User.GetUserId();
+
+            var blockedUsers = await _context.BlockLists
+               .Where(b => b.BlockerId == userId || b.BlockeeId == userId)
+               .Select(b => b.BlockerId == userId ? b.BlockeeId : b.BlockerId)
+               .ToListAsync();
+
             var query = _context.Posts
                 .Where(p => p.Content.ToLower().Contains(key))
-                .AsQueryable();
+                .Where(p => (
+                    (p.Group != null
+                        && p.ApprovalStatus == ApprovalStatus.APPROVED)
+                        && (
+                        (_context.GroupMembers
+                            .Where(m => m.UserId == userId && m.GroupId == p.GroupId.Value)
+                            .Any(m => m.Role != MemberRole.MEMBER)
+                        ) || !blockedUsers.Contains(p.UserId)
+                    ))
+                    || !blockedUsers.Contains(userId)
+                );
 
             var totalCount = await query.CountAsync();
 

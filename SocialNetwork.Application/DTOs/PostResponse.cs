@@ -25,7 +25,10 @@ namespace SocialNetwork.Application.DTOs
         public PostResponse SharePost { get; set; }
         public PostResponse OriginalPost { get; set; }
         public GroupResponse Group { get; set; }
-        public bool IsSaved { get; set; }
         public int Reactions { get; set; }
+
+        // NOT ENTITY PROPERTY
+        public bool IsSaved { get; set; }
+        public bool IsAllowInteraction { get; set; }
     }
 }

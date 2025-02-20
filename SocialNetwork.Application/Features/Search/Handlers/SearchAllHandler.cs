@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
+using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.DTOs.Search;
 using SocialNetwork.Application.Features.Search.Queries;
 using SocialNetwork.Application.Interfaces;
@@ -67,7 +68,6 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                     var blockUser = await _unitOfWork.BlockListRepository
                         .GetBlockListByUserIdAndUserIdAsync(user.Id, userId);
                     if (blockUser != null) continue;
-
                 }
 
                 var haveStory = await _unitOfWork.StoryRepository
@@ -109,11 +109,65 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                 userResponse.Add(item);
             }
 
-            var countResult = groupResponse.Count + userResponse.Count + postTotalCount;
+            var postResponse = new List<PostResponse>();
+            foreach (var item in posts)
+            {
+                var mapPost = ApplicationMapper.MapToPost(item);
 
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+                if (item.UserId != userId)
+                {
+                    var friendShip = await _unitOfWork.FriendShipRepository
+                        .GetFriendShipByUserIdAndFriendIdAsync(item.UserId, userId);
 
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                    if (friendShip == null || !friendShip.IsConnect)
+                    {
+                        mapPost.User.IsShowStatus = false;
+                        mapPost.User.IsOnline = false;
+                    } else
+                    {
+                        // Story
+                        var haveStory = await _unitOfWork.StoryRepository
+                                .IsUserHaveStoryAsync(item.UserId);
+                        mapPost.User.HaveStory = haveStory;
+                    }
+
+                } else
+                {
+                    // Story
+                    var haveStory = await _unitOfWork.StoryRepository
+                            .IsUserHaveStoryAsync(item.UserId);
+                    mapPost.User.HaveStory = haveStory;
+                }
+
+                if (item.PostType == PostType.ORIGINAL_POST)
+                {
+                    var shares = await _unitOfWork.PostRepository.CountSharesByPostIdAsync(item.Id);
+                    mapPost.Shares = shares;
+                };
+
+
+                // Saved Post
+                var savedPost = await _unitOfWork.SavedPostRepository
+                    .GetSavedPostByPostIdAndUserId(item.Id, userId);
+                mapPost.IsSaved = savedPost != null;
+
+                // Group
+                if (item.IsGroupPost && item.Group != null)
+                {
+                    var groupMember = await _unitOfWork.GroupMemberRepository
+                        .GetGroupMemberByGroupIdAndUserId(item.Group.Id, userId);
+
+                    if (groupMember != null)
+                    {
+                        mapPost.Group.IsMine = groupMember.Role == MemberRole.ADMIN;
+                        mapPost.Group.IsMember = true;
+                        mapPost.Group.IsModerator = groupMember.Role == MemberRole.MODERATOR;
+                    }
+                }
+                postResponse.Add(mapPost);
+            }
+
+            var countResult = groupResponse.Count + userResponse.Count + postResponse.Count;
 
             return new DataResponse<SearchAllResponse>
             {
@@ -121,7 +175,7 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                 {
                     Groups = groupResponse,
                     Users = userResponse,
-                    Posts = posts.Select(ApplicationMapper.MapToPost).ToList(),
+                    Posts = postResponse,
                 },
                 IsSuccess = true,
                 Message = $"Tìm thấy {countResult} kết quả cho '{request.Query}'",

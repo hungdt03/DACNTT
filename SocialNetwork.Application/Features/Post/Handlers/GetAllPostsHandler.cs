@@ -8,6 +8,7 @@ using SocialNetwork.Application.Features.Post.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.Post.Handlers
@@ -107,16 +108,30 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     mapPost.User.IsOnline = false;
                 }
 
+                // Story
                 var haveStory = await unitOfWork.StoryRepository
                         .IsUserHaveStoryAsync(item.UserId);
                 mapPost.User.HaveStory = haveStory;
 
+                // Saved Post
                 var savedPost = await unitOfWork.SavedPostRepository
                     .GetSavedPostByPostIdAndUserId(item.Id, userId);
                 mapPost.IsSaved = savedPost != null;
 
-                response.Add(mapPost);
+                // Group
+                if(item.IsGroupPost && item.Group != null)
+                {
+                    var groupMember = await unitOfWork.GroupMemberRepository
+                        .GetGroupMemberByGroupIdAndUserId(item.Group.Id, userId);
 
+                    if (groupMember != null)
+                    {
+                        mapPost.Group.IsMine = groupMember.Role == MemberRole.ADMIN;
+                        mapPost.Group.IsMember = true;
+                        mapPost.Group.IsModerator = groupMember.Role == MemberRole.MODERATOR;
+                    }
+                }
+                response.Add(mapPost);
             }
 
             return new PaginationResponse<List<PostResponse>>

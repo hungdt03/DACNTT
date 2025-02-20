@@ -28,5 +28,6 @@ namespace SocialNetwork.Application.DTOs
         public bool IsLock { get; set; }
         public bool IsShowStatus { get; set; }
         public bool IsShowStory { get; set; }
+        public bool IsBlock { get; set; }
     }
 }

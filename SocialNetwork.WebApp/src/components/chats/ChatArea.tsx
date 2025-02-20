@@ -74,7 +74,10 @@ const ChatArea: FC<ChatAreaProps> = ({
         const response = await messageService.getAllMessagesByChatRoomId(chatRoomId, page, size);
         if (response.isSuccess) {
             setMessages(response.data)
-            setPagination(response.pagination)
+            setPagination(response.pagination);
+
+            if (messagesEndRef.current)
+                messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }
 
@@ -91,16 +94,12 @@ const ChatArea: FC<ChatAreaProps> = ({
         const response = await userService.unblockUser(userId);
         if (response.isSuccess) {
             message.success(response.message)
-            setBlockUser(undefined)
+            getBlock(userId)
+            onFetch()
         } else {
             message.error(response.message)
         }
     }
-
-    useEffect(() => {
-        if (messagesEndRef.current)
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }, [messages])
 
     useEffect(() => {
         chatRoom.isPrivate && chatRoom.friend && getBlock(chatRoom.friend?.id)
@@ -134,8 +133,9 @@ const ChatArea: FC<ChatAreaProps> = ({
 
                         return updatedMessages;
                     });
-
-
+                    
+                    if (messagesEndRef.current)
+                        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
                 }
             },
             // ON READ STATUS RECEIVE
@@ -194,6 +194,7 @@ const ChatArea: FC<ChatAreaProps> = ({
         return () => {
             SignalRConnector.unsubscribeEvents()
         }
+
     }, [chatRoom]);
 
     useEffect(() => {
@@ -404,8 +405,8 @@ const ChatArea: FC<ChatAreaProps> = ({
                 <Avatar src={chatRoom.friend.avatar} className="w-[80px] h-[80px]" />
                 <span className="text-sm text-gray-600 font-bold">{chatRoom.friend.fullName}</span>
                 <span className="text-xs text-gray-600">
-                    {!chatRoom.isFriend && !chatRoom.isConnect && 'Các bạn không phải là bạn bè'}
-                    {chatRoom.isFriend && 'Các bạn là bạn bè'}
+                    {!chatRoom.isFriend && !chatRoom.isConnect && 'Các bạn không phải là bạn bè trên LinkUp'}
+                    {chatRoom.isFriend && 'Các bạn là bạn bè trên LinkUp'}
                     {!chatRoom.isFriend && chatRoom.isConnect && 'Các bạn hiện đã được kết nối với nhau'}
                 </span>
             </div>}

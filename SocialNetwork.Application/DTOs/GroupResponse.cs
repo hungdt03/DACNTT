@@ -12,8 +12,7 @@ namespace SocialNetwork.Application.DTOs
         public List<UserResponse> FriendMembers { get; set; }
         public int CountMembers { get; set; }
         public int CountTodayPosts { get; set; }
-        public bool IsMine { get; set; }
-        public bool IsMember { get; set; }
+     
         public bool OnlyAdminCanPost { get; set; }
         public bool RequireApproval { get; set; }
         public bool RequireApprovalPost { get; set; }
@@ -22,5 +21,9 @@ namespace SocialNetwork.Application.DTOs
         public int AdminCount { get; set; }
         public DateTimeOffset DateCreated { get; set; }
         public bool IsDeleted { get; set;}
+
+        public bool IsMine { get; set; }
+        public bool IsModerator { get; set; }
+        public bool IsMember { get; set; }
     }
 }

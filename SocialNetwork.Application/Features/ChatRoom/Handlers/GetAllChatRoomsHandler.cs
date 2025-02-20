@@ -52,11 +52,13 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                         item.IsOnline = item.Friend.IsOnline = false;
                         item.Friend.IsShowStatus = false;
                         item.Friend.HaveStory = false;
+                        item.Friend.IsShowStory = false;
+                    } else
+                    {
+                        var haveStory = await _unitOfWork.StoryRepository
+                          .IsUserHaveStoryAsync(friend.UserId);
+                        item.Friend.HaveStory = haveStory;
                     }
-
-                    var haveStory = await _unitOfWork.StoryRepository
-                           .IsUserHaveStoryAsync(friend.UserId);
-                    item.Friend.HaveStory = haveStory;
 
                     var friendShip = await _unitOfWork.FriendShipRepository
                         .GetFriendShipByUserIdAndFriendIdAsync(userId, friend.UserId);
@@ -64,9 +66,15 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                     if(friendShip != null && friendShip.IsConnect && friendShip.Status != FriendShipStatus.ACCEPTED)
                     {
                         item.IsConnect = true;
-                    } else if(friendShip != null && friendShip.Status != FriendShipStatus.ACCEPTED)
+                    } else if(friendShip != null && friendShip.Status == FriendShipStatus.ACCEPTED)
                     {
                         item.IsFriend = true;
+                    }
+                    else if (friendShip == null || !friendShip.IsConnect)
+                    {
+                        item.IsOnline = friend.User.IsOnline;
+                        item.Friend.IsShowStatus = false;
+                        item.Friend.IsOnline = false;
                     }
 
                     item.IsMember = true;

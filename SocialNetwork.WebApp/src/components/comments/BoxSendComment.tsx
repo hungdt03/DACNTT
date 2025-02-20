@@ -1,7 +1,7 @@
-import { Avatar, Image, message, Popover, Upload, UploadFile, UploadProps } from "antd";
+import { Avatar, Image, message, Upload, UploadFile, UploadProps } from "antd";
 import { FC, useEffect, useRef, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons'
-import { CameraIcon, Laugh, SendHorizonal } from "lucide-react";
+import { CameraIcon,SendHorizonal } from "lucide-react";
 import cn from "../../utils/cn";
 import images from "../../assets";
 import { useSelector } from "react-redux";
@@ -17,10 +17,8 @@ import { $createTextNode, $getRoot, $getSelection, $isRangeSelection, EditorStat
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { FriendResource } from "../../types/friend";
 import friendService from "../../services/friendService";
-import { extractContentAndStyle, loadContentEmpty } from "../../utils/comment";
 import { isValidImage, isValidVideo } from "../../utils/file";
-import data from '@emoji-mart/data'; // Dữ liệu emoji được bundled
-import Picker from '@emoji-mart/react';
+import { extractContentAndStyle, loadContentEmpty } from "../../utils/comment";
 
 export const COMMENT_MAX_SIZE_IN_BYTES = 10 * 1024 * 1024;
 
@@ -221,25 +219,6 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
         setIsMentioning(false)
     }
 
-    const handleEmojiSelect = (emoji: { native: string }) => {
-        if (editorRef.current) {
-            editorRef.current.update(() => {
-                const selection = $getSelection();
-
-                console.log($isRangeSelection(selection))
-                if ($isRangeSelection(selection)) {
-                    console.log('kakaka')
-                    // Thêm emoji vào vị trí con trỏ hiện tại
-                    const emojiNode = $createTextNode(emoji.native);
-                    selection.insertNodes([emojiNode]);
-
-                    // Thêm một khoảng trắng sau emoji
-                    const spaceNode = $createTextNode(" ");
-                    selection.insertNodes([spaceNode]);
-                }
-            });
-        }
-    };
 
     return <div className="flex flex-col items-start gap-y-2">
         <div className="flex items-center gap-x-4 w-full">
@@ -247,12 +226,6 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
                 <Avatar className="flex-shrink-0 w-[25px] h-[25px] sm:w-[35px] sm:h-[35px]" src={user?.avatar ?? images.user} />
                 <div className="absolute -bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
             </div>
-{/* 
-            <Popover content={<Picker onEmojiSelect={handleEmojiSelect} theme='light' data={data} />} trigger={'click'}>
-                <button className="p-1 rounded-full bg-gray-200 hover:bg-gray-300 cursor-pointer">
-                    <Laugh size={16} />
-                </button>
-            </Popover> */}
 
             <div className={cn("bg-gray-100 px-1 rounded-xl w-full flex items-center justify-between sm:py-[2px]")}>
 

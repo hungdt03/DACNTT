@@ -357,7 +357,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                                     )}
                                     <Button className="cursor-text" type="primary">Chờ phê duyệt</Button>
                                 </>
-                            ) : (
+                            ) : !inviteJoin && (
                                 <Button onClick={() => handleJoinGroup(group.id)} icon={<Plus size={16} />} type="primary">
                                     Tham gia nhóm
                                 </Button>

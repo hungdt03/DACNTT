@@ -25,12 +25,20 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
         public async Task<BaseResponse> Handle(GetAllMemberPostByMemberQuery request, CancellationToken cancellationToken)
         {
-
             var userId = _contextAccessor.HttpContext.User.GetUserId();
 
             var member = await _unitOfWork.GroupMemberRepository
                 .GetGroupMemberByIdAsync(request.MemberId)
                 ?? throw new AppException("Không tìm thấy thông tin nào");
+
+            if(member.UserId != userId)
+            {
+                var block = await _unitOfWork.BlockListRepository
+                    .GetBlockListByUserIdAndUserIdAsync(userId, member.UserId);
+
+                if (member.Role == MemberRole.MEMBER && block != null)
+                    throw new AppException("Bạn không thể thông tin của người này trong nhóm");
+            }
 
             var meInGroup = await _unitOfWork.GroupMemberRepository
                 .GetGroupMemberByGroupIdAndUserId(member.GroupId, userId);
@@ -40,8 +48,55 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
             var (posts, totalCount) = await _unitOfWork.PostRepository
                 .GetAllMemberGroupPostsByGroupIdAsync(member.GroupId, member.UserId, request.Page, request.Size);
-            
-            var response = posts.Select(ApplicationMapper.MapToPost).ToList();
+
+            var response = new List<PostResponse>();
+            foreach (var post in posts)
+            {
+                var postItem = ApplicationMapper.MapToPost(post);
+                if (post.PostType == PostType.ORIGINAL_POST)
+                {
+                    var shares = await _unitOfWork.PostRepository.CountSharesByPostIdAsync(post.Id);
+                    postItem.Shares = shares;
+                };
+
+                if (post.UserId != userId)
+                {
+                    var friendShip = await _unitOfWork.FriendShipRepository
+                       .GetFriendShipByUserIdAndFriendIdAsync(post.UserId, userId);
+
+                    if (friendShip == null || !friendShip.IsConnect)
+                    {
+                        postItem.User.IsShowStatus = false;
+                        postItem.User.IsOnline = false;
+                    }
+                }
+
+                // Group
+                if (post.IsGroupPost && post.Group != null)
+                {
+                    var groupMember = await _unitOfWork.GroupMemberRepository
+                        .GetGroupMemberByGroupIdAndUserId(post.Group.Id, userId);
+
+                    if (groupMember != null)
+                    {
+                        postItem.Group.IsMine = groupMember.Role == MemberRole.ADMIN;
+                        postItem.Group.IsMember = true;
+                        postItem.Group.IsModerator = groupMember.Role == MemberRole.MODERATOR;
+                    }
+                }
+
+                var haveStory = await _unitOfWork.StoryRepository
+                        .IsUserHaveStoryAsync(post.UserId);
+                postItem.User.HaveStory = haveStory;
+
+                var savedPost = await _unitOfWork.SavedPostRepository
+                 .GetSavedPostByPostIdAndUserId(post.Id, userId);
+
+                postItem.IsSaved = savedPost != null;
+                response.Add(postItem);
+
+            }
+
             return new PaginationResponse<List<PostResponse>>()
             {
                 Data = response,

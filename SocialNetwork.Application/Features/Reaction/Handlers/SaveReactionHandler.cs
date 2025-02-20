@@ -31,6 +31,14 @@ namespace SocialNetwork.Application.Features.Reaction.Handlers
                 ?? throw new AppException("Bài viết không tồn tại");
 
             var userId = _contextAccessor.HttpContext.User.GetUserId();
+            if (userId != post.UserId)
+            {
+                var block = await _unitOfWork.BlockListRepository
+                   .GetBlockListByUserIdAndUserIdAsync(userId, post.UserId);
+
+                if (block != null) throw new AppException("Bạn không thể tương tác với bài viết này");
+            }
+       
             var findReaction = await _unitOfWork.ReactionRepository.GetReactionByPostIdAndUserIdAsync(request.PostId, userId);
 
             Domain.Entity.System.Notification notification = null;

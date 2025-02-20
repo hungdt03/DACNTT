@@ -96,7 +96,7 @@ export const loadContent = (user: UserResource) =>
         }
     }`;
 
-    
+
 
 // Cấu hình Lexical
 export const editorConfig = {
@@ -110,3 +110,4 @@ export const editorConfig = {
     },
     nodes: [TextNode],
 };
+

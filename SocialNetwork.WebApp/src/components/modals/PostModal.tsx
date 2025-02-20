@@ -88,6 +88,7 @@ const PostModal: FC<PostModalProps> = ({
     const fetchComments = async (page: number, size: number) => {
         setLoading(true)
         const response = await commentService.getAllRootCommentsByPostId(post.id, page, size);
+        console.log(response)
         setLoading(false)
         if (response.isSuccess) {
             setComments(prev => [...prev, ...response.data])
@@ -242,6 +243,7 @@ const PostModal: FC<PostModalProps> = ({
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[500px] sm:h-[550px] pb-10 overflow-y-auto custom-scrollbar">
         <CommentList
             loading={loading}
+            post={post}
             group={post.group}
             replyComment={handleReplyComment}
             comments={[...pendingComments.filter(p => p.level === 0), ...comments]}

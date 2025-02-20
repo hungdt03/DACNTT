@@ -19,9 +19,9 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { $createTextNode, $getRoot, $getSelection, $isRangeSelection, EditorState, LexicalEditor, TextNode } from 'lexical';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { editorConfig, extractContentAndStyle, loadContent, loadContentEmpty } from "../../utils/comment";
 import { isValidImage, isValidVideo } from "../../utils/file";
 import { COMMENT_MAX_SIZE_IN_BYTES } from "./BoxSendComment";
+import { editorConfig, extractContentAndStyle, loadContent, loadContentEmpty } from "../../utils/comment";
 
 
 

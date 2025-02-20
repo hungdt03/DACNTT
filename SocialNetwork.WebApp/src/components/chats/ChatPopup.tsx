@@ -111,8 +111,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
     const fetchRoom = async () => {
         const response = await chatRoomService.getChatRoomById(roomParam.id);
         if (response.isSuccess) {
-            console.log(response.data)
-            console.log(response.data.isPrivate && !response.data.isAccept && !!response.data.lastMessage)
             setRoom(response.data)
         }
     }
@@ -426,8 +424,8 @@ const ChatPopup: FC<ChatPopupProps> = ({
                 <Avatar src={room.friend.avatar} size={'large'} />
                 <span className="text-sm text-gray-600 font-bold">{room.friend.fullName}</span>
                 <span className="text-xs text-gray-600">
-                    {room.isFriend && 'Các bạn là bạn bè'}
-                    {!room.isFriend && !room.isConnect && 'Các bạn không phải là bạn bè'}
+                    {room.isFriend && 'Các bạn là bạn bè trên LinkUp'}
+                    {!room.isFriend && !room.isConnect && 'Các bạn không phải là bạn bè trên LinkUp'}
                     {!room.isFriend && room.isConnect && 'Các bạn hiện đã được kết nối với nhau'}
                 </span>
             </div>}

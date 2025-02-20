@@ -34,14 +34,35 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var originalPost = await _unitOfWork.PostRepository.GetPostByIdAsync(request.OriginalPostId)
                 ?? throw new AppException("Không tìm thấy bài viết gốc");
 
+            // Check original post
+            if (userId != originalPost.UserId)
+            {
+                var block = await _unitOfWork.BlockListRepository
+                   .GetBlockListByUserIdAndUserIdAsync(userId, originalPost.UserId);
+
+                if (block != null) throw new AppException("Bạn không thể chia sẻ bài viết này");
+            }
+
             if (originalPost.UserId != userId && originalPost.Privacy == PrivacyConstant.PRIVATE)
-                throw new AppException("Không thể chia sẻ bài viết riêng tư của người khác");
+                throw new AppException("Không thể chia sẻ bài viết này");
+
 
             var post = originalPost;
             if (request.OriginalPostId != request.PostId)
             {
                 post = await _unitOfWork.PostRepository.GetPostByIdAsync(request.PostId)
-                ?? throw new AppException("Không tìm thấy bài viết chia sẻ");
+                    ?? throw new AppException("Không tìm thấy bài viết chia sẻ");
+
+                if (userId != post.UserId)
+                {
+                    var block = await _unitOfWork.BlockListRepository
+                       .GetBlockListByUserIdAndUserIdAsync(userId, post.UserId);
+
+                    if (block != null) throw new AppException("Bạn không thể chia sẻ bài viết này");
+                }
+
+                if (post.UserId != userId && post.Privacy == PrivacyConstant.PRIVATE)
+                    throw new AppException("Không thể chia sẻ bài viết này");
             }
 
             var tags = new List<Tag>();

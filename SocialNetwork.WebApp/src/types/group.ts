@@ -13,8 +13,6 @@ export type GroupResource = {
     countMembers: number;
     countTodayPosts: number;
     isHidden: boolean;
-    isMine: boolean;
-    isMember: boolean;
     onlyAdminCanPost: boolean;
     requireApproval: boolean;
     requireApprovalPost: boolean;
@@ -22,4 +20,7 @@ export type GroupResource = {
     adminCount: number;
     isDeleted: boolean;
     
+    isMine: boolean;
+    isMember: boolean;
+    isModerator: boolean;
 }

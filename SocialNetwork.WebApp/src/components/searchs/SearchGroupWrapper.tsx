@@ -18,7 +18,6 @@ const SearchGroupWrapper: FC<SearchGroupWrapperProps> = ({
     const [suggestGroups, setSuggestGroups] = useState<SearchGroupSuggestResource[]>([]);
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
 
     const navigate = useNavigate();
 
@@ -27,7 +26,6 @@ const SearchGroupWrapper: FC<SearchGroupWrapperProps> = ({
         const response = await searchService.searchGroups(value, page, size);
         setLoading(false)
         if (response.isSuccess) {
-            setMessage(response.message)
             setSuggestGroups(response.data);
             setPagination(response.pagination)
         }
@@ -45,7 +43,6 @@ const SearchGroupWrapper: FC<SearchGroupWrapperProps> = ({
     }
 
     return <div className="flex flex-col gap-y-4 w-full h-full custom-scrollbar overflow-y-auto">
-        {!loading && suggestGroups.length === 0 && <div className="text-gray-500 md:text-[16px] text-sm text-center">{message}</div>}
         {suggestGroups.map(suggestGroup => <SearchGroupItem onClick={() => handleRedirectToGroupPage(`/groups/${suggestGroup.group.id}`, suggestGroup.group.id)} key={suggestGroup.group.id} suggestGroup={suggestGroup} />)}
         {loading && <LoadingIndicator />}
 

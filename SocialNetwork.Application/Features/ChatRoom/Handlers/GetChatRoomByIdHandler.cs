@@ -45,9 +45,10 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
 
                 if (checkBlock != null)
                 {
-                    response.Friend.HaveStory = false;
+                    response.Friend.IsShowStory = false;
                     response.Friend.IsShowStatus = false;
                     response.Friend.IsOnline = false;
+                    response.IsOnline = false;
                 }
                 else
                 {
@@ -63,11 +64,15 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 {
                     response.IsConnect = true;
                 }
-                else if (friendShip != null && friendShip.Status != FriendShipStatus.ACCEPTED)
+                else if (friendShip != null && friendShip.Status == FriendShipStatus.ACCEPTED)
                 {
                     response.IsFriend = true;
+                } else if (friendShip == null || !friendShip.IsConnect)
+                {
+                    response.IsOnline = friend.User.IsOnline;
+                    response.Friend.IsShowStatus = false;
+                    response.Friend.IsOnline = false;
                 }
-
 
                 response.IsAccept = chatRoom.Members.FirstOrDefault(s => s.UserId == userId).IsAccepted;
                 response.IsRecipientAccepted = chatRoom.Members.FirstOrDefault(s => s.UserId != userId)?.IsAccepted ?? false;

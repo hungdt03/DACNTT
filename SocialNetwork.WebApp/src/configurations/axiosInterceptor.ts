@@ -26,39 +26,39 @@ instance.interceptors.request.use(function (config) {
 instance.interceptors.response.use(function (response) {
     return response.data;
 }, async function (error: AxiosError) {
-    // const originalRequest = error.config
+    const originalRequest = error.config
 
-    // if (!originalRequest) {
-    //     return Promise.reject(error)
-    // }
+    if (!originalRequest) {
+        return Promise.reject(error)
+    }
 
-    // if (error.response?.status === 401 || error.response?.status === 403 && !originalRequest?._retry) {
-    //     originalRequest._retry = true
+    if (error.response?.status === 401 || error.response?.status === 403) {
+        originalRequest._retry = true
 
-    //     try {
-    //         const rs = await instance.post("/api/auth/refresh-token", {
-    //             refreshToken: getRefreshToken(),
-    //             accessToken: getAccessToken()
-    //         });
+        try {
+            const rs = await instance.post("/api/auth/refresh-token", {
+                refreshToken: getRefreshToken(),
+                accessToken: getAccessToken()
+            });
 
-    //         const response = rs as any;
+            const response = rs as any;
 
-    //         if (response.success) {
-    //             localStorage.setItem('accessToken', response.data.accessToken)
-    //             localStorage.setItem('refreshToken', response.data.refreshToken)
+            if (response.success) {
+                localStorage.setItem('accessToken', response.data.accessToken)
+                localStorage.setItem('refreshToken', response.data.refreshToken)
 
-    //             originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`
-    //             return instance(originalRequest);
-    //         } else {
-    //             clearAuthLocal()
-    //         }
-    //     } catch (error) {
-    //         console.log('Lỗi trong axios', error)
-    //         clearAuthLocal()
-    //     }
+                originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`
+                return instance(originalRequest);
+            } else {
+                clearAuthLocal()
+            }
+        } catch (error) {
+            console.log('Lỗi trong axios', error)
+            clearAuthLocal()
+        }
 
-    //     return Promise.reject(error);
-    // }
+        return Promise.reject(error);
+    }
 
     return error.response?.data;
 });

@@ -39,6 +39,20 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
             var post = await _unitOfWork.PostRepository.GetPostByIdAsync(request.PostId)
                 ?? throw new AppException("Bài viết không tồn tại");
 
+            if(userId != post.UserId)
+            {
+                var block = await _unitOfWork.BlockListRepository
+                   .GetBlockListByUserIdAndUserIdAsync(userId, post.UserId);
+
+                if (block != null) throw new AppException("Bạn không thể bình luận bài viết này");
+            } else if(request.ReplyToUserId != null && userId != request.ReplyToUserId)
+            {
+                var block = await _unitOfWork.BlockListRepository
+                   .GetBlockListByUserIdAndUserIdAsync(userId, request.ReplyToUserId);
+
+                if (block != null) throw new AppException("Bạn không thể phản hồi bình luận của người này");
+            }
+
             var currentUser = await userManager.FindByIdAsync(userId);
 
             var comment = new Domain.Entity.PostInfo.Comment()

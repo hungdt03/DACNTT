@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
+using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Comment.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
@@ -25,6 +26,7 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
         public async Task<BaseResponse> Handle(GetAllRootCommentsByPostIdQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
+
             var (comments, totalCount) = await _unitOfWork.CommentRepository
                 .GetAllRootCommentsByPostAsync(request.PostId, request.Page, request.Size);
 
@@ -37,8 +39,6 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                     var block = await _unitOfWork.BlockListRepository
                     .GetBlockListByUserIdAndUserIdAsync(userId, comment.UserId);
 
-                    if (block != null) continue;
-
                     var friendShip = await _unitOfWork.FriendShipRepository
                       .GetFriendShipByUserIdAndFriendIdAsync(comment.UserId, userId);
 
@@ -47,11 +47,28 @@ namespace SocialNetwork.Application.Features.Comment.Handlers
                         commentItem.User.IsShowStatus = false;
                         commentItem.User.IsOnline = false;
                     }
-                }
 
-                var haveStory = await _unitOfWork.StoryRepository
+                    if (block != null)
+                    {
+                        commentItem.User.IsShowStory = false;
+                        commentItem.User.HaveStory = false;
+                        commentItem.User.IsBlock = true;
+                    }
+                    else
+                    {
+                        var haveStory = await _unitOfWork.StoryRepository
                           .IsUserHaveStoryAsync(comment.UserId);
-                commentItem.User.HaveStory = haveStory;
+                        commentItem.User.HaveStory = haveStory;
+
+                    }
+                }
+                else
+                {
+                    var haveStory = await _unitOfWork.StoryRepository
+                          .IsUserHaveStoryAsync(comment.UserId);
+                    commentItem.User.HaveStory = haveStory;
+
+                }
 
                 response.Add(commentItem);
             }

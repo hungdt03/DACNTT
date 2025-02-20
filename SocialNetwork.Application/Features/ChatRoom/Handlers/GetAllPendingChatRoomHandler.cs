@@ -39,6 +39,9 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
                 if(friend != null)
                 {
                     item.Friend = ApplicationMapper.MapToFriend(friend.User);
+                    var haveStory = await _unitOfWork.StoryRepository
+                     .IsUserHaveStoryAsync(friend.UserId);
+                    item.Friend.HaveStory = haveStory;
                 }
                 
                 var lastMessage = await _unitOfWork.MessageRepository.GetLastMessageByGroupIdAsync(chatRoom.Id);

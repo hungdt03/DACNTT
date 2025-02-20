@@ -30,14 +30,12 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var response = new List<PostResponse>();
             foreach (var post in posts)
             {
-                
                 var postItem = ApplicationMapper.MapToPost(post);
                 if (post.PostType == PostType.ORIGINAL_POST)
                 {
                     var shares = await _unitOfWork.PostRepository.CountSharesByPostIdAsync(post.Id);
                     postItem.Shares = shares;
                 };
-
 
                 if (post.UserId != userId)
                 {
@@ -48,16 +46,40 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     {
                         postItem.User.IsShowStatus = false;
                         postItem.User.IsOnline = false;
+                    } else
+                    {
+                        // Story
+                        var haveStory = await _unitOfWork.StoryRepository
+                                .IsUserHaveStoryAsync(post.UserId);
+                        postItem.User.HaveStory = haveStory;
                     }
-                   
+                } else
+                {
+                    // Story
+                    var haveStory = await _unitOfWork.StoryRepository
+                            .IsUserHaveStoryAsync(post.UserId);
+                    postItem.User.HaveStory = haveStory;
                 }
              
-                    var haveStory = await _unitOfWork.StoryRepository
-                        .IsUserHaveStoryAsync(post.UserId);
-                    postItem.User.HaveStory = haveStory;
+                
 
+                // Saved post
                 var savedPost = await _unitOfWork.SavedPostRepository
                  .GetSavedPostByPostIdAndUserId(post.Id, userId);
+
+                // Group
+                if (post.IsGroupPost && post.Group != null)
+                {
+                    var groupMember = await _unitOfWork.GroupMemberRepository
+                        .GetGroupMemberByGroupIdAndUserId(post.Group.Id, userId);
+
+                    if (groupMember != null)
+                    {
+                        postItem.Group.IsMine = groupMember.Role == MemberRole.ADMIN;
+                        postItem.Group.IsMember = true;
+                        postItem.Group.IsModerator = groupMember.Role == MemberRole.MODERATOR;
+                    }
+                }
 
                 postItem.IsSaved = savedPost != null;
 

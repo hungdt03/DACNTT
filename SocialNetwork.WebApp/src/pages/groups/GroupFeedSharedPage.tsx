@@ -9,6 +9,7 @@ import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";
 import PostGroup from "../../components/posts/PostGroup";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+import { PrivacyType } from "../../enums/privacy";
 
 
 const GroupFeedSharedPage: FC = () => {
@@ -69,7 +70,7 @@ const GroupFeedSharedPage: FC = () => {
                         return <SharePost onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
                     }
 
-                    return <PostGroup key={post.id} post={post} />;
+                    return <PostGroup allowShare={post.privacy === PrivacyType.GROUP_PUBLIC} key={post.id} post={post} />;
                 })}
 
                 {loading && <PostSkeletonList />}

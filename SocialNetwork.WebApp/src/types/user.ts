@@ -16,13 +16,15 @@ export interface UserResource {
     followerCount: number;
     followingCount: number;
     friendCount: number;
-    haveStory: boolean;
     isDeleted: boolean;
     isverification : boolean;
     location: string;
     dateJoined: Date;
     role: Role
     isLock : boolean;
+    
+    haveStory: boolean;
     isShowStatus: boolean;
     isShowStory: boolean;
+    isBlock: boolean;
 }

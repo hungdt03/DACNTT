@@ -310,7 +310,7 @@ const PostGroup: FC<PostGroupProps> = ({
         </div>
         <Divider className='mt-0 mb-2' />
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Bài viết của Bùi Việt</p>} width='700px' classNames={{
+        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Bài viết của {post.user.fullName}</p>} width='700px' classNames={{
             footer: 'hidden'
         }} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
             {isModalOpen && <PostModal post={post} />}
