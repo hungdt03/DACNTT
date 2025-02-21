@@ -104,6 +104,12 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetRegistrationYearsQuery());
             return Ok(response);
         }
+        [HttpGet("get-top1-followers")]
+        public async Task<IActionResult> GetTop1Followers()
+        {
+            var response = await mediator.Send(new GetTop1FollowersQuery());
+            return Ok(response);
+        }
         [HttpGet("get-registration-stats-by-year/{year}")]
         public async Task<IActionResult> GetRegistrationStatsByYear([FromRoute] int year)
         {

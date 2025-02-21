@@ -31,7 +31,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
             {
                 Data = years,
                 IsSuccess = true,
-                Message = "Lấy thông tin posts thành công",
+                Message = "Lấy thông tin thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
             };
         }

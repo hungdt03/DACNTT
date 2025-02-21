@@ -96,7 +96,7 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                         paddingBottom: '5px'
                     }}
                 >
-                    Cập nhật báo cáo
+                    CẬP NHẬT BÁO CÁO
                 </div>
             }
             open={isVisible}
@@ -277,9 +277,16 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                 )}
 
                 <Form.Item style={{ marginBottom: '4px' }}>
-                    <Button type='primary' onClick={() => handleStatusChange()} loading={loading} block>
-                        Cập nhật
-                    </Button>
+                    {tagetReport.resolvedAt && (
+                        <Button type='primary' disabled block>
+                            Cập nhật
+                        </Button>
+                    )}
+                    {!tagetReport.resolvedAt && (
+                        <Button type='primary' onClick={() => handleStatusChange()} loading={loading} block>
+                            Cập nhật
+                        </Button>
+                    )}
                 </Form.Item>
             </Form>
         </Modal>

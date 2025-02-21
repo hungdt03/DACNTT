@@ -45,6 +45,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                     .Any(ur => ur.UserId == u.Id && ur.RoleId == userRoleId))
                 .Include(u => u.Location)
                 .Include(u => u.HomeTown)
+                .Include(u=>u.Followers)
+                .Include(u => u.Followings)
                 .ToListAsync();
 
             return users;
@@ -154,14 +156,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             var monthlyStats = await _context.Users
                 .Where(user => user.DateJoined.Year == year)
-                .GroupBy(user => user.DateJoined.Month) 
+                .GroupBy(user => user.DateJoined.Month)
                 .Select(group => new MonthlyRegistrationStatsResponse
                 {
-                    Month = group.Key, 
+                    Month = group.Key,
                     Year = year,
-                    Count = group.Count() 
+                    Count = group.Count()
                 })
-                .OrderBy(stat => stat.Month) 
                 .ToListAsync();
             for (int month = 1; month <= 12; month++)
             {
@@ -176,7 +177,15 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 }
             }
 
+            monthlyStats = monthlyStats.OrderBy(stat => stat.Month).ToList();
             return monthlyStats;
         }
+        public async Task<User> GetTop1UserFollowers()
+        {
+            return await _context.Users
+                .OrderByDescending(u => _context.Follows.Count(f => f.FolloweeId == u.Id))
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

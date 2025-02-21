@@ -22,7 +22,6 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ isVisible, onClose,
             .oneOf([Yup.ref('password'), ''], 'Mật khẩu xác nhận không khớp')
             .required('Xác nhận mật khẩu không được để trống')
     })
-
     const handleAddAccountAsync = async (values: SignUpRequest) => {
         setLoading(true)
         const response = await authService.signUp(values)
@@ -37,7 +36,24 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ isVisible, onClose,
     }
 
     return (
-        <Modal title='Thêm tài khoản' open={isVisible} onCancel={onClose} footer={null} centered>
+        <Modal
+            title={
+                <div
+                    style={{
+                        textAlign: 'center',
+                        fontSize: '20px',
+                        fontWeight: 'bold',
+                        paddingBottom: '5px'
+                    }}
+                >
+                    THÊM TÀI KHOẢN
+                </div>
+            }
+            open={isVisible}
+            onCancel={onClose}
+            footer={null}
+            centered
+        >
             <Formik
                 initialValues={{ fullName: '', email: '', password: '', confirmPassword: '' }}
                 validationSchema={signUpSchema}

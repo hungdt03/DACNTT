@@ -174,7 +174,7 @@ const AdminGroupsTable: React.FC<GroupsTableProps> = ({ groups, onGroupSelect, r
                                                     }
                                                     style={{ fontSize: 12, padding: '3px 8px', minWidth: 'auto' }}
                                                 >
-                                                    Xóa
+                                                    Giải tán nhóm
                                                 </Button>
                                             </Popconfirm>
                                         </TableCell>
