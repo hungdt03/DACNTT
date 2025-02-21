@@ -225,7 +225,15 @@ const Notification: FC<NotificationProps> = ({
                                       ? notis.notiTag
                                       : notification.type === NotificationType.REPORT_RESPONSE
                                         ? notis.commentNoti
-                                        : notis.userNoti
+                                        : notification.type === NotificationType.REPORT_RESPONSE
+                                          ? notis.commentNoti
+                                          : notification.type === NotificationType.REPORT_DELETE_RESPONSE
+                                            ? notis.commentNoti
+                                            : notification.type === NotificationType.POST_DELETE_RESPONSE
+                                              ? notis.commentNoti
+                                              : notification.type === NotificationType.GROUP_DELETE_RESPONSE
+                                                ? notis.commentNoti
+                                                : notis.userNoti
                     }
                 />
             </div>

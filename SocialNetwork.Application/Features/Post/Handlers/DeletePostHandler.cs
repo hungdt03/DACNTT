@@ -34,9 +34,12 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var reactions = await _unitOfWork.ReactionRepository.GetAllReactionsByPostIdAsync(request.PostId);
             var comments = await _unitOfWork.CommentRepository.GetAllCommentsByPostIdAsync(request.PostId);
             var sharePosts = await _unitOfWork.PostRepository.GetAllSharePostsByOriginalPostId(request.PostId);
+            var tags = await _unitOfWork.TagRepository.GetAllTagsByPostIdAsync(post.Id);
+
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             _unitOfWork.ReactionRepository.RemoveRange(reactions);
             _unitOfWork.CommentRepository.RemoveRange(comments);
+            _unitOfWork.TagRepository.RemoveRange(tags);
             UpdateSharedPosts(sharePosts, post);
             _unitOfWork.PostRepository.DeletePost(post);
 
@@ -69,20 +72,27 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 {
                     p.SharePostId = null;
                 }
-
-            });
-
-            _unitOfWork.CommentRepository.RemoveRange(comments);
-            _unitOfWork.PostRepository.DeletePost(post);
-
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-            return new BaseResponse()
+            }
+        }
+        private async Task NotifyUser(Domain.Entity.PostInfo.Post post)
+        {
+            var notification = new Domain.Entity.System.Notification
             {
-                IsSuccess = true,
-                Message = "Xóa bài viết thành công",
-                StatusCode = System.Net.HttpStatusCode.OK
+                ImageUrl = _contextAccessor.HttpContext.User.GetAvatar(),
+                IsRead = false,
+                Title = "Thông báo gỡ bài viết",
+                RecipientId = post.UserId,
+                Recipient = post.User,
+                Type = NotificationType.POST_DELETE_RESPONSE,
+                DateSent = DateTimeOffset.UtcNow,
+                Content = "Chúng tôi đã xóa bài viết của bạn, nhấn vào để xem chi tiết",
+                Post = post,
+                PostId = post.Id
             };
+
+            await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+            var mappedNotification = ApplicationMapper.MapToNotification(notification);
+            await _signalRService.SendNotificationToSpecificUser(mappedNotification.Recipient.FullName, mappedNotification);
         }
     }
 }
