@@ -166,8 +166,7 @@ const StatisticsPage: React.FC = () => {
                                         borderRadius: '10px',
                                         textAlign: 'center',
                                         height: '180px',
-                                        flexDirection: 'column',
-                                        justifyContent: 'center'
+                                        flexDirection: 'column'
                                     }}
                                 >
                                     <Pie data={inventoryData} angleField='value' colorField='type' height={110} />
@@ -183,10 +182,10 @@ const StatisticsPage: React.FC = () => {
                                         height: '180px',
                                         flexDirection: 'column',
                                         alignItems: 'center',
-                                        justifyContent: 'center'
+                                        display: 'flex'
                                     }}
                                 >
-                                    <Avatar size={64} icon={<UserOutlined />} />
+                                    <Avatar size={64} src={top1Followers?.avatar} />
                                     <Typography.Text
                                         style={{
                                             marginTop: 5,
@@ -196,7 +195,7 @@ const StatisticsPage: React.FC = () => {
                                     >
                                         {top1Followers?.fullName}
                                     </Typography.Text>
-                                    <Statistic value={top1Followers?.followerCount} prefix={<UserOutlined />} />
+                                    <Statistic value={top1Followers?.followingCount} prefix={<UserOutlined />} />
                                 </Card>
                             </Col>
                         </Row>

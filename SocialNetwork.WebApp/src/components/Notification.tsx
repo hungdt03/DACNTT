@@ -54,6 +54,8 @@ type NotificationProps = {
     onGroupNotification: () => void
     onReportUserNotification: () => void
     onReportDeleteNotification: () => void
+    onPostDeleteNotification: () => void
+    onGroupDeleteNotification: () => void
 }
 
 const Notification: FC<NotificationProps> = ({
@@ -68,7 +70,9 @@ const Notification: FC<NotificationProps> = ({
     onPostReactionNotification,
     onGroupNotification,
     onReportUserNotification,
-    onReportDeleteNotification
+    onReportDeleteNotification,
+    onPostDeleteNotification,
+    onGroupDeleteNotification
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false)
     const [acceptedFriendRequest, setAcceptedFriendRequest] = useState<'accepted' | 'cancel' | 'none'>('none')
@@ -181,6 +185,10 @@ const Notification: FC<NotificationProps> = ({
             onReportUserNotification()
         } else if (notification.type === NotificationType.REPORT_DELETE_RESPONSE) {
             onReportDeleteNotification()
+        } else if (notification.type === NotificationType.POST_DELETE_RESPONSE) {
+            onPostDeleteNotification()
+        } else if (notification.type === NotificationType.GROUP_DELETE_RESPONSE) {
+            onGroupDeleteNotification()
         }
     }
 
@@ -217,7 +225,13 @@ const Notification: FC<NotificationProps> = ({
                                       ? notis.notiTag
                                       : notification.type === NotificationType.REPORT_RESPONSE
                                         ? notis.commentNoti
-                                        : notis.userNoti
+                                        : notification.type === NotificationType.REPORT_DELETE_RESPONSE
+                                          ? notis.commentNoti
+                                          : notification.type === NotificationType.POST_DELETE_RESPONSE
+                                            ? notis.commentNoti
+                                            : notification.type === NotificationType.GROUP_DELETE_RESPONSE
+                                              ? notis.commentNoti
+                                              : notis.userNoti
                     }
                 />
             </div>

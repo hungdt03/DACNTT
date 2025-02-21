@@ -63,7 +63,7 @@ class AdminService {
      getAllPost() : Promise<DataResponse<PostResource[]>> {
           return axiosInterceptor.get('/api/admin/get-all-post')
      }
-     DeleteOnePost(postId : string) : Promise<BaseResponse> {
+     DeleteOnePost(postId : string) : Promise<DataResponse<PostResource>> {
           return axiosInterceptor.delete('/api/admin/delete-post/' + postId)
      }
      DeleteManyPost(listPostId: string[]) : Promise<BaseResponse> {

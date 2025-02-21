@@ -6,6 +6,7 @@ using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Application.Features.Admin.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.Admin.Handlers
 {
@@ -19,11 +20,14 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         }
         public async Task<BaseResponse> Handle(GetTop1FollowersQuery request, CancellationToken cancellationToken)
         {
-            var top1Followers = await unitOfWork.UserRepository.GetTop1UserFollowers();
+            var user = await unitOfWork.UserRepository.GetTop1UserFollowers();
+
+            var mapper = ApplicationMapper.MapToUser(user);
+            mapper.FollowingCount = await unitOfWork.FollowRepository.CountFollowersByUserIdAsync(mapper.Id);
 
             return new DataResponse<UserResponse>()
             {
-                Data = ApplicationMapper.MapToUser(top1Followers),
+                Data = mapper,
                 IsSuccess = true,
                 Message = "Lấy thông tin user top 1 follower thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,

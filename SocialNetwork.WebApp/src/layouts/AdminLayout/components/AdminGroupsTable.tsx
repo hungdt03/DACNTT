@@ -87,6 +87,7 @@ const AdminGroupsTable: React.FC<GroupsTableProps> = ({ groups, onGroupSelect, r
     const columns = [
         { key: 'name', label: 'Tên nhóm' },
         { key: 'description', label: 'Mô tả nhóm' },
+        { key: 'coverImage', label: 'Ảnh nhóm' },
         { key: 'dateCreated', label: 'Ngày tạo' },
         { key: 'countMembers', label: 'Số thành viên' },
         { key: 'privacy', label: 'Chế độ nhóm' }
@@ -145,6 +146,14 @@ const AdminGroupsTable: React.FC<GroupsTableProps> = ({ groups, onGroupSelect, r
                                         </TableCell>
                                         <TableCell>{group.name}</TableCell>
                                         <TableCell>{group.description}</TableCell>
+
+                                        <TableCell>
+                                            {group.coverImage ? (
+                                                <img key={group.id} src={group.coverImage} alt='Media' width={50} />
+                                            ) : (
+                                                'Không có'
+                                            )}
+                                        </TableCell>
                                         <TableCell>
                                             {group.dateCreated ? dayjs(group.dateCreated).format('DD/MM/YYYY') : '-'}
                                         </TableCell>

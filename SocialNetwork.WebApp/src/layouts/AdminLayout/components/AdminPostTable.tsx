@@ -101,6 +101,7 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
 
     const columns = [
         { key: 'content', label: 'Nội dung' },
+        { key: 'medias', label: 'Hình ảnh/video' },
         { key: 'createdAt', label: 'Ngày tạo' },
         { key: 'user', label: 'Người đăng' },
         { key: 'postType', label: 'Kiểu bài viết' },
@@ -159,6 +160,14 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                                             />
                                         </TableCell>
                                         <TableCell>{post.content}</TableCell>
+                                        <TableCell>
+                                            {post.medias && post.medias.length > 0
+                                                ? post.medias.map((media) => (
+                                                      <img key={media.id} src={media.mediaUrl} alt='Media' width={50} />
+                                                  ))
+                                                : 'Không có'}
+                                        </TableCell>
+
                                         <TableCell>
                                             {post.createdAt ? dayjs(post.createdAt).format('DD/MM/YYYY') : '-'}
                                         </TableCell>

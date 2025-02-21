@@ -87,6 +87,7 @@ const AdminUsersTable: React.FC<UsersTableProps> = ({ users, onUserSelect, rowsP
 
     const columns = [
         { key: 'fullName', label: 'Tên' },
+        { key: 'avatar', label: 'Ảnh' },
         { key: 'email', label: 'Email' },
         { key: 'phoneNumber', label: 'Số điện thoại' },
         { key: 'gender', label: 'Giới tính' },
@@ -148,6 +149,9 @@ const AdminUsersTable: React.FC<UsersTableProps> = ({ users, onUserSelect, rowsP
                                         </TableCell>
 
                                         <TableCell>{user.fullName}</TableCell>
+                                        <TableCell>
+                                            <img key={user.id} src={user.avatar} alt='Media' width={25} />
+                                        </TableCell>
                                         <TableCell>{user.email}</TableCell>
                                         <TableCell>{user.phoneNumber || 'Không có'}</TableCell>
                                         <TableCell>

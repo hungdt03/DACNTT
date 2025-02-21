@@ -23,7 +23,6 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
    
             return new BaseResponse()
             {
-               
                 IsSuccess = true,
                 Message = "Xóa nhóm thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,

@@ -97,20 +97,6 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                 return 'Không xác định'
         }
     }
-    const getContentReported = (report: ReportResource) => {
-        switch (report.reportType) {
-            case ReportType.USER:
-                return `Người bị báo cáo: ${report.targetUser?.fullName}` || 'Không có'
-            case ReportType.GROUP:
-                return `Nhóm bị báo cáo: ${report.targetGroup?.name}` || 'Không có'
-            case ReportType.POST:
-                return `Bài viết bị báo cáo: ${report.targetPost?.content}` || 'Không xác định'
-            case ReportType.COMMENT:
-                return `Bình luận bị báo cáo: ${report.targetComment?.content}` || 'Không xác định'
-            default:
-                return 'Không xác định'
-        }
-    }
     const getTargetLabel = (reportType: string) => {
         switch (reportType) {
             case ReportType.USER:
@@ -140,6 +126,7 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
     const columns = [
         { key: 'reporter', label: 'Tài khoản báo cáo' },
         { key: 'reason', label: 'Lý do báo cáo' },
+        { key: 'background', label: 'Ảnh' },
         { key: 'reportType', label: 'Loại báo cáo' },
         { key: 'status', label: 'Trạng thái' },
         { key: 'dateCreatedAt', label: 'Ngày báo cáo' }
@@ -198,6 +185,43 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                         </TableCell>
                                         <TableCell>{report.reporter.fullName}</TableCell>
                                         <TableCell>{report.reason}</TableCell>
+                                        {report.targetUser && report.reportType === ReportType.USER && (
+                                            <TableCell>
+                                                <img
+                                                    key={report.id}
+                                                    src={report.targetUser.avatar}
+                                                    alt='Media'
+                                                    width={25}
+                                                />
+                                            </TableCell>
+                                        )}
+                                        {report.targetPost && report.reportType === ReportType.POST && (
+                                            <TableCell>
+                                                {report.targetPost.medias && report.targetPost.medias.length > 0
+                                                    ? report.targetPost.medias.map((media) => (
+                                                          <img
+                                                              key={media.id}
+                                                              src={media.mediaUrl}
+                                                              alt='Media'
+                                                              width={25}
+                                                          />
+                                                      ))
+                                                    : 'Không có'}
+                                            </TableCell>
+                                        )}
+                                        {report.targetGroup && report.reportType === ReportType.GROUP && (
+                                            <TableCell>
+                                                <img
+                                                    key={report.id}
+                                                    src={report.targetGroup.coverImage}
+                                                    alt='Media'
+                                                    width={25}
+                                                />
+                                            </TableCell>
+                                        )}
+                                        {report.targetComment && report.reportType === ReportType.COMMENT && (
+                                            <TableCell>Không có</TableCell>
+                                        )}
                                         <TableCell>
                                             {report.reportType === ReportType.USER
                                                 ? 'Tài khoản'
@@ -269,7 +293,9 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                                         <Typography variant='body2'>{`${getTargetLabel(report.reportType) + ' bị báo cáo'}: ${getReportedAccount(report)}`}</Typography>
                                                     </Grid>
                                                     <Grid item xs={6} sx={{ padding: '2px' }}>
-                                                        <Typography variant='body2'>{`${getContentReported(report)}`}</Typography>
+                                                        <Typography variant='body2'>
+                                                            Người báo cáo: {report.reporter.fullName}
+                                                        </Typography>
                                                     </Grid>
                                                     {report.reportType === ReportType.POST && (
                                                         <Grid item xs={6} sx={{ padding: '2px' }}>

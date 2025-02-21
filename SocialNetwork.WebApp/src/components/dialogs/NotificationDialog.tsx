@@ -15,6 +15,11 @@ import { ReportResource } from '../../types/report'
 import adminService from '../../services/adminService'
 import { ReportType } from '../../enums/report-type'
 import { useElementInfinityScroll } from '../../hooks/useElementInfinityScroll'
+import { PostResource } from '../../types/post'
+import { GroupResource } from '../../types/group'
+import NotificationDeleteModal from '../modals/NotificationDeleteModal'
+import postService from '../../services/postService'
+import groupService from '../../services/groupService'
 
 type NotificationDialogProps = {
     notifications: NotificationResource[]
@@ -41,12 +46,26 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     const { isModalOpen: openReport, handleCancel: cancelReport, showModal: showReport } = useModal()
     const { isModalOpen: openReportDelete, handleCancel: cancelReportDelete, showModal: showReportDelete } = useModal()
     const [getReport, setGetReport] = useState<ReportResource>()
+    const [getPost, setGetPost] = useState<PostResource>()
+    const [getGroup, setGetGroup] = useState<GroupResource>()
     const navigate = useNavigate()
 
-    const getReportId = async (reportId: string) => {
+    const getReportById = async (reportId: string) => {
         const response = await adminService.GetReportById(reportId)
         if (response.isSuccess) {
             setGetReport(response.data)
+        }
+    }
+    const getPostById = async (postId: string) => {
+        const response = await postService.getPostById(postId)
+        if (response.isSuccess) {
+            setGetPost(response.data)
+        }
+    }
+    const getGroupById = async (groupId: string) => {
+        const response = await groupService.getGroupById(groupId)
+        if (response.isSuccess) {
+            setGetGroup(response.data)
         }
     }
 
@@ -117,17 +136,25 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     const handleReportReceiverPage = async (notification: NotificationResource) => {
         handleMarkNotificationAsRead(notification.id)
         setNotification(notification)
-        await getReportId(notification.reportId)
+        await getReportById(notification.reportId)
         showReport()
     }
     const handleReportDeleteReceiverPage = async (noti: NotificationResource) => {
-        console.log(noti.reportId)
-        console.log(noti.id)
         handleMarkNotificationAsRead(noti.id)
-        setNotification(notification)
-        await getReportId(noti.reportId)
-        console.log(noti.reportId)
-        console.log(getReport)
+        setNotification(noti)
+        await getReportById(noti.reportId)
+        showReportDelete()
+    }
+    const handlePostDeleteReceiverPage = async (noti: NotificationResource) => {
+        handleMarkNotificationAsRead(noti.id)
+        setNotification(noti)
+        await getPostById(noti.postId)
+        showReportDelete()
+    }
+    const handleGroupDeleteReceiverPage = async (noti: NotificationResource) => {
+        handleMarkNotificationAsRead(noti.id)
+        setNotification(noti)
+        await getGroupById(noti.groupId)
         showReportDelete()
     }
 
@@ -154,6 +181,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                             onGroupNotification={() => handleRedirectToGroupPage(notifi)}
                             onReportUserNotification={() => handleReportReceiverPage(notifi)}
                             onReportDeleteNotification={() => handleReportDeleteReceiverPage(notifi)}
+                            onPostDeleteNotification={() => handlePostDeleteReceiverPage(notifi)}
+                            onGroupDeleteNotification={() => handleGroupDeleteReceiverPage(notifi)}
                         />
                     ))}
 
@@ -300,66 +329,14 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                 </Modal>
             )}
             {openReportDelete && (
-                <Modal
-                    title={<p className='text-center font-bold text-lg'>📌 Thông báo Xóa Nội Dung Vi Phạm</p>}
-                    centered
-                    open={openReportDelete}
-                    onCancel={cancelReportDelete}
-                    footer={[
-                        <Button key='ok' type='primary' onClick={cancelReportDelete}>
-                            Xong
-                        </Button>
-                    ]}
-                >
-                    <div className='flex flex-col gap-y-3 text-gray-700'>
-                        <span className='text-[16px] font-bold'>
-                            Chào <span className='text-blue-600'>{notification?.recipient?.fullName}</span>,
-                        </span>
-
-                        <p className='text-sm'>
-                            Chúng tôi xin thông báo rằng bài viết/bình luận của bạn đã bị xóa do vi phạm các tiêu chuẩn
-                            cộng đồng của nền tảng.
-                        </p>
-
-                        <p className='text-sm'>
-                            <strong>🛑 Nội dung bị xóa:</strong>
-                            {getReport?.reportType === ReportType.POST && (
-                                <span className='block text-red-600'>
-                                    📌 Bài viết: "{getReport?.targetPost?.content?.slice(0, 100)}..."
-                                </span>
-                            )}
-                            {getReport?.reportType === ReportType.COMMENT && (
-                                <span className='block text-red-600'>
-                                    📌 Bình luận: "{getReport?.targetComment?.content?.slice(0, 100)}..."
-                                </span>
-                            )}
-                        </p>
-
-                        <p className='text-sm'>
-                            <strong>📜 Lý do vi phạm:</strong>
-                        </p>
-                        <ul className='text-sm list-disc list-inside'>
-                            <li>🔹 Nội dung chứa thông tin sai lệch/gây hiểu lầm</li>
-                            <li>🔹 Ngôn từ kích động, thù địch hoặc xúc phạm</li>
-                            <li>🔹 Vi phạm quyền riêng tư hoặc quấy rối người khác</li>
-                            <li>🔹 Nội dung không phù hợp với cộng đồng</li>
-                        </ul>
-
-                        <p className='text-sm'>
-                            Chúng tôi khuyến khích bạn đọc lại <strong>Chính sách Cộng đồng</strong> để tránh vi phạm
-                            trong tương lai. Nếu bạn cho rằng đây là một sự nhầm lẫn, bạn có thể gửi yêu cầu xem xét
-                            lại.
-                        </p>
-
-                        <p className='text-sm'>
-                            Cảm ơn bạn đã đồng hành cùng chúng tôi trong việc xây dựng một{' '}
-                            <strong>cộng đồng lành mạnh!</strong> 🚀
-                        </p>
-
-                        <p className='text-sm font-semibold'>Trân trọng,</p>
-                        <p className='text-sm font-semibold'>🚀 [SocialNetwork] – Đội ngũ Hỗ trợ</p>
-                    </div>
-                </Modal>
+                <NotificationDeleteModal
+                    notification={notification}
+                    openDeleteModal={openReportDelete}
+                    cancelDeleteModal={cancelReportDelete}
+                    getReport={getReport}
+                    getPost={getPost}
+                    getGroup={getGroup}
+                />
             )}
         </>
     )

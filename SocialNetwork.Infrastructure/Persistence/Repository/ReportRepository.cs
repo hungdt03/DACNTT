@@ -78,9 +78,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Reports
                 .Include(r=>r.TargetGroup)
+                    .Where(r=>r.GroupId==null)
                 .Include(r => r.TargetComment)
+                    .ThenInclude(r => r.User)
                     .IgnoreQueryFilters()
                 .Include(r => r.TargetPost)
+                    .ThenInclude(r => r.User)
                     .IgnoreQueryFilters()
                 .Include(r => r.TargetUser)
                     .IgnoreQueryFilters()

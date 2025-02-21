@@ -11,6 +11,7 @@ using SocialNetwork.Application.Interfaces.Services.Redis;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Entity.System;
 using System.Data;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SocialNetwork.Application.Features.Auth.Handlers
 {
