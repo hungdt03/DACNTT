@@ -80,7 +80,7 @@ const GroupMyAcceptedPostPage: FC = () => {
 
 
     return <div id="my-approval-post" className="flex flex-col gap-y-2 md:gap-4">
-        <div className="grid grid-cols-2 gap-y-2 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 md:gap-4">
             {posts.map(post => {
                 return <Post onFetch={() => fetchPostByID(post.id)} onRemovePost={() => handleRemovePost(post.id)} group={group} key={post.id} post={post} allowShare={group?.privacy === GroupPrivacy.PUBLIC} />
             })}

@@ -39,9 +39,19 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet("posts")]
-        public async Task<IActionResult> SearchGroups([FromQuery] string query, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        public async Task<IActionResult> SearchGroups([FromQuery] int page = 1, [FromQuery] int size = 6, [FromQuery] string query = "", [FromQuery] string sortOrder = "desc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset? fromDate = default, [FromQuery] DateTimeOffset? toDate = default)
         {
-            var response = await _mediator.Send(new SearchPostQuery(query, page, size));
+            if (fromDate == default)
+            {
+                fromDate = null;
+            }
+
+            if (toDate == default)
+            {
+                toDate = null;
+            }
+
+            var response = await _mediator.Send(new SearchPostQuery(query, page, size, sortOrder, contentType, fromDate, toDate));
             return Ok(response);
         }
 

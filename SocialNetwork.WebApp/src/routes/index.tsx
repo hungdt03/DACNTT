@@ -18,7 +18,6 @@ import GroupManagerLayout from '../layouts/GroupManagerLayout/GroupManagerLayout
 import CreateGroupPage from '../pages/groups/CreateGroupPage'
 import HeaderFullWidthLayout from '../layouts/HeaderFullWidthLayout/HeaderFullWidthLayout'
 import GroupFeedSharedPage from '../pages/groups/GroupFeedSharedPage'
-import SearchPage from '../pages/SearchPage'
 import SearchLayout from '../layouts/SearchLayout/SearchLayout'
 import GroupLayout from '../layouts/GroupLayout/GroupLayout'
 import GroupPendingMembers from '../pages/groups/GroupPendingMembers'
@@ -33,13 +32,17 @@ import FriendRequestsPage from '../pages/friends/FriendRequestsPage'
 import SuggestedFriendPage from '../pages/friends/SuggestedFriendPage'
 import AdminLayout from '../layouts/AdminLayout/AdminLayout'
 import AdminGuard from './adminGuard'
-import GroupPendingInvites from '../pages/groups/GroupPendingInvites'
-import GroupMemberDetailPage from '../pages/groups/GroupMemberDetailPage'
 import GroupPendingInvitesPage from '../pages/groups/GroupPendingInvitesPage'
+import GroupMemberDetailPage from '../pages/groups/GroupMemberDetailPage'
+import GroupMyPendingInvitesPage from '../pages/groups/GroupMyPendingInvitesPage'
 import GroupMyPostPage from '../pages/groups/post/GroupMyPostPage'
 import GroupMyPendingPostPage from '../pages/groups/post/GroupMyPendingPostPage'
 import GroupMyRejectedPostPage from '../pages/groups/post/GroupMyRejectedPostPage'
 import GroupMyAcceptedPostPage from '../pages/groups/post/GroupMyAcceptedPostPage'
+import SearchUserPage from '../pages/search/SearchUserPage'
+import SearchPostPage from '../pages/search/SearchPostPage'
+import SearchGroupPage from '../pages/search/SearchGroupPage'
+import SearchTopPage from '../pages/search/SearchTopPage'
 
 const appRouter = createBrowserRouter([
     {
@@ -86,8 +89,8 @@ const appRouter = createBrowserRouter([
                 element: <GroupFeedSharedPage />
             },
             {
-                path: 'pending-invites',
-                element: <GroupPendingInvitesPage />
+                path: 'my-pending-invites',
+                element: <GroupMyPendingInvitesPage />
             }
         ]
     },
@@ -105,7 +108,7 @@ const appRouter = createBrowserRouter([
                 path: 'groups/:id',
                 element: <GroupLayout />,
                 children: [
-                    {   
+                    {
                         path: 'my-content',
                         element: <GroupMyPostPage />,
                         children: [
@@ -145,7 +148,7 @@ const appRouter = createBrowserRouter([
                     },
                     {
                         path: 'pending-invites',
-                        element: <GroupPendingInvites />
+                        element: <GroupPendingInvitesPage />
                     },
                     {
                         path: 'pending-posts',
@@ -189,14 +192,27 @@ const appRouter = createBrowserRouter([
         children: []
     },
     {
-        path: '/',
+        path: '/search',
         errorElement: <ErrorBoundaryPage />,
         element: <AuthGuard element={<SearchLayout />} />,
         children: [
+
             {
-                path: 'search',
-                element: <SearchPage />
-            }
+                path: 'top',
+                element: <SearchTopPage />
+            },
+            {
+                path: 'user',
+                element: <SearchUserPage />
+            },
+            {
+                path: 'post',
+                element: <SearchPostPage />
+            },
+            {
+                path: 'group',
+                element: <SearchGroupPage />
+            },
         ]
     },
     {

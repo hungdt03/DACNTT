@@ -18,7 +18,7 @@ const SearchUserSuggestItem: FC<SearchUserSuggestItemProps> = ({
         </span>}
 
         <div className="flex items-center gap-x-2">
-            <img src={suggest.user.avatar ?? images.cover} className="w-[35px] h-[35px] rounded-full border-[1px] border-gray-100" />
+            <img src={suggest.user.avatar ?? images.cover} className="w-[35px] h-[35px] rounded-full border-[1px] border-gray-100 object-cover" />
             <div className="flex flex-col items-start">
                 <span className="text-sm font-semibold line-clamp-1">{suggest.user.fullName}</span>
                 <span className="text-gray-600 text-xs line-clamp-1">

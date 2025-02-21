@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import ExpandableText from "../ExpandableText";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
+import PostNotFound from "./PostNotFound";
 
 type PostShareInnerProps = {
     post: PostResource
@@ -19,6 +20,9 @@ const PostShareInner: FC<PostShareInnerProps> = ({
     post
 }) => {
     const { user } = useSelector(selectAuth)
+
+    if(post.isGroupPost && post.group === null) return <PostNotFound />;
+
     return <div className="flex flex-col gap-y-2 bg-white rounded-xl overflow-hidden border-[1px] border-gray-200">
         {post.medias.length > 0 && <PostMedia files={post.medias} />}
         <div className={cn("px-4 flex flex-col gap-y-2", post.medias.length > 0 ? 'py-6' : 'py-2')}>
@@ -31,22 +35,24 @@ const PostShareInner: FC<PostShareInnerProps> = ({
 
                         {post.user.haveStory ? (
                             <Link
-                                className={`absolute -right-2 -bottom-2 border-[2px] border-primary rounded-full ${post.isGroupPost ? '' : 'p-[1px]'}`}
+                                className={`border-[2px] border-primary inline-block rounded-full ${post.isGroupPost ? 'absolute -right-2 -bottom-2' : 'p-[1px]'}`}
                                 to={`/stories/${post.user.id}`}
                             >
                                 <Avatar
                                     className={`${post.isGroupPost ? 'w-6 h-6' : 'md:w-9 md:h-9 w-8 h-8 flex-shrink-0'} border-[1px] border-gray-50`}
                                     src={post.user.avatar ?? images.user}
                                 />
+                                {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-0 -right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                             </Link>
                         ) : (
-                            <Avatar
-                                className={`${post.isGroupPost ? 'w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50' : 'w-8 h-8 md:w-10 md:h-10 flex-shrink-0'}`}
-                                src={post.user.avatar ?? images.user}
-                            />
+                            <div className={`${post.isGroupPost ? 'absolute -right-2 -bottom-2' : 'flex-shrink-0'}`}>
+                                <Avatar
+                                    className={`${post.isGroupPost ? 'w-7 h-7 border-[1px] border-gray-50' : 'w-8 h-8 md:w-10 md:h-10'}`}
+                                    src={post.user.avatar ?? images.user}
+                                />
+                                {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-0 -right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                            </div>
                         )}
-
-                         {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-1 -right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                     </div>
 
                     <div className="flex flex-col gap-y-[1px]">

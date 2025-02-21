@@ -42,7 +42,9 @@ const SearchSuggestionList: FC<SearchSuggestionListProps> = ({
     const fetchSearchHistories = async (page: number, size: number) => {
         setLoading(true)
         const response = await searchService.getUserSearchHistories(page, size);
+        console.log('Có fetch không')
         setLoading(false)
+        console.log(response)
         if (response.isSuccess) {
             setSearchHistories(prevHistories => {
                 const existingIds = new Set(prevHistories.map(m => m.id));

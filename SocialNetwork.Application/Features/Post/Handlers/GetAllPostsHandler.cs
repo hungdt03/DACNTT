@@ -108,6 +108,14 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     mapPost.User.IsOnline = false;
                 }
 
+                if(item.OriginalPost != null)
+                {
+                    // Story
+                    var originalPostStory = await unitOfWork.StoryRepository
+                            .IsUserHaveStoryAsync(item.OriginalPost.UserId);
+                    mapPost.OriginalPost.User.HaveStory = originalPostStory;
+                }
+
                 // Story
                 var haveStory = await unitOfWork.StoryRepository
                         .IsUserHaveStoryAsync(item.UserId);

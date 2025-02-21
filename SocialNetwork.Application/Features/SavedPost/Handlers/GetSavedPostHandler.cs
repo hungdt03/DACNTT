@@ -8,6 +8,7 @@ using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Features.SavedPost.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
+using SocialNetwork.Domain.Constants;
 
 namespace SocialNetwork.Application.Features.SavedPost.Handlers
 {
@@ -38,14 +39,57 @@ namespace SocialNetwork.Application.Features.SavedPost.Handlers
             foreach (var savedPost in takeSavedPost)
             {
                 var findPost = await _unitOfWork.PostRepository.GetPostByIdAsync(savedPost.PostId.Value);
-
                 if (findPost == null) continue;
-                var postItem = ApplicationMapper.MapToPost(findPost);
 
+                var postItem = ApplicationMapper.MapToPost(findPost);
+                if (findPost.PostType == PostType.ORIGINAL_POST)
+                {
+                    var shares = await _unitOfWork.PostRepository.CountSharesByPostIdAsync(findPost.Id);
+                    postItem.Shares = shares;
+                };
+
+                var checkIsBlock = await _unitOfWork.BlockListRepository
+                        .CheckIsBlockAsync(findPost.UserId, userId);
+
+                if (checkIsBlock) continue;
+
+                var friendShip = await _unitOfWork.FriendShipRepository
+                    .GetFriendShipByUserIdAndFriendIdAsync(findPost.UserId, userId);
+
+                if ((findPost.Privacy == PrivacyConstant.PUBLIC || findPost.Privacy == PrivacyConstant.GROUP_PUBLIC || findPost.Privacy == PrivacyConstant.GROUP_PRIVATE) && (friendShip == null || !friendShip.IsConnect))
+                {
+                    postItem.User.IsShowStatus = false;
+                    postItem.User.IsOnline = false;
+                }
+
+                if (findPost.OriginalPost != null)
+                {
+                    // Story
+                    var originalPostStory = await _unitOfWork.StoryRepository
+                            .IsUserHaveStoryAsync(findPost.OriginalPost.UserId);
+                    postItem.OriginalPost.User.HaveStory = originalPostStory;
+                }
+
+                // Story
                 var haveStory = await _unitOfWork.StoryRepository
-                   .IsUserHaveStoryAsync(findPost.UserId);
-                    postItem.User.HaveStory = haveStory;
-              
+                        .IsUserHaveStoryAsync(findPost.UserId);
+                postItem.User.HaveStory = haveStory;
+
+                // Group
+                if (findPost.IsGroupPost && findPost.Group != null)
+                {
+                    var groupMember = await _unitOfWork.GroupMemberRepository
+                        .GetGroupMemberByGroupIdAndUserId(findPost.Group.Id, userId);
+
+                    if (groupMember != null)
+                    {
+                        postItem.Group.IsMine = groupMember.Role == MemberRole.ADMIN;
+                        postItem.Group.IsMember = true;
+                        postItem.Group.IsModerator = groupMember.Role == MemberRole.MODERATOR;
+                    }
+                }
+
+                postItem.IsSaved = true;
                 posts.Add(postItem);
             }
 

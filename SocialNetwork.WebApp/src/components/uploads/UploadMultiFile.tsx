@@ -141,7 +141,6 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
                     onChange={handleImageChange}
                     onRemove={handleRemoveFile}
                     iconRender={(file) => {
-                       
                         // Binding
                         if (file.type === MediaType.VIDEO) {
                             console.log(file)
@@ -173,8 +172,7 @@ const UploadMultipleFile = forwardRef<UploadMultipleFileRef, UploadMultipleFileP
                             );
                         }
 
-
-                        return null; // Không hiển thị icon cho ảnh
+                        return <Image src={file.url} />
                     }}
                 >
                     {(fileList?.length ?? 0) >= 8 ? null : <UploadButton />}

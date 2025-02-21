@@ -25,12 +25,11 @@ namespace SocialNetwork.Application.Features.Search.Handlers
         public async Task<BaseResponse> Handle(SearchPostQuery request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var (posts, totalCount) = await _unitOfWork.PostRepository.GetAllPostsContainsKey(request.Query.ToLower(), request.Page, request.Size);
+            var (posts, totalCount) = await _unitOfWork.PostRepository.GetAllPostsContainsKey(request.Query.ToLower(), request.Page, request.Size, request.SortOrder, request.ContentType, request.FromDate, request.ToDate);
 
             var response = new List<PostResponse>();
             foreach (var item in posts)
             {
-                var check = false;
                 var mapPost = ApplicationMapper.MapToPost(item);
 
                 if (item.UserId != userId)
@@ -62,12 +61,7 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                     var shares = await _unitOfWork.PostRepository.CountSharesByPostIdAsync(item.Id);
                     mapPost.Shares = shares;
                 };
-
-                if (check)
-                {
-                   
-                }
-
+               
                 // Saved Post
                 var savedPost = await _unitOfWork.SavedPostRepository
                     .GetSavedPostByPostIdAndUserId(item.Id, userId);

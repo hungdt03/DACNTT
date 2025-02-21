@@ -65,7 +65,8 @@ type PostProps = {
     group?: GroupResource;
     post: PostResource;
     onFetch?: (data: PostResource) => void;
-    onRemovePost?: (postId: string) => void
+    onRemovePost?: (postId: string) => void;
+    onRemoveSavedPost?: (postId: string) => void;
 }
 
 
@@ -76,7 +77,8 @@ const Post: FC<PostProps> = ({
     post: postParam,
     group,
     onFetch,
-    onRemovePost
+    onRemovePost,
+    onRemoveSavedPost
 }) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const { handleCancel: editPostCancel, isModalOpen: isEditPostOpen, handleOk: handleEditPostOk, showModal: showEditPostModal } = useModal();
@@ -190,6 +192,7 @@ const Post: FC<PostProps> = ({
         const response = await reportService.reportPost(post.id, reason, group?.id);
         if (response.isSuccess) {
             message.success(response.message)
+            okReport()
             okReportAdmin()
             setReason('')
         } else {
@@ -213,6 +216,7 @@ const Post: FC<PostProps> = ({
     const handleRemoveSavedPost = async (postId: string) => {
         const response = await postService.removeSavedPostByPostId(postId);
         if (response.isSuccess) {
+            onRemoveSavedPost?.(postId)
             message.success(response.message)
             setPost(prev => ({
                 ...prev,
@@ -322,8 +326,8 @@ const Post: FC<PostProps> = ({
             </div> : <ExpandableText content={post.content} />}
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
         </div>
-        {isShowInteraction && <>
 
+        {isShowInteraction && <>
             <div className="flex items-center justify-between md:text-sm text-[13px]">
                 <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
                     <Avatar.Group>
@@ -467,7 +471,7 @@ const Post: FC<PostProps> = ({
                 value={reason}
                 onChange={(newValue) => setReason(newValue)}
                 title="Tại sao bạn báo cáo bài viết này"
-                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
             />
         </Modal>
 
@@ -489,7 +493,7 @@ const Post: FC<PostProps> = ({
                 value={reason}
                 onChange={(newValue) => setReason(newValue)}
                 title="Tại sao bạn báo cáo bài viết này"
-                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
             />
         </Modal>
     </div>

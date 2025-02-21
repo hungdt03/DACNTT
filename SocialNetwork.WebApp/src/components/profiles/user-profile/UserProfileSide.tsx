@@ -34,12 +34,10 @@ const UserProfileSide: FC<UserProfileSideProps> = ({
             {
                 <div className="grid grid-cols-3 gap-2">
                     {friends.map(friend => (
-                        <Link to={`/profile/${friend.id}`} key={friend.id} className="flex flex-col items-start gap-1 cursor-pointer">
-                            <div className="relative">
-                                <Image
-                                    preview={false}
+                        <Link to={`/profile/${friend.id}`} key={friend.id} className="flex flex-col items-start gap-1 cursor-pointer w-full h-full">
+                            <div className="relative w-full h-full">
+                                <img
                                     src={friend.avatar ?? images.cover}
-                                    style={{ height: '100%', width: '100%' }}
                                     className="border-[1px] w-full h-full object-cover border-gray-200 rounded-md aspect-square"
                                 />
                                 {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-0 -right-1 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}

@@ -24,6 +24,12 @@ import PostOtherTags from "../../posts/PostOtherTags";
 import { PostReaction } from "../../posts/PostReaction";
 import { PostMoreAction } from "../../posts/PostMoreAction";
 import PostMedia from "../../posts/PostMedia";
+import { GroupResource } from "../../../types/group";
+import reportService from "../../../services/reportService";
+import { PrivacyType } from "../../../enums/privacy";
+import ReportPostModal from "../../modals/reports/ReportPostModal";
+import ChangePostPrivacyModal from "../../modals/ChangePostPrivacyModal";
+import { getTopReactions } from "../sharings/MentionSharePostInner";
 
 export type CommentRequest = {
     postId: string;
@@ -37,41 +43,42 @@ export type ReactionRequest = {
     reactionType: ReactionType;
 }
 
-export const getTopReactions = (reactions?: ReactionResource[], top: number = 3) => {
-    const counts = reactions?.reduce((acc, reaction) => {
-        acc[reaction.reactionType] = (acc[reaction.reactionType] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
-
-    return counts
-        ? Object.entries(counts)
-            .sort(([, countA], [, countB]) => countB - countA)
-            .slice(0, top) // Lấy top N
-            .map(([reactionType, count]) => ({ reactionType, count }))
-        : [];
-};
-
 type MentionPostInnerProps = {
+    allowShare?: boolean;
+    isShowMore?: boolean;
+    isShowInteraction?: boolean;
+    group?: GroupResource;
     post: PostResource;
     onFetch?: (data: PostResource) => void;
+    onRemovePost?: (postId: string) => void
 }
 
 
 const MentionPostInner: FC<MentionPostInnerProps> = ({
+    allowShare = true,
+    isShowMore = true,
+    isShowInteraction = true,
     post: postParam,
-    onFetch
+    group,
+    onFetch,
+    onRemovePost
 }) => {
     const { handleCancel: editPostCancel, isModalOpen: isEditPostOpen, handleOk: handleEditPostOk, showModal: showEditPostModal } = useModal();
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
     const { handleCancel: cancelListShare, isModalOpen: openListShare, handleOk: okListShare, showModal: showListShare } = useModal();
+    const { handleCancel: cancelReportAdmin, isModalOpen: openReportAdmin, handleOk: okReportAdmin, showModal: showReportAdmin } = useModal();
+    const { handleCancel: cancelReport, isModalOpen: openReport, handleOk: okReport, showModal: showReport } = useModal();
+    const { handleCancel: cancelPrivacy, isModalOpen: openPrivacy, handleOk: okPrivacy, showModal: showPrivacy } = useModal();
 
     const [reactions, setReactions] = useState<ReactionResource[]>();
     const { user } = useSelector(selectAuth)
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
 
-    const [post, setPost] = useState<PostResource>(postParam)
+    const [post, setPost] = useState<PostResource>(postParam);
+    const [reason, setReason] = useState('')
+    const [privacy, setPrivacy] = useState<PrivacyType>(post.privacy)
 
     const fetchReactions = async () => {
         const response = await reactionService.getAllReactionsByPostId(post.id);
@@ -154,13 +161,93 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
         }
     }
 
+    const handleDeletePost = async () => {
+        const response = await postService.deletePost(post.id);
+        if (response.isSuccess) {
+            onRemovePost?.(post.id)
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleReportPost = async (reason: string) => {
+        const response = await reportService.reportPost(post.id, reason, group?.id);
+        if (response.isSuccess) {
+            message.success(response.message)
+            okReport()
+            okReportAdmin()
+            setReason('')
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleSavedPost = async (postId: string) => {
+        const response = await postService.addSavedPost(postId);
+        if (response.isSuccess) {
+            message.success(response.message);
+            setPost(prev => ({
+                ...prev,
+                isSaved: true
+            }))
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleRemoveSavedPost = async (postId: string) => {
+        const response = await postService.removeSavedPostByPostId(postId);
+        if (response.isSuccess) {
+            message.success(response.message)
+            setPost(prev => ({
+                ...prev,
+                isSaved: false
+            }))
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleChangePrivacy = async (postId: string, privacy: PrivacyType) => {
+        const response = await postService.changePrivacy(postId, privacy);
+        if (response.isSuccess) {
+            message.success(response.message)
+            setPost(prev => ({
+                ...prev,
+                privacy: privacy
+            }))
+
+            okPrivacy()
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleRevokeTag = async () => {
+        const response = await postService.revokeTag(post.id);
+        if (response.isSuccess) {
+            fetchPostById()
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
     return <div className="flex flex-col gap-y-2 bg-white rounded-md">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
-                <Avatar className="w-10 h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
+                <div className="relative">
+                    {!post.user.haveStory
+                        ? <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
+                        : <Link className="inline-block p-[1px] border-[2px] border-primary rounded-full" to={`/stories/${post.user.id}`}><Avatar className="w-9 h-9 flex-shrink-0" src={post.user.avatar ?? images.user} /> </Link>
+                    }
+                    {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
+                </div>
+
                 <div className="flex flex-col gap-y-[1px]">
-                    <div className="font-semibold text-[15px] text-gray-600">
-                        <Link to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                    <div className="font-semibold text-[13px] text-gray-600">
+                        <Link className="font-bold text-[13px] hover:text-gray-600 hover:underline md:text-sm" to={`/${post.isGroupPost ? `groups/${post.group.id}/user` : 'profile'}/${post.user.id}`}>{post.user?.fullName}</Link>
                         {post.tags.length > 0 &&
                             (() => {
                                 const maxDisplay = 3;
@@ -172,7 +259,7 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
                                     <>
                                         {' cùng với '}
                                         {displayedTags.map((tag, index) => (
-                                            <Link className="hover:underline" to={`/profile/${tag.user.id}`} key={tag.id}>
+                                            <Link className="text-[13px] font-bold hover:underline hover:text-gray-600" to={`/profile/${tag.user.id}`} key={tag.id}>
                                                 {tag.user.fullName}
                                                 {index < displayedTags.length - 1 ? ', ' : ''}
                                             </Link>
@@ -186,19 +273,29 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
                     </div>
                     <div className="flex items-center gap-x-2">
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
-                            <span className="text-[13px] font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
+                            <span className="text-[11px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
-                        {getPrivacyPost(post.privacy)}
+                         <button onClick={post.isGroupPost || post.user.id !== user?.id ? undefined : showPrivacy}>{getPrivacyPost(post.privacy)}</button>
                     </div>
                 </div>
             </div>
             <Popover className="flex-shrink-0" content={<PostMoreAction
-                isMine={user?.id === post.user.id}
                 onEditPost={showEditPostModal}
+                onDeletePost={handleDeletePost}
+                onReportPost={showReport}
+                isHasTag={!!post.tags.find(s => s.user.id === user?.id)}
+                onRevokeTag={handleRevokeTag}
+                onReportPostGroup={showReportAdmin}
+                onSavedPost={() => handleSavedPost(post.id)}
+                onRemoveSavedPost={() => handleRemoveSavedPost(post.id)}
+                isAdmin={group?.isMine}
+                isPostGroup={group != undefined}
+                isSaved={post.isSaved}
+                isMine={post.user.id === user?.id}
             />}>
-                <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
-                    <MoreHorizontal className="text-gray-400" />
-                </button>
+                {isShowMore && <button className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-100">
+                    <MoreHorizontal size={16} className="text-gray-400" />
+                </button>}
             </Popover>
         </div>
 
@@ -227,7 +324,7 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
 
         <Divider className='my-0' />
         <div className="flex items-center justify-between gap-x-4">
-            <Popover  content={<PostReaction
+            <Popover content={<PostReaction
                 onSelect={handleSaveReaction}
             />}>
                 {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
@@ -286,6 +383,72 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
             }}
         >
             <ListSharePostModal post={post} />
+        </Modal>
+
+        
+        {/* MODAL CHANGE PRIVACY*/}
+        <Modal
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Chọn đối tượng</p>}
+            centered
+            open={openPrivacy}
+            onOk={okPrivacy}
+            onCancel={cancelPrivacy}
+            okText='Lưu lại'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => void handleChangePrivacy(post.id, privacy),
+                disabled: privacy === post.privacy
+            }}
+        >
+            <ChangePostPrivacyModal
+                privacy={privacy}
+                onChange={(newPrivacy) => setPrivacy(newPrivacy)}
+            />
+        </Modal>
+
+
+        {/* REPORT TO ADMIN OF GROUP */}
+        <Modal
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Báo cáo bài viết tới quản trị viên nhóm</p>}
+            centered
+            open={openReportAdmin}
+            onOk={okReportAdmin}
+            onCancel={cancelReportAdmin}
+            okText='Gửi báo cáo'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason),
+                disabled: reason.trim().length < 20
+            }}
+        >
+            <ReportPostModal
+                value={reason}
+                onChange={(newValue) => setReason(newValue)}
+                title="Tại sao bạn báo cáo bài viết này"
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
+            />
+        </Modal>
+
+        {/* REPORT TO ADMIN OF APPLICATION*/}
+        <Modal
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Báo cáo bài viết</p>}
+            centered
+            open={openReport}
+            onOk={okReport}
+            onCancel={cancelReport}
+            okText='Gửi báo cáo'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason),
+                disabled: reason.trim().length < 20
+            }}
+        >
+            <ReportPostModal
+                value={reason}
+                onChange={(newValue) => setReason(newValue)}
+                title="Tại sao bạn báo cáo bài viết này"
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
+            />
         </Modal>
     </div>
 };

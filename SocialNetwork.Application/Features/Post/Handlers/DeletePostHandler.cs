@@ -25,6 +25,8 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var reactions = await _unitOfWork.ReactionRepository.GetAllReactionsByPostIdAsync(request.PostId);
             var comments = await _unitOfWork.CommentRepository.GetAllCommentsByPostIdAsync(request.PostId);
             var sharePosts = await _unitOfWork.PostRepository.GetAllSharePostsByOriginalPostId(request.PostId);
+            var tags = await _unitOfWork.TagRepository.GetAllTagsByPostIdAsync(post.Id);
+            
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             _unitOfWork.ReactionRepository.RemoveRange(reactions);
@@ -47,6 +49,7 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             });
 
             _unitOfWork.CommentRepository.RemoveRange(comments);
+            _unitOfWork.TagRepository.RemoveRange(tags);
             _unitOfWork.PostRepository.DeletePost(post);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);

@@ -30,6 +30,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 throw new NotFoundException("Lời mời không tồn tại hoặc không còn nữa");
 
             var userId = _contextAccessor.HttpContext.User.GetUserId();
+       
             if (invitation.InviteeId != userId)
                 throw new AppException("Bạn không có quyền chấp nhận lời mời này");
 
@@ -38,12 +39,25 @@ namespace SocialNetwork.Application.Features.Group.Handlers
            
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            if(invitation.Group.OnlyAdminCanApprovalMember)
-            {
-                invitation.Status = true;
+            var isAllowJoin = true;
+            var inviterInGroup = await _unitOfWork.GroupMemberRepository
+                 .GetGroupMemberByGroupIdAndUserId(invitation.Group.Id, invitation.InviterId);
 
-            } else
+            if (invitation.Group.OnlyAdminCanApprovalMember)
             {
+             
+                if (inviterInGroup != null && inviterInGroup.Role == MemberRole.MEMBER)
+                {
+                    invitation.Status = true;
+                    isAllowJoin = false;
+                }
+                else
+                {
+                    isAllowJoin = true;
+                }
+            }
+
+            if (isAllowJoin) {
                 var joinGroupRequest = await _unitOfWork
                    .JoinGroupRequestRepository
                    .GetJoinGroupRequestByUserIdAndGroupIdAsync(userId, invitation.GroupId);
@@ -72,7 +86,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             return new BaseResponse()
             {
                 IsSuccess = true,
-                Message = invitation.Group.OnlyAdminCanApprovalMember ? "Bạn phải chờ quản trị viên hoặc người kiểm duyệt phê duyệt" : "Chấp nhận tham gia nhóm thành công",
+                Message = (invitation.Group.OnlyAdminCanApprovalMember && inviterInGroup?.Role == MemberRole.MEMBER) ? "Bạn phải chờ quản trị viên hoặc người kiểm duyệt phê duyệt" : "Chấp nhận tham gia nhóm thành công",
                 StatusCode = System.Net.HttpStatusCode.OK
             };
 

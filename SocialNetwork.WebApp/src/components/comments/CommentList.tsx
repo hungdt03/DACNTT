@@ -74,7 +74,6 @@ export const CommentList: React.FC<CommentListProps> = ({
                         showAdmin()
                     }}
                 />
-
             ))}
 
             {loading && <CommentSkeleton />}
@@ -100,7 +99,7 @@ export const CommentList: React.FC<CommentListProps> = ({
                 value={reason}
                 onChange={(newValue) => setReason(newValue)}
                 title="Tại sao bạn báo cáo bình luận này"
-                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
             />
         </Modal>
 
@@ -122,7 +121,7 @@ export const CommentList: React.FC<CommentListProps> = ({
                 value={reason}
                 onChange={(newValue) => setReason(newValue)}
                 title="Tại sao bạn báo cáo bình luận này"
-                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
             />
         </Modal>
     </>

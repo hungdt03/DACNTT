@@ -26,7 +26,7 @@ const SearchUserBlock: FC<SearchUserBlockProps> = ({
             {users.map(suggestUser =>
                 <SearchUserItem onClick={() => handleRedirectToUserPage(`/profile/${suggestUser.user.id}`, suggestUser.user.id)} key={suggestUser.user.id} suggestUser={suggestUser} />
             )}
-            <Link to={`/search/?type=user&q=${searchValue}`} className="text-center w-full py-2 text-sm hover:bg-sky-100 rounded-md bg-sky-50 text-primary font-semibold">Xem tất cả</Link>
+            <Link to={`/search/user/?q=${searchValue}`} className="text-center w-full py-2 text-sm hover:bg-sky-100 rounded-md bg-sky-50 text-primary font-semibold">Xem tất cả</Link>
         </div>
     </div>
 };

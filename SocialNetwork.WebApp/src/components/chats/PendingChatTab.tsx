@@ -10,7 +10,13 @@ import { add, setChatRoomRead } from "../../features/slices/chat-popup-slice";
 import cn from "../../utils/cn";
 import images from "../../assets";
 
-const PendingChatTab: FC = () => {
+type PendingChatTabProps = {
+    width?: 'dialog' | 'sidebar'
+}
+
+const PendingChatTab: FC<PendingChatTabProps> = ({
+    width = 'dialog'
+}) => {
     const [pendingChats, setPendingChats] = useState<ChatRoomResource[]>([]);
     const dispatch = useDispatch<AppDispatch>()
 
@@ -38,7 +44,7 @@ const PendingChatTab: FC = () => {
         fetchPendingChatRooms()
     }, [])
 
-    return <div className="w-[380px] flex flex-col gap-y-3">
+    return <div className={cn("flex flex-col gap-y-3", width === 'dialog' ? 'w-[380px]' : 'w-full')}>
         <span className="font-bold text-gray-700 px-1 text-[15px]">Tin nhắn chờ</span>
         {pendingChats.map(chatRoom => <div onClick={() => handleSelectChat(chatRoom)} key={chatRoom.id} className="relative flex items-center gap-x-3 py-2 px-3 hover:bg-gray-100 rounded-md cursor-pointer">
             <div className="relative">

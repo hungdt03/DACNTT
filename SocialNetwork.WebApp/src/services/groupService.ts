@@ -1,6 +1,7 @@
 
 import { InviteFriendsRequest } from '../components/groups/GroupHeader';
 import axiosInterceptor from '../configurations/axiosInterceptor'
+import { RoleFilter } from '../pages/groups/GroupMemberPage';
 import { GroupResource } from '../types/group';
 import { GroupApprovalSummaryResource } from '../types/group-approval-summary';
 import { GroupInvitationResource } from '../types/group-invitation';
@@ -112,11 +113,13 @@ class GroupService {
         })
     }
 
-    getAllMembersByGroupId(groupId: string, page: number, size: number) : Promise<PaginationResponse<GroupMemberResource[]>> {
+    getAllMembersByGroupId(groupId: string, page: number, size: number, query: string, role: RoleFilter) : Promise<PaginationResponse<GroupMemberResource[]>> {
         return axiosInterceptor.get('/api/groups/members/' + groupId, {
             params: {
                 page,
-                size
+                size,
+                query,
+                role
             }
         })
     }

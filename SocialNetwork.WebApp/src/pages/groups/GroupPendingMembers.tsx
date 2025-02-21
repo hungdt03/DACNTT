@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import groupService from "../../services/groupService";
 import { Empty, message } from "antd";
 import LoadingIndicator from "../../components/LoadingIndicator";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 
 const GroupPendingMembers: FC = () => {
     const { id } = useParams()
@@ -29,6 +30,19 @@ const GroupPendingMembers: FC = () => {
         fetchPendingRequests(pagination.page, pagination.size)
     }, [id])
 
+    const fetchNextPage = () => {
+        if (!pagination.hasMore || loading) return;
+        fetchPendingRequests(pagination.page + 1, pagination.size);
+    }
+
+    const { containerRef } = useInfiniteScroll({
+        fetchMore: () => fetchNextPage(),
+        hasMore: pagination.hasMore,
+        loading: loading,
+        rootMargin: "50px",
+        triggerId: "pending-members-scroll-trigger",
+    });
+
     const handleRejectRequest = async (requestId: string) => {
         const response = await groupService.rejectRequestJoinGroup(requestId);
         if (response.isSuccess) {
@@ -49,7 +63,7 @@ const GroupPendingMembers: FC = () => {
         }
     }
 
-    return <div className="w-full px-2">
+    return <div ref={containerRef} className="w-full h-full overflow-y-auto custom-scrollbar px-2">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 px-8">
             {pendingRequests?.map(request => <PendingMember
                 onApproval={() => handleApprovalRequest(request.id)}
@@ -61,6 +75,7 @@ const GroupPendingMembers: FC = () => {
 
         {loading && <LoadingIndicator />}
         {!loading && pendingRequests?.length === 0 && <Empty description='Không có yêu cầu tham gia nhóm nào' />}
+        <div id="pending-members-scroll-trigger" className="w-full h-1" />
     </div>
 };
 

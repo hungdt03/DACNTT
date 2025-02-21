@@ -3,6 +3,7 @@ import images from "../../../assets";
 import { Button } from "antd";
 import { JoinGroupRequestResource } from "../../../types/join-group";
 import { formatTime } from "../../../utils/date";
+import { Link } from "react-router-dom";
 
 type PendingMemberProps = {
     request: JoinGroupRequestResource;
@@ -21,7 +22,7 @@ const PendingMember: FC<PendingMemberProps> = ({
                 <img className="w-[60px] h-[60px] object-cover rounded-full" src={request.user.avatar ?? images.cover} />
 
                 <div className="flex flex-col">
-                    <span className="text-[16px] font-bold text-gray-700">{request.user.fullName}</span>
+                    <Link to={`/profile/${request.user.id}`} className="text-[16px] hover:underline font-bold text-gray-700 hover:text-gray-700">{request.user.fullName}</Link>
                     <span className="text-[14px] text-gray-500">Đã yêu cầu {formatTime(new Date(request.requestDate))}</span>
                 </div>
             </div>

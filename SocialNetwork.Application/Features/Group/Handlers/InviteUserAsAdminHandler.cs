@@ -68,7 +68,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 Title = "Mời làm quản trị viên",
                 Content = $"{member.User.FullName} đã mời bạn làm quản trị viên của nhóm {member.Group.Name}",
                 IsRead = false,
-                ImageUrl = member.Group.Name,
+                ImageUrl = member.Group.CoverImage,
                 RecipientId = memberAsAdmin.UserId,
                 Type = NotificationType.INVITE_ROLE_GROUP,
                 DateSent = DateTimeOffset.UtcNow,

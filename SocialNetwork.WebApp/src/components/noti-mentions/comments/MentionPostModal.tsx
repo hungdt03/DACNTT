@@ -28,6 +28,7 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
     postId,
     commentId
 }) => {
+    const [loading, setLoading] = useState(false)
     const { user } = useSelector(selectAuth);
     const [post, setPost] = useState<PostResource | null>(null);
     const [comments, setComments] = useState<CommentResource[]>([])
@@ -60,8 +61,6 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
 
         const formData = new FormData();
         formData.append('content', values.content);
-
-
         formData.append('sentAt', sentAt.toISOString())
         formData.append('postId', postId);
         values?.mentionUserIds?.forEach(mention => formData.append('mentionUserIds', mention))
@@ -90,7 +89,9 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
     }
 
     const fetchComments = async () => {
+        setLoading(true)
         const response = await commentService.getNearbyCommentsByCommentId(postId, commentId);
+        setLoading(false)
         if (response.isSuccess) {
             setComments(prev => [...prev, ...response.data])
             setPagination(response.pagination)
@@ -99,7 +100,6 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
 
     const fetchPrevComments = async (parentCommentId: string | null, page: number) => {
         const response = await commentService.getPrevComments(postId, parentCommentId, page);
-        console.log(response)
         if (response.isSuccess) {
             setComments(prevComments => [...response.data, ...prevComments])
             setPagination(prevPagination => ({
@@ -258,18 +258,61 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
         setComments((prevComments) => isPrev ? updatePrevComments(prevComments, commentId, replies) : updateNextComments(prevComments, commentId, replies))
     }
 
-    return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
-        {post && <MentionPostInner post={post} />}
+    const removeComment = (commentId: string) => {
+        setComments((prevComments) => {
+            const updateComments = (comments: CommentResource[]): CommentResource[] => {
+                return comments.flatMap((comment) => {
+                    if (comment.id === commentId) {
+                        return comment.replies || [];
+                    }
 
-        <MentionCommentList
-            activeCommentId={commentId}
-            comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
-            pagination={pagination}
-            replyComment={handleReplyComment}
-            updatedComments={handleUpdateCommentList}
-            onFetchNextPage={fetchNextComment}
-            onFetchPrevPage={fetchPrevComments}
-        />
+                    if (comment.replies && comment.replies.length > 0) {
+                        const updatedReplies = updateComments(comment.replies);
+                        const isHaveChildren = updatedReplies.length > 0;
+
+                        return {
+                            ...comment,
+                            replies: updatedReplies,
+                            isHaveChildren: isHaveChildren,
+                        };
+                    }
+
+                    return comment;
+                });
+            };
+
+            return updateComments(prevComments);
+        });
+    };
+
+    const handleDeleteComment = async (commentId: string) => {
+        const response = await commentService.deleteCommentById(commentId);
+        if (response.isSuccess) {
+            removeComment(commentId)
+            message.success(response.message);
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
+        {post && <>
+            <MentionPostInner post={post} />
+
+            <MentionCommentList
+                activeCommentId={commentId}
+                comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
+                pagination={pagination}
+                replyComment={handleReplyComment}
+                updatedComments={handleUpdateCommentList}
+                onFetchNextPage={fetchNextComment}
+                onFetchPrevPage={fetchPrevComments}
+                onDeleteComment={handleDeleteComment}
+                loading={loading}
+                post={post}
+                group={post?.group}
+            />
+        </>}
 
         <div className="shadow p-4 absolute left-0 right-0 bottom-0 bg-white rounded-b-md">
             <BoxSendComment

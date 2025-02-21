@@ -2,12 +2,14 @@
 
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Group.Commands;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Common;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.GroupInfo;
 
@@ -18,12 +20,14 @@ namespace SocialNetwork.Application.Features.Group.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IConfiguration _configuration;
 
-        public CreateGroupHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, ICloudinaryService cloudinaryService)
+        public CreateGroupHandler(IUnitOfWork unitOfWork, IConfiguration configuration, IHttpContextAccessor contextAccessor, ICloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             _cloudinaryService = cloudinaryService;
+            _configuration = configuration;
         }
         public async Task<BaseResponse> Handle(CreateGroupCommand request, CancellationToken cancellationToken)
         {
@@ -42,7 +46,8 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 OnlyAdminCanApprovalMember = false,
                 OnlyAdminCanPost = false,
                 IsHidden = request.Privacy == GroupPrivacy.PUBLIC ? false : request.IsHidden,
-            };
+                CoverImage = _configuration["ServerHost"] + ShareConstant.PREFIX_FILE_API + ShareConstant.COVER_GROUP_FILENAME,
+        };
 
             if(request.IsHidden)
             {

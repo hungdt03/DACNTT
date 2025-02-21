@@ -29,14 +29,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<(List<Report> Reports, int TotalCount)> GetAllPendingReportsByGroupIdAsync(Guid groupId, int page, int size)
         {
-            var queryable = _context.Reports.Where(r => r.GroupId == groupId && r.Status == ReportStatus.PENDING);
-            var totalCount = await queryable.CountAsync();  
-
-            var reports = await queryable
-                .OrderByDescending(r => r.DateCreated)
-                .Skip((page - 1) * size)
-                .Take(size)
-                 .Include(report => report.Reporter)
+            var queryable = _context.Reports
+                .Include(report => report.Reporter)
                  .Include(report => report.TargetPost)
                     .ThenInclude(r => r.User)
                 .Include(report => report.TargetPost)
@@ -47,7 +41,22 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(report => report.TargetComment)
                     .ThenInclude(r => r.User)
                 .Include(report => report.TargetUser)
-                .Include(report => report.TargetGroup)
+                .Where(r => 
+                    r.GroupId == groupId && 
+                   (
+                     (r.ReportType == ReportType.POST && r.TargetPost != null)
+                     || (r.ReportType == ReportType.COMMENT && r.TargetComment != null)
+                     || (r.ReportType == ReportType.USER && r.TargetUser != null)
+                   )
+                    && r.Status == ReportStatus.PENDING
+                );
+            var totalCount = await queryable.CountAsync();  
+
+            var reports = await queryable
+                .OrderByDescending(r => r.DateCreated)
+                .Skip((page - 1) * size)
+                .Take(size)
+                 
                .ToListAsync();
 
             return (reports, totalCount);

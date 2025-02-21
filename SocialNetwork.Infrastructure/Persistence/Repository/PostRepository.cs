@@ -344,18 +344,22 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                .ToListAsync();
 
             var query = _context.Posts
-                .Where(p => p.Content.ToLower().Contains(key))
-                .Where(p => (
-                    (p.Group != null
-                        && p.ApprovalStatus == ApprovalStatus.APPROVED)
-                        && (
-                        (_context.GroupMembers
-                            .Where(m => m.UserId == userId && m.GroupId == p.GroupId.Value)
-                            .Any(m => m.Role != MemberRole.MEMBER)
-                        ) || !blockedUsers.Contains(p.UserId)
-                    ))
-                    || !blockedUsers.Contains(userId)
-                );
+             .Where(p => p.Content.ToLower().Contains(key))
+             .Where(p =>
+                 !blockedUsers.Contains(p.UserId) && // Không bị chặn hoặc không chặn chủ bài viết
+                 (
+                     p.Group == null || // Bài viết không thuộc nhóm
+                     p.Group.Privacy == GroupPrivacy.PUBLIC || // Bài viết thuộc nhóm công khai
+                     (p.Group.Privacy == GroupPrivacy.PRIVATE && // Nhóm riêng tư: Người dùng phải là thành viên
+                         _context.GroupMembers.Any(m => m.UserId == userId && m.GroupId == p.GroupId.Value) &&
+                         (
+                             !blockedUsers.Contains(p.UserId) || // Nếu bị chặn, thì cần quyền cao hơn MEMBER
+                             _context.GroupMembers.Any(m => m.UserId == userId && m.GroupId == p.GroupId.Value && m.Role != MemberRole.MEMBER)
+                         )
+                     )
+                 )
+             );
+
 
             var totalCount = await query.CountAsync();
 
@@ -518,10 +522,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             {
                 query = contentType switch
                 {
-                    PostContentType.TEXT => query.Where(p => (p.Medias == null || p.Medias.Count == 0) && p.Background == null && p.OriginalPostId == null),
+                    PostContentType.TEXT => query.Where(p => (p.Medias == null || p.Medias.Count == 0) && p.Background == null && p.PostType != PostType.SHARE_POST),
                     PostContentType.MEDIA => query.Where(p => p.Medias != null && p.Medias.Count > 0),
                     PostContentType.BACKGROUND => query.Where(p => p.Background != null),
-                    PostContentType.SHARE => query.Where(p => p.OriginalPostId != null),
+                    PostContentType.SHARE => query.Where(p => p.PostType == PostType.SHARE_POST),
                     _ => query
                 };
             }
@@ -550,6 +554,91 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
                  .Include(p => p.OriginalPost).ThenInclude(o => o.Tags).ThenInclude(o => o.User)
+                .ToListAsync();
+
+            return (posts, totalCount);
+        }
+
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsContainsKey(string key, int page, int size, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        {
+            var userId = _contextAccessor?.HttpContext?.User.GetUserId();
+
+            var blockedUsers = await _context.BlockLists
+               .Where(b => b.BlockerId == userId || b.BlockeeId == userId)
+               .Select(b => b.BlockerId == userId ? b.BlockeeId : b.BlockerId)
+               .ToListAsync();
+
+            var query = _context.Posts
+             .Where(p =>
+                 !blockedUsers.Contains(p.UserId) && // Không bị chặn hoặc không chặn chủ bài viết
+                 (
+                     p.Group == null || // Bài viết không thuộc nhóm
+                     p.Group.Privacy == GroupPrivacy.PUBLIC || // Bài viết thuộc nhóm công khai
+                     (p.Group.Privacy == GroupPrivacy.PRIVATE && // Nhóm riêng tư: Người dùng phải là thành viên
+                         _context.GroupMembers.Any(m => m.UserId == userId && m.GroupId == p.GroupId.Value) &&
+                         (
+                             !blockedUsers.Contains(p.UserId) || // Nếu bị chặn, thì cần quyền cao hơn MEMBER
+                             _context.GroupMembers.Any(m => m.UserId == userId && m.GroupId == p.GroupId.Value && m.Role != MemberRole.MEMBER)
+                         )
+                     )
+             )
+            );
+
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                query = query.Where(p => p.Content.ToLower().Contains(key.ToLower()));
+            }
+
+            if (fromDate.HasValue)
+            {
+                var startDate = fromDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date >= startDate);
+            }
+
+            if (toDate.HasValue)
+            {
+                var endDate = toDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date <= endDate);
+            }
+
+
+            if (contentType != "ALL")
+            {
+                query = contentType switch
+                {
+                    PostContentType.TEXT => query.Where(p => (p.Medias == null || p.Medias.Count == 0) && p.Background == null && p.PostType != PostType.SHARE_POST),
+                    PostContentType.MEDIA => query.Where(p => p.Medias != null && p.Medias.Count > 0),
+                    PostContentType.BACKGROUND => query.Where(p => p.Background != null),
+                    PostContentType.SHARE => query.Where(p => p.PostType == PostType.SHARE_POST),
+                    _ => query
+                };
+            }
+
+            if (sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.OrderBy(p => p.DateCreated);
+            }
+            else
+            {
+                query = query.OrderByDescending(p => p.DateCreated);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var posts = await query
+                 .Skip((page - 1) * size)
+                .Take(size)
+                .Include(p => p.Group)
+                .Include(p => p.User)
+                .Include(p => p.Tags)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.Comments)
+                .Include(p => p.Medias)
+                .Include(p => p.SharePost)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.OriginalPost)
+                    .ThenInclude(p => p.Medias)
                 .ToListAsync();
 
             return (posts, totalCount);

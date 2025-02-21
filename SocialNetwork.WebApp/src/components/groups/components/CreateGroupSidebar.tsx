@@ -119,13 +119,13 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
         },
     ];
 
-    return <div className="h-full relative">
+    return <div className="h-full relative overflow-y-auto custom-scrollbar">
         {showHeader && <>
             <div className="flex items-center gap-x-2 p-3">
                 <Link to='/' className="p-2 w-9 h-9 flex items-center justify-center rounded-full text-white bg-gray-400">
                     <CloseOutlined />
                 </Link>
-                <Link to='/'><img width='36px' height='36px' src={images.facebook} /></Link>
+                <Link to='/'><img alt="Logo ứng dụng" width='36px' height='36px' src={images.facebook} /></Link>
             </div> <Divider className="my-0" />
         </>}
 
@@ -140,7 +140,7 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
                 </div>
             </div>
             <Divider className="my-0" />
-            <div className="flex flex-col h-full gap-y-4 pb-4 overflow-y-auto custom-scrollbar">
+            <div className="flex flex-col h-full gap-y-4 pb-4">
                 <div className="flex flex-col justify-center">
                     <span className="font-semibold pl-1 text-gray-700">Ảnh bìa</span>
                     <div className="flex justify-center">
@@ -184,7 +184,7 @@ const CreateGroupSidebar: FC<CreateGroupSidebarProps> = ({
         </div>
 
         <div className="sticky left-0 right-0 bottom-0 shadow border-t-[1px] bg-white z-10 border-gray-100 px-3 py-4">
-            <Button className="w-full" onClick={handleSubmit} type="primary" loading={loading} disabled={disabled || loading}>Tạo</Button>
+            <Button className="w-full" onClick={handleSubmit} type="primary" loading={loading} disabled={disabled}>Tạo</Button>
         </div>
     </div>
 };

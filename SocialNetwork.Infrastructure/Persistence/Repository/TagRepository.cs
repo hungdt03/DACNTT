@@ -20,6 +20,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context.Tags.Remove(tag);
         }
 
+        public async Task<List<Tag>> GetAllTagsByPostIdAsync(Guid postId)
+        {
+            return await _context.Tags.Where(tag => tag.PostId == postId).ToListAsync();
+        }
+
         public async Task<Tag?> GetTagByIdAsync(Guid id)
         {
             return await _context.Tags.SingleOrDefaultAsync(t => t.Id == id);
@@ -28,6 +33,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<Tag?> GetTagByPostIdAndUserIdAsync(Guid postId, string userId)
         {
             return await _context.Tags.SingleOrDefaultAsync(t => t.UserId == userId && t.PostId == postId);
+        }
+
+        public void RemoveRange(List<Tag> tags)
+        {
+            _context.Tags.RemoveRange(tags);
         }
     }
 }

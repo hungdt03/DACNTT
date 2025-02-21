@@ -67,10 +67,12 @@ namespace SocialNetwork.Application.Features.Report.Handlers
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
+            string messageResponse = findGroup != null ? "Báo cáo bài viết thành công và đã được gửi đi cho quản trị viên của nhóm" : "Báo cáo bài viết thành công và đã được gửi đi cho người quản trị hệ thống";
+
             return new BaseResponse()
             {
                 IsSuccess = true,
-                Message = "Báo cáo bài viết thành công và đã được gửi đi cho người quản trị hệ thống",
+                Message = messageResponse,
                 StatusCode = System.Net.HttpStatusCode.OK,
             };
         }

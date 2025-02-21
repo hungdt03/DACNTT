@@ -56,9 +56,9 @@ const BoxSearchHeader: FC = () => {
 
     const handleClickSuggestText = async (value: string) => {
         setSearchClick(true)
-       
+        await searchService.addSearchTextPlain(searchValue);
         setSearchClick(false)
-        navigate(`/search/?q=${encodeURIComponent(value)}`)
+        navigate(`/search/top/?q=${encodeURIComponent(value)}`)
         setOpenPopover(false)
     }
 
@@ -67,7 +67,7 @@ const BoxSearchHeader: FC = () => {
             loading ? <div className="w-full flex justify-center gap-x-4 items-center">
                 <LoadingIndicator />
             </div>
-                : searchValue.trim() && !searchSuggestions?.groups.length && !searchSuggestions.users.length
+                : (searchValue.trim() && !searchSuggestions?.groups.length && !searchSuggestions.users.length)
                     ? <SearchTextPlain disabled={searchClick} onClick={() => handleClickSuggestText(searchValue)} searchValue={searchValue} />
                     : <SearchSuggestionList searchValue={searchValue} suggestion={searchSuggestions} />
         }
@@ -86,7 +86,7 @@ const BoxSearchHeader: FC = () => {
                 onKeyDown={async (e) => {
                     if (e.key === "Enter" && searchValue.trim().length > 1) {
                         await searchService.addSearchTextPlain(searchValue);
-                        navigate(`/search/?q=${encodeURIComponent(searchValue.trim())}`)
+                        navigate(`/search/top/?q=${encodeURIComponent(searchValue.trim())}`)
                     }
                 }}
             />

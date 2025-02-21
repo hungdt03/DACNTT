@@ -27,7 +27,7 @@ const SearchPostBlock: FC<SearchPostBlockProps> = ({
                 return <Post key={post.id} post={post} />;
             })}
 
-            <Link to={`/search/?type=post&q=${searchValue}`} className="text-center w-full py-2 text-sm hover:bg-sky-100 rounded-md bg-sky-50 text-primary font-semibold">Xem tất cả</Link>
+            <Link to={`/search/post/?q=${searchValue}`} className="text-center w-full py-2 text-sm hover:bg-sky-100 rounded-md bg-sky-50 text-primary font-semibold">Xem tất cả</Link>
         </div>
     </div>
 };

@@ -9,14 +9,13 @@ const CreateGroupPage: FC = () => {
     const [open, setOpen] = useState(false);
 
     return <div className="grid grid-cols-12 gap-4 w-full h-screen">
-        <div className="h-full hidden lg:block lg:col-span-3 shadow overflow-hidden">
+        <div className="h-full hidden lg:block lg:col-span-3 shadow overflow-y-hidden">
             <CreateGroupSidebar
                 onChange={(values) => setValues(values)}
             />
         </div>
 
         <div className="col-span-12 lg:col-span-9 h-full overflow-hidden flex items-center justify-center py-10">
-          
             <CreateGroupPreview
                 onOpenDrawer={() => setOpen(true)}
                 values={values}

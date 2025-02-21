@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SocialNetwork.Application.Contracts.Responses;
+using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.DBContext;
@@ -71,20 +71,20 @@ namespace SocialNetwork.Infrastructure.JsonWebToken
             var accessToken = jwtTokenHandler.WriteToken(token);
             var refreshToken = await GenerateRefreshTokenAsync();
 
-            //var newRefreshToken = new AppToken()
-            //{
-            //    UserId = user.Id,
-            //    JwtId = token.Id,
-            //    RefreshToken = refreshToken,
-            //    IssuedAt = DateTime.Now,
-            //    ExpiredAt = DateTime.UtcNow.AddHours(5),
-            //    IsRevoked = false,
-            //};
+            var newRefreshToken = new RefreshToken()
+            {
+                UserId = user.Id,
+                JwtId = token.Id,
+                Token = refreshToken,
+                IssuedAt = DateTime.Now,
+                ExpiredAt = DateTime.UtcNow.AddHours(5),
+                IsRevoked = false,
+            };
 
-            //await _context.AppTokens.AddAsync(newRefreshToken);
-            //int rows = await _context.SaveChangesAsync();
+            await _context.RefreshTokens.AddAsync(newRefreshToken);
+            int rows = await _context.SaveChangesAsync();
 
-            //if (rows == 0) throw new AppException("Có lỗi xảy ra khi tạo refresh token");
+            if (rows == 0) throw new AppException("Có lỗi xảy ra khi tạo refresh token");
 
             return new TokenResponse
             {

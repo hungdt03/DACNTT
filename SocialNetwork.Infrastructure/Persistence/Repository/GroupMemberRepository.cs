@@ -40,10 +40,25 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .ToListAsync();
         }
 
-        public async Task<(IEnumerable<GroupMember> Members, int TotalCount)> GetAllMembersInGroupAsync(Guid groupId, int page, int size)
+        public async Task<(IEnumerable<GroupMember> Members, int TotalCount)> GetAllMembersInGroupAsync(Guid groupId, int page, int size, string query, string role)
         {
-            var queryable = _context.GroupMembers.Where(m => m.GroupId == groupId)
-               .AsQueryable();
+            var queryable = _context.GroupMembers
+                .Include(m => m.User)
+                .Where(m => 
+                    m.GroupId == groupId
+                    && m.User.FullName.ToLower().Contains(query.ToLower())
+                );
+
+            if(role != "ALL")
+            {
+                queryable = role switch
+                {
+                    MemberRole.ADMIN => queryable.Where(p => p.Role == MemberRole.ADMIN),
+                    MemberRole.MODERATOR => queryable.Where(p => p.Role == MemberRole.MODERATOR),
+                    MemberRole.MEMBER => queryable.Where(p => p.Role == MemberRole.MEMBER),
+                    _ => queryable
+                };
+            }
 
             var totalCount = await queryable.CountAsync();
 
@@ -51,7 +66,6 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .OrderByDescending(m => m.DateCreated)
                 .Skip((page - 1) * size)
                 .Take(size)
-                .Include(m => m.User)
                 .ToListAsync();
 
             return (members, totalCount);

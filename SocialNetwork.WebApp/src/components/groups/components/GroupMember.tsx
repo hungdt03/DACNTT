@@ -80,7 +80,7 @@ const GroupMember: FC<GroupMemberProps> = ({
 
         {member.user.id !== user?.id && isMine && member.role !== MemberRole.ADMIN && (
             <Popover
-                trigger="click"
+                trigger="hover"
                 content={
                     <div className="flex flex-col items-start">
                         {member.isInvitedAsAdmin ? (

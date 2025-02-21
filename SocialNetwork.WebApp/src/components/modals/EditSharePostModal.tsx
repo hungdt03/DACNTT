@@ -63,6 +63,7 @@ const EditSharePostModal: FC<EditSharePostModalProps> = ({
     }, [post])
 
     const handleTagsChange = (newTags: FriendResource[]) => {
+        setIsEdited(true)
         setTags(newTags)
         setPostRequest({
             ...postRequest,
@@ -78,6 +79,8 @@ const EditSharePostModal: FC<EditSharePostModalProps> = ({
                 ...postRequest,
                 removeTagIds: [...postRequest.removeTagIds, findTag.id]
             })
+
+            setIsEdited(true)
         }
     }
 
@@ -109,10 +112,13 @@ const EditSharePostModal: FC<EditSharePostModalProps> = ({
                         })()}
                 </div>
                 <Popover trigger='click' content={<PostPrivacryOption
-                    onChange={(privacy) => setPostRequest({
-                        ...postRequest,
-                        privacy
-                    })}
+                    onChange={(privacy) => {
+                        setIsEdited(true);
+                        setPostRequest({
+                            ...postRequest,
+                            privacy
+                        })
+                    }}
                 />}>
                     {getButtonPrivacyContent(postRequest.privacy)}
                 </Popover>

@@ -57,6 +57,14 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     } 
                 }
 
+                if (post.OriginalPost != null)
+                {
+                    // Story
+                    var originalPostStory = await _unitOfWork.StoryRepository
+                            .IsUserHaveStoryAsync(post.OriginalPost.UserId);
+                    postItem.OriginalPost.User.HaveStory = originalPostStory;
+                }
+
                 var haveStory = await _unitOfWork.StoryRepository
                         .IsUserHaveStoryAsync(post.UserId);
                 postItem.User.HaveStory = haveStory;

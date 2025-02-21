@@ -1,7 +1,11 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { Avatar, Button } from "antd";
 import { GroupInvitationResource } from "../../types/group-invitation";
 import { GroupResource } from "../../types/group";
+import { MemberRole } from "../../enums/member-role";
+import { GroupMemberResource } from "../../types/group-member";
+import groupService from "../../services/groupService";
+import { setIn } from "formik";
 
 type GroupInvitationLabelProps = {
     invitation: GroupInvitationResource;
@@ -16,6 +20,21 @@ const GroupInvitationLabel: FC<GroupInvitationLabelProps> = ({
     onAccept,
     onReject
 }) => {
+    const [inviter, setInviter] = useState<GroupMemberResource>();
+
+    useEffect(() => {
+        console.log(group)
+        console.log(invitation)
+       const fetchInviter = async () => {
+            const response = await groupService.getGroupMemberByGroupIdAndUserId(group.id, invitation.inviter.id);
+            console.log(response)
+            if(response.isSuccess) {
+                setInviter(response.data)
+            }
+       }
+
+       fetchInviter()
+    }, [group, invitation])
     return <div className="flex items-center w-full justify-between p-4 rounded-md bg-gray-100 mt-2">
         <div className="flex items-center gap-x-3">
             <Avatar src={invitation.inviter.avatar} size={'large'} />
@@ -24,7 +43,7 @@ const GroupInvitationLabel: FC<GroupInvitationLabelProps> = ({
                 <span className="font-bold">{invitation.inviter.fullName} đã mời bạn tham gia nhóm này</span>
                 <p className="text-sm text-gray-500">
                     Nếu chấp nhận, {
-                        group.onlyAdminCanApprovalMember ? 'lời mời này sẽ được gửi tới quản trị viên và người kiểm duyệt để chờ phê duyệt'
+                        (group.onlyAdminCanApprovalMember && inviter?.role !== MemberRole.ADMIN) ? 'lời mời này sẽ được gửi tới quản trị viên và người kiểm duyệt để chờ phê duyệt'
                         : 'bạn sẽ có thể thấy được mọi hoạt động của nhóm'
                     }
                 </p>

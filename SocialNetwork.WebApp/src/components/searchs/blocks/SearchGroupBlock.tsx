@@ -27,7 +27,7 @@ const SearchGroupBlock: FC<SearchGroupBlockProps> = ({
             {groups.map(suggestGroup => 
                 <SearchGroupItem onClick={() => handleRedirectToGroupPage(`/groups/${suggestGroup.group.id}`, suggestGroup.group.id)} key={suggestGroup.group.id} suggestGroup={suggestGroup} />
             )}
-            <Link to={`/search/?type=group&q=${searchValue}`} className="w-full py-2 text-sm hover:bg-sky-100 rounded-md bg-sky-50 text-primary text-center font-semibold">Xem tất cả</Link>
+            <Link to={`/search/group/?q=${searchValue}`} className="w-full py-2 text-sm hover:bg-sky-100 rounded-md bg-sky-50 text-primary text-center font-semibold">Xem tất cả</Link>
         </div>
     </div>
 };

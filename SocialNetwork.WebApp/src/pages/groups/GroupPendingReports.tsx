@@ -40,7 +40,7 @@ const GroupPendingReports: FC = ({
     }, [id])
 
     const { containerRef } = useInfiniteScroll({
-        fetchMore: () => void fetchMoreMembers(),
+        fetchMore: () => void fetchNextPage(),
         hasMore: pagination.hasMore,
         loading: loading,
         rootMargin: "10px",
@@ -50,6 +50,7 @@ const GroupPendingReports: FC = ({
     const fetchPendingReports = async (groupId: string, page: number, size: number) => {
         setLoading(true);
         const response = await reportService.getGroupReports(groupId, page, size);
+        console.log(response)
         setLoading(false);
 
         if (response.isSuccess) {
@@ -62,7 +63,7 @@ const GroupPendingReports: FC = ({
         }
     };
 
-    const fetchMoreMembers = async () => {
+    const fetchNextPage = async () => {
         if (!pagination.hasMore || loading || !id) return;
         fetchPendingReports(id, pagination.page + 1, pagination.size);
     };

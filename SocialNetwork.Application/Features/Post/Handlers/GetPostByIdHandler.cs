@@ -33,6 +33,14 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 response.Shares = shares;
             }
 
+            if (post.OriginalPost != null)
+            {
+                // Story
+                var originalPostStory = await _unitOfWork.StoryRepository
+                        .IsUserHaveStoryAsync(post.OriginalPost.UserId);
+                response.OriginalPost.User.HaveStory = originalPostStory;
+            }
+
             var haveStory = await _unitOfWork.StoryRepository
                     .IsUserHaveStoryAsync(post.UserId);
             response.User.HaveStory = haveStory;

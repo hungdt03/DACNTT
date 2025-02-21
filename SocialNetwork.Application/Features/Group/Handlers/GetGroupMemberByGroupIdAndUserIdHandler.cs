@@ -31,11 +31,11 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 .GetGroupMemberByGroupIdAndUserId(request.GroupId, request.UserId)
                 ?? throw new AppException("Không tìm thấy thông tin nào");
 
-            var meInGroup = await _unitOfWork.GroupMemberRepository
-                .GetGroupMemberByGroupIdAndUserId(member.GroupId, userId);
+            //var meInGroup = await _unitOfWork.GroupMemberRepository
+            //    .GetGroupMemberByGroupIdAndUserId(request.GroupId, userId);
 
-            if (meInGroup == null && member.Group.Privacy == GroupPrivacy.PRIVATE)
-                throw new AppException("Quyền truy cập bị từ chối");
+            //if (meInGroup == null && member.Group.Privacy == GroupPrivacy.PRIVATE)
+            //    throw new AppException("Quyền truy cập bị từ chối");
 
             var mapMember = ApplicationMapper.MapToGroupMember(member);
             if (userId != request.UserId)

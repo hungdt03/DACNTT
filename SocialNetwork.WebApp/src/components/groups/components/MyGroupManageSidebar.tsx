@@ -1,10 +1,8 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { GroupResource } from "../../../types/group";
 import images from "../../../assets";
 import { Book, ChartBarIcon, GitPullRequest, Home, Lock, UserCog } from "lucide-react";
-import { Badge, Divider } from "antd";
-import { GroupApprovalSummaryResource } from "../../../types/group-approval-summary";
-import groupService from "../../../services/groupService";
+import { Divider } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import cn from "../../../utils/cn";
 import { getGroupPrivacyTitle } from "../../../utils/privacy";
@@ -21,7 +19,7 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
 
     return <>
         <div className="flex items-center gap-x-2 px-2 py-4">
-            <img className="w-[50px] h-[50px] rounded-md object-cover border-[1px] border-gray-100" src={group.coverImage ?? images.cover} />
+            <img alt="Ảnh bìa nhóm" className="w-[50px] h-[50px] rounded-md object-cover border-[1px] border-gray-100" src={group.coverImage ?? images.cover} />
             <div className="flex flex-col">
                 <span className="font-bold">{group.name}</span>
                 <div className="flex gap-x-2 items-center text-sm">
@@ -50,14 +48,14 @@ const MyGroupManageSidebar: FC<MyGroupManageSidebarProps> = ({
                 <UserCog size={20} />
                 <span className="font-semibold">Yêu cầu thành viên</span>
             </Link>
-            {group.onlyAdminCanApprovalMember && <Link to={`/groups/${group.id}/pending-invites`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-members') && 'bg-gray-100')}>
+            {group.onlyAdminCanApprovalMember && <Link to={`/groups/${group.id}/pending-invites`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-invites') && 'bg-gray-100')}>
                 <GitPullRequest size={20} />
                 <span className="font-semibold">Lời mời từ thành viên</span>
             </Link>}
-            <Link to={`/groups/${group.id}/pending-reports`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-reports') && 'bg-gray-100')}>
+            {group.isMine && <Link to={`/groups/${group.id}/pending-reports`} className={cn("flex items-center hover:text-black text-[15px] gap-x-2 py-3 px-2 rounded-md hover:bg-gray-100 cursor-pointer", location.pathname.includes('pending-reports') && 'bg-gray-100')}>
                 <ChartBarIcon size={20} />
                 <span className="font-semibold">Báo cáo đang chờ</span>
-            </Link>
+            </Link>}
         </div >
     </>
 };
