@@ -1,7 +1,6 @@
 import { FC } from "react";
 import images from "../../../assets";
 import { Button } from "antd";
-import { formatTime } from "../../../utils/date";
 import { GroupInvitationResource } from "../../../types/group-invitation";
 
 type InviteMemberPendingProps = {

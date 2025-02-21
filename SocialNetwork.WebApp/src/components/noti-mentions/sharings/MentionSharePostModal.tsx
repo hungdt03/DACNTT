@@ -34,7 +34,7 @@ const MentionSharePostModal: FC<MentionSharePostModalProps> = ({
 
     const fetchPost = async () => {
         const response = await postService.getPostById(postId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             setPost(response.data)
         }
     }
@@ -119,7 +119,7 @@ const MentionSharePostModal: FC<MentionSharePostModalProps> = ({
             mediaType: MediaType.IMAGE,
             level
         };
-       
+
         const formData = new FormData();
         formData.append('content', values.content);
         formData.append('postId', postId);
@@ -140,9 +140,9 @@ const MentionSharePostModal: FC<MentionSharePostModalProps> = ({
 
         parentCommentId && handleUpdateCommentList(parentCommentId, [tempReplyComment])
         const response = await commentService.createComment(formData);
-      
+
         if (response.isSuccess) {
-            
+
             if (response.data.parentCommentId) {
                 replaceTempCommentWithResponse(response.data)
             }
@@ -162,18 +162,18 @@ const MentionSharePostModal: FC<MentionSharePostModalProps> = ({
                     if (comment.parentCommentId && comment.status === 'pending' && comment.sentAt.getTime() === new Date(updatedComment.sentAt).getTime()) {
                         return { ...updatedComment };
                     }
-    
+
                     if (comment.replies && comment.replies.length > 0) {
                         return {
                             ...comment,
                             replies: updateComments(comment.replies),
                         };
                     }
-    
+
                     return comment;
                 });
             };
-    
+
             return updateComments(prevComments);
         });
     };
@@ -205,17 +205,22 @@ const MentionSharePostModal: FC<MentionSharePostModalProps> = ({
     }
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
-        {post && <MentionSharePostInnner post={post} />}
-
-        <CommentList
-            loading={false}
-            replyComment={handleReplyComment}
-            comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
-            updatedComments={handleUpdateCommentList}
-            pagination={pagination}
-            fetchNextPage={fetchComments}
-            onDeleteComment={() => {}}
-        />
+        {post &&
+            <>
+                <MentionSharePostInnner post={post} />
+                <CommentList
+                    post={post}
+                    group={post?.group}
+                    loading={false}
+                    replyComment={handleReplyComment}
+                    comments={[...pendingComments.filter(p => p.level === 0), ...comments]}
+                    updatedComments={handleUpdateCommentList}
+                    pagination={pagination}
+                    fetchNextPage={fetchComments}
+                    onDeleteComment={() => { }}
+                />
+            </>
+        }
 
         <div className="shadow p-4 absolute left-0 right-0 bottom-0 bg-white rounded-b-md">
             <BoxSendComment

@@ -68,13 +68,13 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 Title = "Mời làm người kiểm duyệt",
                 Content = $"{member.User.FullName} đã mời bạn làm người kiểm duyệt của nhóm {member.Group.Name}",
                 IsRead = false,
-                ImageUrl = member.Group.Name,
+                ImageUrl = member.Group.CoverImage,
                 RecipientId = memberAsModerator.UserId,
                 Type = NotificationType.INVITE_ROLE_GROUP,
                 DateSent = DateTimeOffset.UtcNow,
                 GroupId = inviteModerator.GroupId,
             };
-
+            await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
             var savedNotification = await _unitOfWork.NotificationRepository.GetNotificationByIdAsync(notification.Id);

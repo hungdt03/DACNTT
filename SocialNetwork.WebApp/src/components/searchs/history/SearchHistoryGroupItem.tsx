@@ -21,7 +21,7 @@ const SearchHistoryGroupItem: FC<SearchHistoryGroupItemProps> = ({
             </span>
 
             <div className="flex items-center gap-x-2">
-                <img src={searchHistory.group.coverImage ?? images.cover} className="w-[32px] h-[32px] rounded-md" />
+                <img src={searchHistory.group.coverImage ?? images.cover} className="w-[32px] h-[32px] object-cover rounded-md" />
                 <div className="flex flex-col">
                     <span className="text-sm font-semibold line-clamp-1">{searchHistory.group.name}</span>
                     <span className="text-gray-600 text-xs line-clamp-1">

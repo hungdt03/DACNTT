@@ -1,4 +1,4 @@
-import { Bookmark, Edit,  Flag,  FlagOff, Tags, Trash } from "lucide-react"
+import { Bookmark, Edit, Flag, FlagOff, Tags, Trash } from "lucide-react"
 import { FC } from "react"
 
 type PostMoreActionProps = {
@@ -32,17 +32,16 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
 }) => {
 
     return <div className="flex flex-col items-start rounded-md md:text-sm text-xs">
-        {isMine && <>
-            <button onClick={onEditPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
-                <Edit size={17} className="text-gray-500" />
-                Chỉnh sửa bài viết
-            </button>
-            <button onClick={onDeletePost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
-                <Trash size={17} className="text-gray-500" />
-                Xóa bài viết
-            </button>
+        {isMine && <button onClick={onEditPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+            <Edit size={17} className="text-gray-500" />
+            Chỉnh sửa bài viết
+        </button>}
 
-        </>}
+        {((isAdmin && isPostGroup) || isMine) && <button onClick={onDeletePost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+            <Trash size={17} className="text-gray-500" />
+            Xóa bài viết
+        </button>}
+
         {!isMine && <>
             {isSaved ? <button onClick={onRemoveSavedPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
                 <Bookmark size={17} className="text-gray-500" />
@@ -62,7 +61,7 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
                     Báo cáo bài viết
                 </button>
             </> : !isPostGroup && <button onClick={onReportPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
-                <Trash size={17} className="text-gray-500" />
+                <Flag size={17} className="text-gray-500" />
                 Báo cáo bài viết
             </button>}
 

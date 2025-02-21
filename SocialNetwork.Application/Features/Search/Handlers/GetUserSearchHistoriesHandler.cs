@@ -37,6 +37,11 @@ namespace SocialNetwork.Application.Features.Search.Handlers
                 {
                     if(searchHistory.SearchUserId != userId)
                     {
+                        var block = await _unitOfWork.BlockListRepository
+                            .GetBlockListByUserIdAndUserIdAsync(searchHistory.SearchUserId, userId);
+
+                        if (block != null) continue;
+
                         var friendShip = await _unitOfWork.FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(userId, searchHistory.SearchUserId);
                         if (friendShip == null || !friendShip.IsConnect)
                         {
@@ -50,6 +55,8 @@ namespace SocialNetwork.Application.Features.Search.Handlers
 
                     searchHistoryItem.User.HaveStory = haveStory;
                 }
+
+                response.Add(searchHistoryItem);
             }
 
             return new PaginationResponse<List<SearchHistoryResponse>>()

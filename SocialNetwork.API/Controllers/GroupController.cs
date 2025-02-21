@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using CloudinaryDotNet.Actions;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.API.Filters;
@@ -21,6 +22,7 @@ namespace SocialNetwork.API.Controllers
             this.mediator = mediator;
         }
 
+        [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost]
         public async Task<IActionResult> CreateGroup([FromForm] CreateGroupCommand command)
         {
@@ -35,6 +37,7 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost("upload-cover")]
         public async Task<IActionResult> UploadCoverImage([FromForm] UploadGroupCoverCommand command)
         {
@@ -120,6 +123,7 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost("invite-friends")]
         public async Task<IActionResult> InviteFriendsJoinGroup([FromBody] InviteFriendsCommand command)
         {
@@ -158,7 +162,6 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
-
         [HttpPost("approval/{requestId}")]
         public async Task<IActionResult> ApprovalRequestJoinGroup([FromRoute] Guid requestId)
         {
@@ -191,9 +194,9 @@ namespace SocialNetwork.API.Controllers
 
 
         [HttpGet("members/{groupId}")]
-        public async Task<IActionResult> GetMembersByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6)
+        public async Task<IActionResult> GetMembersByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6, [FromQuery] string query = "", [FromQuery] string role = "ALL")
         {
-            var response = await mediator.Send(new GetAllMembersByGroupIdQuery(groupId, page, size));
+            var response = await mediator.Send(new GetAllMembersByGroupIdQuery(groupId, page, size, query, role));
             return Ok(response);
         }
 

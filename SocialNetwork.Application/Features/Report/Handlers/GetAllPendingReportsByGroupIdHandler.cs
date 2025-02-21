@@ -33,11 +33,11 @@ namespace SocialNetwork.Application.Features.Report.Handlers
             foreach (var item in reports)
             {
                 var responseItem = ApplicationMapper.MapToReport(item);
-                if(item.ReportType == ReportType.USER && item.TargetUserId != null)
+                if(item.ReportType == ReportType.USER && item.TargetUser != null)
                 {
                     var haveStory = await _unitOfWork.StoryRepository.IsUserHaveStoryAsync(item.TargetUserId);
                     responseItem.TargetUser.HaveStory = haveStory;
-                } else if(item.ReportType == ReportType.POST && item.TargetPostId != null)
+                } else if(item.ReportType == ReportType.POST && item.TargetPost != null)
                 {
                     var haveStory = await _unitOfWork.StoryRepository.IsUserHaveStoryAsync(item.TargetPost.UserId);
                     responseItem.TargetPost.User.HaveStory = haveStory;

@@ -3,7 +3,7 @@ import { PostMediaResource } from "../../types/post";
 import { useParams } from "react-router-dom";
 import { inititalValues } from "../../utils/pagination";
 import groupService from "../../services/groupService";
-import { Empty, Image } from "antd";
+import { Empty } from "antd";
 import LoadingIndicator from "../../components/LoadingIndicator";
 
 const GroupVideoPage: FC = () => {
@@ -16,22 +16,19 @@ const GroupVideoPage: FC = () => {
         if (id) {
             setLoading(true)
             const response = await groupService.getAllGroupVideosByGroupId(id, page, size);
-            setTimeout(() => {
-                setLoading(false)
-                if (response.isSuccess) {
-                    setVideos(prevVideos => {
-                        const existingIds = new Set(prevVideos.map(image => image.id));
-                        const newVideos = response.data.filter(image => !existingIds.has(image.id));
-                        return [...prevVideos, ...newVideos];
-                    });
-                    setPagination(response.pagination)
-                }
-            }, 2000)
+            setLoading(false)
+            if (response.isSuccess) {
+                setVideos(prevVideos => {
+                    const existingIds = new Set(prevVideos.map(image => image.id));
+                    const newVideos = response.data.filter(image => !existingIds.has(image.id));
+                    return [...prevVideos, ...newVideos];
+                });
+                setPagination(response.pagination)
+            }
         }
     }
 
     const fetchNextPage = () => {
-        console.log('Fetch next page ...')
         fetchVideos(pagination.page + 1, pagination.size)
     }
 
@@ -75,7 +72,7 @@ const GroupVideoPage: FC = () => {
                     </div>
                 ))}
             </div>}
-            {!loading && <Empty description="Chưa có file video nào" />}
+            {!loading && videos.length === 0 && <Empty description="Chưa có file video nào" />}
             <div className="col-span-5">{loading && <LoadingIndicator />}</div>
         </div>
     </div>

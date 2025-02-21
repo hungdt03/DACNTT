@@ -26,7 +26,6 @@ import { ReactionType } from "../../enums/reaction";
 import postService from "../../services/postService";
 import ListSharePostModal from "../modals/ListSharePostModal";
 import EditPostModal from "../modals/EditPostModal";
-import { GroupPrivacy } from "../../enums/group-privacy";
 import ExpandableText from "../ExpandableText";
 import ReportPostModal from "../modals/reports/ReportPostModal";
 import reportService from "../../services/reportService";
@@ -35,14 +34,16 @@ type PostGroupProps = {
     post: PostResource;
     allowShare?: boolean;
     onFetch?: (data: PostResource) => void;
-    onRemovePost?: (postId: string) => void
+    onRemovePost?: (postId: string) => void;
+    onRemoveSavedPost?: (postId: string) => void;
 }
 
 const PostGroup: FC<PostGroupProps> = ({
     post: postParam,
     allowShare,
     onFetch,
-    onRemovePost
+    onRemovePost,
+    onRemoveSavedPost
 }) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const { handleCancel: editPostCancel, isModalOpen: isEditPostOpen, handleOk: handleEditPostOk, showModal: showEditPostModal } = useModal();
@@ -180,7 +181,8 @@ const PostGroup: FC<PostGroupProps> = ({
     const handleRemoveSavedPost = async (postId: string) => {
         const response = await postService.removeSavedPostByPostId(postId);
         if (response.isSuccess) {
-            message.success(response.message)
+            message.success(response.message);
+            onRemoveSavedPost?.(postId)
             setPost(prev => ({
                 ...prev,
                 isSaved: false
@@ -201,12 +203,11 @@ const PostGroup: FC<PostGroupProps> = ({
         }
     }
 
-
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
                 <div className="relative">
-                    <img className="w-10 h-10 rounded-md object-cover" src={post.group?.coverImage ?? images.cover} />
+                    <img alt="Ảnh nhóm" className="w-10 h-10 rounded-md object-cover" src={post.group?.coverImage ?? images.cover} />
 
                     {!post.user.haveStory
                         ? <Avatar className="w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} />
@@ -272,47 +273,74 @@ const PostGroup: FC<PostGroupProps> = ({
         </div>
 
         <div className="flex flex-col gap-y-3">
-            {post.background ? <div style={{
-                background: post.background,
-                width: '100%',
-            }} className="flex items-center justify-center md:h-[380px] sm:h-[350px] h-[280px] px-6 py-8 rounded-md">
-                <p className="md:text-2xl text-lg font-bold text-center break-words break-all text-white">{post.content}</p>
-            </div> : <ExpandableText content={post.content} />}
+            {post.background
+                ? <div
+                    style={{
+                        background: post.background,
+                        width: '100%',
+                    }}
+                    className="flex items-center justify-center md:h-[380px] sm:h-[350px] h-[280px] px-6 py-8 rounded-md"
+                >
+                    <p className="md:text-2xl text-lg font-bold text-center break-words break-all text-white">{post.content}</p>
+                </div>
+                : <ExpandableText content={post.content} />
+            }
+
             {post.medias.length > 0 && <PostMedia files={post.medias} />}
+
         </div>
+
         <div className="flex items-center justify-between text-sm">
+
             <button onClick={showReactionModal} className="flex gap-x-[2px] items-center">
                 <Avatar.Group>
                     {topReactions.map(reaction => <img key={reaction.reactionType} alt={reaction.reactionType} src={svgReaction[reaction.reactionType as ReactionSvgType]} className="w-5 h-5 mx-[5px]" />)}
                 </Avatar.Group>
                 <span className="hover:underline">{reactions?.length === 0 ? '' : reactions?.length}</span>
             </button>
+
             <div className="flex gap-x-4 items-center">
                 <button onClick={showModal} className="hover:underline text-gray-500">{post.comments} bình luận</button>
                 <button onClick={showListShare} className="hover:underline text-gray-500">{post.shares} lượt chia sẻ</button>
             </div>
+
         </div>
+
         <Divider className='my-0' />
+
         <div className="flex items-center justify-between gap-x-4">
-            <Popover content={<PostReaction
-                onSelect={handleSaveReaction}
-            />}>
+            <Popover
+                content={<PostReaction
+                    onSelect={handleSaveReaction}
+                />}
+            >
                 {getBtnReaction(reaction?.reactionType ?? 'UNKNOWN', handleSaveReaction)}
             </Popover>
+
             <button onClick={showModal} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center items-center gap-x-2 text-sm text-gray-500">
                 <ChatBubbleLeftIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
                 <span>Bình luận</span>
             </button>
+
             {allowShare && <button onClick={showSharePost} className="py-2 cursor-pointer rounded-md hover:bg-gray-100 w-full flex justify-center items-center gap-x-2 text-sm text-gray-500">
                 <ShareIcon className="md:h-5 md:w-5 w-4 h-4 text-gray-500" />
                 <span>Chia sẻ</span>
             </button>}
         </div>
+
         <Divider className='mt-0 mb-2' />
 
-        <Modal style={{ top: 20 }} title={<p className="text-center font-bold text-lg">Bài viết của {post.user.fullName}</p>} width='700px' classNames={{
-            footer: 'hidden'
-        }} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <Modal
+            style={{ top: 20 }}
+            title={<p className="text-center font-bold text-lg">Bài viết của {post.user.fullName}</p>}
+            width='700px'
+            classNames={{
+                footer: 'hidden'
+            }}
+            open={isModalOpen}
+            onOk={handleOk}
+            onCancel={handleCancel}
+        >
             {isModalOpen && <PostModal post={post} />}
         </Modal>
 
@@ -356,7 +384,7 @@ const PostGroup: FC<PostGroupProps> = ({
         >
             <ListSharePostModal post={post} />
         </Modal>
-      
+
         {/* REPORT TO ADMIN OF GROUP */}
         <Modal
             title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Báo cáo bài viết tới quản trị viên nhóm</p>}
@@ -375,7 +403,7 @@ const PostGroup: FC<PostGroupProps> = ({
                 value={reason}
                 onChange={(newValue) => setReason(newValue)}
                 title="Tại sao bạn báo cáo bài viết này"
-                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
             />
         </Modal>
 
@@ -397,7 +425,7 @@ const PostGroup: FC<PostGroupProps> = ({
                 value={reason}
                 onChange={(newValue) => setReason(newValue)}
                 title="Tại sao bạn báo cáo bài viết này"
-                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
             />
         </Modal>
     </div>

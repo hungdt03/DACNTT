@@ -125,10 +125,13 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
         }
     }
 
-    const handleReportPost = async (reason: string) => {
+    const handleReportUser = async (reason: string) => {
         const response = await reportService.reportUser(targetUser.id, reason);
         if (response.isSuccess) {
-            message.success(response.message)
+            message.success(response.message);
+            okReport()
+            setReason('')
+          
         } else {
             message.error(response.message)
         }
@@ -165,7 +168,7 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
             <div className="relative flex-shrink-0 z-30">
                 {targetUser?.haveStory ?
                     <Link className="lg:w-32 lg:h-32 w-28 h-28 rounded-full border-[4px] p-[2px] border-primary flex items-center justify-center aspect-square" to={`/stories/${targetUser.id}`}>
-                        <img alt="Ảnh đại diện" className="object-cover aspect-square rounded-full" src={targetUser?.avatar ?? images.user} />
+                        <img alt="Ảnh đại diện" className="object-cover aspect-square w-full h-full rounded-full" src={targetUser?.avatar ?? images.user} />
                     </Link>
                     : <img
                         alt="Ảnh đại diện"
@@ -278,7 +281,7 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
 
         {/* REPORT TO ADMIN OF APP */}
         <Modal
-            title={<p className="text-center font-bold text-lg">Báo cáo {targetUser.fullName} tới quản trị hệ thống</p>}
+            title={<p className="text-center font-bold text-lg">Báo cáo {targetUser.fullName}</p>}
             centered
             open={openReport}
             onOk={okReport}
@@ -286,7 +289,7 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
             okText='Gửi báo cáo'
             cancelText='Hủy'
             okButtonProps={{
-                onClick: () => reason.trim().length >= 20 && handleReportPost(reason),
+                onClick: () => reason.trim().length >= 20 && void handleReportUser(reason),
                 disabled: reason.trim().length < 20
             }}
         >
@@ -294,7 +297,7 @@ const UserProfileHeader: FC<UserProfileHeaderProps> = ({
                 value={reason}
                 onChange={(newValue) => setReason(newValue)}
                 title="Tại sao bạn báo cáo người này này"
-                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với Facebook."
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
             />
         </Modal>
     </div>

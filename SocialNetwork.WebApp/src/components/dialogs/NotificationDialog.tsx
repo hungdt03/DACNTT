@@ -94,7 +94,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
 
             onUpdateNotifications(updateNotifications)
         } else {
-            toast.error(response.message)
+            // toast.error(response.message)
         }
     }
 
@@ -162,7 +162,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         <>
             <div
                 id='notification-dialog-element'
-                className='flex flex-col gap-y-3 pt-2 px-2 max-h-[600px] min-w-[400px] overflow-y-auto custom-scrollbar'
+                className='z-50 flex flex-col gap-y-3 pt-2 px-2 max-h-[600px] min-w-[400px] overflow-y-auto custom-scrollbar'
             >
                 <span className='font-semibold text-lg'>Thông báo của bạn</span>
                 <div className='flex flex-col gap-y-2'>

@@ -225,14 +225,15 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                     {comment?.replies?.map((child) => (
                         <CommentItem
                             onReportComment={onReportComment}
+                            onDeleteComment={onDeleteComment}
                             post={post}
+                            group={group}
                             parentComment={comment}
                             key={child.id}
                             comment={child}
                             onFetchReplies={onFetchReplies}
                             replyComment={replyComment}
                             updatedComments={updatedComments}
-                            onDeleteComment={onDeleteComment}
                             level={level + 1}
                             onReply={(comment) => {
                                 if (level + 1 > 2) {

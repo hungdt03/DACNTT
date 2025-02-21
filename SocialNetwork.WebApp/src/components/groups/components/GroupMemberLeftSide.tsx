@@ -10,7 +10,7 @@ import reportService from "../../../services/reportService";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../../features/slices/auth-slice";
 import { MemberRole } from "../../../enums/member-role";
-import { formatDateStandard, formatTime } from "../../../utils/date";
+import { formatDateStandard } from "../../../utils/date";
 import { getRoleGroupTitle } from "../../../utils/role";
 
 type GroupMemberLeftSideProps = {
@@ -60,21 +60,10 @@ const GroupMemberLeftSide: FC<GroupMemberLeftSideProps> = ({
                 <Link to={`/profile/${member.user.id}`}>
                     <Button type="primary">Trang cá nhân</Button>
                 </Link>
-                {member.user.id !== user?.id && member.role !== MemberRole.ADMIN && <button onClick={showModal} className="py-[7px] px-3 rounded-md bg-gray-100 hover:bg-gray-200 text-sm">Báo cáo</button>}
+                {!group.isMine && member.user.id !== user?.id && member.role !== MemberRole.ADMIN && <button onClick={showModal} className="py-[7px] px-3 rounded-md bg-gray-100 hover:bg-gray-200 text-sm">Báo cáo</button>}
             </div>
         </div>
-
-        <div className="p-4 rounded-md bg-white shadow flex flex-col gap-y-2">
-            <span className="text-lg font-bold">Hoạt động gần đây</span>
-
-            <div className="flex items-start gap-x-3">
-                <UserGroupIcon width={25} className="flex-shrink-0" color="gray" />
-                <span>
-                    Quản trị viên của CHIẾN TRANH VIỆT NAM VÀ NHỮNG CÂU CHUYỆN!!! từ ngày 18 tháng 7, 2024
-                </span>
-            </div>
-        </div>
-
+        
         {/* REPORT TO ADMIN OF APP */}
         <Modal
             title={<p className="text-center font-bold text-lg">Báo cáo {member.user.fullName} tới quản trị viên</p>}
@@ -85,7 +74,7 @@ const GroupMemberLeftSide: FC<GroupMemberLeftSideProps> = ({
             okText='Gửi báo cáo'
             cancelText='Hủy'
             okButtonProps={{
-                onClick: () => reason.trim().length >= 20 && handleReportMember(),
+                onClick: () => reason.trim().length >= 20 && void handleReportMember(),
                 disabled: reason.trim().length < 20
             }}
         >

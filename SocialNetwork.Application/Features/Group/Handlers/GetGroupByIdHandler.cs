@@ -50,6 +50,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             if (groupMember != null)
             {
                 response.IsMine = groupMember.Role == MemberRole.ADMIN;
+                response.IsModerator = groupMember.Role == MemberRole.MODERATOR;
                 response.IsMember = true;
             }
 

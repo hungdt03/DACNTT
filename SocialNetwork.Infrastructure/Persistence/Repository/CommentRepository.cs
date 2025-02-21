@@ -105,8 +105,8 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<Comment?> GetCommentByIdAsync(Guid id)
         {
             return await _dbContext.Comments
-                //.IgnoreQueryFilters()
                 .Include (cmt => cmt.Post)
+                    .ThenInclude(cmt => cmt.Group)
                 .SingleOrDefaultAsync(c => c.Id == id);
         }
 

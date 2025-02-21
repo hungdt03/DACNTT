@@ -15,6 +15,10 @@ import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import LoadingIndicator from "../LoadingIndicator";
 import messageService from "../../services/messageService";
+import { Modal, Tabs, Tooltip } from "antd";
+import PendingChatTab from "./PendingChatTab";
+import CreateGroupChatModal from "../modals/CreateGroupChatModal";
+import useModal from "../../hooks/useModal";
 
 type ChatSidebarProps = {
     chatRoom: ChatRoomResource
@@ -26,6 +30,8 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
     const [loading, setLoading] = useState(false)
     const [chatRooms, setChatRooms] = useState<ChatRoomResource[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const { handleCancel, handleOk, isModalOpen, showModal } = useModal();
+
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
     const { user } = useSelector(selectAuth);
     const navigate = useNavigate();
@@ -83,7 +89,7 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
 
                                 setChatRooms(prev => {
                                     const findExisted = prev.find(m => m.id === data.id);
-                                    if(!findExisted)
+                                    if (!findExisted)
                                         return [data, ...prev]
                                     return prev
                                 })
@@ -113,17 +119,17 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
 
     }, [isChatRoomsLoaded, chatRoom]);
 
-    useEffect(() => {
-        const fetchChatRooms = async () => {
-            setLoading(true)
-            const response = await chatRoomService.getAllChatRooms();
-            setLoading(false)
-            if (response.isSuccess) {
-                setChatRooms(response.data);
-                setIsChatRoomsLoaded(true);
-            }
+    const fetchChatRooms = async () => {
+        setLoading(true)
+        const response = await chatRoomService.getAllChatRooms();
+        setLoading(false)
+        if (response.isSuccess) {
+            setChatRooms(response.data);
+            setIsChatRoomsLoaded(true);
         }
+    }
 
+    useEffect(() => {
         fetchChatRooms();
     }, [])
 
@@ -147,20 +153,58 @@ const ChatSidebar: FC<ChatSidebarProps> = ({
         <div className="flex items-center justify-between px-4">
             <Link to='/' className="px-2 py-1 rounded-md bg-sky-100 text-primary text-xs">Quay lại</Link>
             <span className="text-xl font-semibold">Nhắn tin</span>
-            <button>
-                <Edit className="text-primary font-semibold" size={18} />
-            </button>
+            <Tooltip title='Tạo phòng chat'>
+                <button onClick={showModal}>
+                    <Edit className="text-primary font-semibold" size={18} />
+                </button>
+            </Tooltip>
         </div>
 
-        <div className="px-4">
-            <div className="px-3 py-[6px] text-sm rounded-3xl bg-gray-100 flex items-center gap-x-2">
-                <Search size={16} className="text-gray-400" />
-                <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="outline-none border-none w-full bg-gray-100" placeholder="Tìm kiếm" />
-            </div>
-        </div>
-        {loading ? <LoadingIndicator /> : <div className="flex flex-col gap-y-2 px-4 w-full h-full overflow-y-auto custom-scrollbar">
-            {chatRooms.map((item) => <ChatUserItem onClick={() => handleReadMessage(item.id)} isActive={item.id === chatRoom.id} key={item.id} chatRoom={item} />)}
-        </div>}
+        <Tabs
+            className="px-4 h-full overflow-y-auto custom-scrollbar"
+            items={[{
+                key: "1",
+                label: "Hội thoại",
+                children: <div className="flex flex-col gap-y-4 h-full">
+                    <div className="px-3 py-[6px] text-sm rounded-3xl bg-gray-100 flex items-center gap-x-2">
+                        <Search size={16} className="text-gray-400" />
+                        <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="outline-none border-none w-full bg-gray-100" placeholder="Tìm kiếm" />
+                    </div>
+
+                    {loading ? <LoadingIndicator /> : <div className="flex flex-col gap-y-2 w-full h-full">
+                        {chatRooms.map((item) => <ChatUserItem onClick={() => handleReadMessage(item.id)} isActive={item.id === chatRoom.id} key={item.id} chatRoom={item} />)}
+                    </div>}
+                </div>,
+            },
+            {
+                key: "2",
+                label: "Đang chờ",
+                children: <PendingChatTab width="sidebar" />,
+            },]}
+        />
+
+        <Modal
+            style={{
+                top: 20
+            }}
+            title={<p className="text-center font-bold text-lg">Tạo nhóm chat</p>}
+            width='500px'
+            open={isModalOpen}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            styles={{
+                footer: {
+                    display: 'none'
+                }
+            }}
+        >
+            <CreateGroupChatModal
+                onSuccess={() => {
+                    fetchChatRooms()
+                    handleOk()
+                }}
+            />
+        </Modal>
     </div>
 };
 

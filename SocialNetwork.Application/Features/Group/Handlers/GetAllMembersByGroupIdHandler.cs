@@ -19,7 +19,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
 
         public async Task<BaseResponse> Handle(GetAllMembersByGroupIdQuery request, CancellationToken cancellationToken)
         {
-            var (groupMembers, totalCount) = await _unitOfWork.GroupMemberRepository.GetAllMembersInGroupAsync(request.GroupId, request.Page, request.Size);
+            var (groupMembers, totalCount) = await _unitOfWork.GroupMemberRepository.GetAllMembersInGroupAsync(request.GroupId, request.Page, request.Size, request.Query, request.Role);
             
             var response = new List<GroupMemberResponse>();
 

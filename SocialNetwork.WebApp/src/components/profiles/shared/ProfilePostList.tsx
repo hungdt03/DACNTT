@@ -24,7 +24,8 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
     const [pagination, setPagination] = useState<Pagination>(inititalValues)
     const [loading, setLoading] = useState(false)
     const [posts, setPosts] = useState<PostResource[]>([]);
-    const [isFilter, setIsFilter] = useState(false)
+    const [isFilter, setIsFilter] = useState(false);
+    const [filter, setFilter] = useState<ProfilePostFilter>()
 
     useElementInfinityScroll({
         onLoadMore: () => void fetchNewPosts(),
@@ -36,31 +37,26 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
 
     const fetchPosts = async (page: number, size: number) => {
         setLoading(true)
-        const response = await postService.getAllPostsByUserId(user.id, page, size);
+        const response = await postService.getAllPostsByUserId(user.id, page, size, filter);
         setLoading(false)
         if (response.isSuccess) {
-            setPagination(response.pagination)
-            setPosts(prevPosts => {
-                const existingIds = new Set(prevPosts.map(post => post.id));
-                const newPosts = response.data.filter(post => !existingIds.has(post.id));
-                return [...prevPosts, ...newPosts];
-            });
-        }
-    }
+            setPagination(response.pagination);
 
-    const fetchPostFilter = async (page: number, size: number, filterParams: ProfilePostFilter) => {
-        setLoading(true)
-        const response = await postService.getAllPostsByUserId(user.id, page, size, filterParams);
-        setLoading(false)
-        if (response.isSuccess) {
-            setPagination(response.pagination)
-            setPosts(response.data);
+            if(page === 1) {
+                setPosts(response.data);
+            } else {
+                setPosts(prevPosts => {
+                    const existingIds = new Set(prevPosts.map(post => post.id));
+                    const newPosts = response.data.filter(post => !existingIds.has(post.id));
+                    return [...prevPosts, ...newPosts];
+                });
+            }
         }
     }
 
     useEffect(() => {
-        fetchPosts(pagination.page, pagination.size)
-    }, [])
+        fetchPosts(1, 6)
+    }, [filter])
 
     const fetchNewPosts = async () => {
         if (!pagination.hasMore || loading) return;
@@ -85,8 +81,8 @@ const ProfilePostList: FC<ProfilePostListProps> = ({
 
             <PostFilter
                 onChange={(filter) => {
-                    setIsFilter(true)
-                    fetchPostFilter(1, 6, filter)
+                    setIsFilter(true);
+                    setFilter(filter)
                 }}
             />
         </div>

@@ -31,7 +31,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
         public async Task<BaseResponse> Handle(InviteFriendsCommand request, CancellationToken cancellationToken)
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
-            var isMember = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId, userId)
+            var meInGroup = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId, userId)
                 ?? throw new AppException("Bạn không phải là thành viên của nhóm");
 
             var group = await _unitOfWork.GroupRepository.GetGroupByIdAsync(request.GroupId)

@@ -34,7 +34,6 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var reactions = await _unitOfWork.ReactionRepository.GetAllReactionsByPostIdAsync(request.PostId);
             var comments = await _unitOfWork.CommentRepository.GetAllCommentsByPostIdAsync(request.PostId);
             var sharePosts = await _unitOfWork.PostRepository.GetAllSharePostsByOriginalPostId(request.PostId);
-
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             _unitOfWork.ReactionRepository.RemoveRange(reactions);
             _unitOfWork.CommentRepository.RemoveRange(comments);
@@ -48,12 +47,12 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            return new DataResponse<PostResponse>() 
-            { 
+            return new DataResponse<PostResponse>()
+            {
                 Data = ApplicationMapper.MapToPost(post),
-                IsSuccess = true, 
-                Message = "Xóa bài viết thành công", 
-                StatusCode = System.Net.HttpStatusCode.OK 
+                IsSuccess = true,
+                Message = "Xóa bài viết thành công",
+                StatusCode = System.Net.HttpStatusCode.OK
             };
         }
 
@@ -70,27 +69,20 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 {
                     p.SharePostId = null;
                 }
-            }
-        }
 
-        private async Task NotifyUser(Domain.Entity.PostInfo.Post post)
-        {
-            var notifi = new Domain.Entity.System.Notification
+            });
+
+            _unitOfWork.CommentRepository.RemoveRange(comments);
+            _unitOfWork.PostRepository.DeletePost(post);
+
+            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            return new BaseResponse()
             {
-                ImageUrl = _contextAccessor.HttpContext.User.GetAvatar(),
-                IsRead = false,
-                Title = "Thông báo gỡ bài viết",
-                RecipientId = post.UserId,
-                Recipient = post.User,
-                Type = NotificationType.POST_DELETE_RESPONSE,
-                DateSent = DateTimeOffset.UtcNow,
-                Content = "Chúng tôi đã xóa bài viết của bạn, nhấn vào để xem chi tiết",
-                Post = post,
-                PostId = post.Id
+                IsSuccess = true,
+                Message = "Xóa bài viết thành công",
+                StatusCode = System.Net.HttpStatusCode.OK
             };
-            await _unitOfWork.NotificationRepository.CreateNotificationAsync(notifi);
-            var mappedNotification = ApplicationMapper.MapToNotification(notifi);
-            await _signalRService.SendNotificationToSpecificUser(mappedNotification.Recipient.FullName, mappedNotification);
         }
     }
 }

@@ -252,7 +252,7 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
                     </LexicalComposer>}
 
                 {isMentioning && suggestedFriends.length > 0 && (
-                    <div className="absolute top-full z-10 bg-white border p-2 rounded-md shadow-lg mt-1">
+                    <div className="absolute bottom-full z-10 bg-white border p-2 rounded-md shadow-lg mt-1">
                         {suggestedFriends.map((friend) => (
                             <div onClick={() => handleSelectFriend(friend)} key={friend.id} className="flex items-center gap-2 p-1 cursor-pointer hover:bg-gray-200">
                                 <Avatar src={friend.avatar} size="small" />

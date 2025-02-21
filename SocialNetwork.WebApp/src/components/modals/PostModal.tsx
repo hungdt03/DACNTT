@@ -88,7 +88,6 @@ const PostModal: FC<PostModalProps> = ({
     const fetchComments = async (page: number, size: number) => {
         setLoading(true)
         const response = await commentService.getAllRootCommentsByPostId(post.id, page, size);
-        console.log(response)
         setLoading(false)
         if (response.isSuccess) {
             setComments(prev => [...prev, ...response.data])
@@ -253,7 +252,7 @@ const PostModal: FC<PostModalProps> = ({
             onDeleteComment={handleDeleteComment}
         />
 
-        <div className="shadow p-4 absolute left-0 right-0 bottom-0 bg-white rounded-b-md">
+        <div className="shadow p-4 absolute left-0 right-0 bottom-0 bg-white rounded-b-md z-[200]">
             <BoxSendComment
                 onSubmit={handleCreateComment}
                 key={'box-send-comment'}

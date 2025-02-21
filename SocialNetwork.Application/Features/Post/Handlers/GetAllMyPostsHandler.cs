@@ -38,6 +38,19 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                     postItem.Shares = shares;
                 };
 
+                if (post.OriginalPost != null)
+                {
+                    // Story
+                    var originalPostStory = await _unitOfWork.StoryRepository
+                            .IsUserHaveStoryAsync(post.OriginalPost.UserId);
+                    postItem.OriginalPost.User.HaveStory = originalPostStory;
+                }
+
+                // Story
+                var haveStory = await _unitOfWork.StoryRepository
+                        .IsUserHaveStoryAsync(post.UserId);
+                postItem.User.HaveStory = haveStory;
+
                 var savedPost = await _unitOfWork.SavedPostRepository
                   .GetSavedPostByPostIdAndUserId(post.Id, userId);
 

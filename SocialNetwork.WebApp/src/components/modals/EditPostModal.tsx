@@ -194,6 +194,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
         const findTag = post.tags.find(item => item.user.id === tag.id)
 
         if (findTag && !postRequest.removeTagIds.includes(findTag)) {
+            setIsEdited(true)
             setPostRequest({
                 ...postRequest,
                 removeTagIds: [...postRequest.removeTagIds, findTag]
@@ -202,7 +203,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
     }
 
     const handleEmojiSelect = (emoji: { native: string }) => {
-        console.log('Vô đây')
+        setIsEdited(true)
         setPostRequest({
             ...postRequest,
             content: postRequest.content + emoji.native
@@ -236,10 +237,13 @@ const EditPostModal: FC<EditPostModalProps> = ({
                         })()}
                 </div>
                 {post.isGroupPost ? getGroupButtonPrivacyContent(post.group.privacy) : <Popover trigger='click' content={<PostPrivacryOption
-                    onChange={(privacy) => setPostRequest({
-                        ...postRequest,
-                        privacy
-                    })}
+                    onChange={(privacy) => {
+                        setIsEdited(true);
+                        setPostRequest({
+                            ...postRequest,
+                            privacy
+                        })
+                    }}
                 />}>
                     {getButtonPrivacyContent(postRequest.privacy)}
                 </Popover>}
@@ -328,6 +332,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     <Popover trigger='click' placement="right" content={<TagFriendModal
                         tags={post.tags}
                         onChange={(tags) => {
+                            setIsEdited(true)
                             setPostRequest({
                                 ...postRequest,
                                 tagIds: tags
@@ -343,7 +348,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 </div>
             </div>
         </div>
-        <button onClick={handleEditPost} disabled={!isEdited || !postRequest.content} className="sm:py-[5px] py-[4px] w-full rounded-md font-semibold text-sm sm:text-[16px] text-white bg-sky-500">LƯU LẠI</button>
+        <button onClick={handleEditPost} disabled={!isEdited || !postRequest.content} className="sm:py-[8px] py-[4px] w-full rounded-md font-semibold text-sm sm:text-[16px] text-white bg-sky-500">LƯU LẠI</button>
     </div>
 };
 

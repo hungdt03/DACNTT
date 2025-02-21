@@ -20,7 +20,7 @@ type NotificationMoreActionProps = {
 
 const NotificationMoreAction: FC<NotificationMoreActionProps> = ({ onMarkAsRead, onDelete, isRead }) => {
     return (
-        <div className='flex flex-col items-start rounded-md'>
+        <div onClick={(e) => e.stopPropagation()} className='flex flex-col items-start rounded-md'>
             {!isRead && (
                 <button
                     onClick={onMarkAsRead}
@@ -225,13 +225,7 @@ const Notification: FC<NotificationProps> = ({
                                       ? notis.notiTag
                                       : notification.type === NotificationType.REPORT_RESPONSE
                                         ? notis.commentNoti
-                                        : notification.type === NotificationType.REPORT_DELETE_RESPONSE
-                                          ? notis.commentNoti
-                                          : notification.type === NotificationType.POST_DELETE_RESPONSE
-                                            ? notis.commentNoti
-                                            : notification.type === NotificationType.GROUP_DELETE_RESPONSE
-                                              ? notis.commentNoti
-                                              : notis.userNoti
+                                        : notis.userNoti
                     }
                 />
             </div>
@@ -253,14 +247,20 @@ const Notification: FC<NotificationProps> = ({
                             <div className='flex items-center gap-x-2'>
                                 <button
                                     className='px-3 py-[1px] rounded-md bg-gray-200 text-gray-600'
-                                    onClick={() => handleRejectJoinGroup(notification.groupInvitationId)}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleRejectJoinGroup(notification.groupInvitationId)
+                                    }}
                                 >
                                     Gỡ
                                 </button>
                                 <Button
                                     size='small'
                                     type='primary'
-                                    onClick={() => handleAcceptJoinGroup(notification.groupInvitationId)}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleAcceptJoinGroup(notification.groupInvitationId)
+                                    }}
                                 >
                                     Chấp nhận
                                 </Button>
@@ -279,14 +279,20 @@ const Notification: FC<NotificationProps> = ({
                             <div className='flex items-center gap-x-2'>
                                 <button
                                     className='px-3 py-[1px] rounded-md bg-gray-200 text-gray-600'
-                                    onClick={() => handleCancelFriendRequest(notification.friendRequestId)}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleCancelFriendRequest(notification.friendRequestId)
+                                    }}
                                 >
                                     Gỡ
                                 </button>
                                 <Button
                                     size='small'
                                     type='primary'
-                                    onClick={() => handleAcceptFriendRequest(notification.friendRequestId)}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleAcceptFriendRequest(notification.friendRequestId)
+                                    }}
                                 >
                                     Chấp nhận
                                 </Button>
@@ -305,14 +311,20 @@ const Notification: FC<NotificationProps> = ({
                             <div className='flex items-center gap-x-2'>
                                 <button
                                     className='px-3 py-[1px] rounded-md bg-gray-200 text-gray-600'
-                                    onClick={() => handleRejectRoleInvitation(notification.groupRoleInvitationId)}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleRejectRoleInvitation(notification.groupRoleInvitationId)
+                                    }}
                                 >
                                     Gỡ
                                 </button>
                                 <Button
                                     size='small'
                                     type='primary'
-                                    onClick={() => handleAcceptFriendRequest(notification.groupRoleInvitationId)}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleAcceptRoleInvitation(notification.groupRoleInvitationId)
+                                    }}
                                 >
                                     Chấp nhận
                                 </Button>
@@ -329,7 +341,7 @@ const Notification: FC<NotificationProps> = ({
             {showMoreAction && (
                 <Popover
                     trigger='click'
-                    className='z-[200]'
+                    className='z-20'
                     content={
                         <NotificationMoreAction
                             isRead={notification.isRead}
@@ -338,7 +350,10 @@ const Notification: FC<NotificationProps> = ({
                         />
                     }
                 >
-                    <button className='z-[200] absolute top-1/2 -translate-y-1/2 right-6 bg-white shadow transition-all ease-linear duration-100 border-[1px] border-gray-200 w-6 h-6 flex items-center justify-center rounded-full'>
+                    <button
+                        onClick={(e) => e.stopPropagation()}
+                        className='absolute top-1/2 -translate-y-1/2 right-6 bg-white shadow transition-all ease-linear duration-100 border-[1px] border-gray-200 w-6 h-6 flex items-center justify-center rounded-full'
+                    >
                         <MoreHorizontal className='text-gray-400' size={16} />
                     </button>
                 </Popover>

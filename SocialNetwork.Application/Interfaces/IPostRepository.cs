@@ -23,6 +23,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<int> CountPendingPostsByGroupIdAsync(Guid groupId);
         Task<int> CountTodayPostsByGroupIdAsync(Guid groupId);
         Task<(List<Post> Posts, int TotalCount)> GetAllPostsContainsKey(string key, int page, int size);
+        Task<(List<Post> Posts, int TotalCount)> GetAllPostsContainsKey(string key, int page, int size, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate);
         Task<(List<Post> Posts, int TotalCount)> GetAllGroupPostsByGroupIdAndUserIdAndStatus(Guid groupId, string userId, string status, int page, int size);
 
         Task DeleteManyPost(List<string> listPostId);

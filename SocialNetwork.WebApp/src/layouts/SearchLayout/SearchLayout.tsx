@@ -9,7 +9,7 @@ const SearchLayout: FC = () => {
     useTitle('Tìm kiếm')
     return <div className="flex flex-col bg-slate-100 w-screen h-screen">
         <HeaderFullWidth />
-        <div className="grid grid-cols-12 gap-4 h-full w-full overflow-hidden">
+        <div className="grid grid-cols-12 h-full w-full overflow-hidden">
             <SearchSidebar />
             <div className="lg:col-span-9 col-span-12 h-full overflow-y-auto custom-scrollbar">
                 <SearchMenuMobile />

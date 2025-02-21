@@ -28,17 +28,15 @@ const ProfileSavedPost: FC = () => {
     const fetchSavedPosts = async (page: number, size: number) => {
         setLoading(true)
         const response = await postService.getUserSavedPosts(page, size);
-        setTimeout(() => {
-            setLoading(false);
-            if (response.isSuccess) {
-                setPagination(response.pagination);
-                setSavedPosts(prevPosts => {
-                    const existingIds = new Set(prevPosts.map(post => post.id));
-                    const newPosts = response.data.filter(post => !existingIds.has(post.id));
-                    return [...prevPosts, ...newPosts];
-                });
-            }
-        }, 2000)
+        setLoading(false);
+        if (response.isSuccess) {
+            setPagination(response.pagination);
+            setSavedPosts(prevPosts => {
+                const existingIds = new Set(prevPosts.map(post => post.id));
+                const newPosts = response.data.filter(post => !existingIds.has(post.id));
+                return [...prevPosts, ...newPosts];
+            });
+        }
     }
 
     useEffect(() => {
@@ -58,12 +56,12 @@ const ProfileSavedPost: FC = () => {
     return <div ref={containerRef} className="mx-auto max-w-screen-sm flex flex-col gap-y-4 pb-20">
         {savedPosts.map(post => {
             if (post.postType === PostType.SHARE_POST) {
-                return <SharePost allowShare={post.privacy === PrivacyType.PUBLIC}  key={post.id} post={post} />;
+                return <SharePost onRemoveSavedPost={handleRemoveSavedPost} allowShare={post.privacy === PrivacyType.PUBLIC} key={post.id} post={post} />;
             } else if (post.isGroupPost) {
-                return <PostGroup allowShare={post.privacy === PrivacyType.GROUP_PUBLIC} key={post.id} post={post} />;
+                return <PostGroup onRemoveSavedPost={handleRemoveSavedPost} allowShare={post.privacy === PrivacyType.GROUP_PUBLIC} key={post.id} post={post} />;
             }
 
-            return <Post allowShare={post.privacy === PrivacyType.PUBLIC} key={post.id} post={post} />;
+            return <Post onRemoveSavedPost={handleRemoveSavedPost} allowShare={post.privacy === PrivacyType.PUBLIC} key={post.id} post={post} />;
         })}
 
         {loading && <PostSkeletonList />}

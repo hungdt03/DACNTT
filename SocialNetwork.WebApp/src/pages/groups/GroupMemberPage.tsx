@@ -9,11 +9,21 @@ import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import LoadingIndicator from "../../components/LoadingIndicator";
 import { Search } from "lucide-react";
 import { GroupResource } from "../../types/group";
-import { Empty, message, Modal } from "antd";
+import { Dropdown, Empty, message, Modal } from "antd";
 import ChooseNewAdminModal from "../../components/modals/ChooseNewAdminModal";
 import useModal from "../../hooks/useModal";
 import { MemberRole } from "../../enums/member-role";
 import Loading from "../../components/Loading";
+import useDebounce from "../../hooks/useDebounce";
+
+const MEMBER_VALUES = [
+    { key: "ALL", label: "Tất cả" },
+    { key: "ADMIN", label: "Quản trị viên" },
+    { key: "MODERATOR", label: "Người kiểm duyệt" },
+    { key: "MEMBER", label: "Thành viên" }
+];
+
+export type RoleFilter = 'ALL' | 'MEMBER' | 'ADMIN' | 'MODERATOR'
 
 const GroupMemberPage: FC = () => {
     const { id } = useParams()
@@ -27,7 +37,9 @@ const GroupMemberPage: FC = () => {
     const [group, setGroup] = useState<GroupResource>();
     const [selectMember, setSelectMember] = useState<GroupMemberResource>()
     const { isModalOpen, handleCancel, handleOk, showModal } = useModal();
-    const [groupLoading, setGroupLoading] = useState(false)
+    const [groupLoading, setGroupLoading] = useState(false);
+    const [role, setRole] = useState<RoleFilter>('ALL');
+    const debouncedValue = useDebounce(searchValue, 300)
 
     const { containerRef } = useInfiniteScroll({
         fetchMore: () => void fetchMoreMembers(),
@@ -53,14 +65,18 @@ const GroupMemberPage: FC = () => {
     const fetchMembers = async (page: number, size: number) => {
         if (id) {
             setLoading(true)
-            const response = await groupService.getAllMembersByGroupId(id, page, size);
+            const response = await groupService.getAllMembersByGroupId(id, page, size, searchValue, role);
             setLoading(false)
             if (response.isSuccess) {
-                setMembers(prevMembers => {
-                    const existingIds = new Set(prevMembers.map(m => m.user.id));
-                    const newMembers = response.data.filter(m => !existingIds.has(m.user.id));
-                    return [...prevMembers, ...newMembers];
-                });
+                if (page === 1) {
+                    setMembers(response.data)
+                } else {
+                    setMembers(prevMembers => {
+                        const existingIds = new Set(prevMembers.map(m => m.user.id));
+                        const newMembers = response.data.filter(m => !existingIds.has(m.user.id));
+                        return [...prevMembers, ...newMembers];
+                    });
+                }
                 setPagination(response.pagination)
             }
         }
@@ -174,6 +190,10 @@ const GroupMemberPage: FC = () => {
         fetchMembers(pagination.page, pagination.size)
     }, [id]);
 
+    useEffect(() => {
+        fetchMembers(1, 6)
+    }, [role, debouncedValue])
+
     return <div className="w-full">
         {groupLoading && <Loading />}
         <div className="w-full flex items-center justify-center bg-white shadow sticky top-0 z-10">
@@ -188,6 +208,23 @@ const GroupMemberPage: FC = () => {
                         <Search size={14} />
                         <input value={searchValue} onChange={e => setSearchValue(e.target.value)} placeholder="Tìm kiếm" className="px-2 py-1 w-full bg-gray-100 outline-none border-none" />
                     </div>
+                    <Dropdown
+                        menu={{
+                            items: MEMBER_VALUES.map(item => ({
+                                key: item.key,
+                                label: (
+                                    <button className="py-1 text-left" onClick={() => setRole(item.key as RoleFilter)}>
+                                        {item.label}
+                                    </button>
+                                ),
+                            })),
+                        }}
+                        placement="bottom"
+                    >
+                        <button className="py-[6px] px-8 text-sm rounded-md font-semibold bg-gray-100 hover:bg-gray-200">
+                            {MEMBER_VALUES.find(item => item.key === role)?.label ?? 'Lọc theo quyền'}    
+                        </button>
+                    </Dropdown>
                 </div>
             </div>
         </div>

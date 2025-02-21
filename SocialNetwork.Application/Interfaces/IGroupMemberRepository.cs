@@ -7,7 +7,7 @@ namespace SocialNetwork.Application.Interfaces
     {
         Task CreateGroupMemberAsync(GroupMember groupMember);
         Task<(IEnumerable<GroupMember> Members, int TotalCount)> GetAllNonAdminMembersInGroupAsync(Guid groupId, int page, int size);
-        Task<(IEnumerable<GroupMember> Members, int TotalCount)> GetAllMembersInGroupAsync(Guid groupId, int page, int size);
+        Task<(IEnumerable<GroupMember> Members, int TotalCount)> GetAllMembersInGroupAsync(Guid groupId, int page, int size, string query, string role);
         Task<GroupMember?> GetGroupMemberByIdAsync(Guid groupMemberId);
         Task<GroupMember?> GetGroupMemberByGroupIdAndUserId(Guid groupId, string userId);
         void RemoveGroupMember(GroupMember groupMember);

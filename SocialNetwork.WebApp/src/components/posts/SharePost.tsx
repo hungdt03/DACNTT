@@ -30,11 +30,14 @@ import PostNotFound from "./PostNotFound";
 import ExpandableText from "../ExpandableText";
 import ChangePostPrivacyModal from "../modals/ChangePostPrivacyModal";
 import { PrivacyType } from "../../enums/privacy";
+import ReportPostModal from "../modals/reports/ReportPostModal";
+import reportService from "../../services/reportService";
 
 type SharePostProps = {
     post: PostResource;
     onFetch?: (data: PostResource) => void;
     onRemovePost?: (postId: string) => void;
+    onRemoveSavedPost?: (postId: string) => void;
     allowShare?: boolean;
 }
 
@@ -42,7 +45,8 @@ const SharePost: FC<SharePostProps> = ({
     post: postParam,
     allowShare = true,
     onFetch,
-    onRemovePost
+    onRemovePost,
+    onRemoveSavedPost
 }) => {
     const { handleCancel, isModalOpen, handleOk, showModal } = useModal();
     const { handleCancel: cancelReactionModal, isModalOpen: openReactionModal, handleOk: okReactionModal, showModal: showReactionModal } = useModal();
@@ -50,13 +54,14 @@ const SharePost: FC<SharePostProps> = ({
     const { handleCancel: cancelSharePost, isModalOpen: openSharePost, handleOk: okSharePost, showModal: showSharePost } = useModal();
     const { handleCancel: cancelListShare, isModalOpen: openListShare, handleOk: okListShare, showModal: showListShare } = useModal();
     const { handleCancel: cancelPrivacy, isModalOpen: openPrivacy, handleOk: okPrivacy, showModal: showPrivacy } = useModal();
+    const { handleCancel: cancelReport, isModalOpen: openReport, handleOk: okReport, showModal: showReport } = useModal();
 
     const [reactions, setReactions] = useState<ReactionResource[]>();
     const { user } = useSelector(selectAuth)
     const [reaction, setReaction] = useState<ReactionResource | null>();
     const [topReactions, setTopReactions] = useState<{ reactionType: string; count: number }[]>([]);
     const [privacy, setPrivacy] = useState<PrivacyType>(postParam.privacy)
-
+    const [reason, setReason] = useState('')
     const [post, setPost] = useState<PostResource>(postParam)
 
     const fetchReactions = async () => {
@@ -164,6 +169,55 @@ const SharePost: FC<SharePostProps> = ({
         }
     }
 
+
+    const handleReportPost = async (reason: string) => {
+        const response = await reportService.reportPost(post.id, reason);
+        if (response.isSuccess) {
+            message.success(response.message)
+            okReport()
+            setReason('')
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleSavedPost = async (postId: string) => {
+        const response = await postService.addSavedPost(postId);
+        if (response.isSuccess) {
+            message.success(response.message);
+            setPost(prev => ({
+                ...prev,
+                isSaved: true
+            }))
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleRemoveSavedPost = async (postId: string) => {
+        const response = await postService.removeSavedPostByPostId(postId);
+        if (response.isSuccess) {
+            onRemoveSavedPost?.(postId)
+            message.success(response.message)
+            setPost(prev => ({
+                ...prev,
+                isSaved: false
+            }))
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleRevokeTag = async () => {
+        const response = await postService.revokeTag(post.id);
+        if (response.isSuccess) {
+            fetchPostById()
+            message.success(response.message)
+        } else {
+            message.error(response.message)
+        }
+    }
+
     return <div className="flex flex-col gap-y-3 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
@@ -222,6 +276,12 @@ const SharePost: FC<SharePostProps> = ({
             <Popover content={<PostMoreAction
                 onEditPost={showEditPostModal}
                 onDeletePost={handleDeletePost}
+                onReportPost={showReport}
+                isHasTag={!!post.tags.find(s => s.user.id === user?.id)}
+                onRevokeTag={handleRevokeTag}
+                onSavedPost={() => handleSavedPost(post.id)}
+                onRemoveSavedPost={() => handleRemoveSavedPost(post.id)}
+                isSaved={post.isSaved}
                 isMine={post.user.id === user?.id}
             />}>
                 <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100">
@@ -328,6 +388,28 @@ const SharePost: FC<SharePostProps> = ({
             <ChangePostPrivacyModal
                 privacy={privacy}
                 onChange={(newPrivacy) => setPrivacy(newPrivacy)}
+            />
+        </Modal>
+
+        {/* REPORT TO ADMIN OF APPLICATION*/}
+        <Modal
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Báo cáo bài viết</p>}
+            centered
+            open={openReport}
+            onOk={okReport}
+            onCancel={cancelReport}
+            okText='Gửi báo cáo'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason),
+                disabled: reason.trim().length < 20
+            }}
+        >
+            <ReportPostModal
+                value={reason}
+                onChange={(newValue) => setReason(newValue)}
+                title="Tại sao bạn báo cáo bài viết này"
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
             />
         </Modal>
     </div>

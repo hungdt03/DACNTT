@@ -89,10 +89,7 @@ const MoreThanFiveImage: FC<ImageProps> = ({ items }) => {
 
                                 <button 
                                     onClick={handleImageClick}
-                                    style={{
-                                        zIndex: 100
-                                    }}
-                                    className="absolute inset-0 overflow-hidden w-full h-full bg-black bg-opacity-50 flex justify-center items-center text-white text-lg font-bold cursor-pointer"
+                                    className="z-[100] absolute inset-0 overflow-hidden w-full h-full bg-black bg-opacity-50 flex justify-center items-center text-white text-lg font-bold cursor-pointer"
                                 >
                                     +{extraImages.length}
                                 </button>

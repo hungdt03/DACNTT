@@ -99,7 +99,7 @@ const HomePage: FC = () => {
                 if (post.postType === PostType.SHARE_POST) {
                     return <SharePost allowShare={post.privacy === PrivacyType.PUBLIC} onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;
                 } else if (post.isGroupPost) {
-                    return <PostGroup allowShare={post.privacy === PrivacyType.GROUP_PUBLIC} key={post.id} post={post} />;
+                    return <PostGroup allowShare={post.privacy === PrivacyType.GROUP_PUBLIC} onRemovePost={handleRemovePost}  key={post.id} post={post} />;
                 }
 
                 return <Post allowShare={post.privacy === PrivacyType.PUBLIC} onRemovePost={handleRemovePost} onFetch={(data) => fetchPostByID(data.id)} key={post.id} post={post} />;

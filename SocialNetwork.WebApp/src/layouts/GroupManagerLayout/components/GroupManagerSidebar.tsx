@@ -44,7 +44,7 @@ const GroupManagerSidebar: FC = () => {
                 <img alt="Bảng tin" className="w-6 h-6" src={images.feed} />
                 <span className="text-[15px]">Bảng tin của bạn</span>
             </Link>
-            <Link to='/groups/pending-invites' className={cn("flex items-center gap-x-2 py-3 px-2 rounded-md w-full hover:text-black hover:bg-gray-100", location.pathname.includes('/pending-invites') && 'bg-gray-100')}>
+            <Link to='/groups/my-pending-invites' className={cn("flex items-center gap-x-2 py-3 px-2 rounded-md w-full hover:text-black hover:bg-gray-100", location.pathname.includes('/pending-invites') && 'bg-gray-100')}>
                 <img alt="Lời mời" className="w-6 h-6" src={images.invites} />
                 <span className="text-[15px]">Lời mời đang chờ</span>
             </Link>

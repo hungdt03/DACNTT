@@ -1,4 +1,5 @@
 
+import { SearchPostFilterParams } from '../components/posts/SearchPostFilter';
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { PostResource } from '../types/post';
 import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
@@ -45,12 +46,13 @@ class SearchService {
         })
     }
 
-    searchPosts(query: string, page: number, size: number) : Promise<PaginationResponse<PostResource[]>> {
+    searchPosts(query: string, page: number, size: number, filter?: SearchPostFilterParams) : Promise<PaginationResponse<PostResource[]>> {
         return axiosInterceptor.get('/api/search/posts', {
             params: {
                 query,
                 page,
-                size
+                size,
+                ...filter
             }
         })
     }

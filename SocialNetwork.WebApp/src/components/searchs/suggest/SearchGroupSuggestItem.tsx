@@ -18,7 +18,7 @@ const SearchGroupSuggestItem: FC<SearchGroupSuggestItemProps> = ({
         </span>}
 
         <div className="flex items-center gap-x-2">
-            <img src={suggest.group.coverImage ?? images.cover} className="w-[40px] h-[40px] rounded-md" />
+            <img src={suggest.group.coverImage ?? images.cover} className="w-[40px] object-cover h-[40px] rounded-md" />
             <div className="flex flex-col items-start">
                 <span className="text-sm font-semibold line-clamp-1">{suggest.group.name}</span>
                 <span className="text-gray-600 text-xs line-clamp-1">
