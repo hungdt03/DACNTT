@@ -196,7 +196,7 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                                                     }
                                                     style={{ fontSize: 12, padding: '3px 8px', minWidth: 'auto' }}
                                                 >
-                                                    Xóa
+                                                    Gỡ bài viết
                                                 </Button>
                                             </Popconfirm>
                                         </TableCell>

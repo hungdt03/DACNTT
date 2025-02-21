@@ -56,6 +56,9 @@ class AdminService {
      GetRegistrationStatsByYear(year : number) : Promise<DataResponse<MonthlyRegistrationStatsResource[]>> {
           return axiosInterceptor.get('/api/admin/get-registration-stats-by-year/'+year)
      }
+     GetTop1Followers() : Promise<DataResponse<UserResource>> {
+          return axiosInterceptor.get('/api/admin/get-top1-followers')
+     }
      //POSt
      getAllPost() : Promise<DataResponse<PostResource[]>> {
           return axiosInterceptor.get('/api/admin/get-all-post')

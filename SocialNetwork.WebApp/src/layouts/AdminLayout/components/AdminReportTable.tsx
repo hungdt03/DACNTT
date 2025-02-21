@@ -227,7 +227,7 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                                 startIcon={<FontAwesomeIcon icon={faPen} style={{ fontSize: 10 }} />}
                                                 onClick={() => handleOpenUpdateReportDialog(report)}
                                             >
-                                                Cập nhật
+                                                Sửa
                                             </Button>
                                             <span style={{ width: 10, display: 'inline-block' }}></span>
                                             <Popconfirm

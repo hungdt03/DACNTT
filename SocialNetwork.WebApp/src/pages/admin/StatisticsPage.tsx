@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Layout, Card, Row, Col, Statistic, Select } from 'antd'
+import { Layout, Card, Row, Col, Statistic, Select, Avatar, Typography } from 'antd'
 import { StockOutlined, WarningOutlined, UserOutlined, TeamOutlined } from '@ant-design/icons'
 import { Pie, Line, Bar } from '@ant-design/plots'
 import adminService from '../../services/adminService'
+import { UserResource } from '../../types/user'
 
 const { Content } = Layout
 const { Option } = Select
@@ -17,9 +18,9 @@ const StatisticsPage: React.FC = () => {
     const [selectedStatYear, setSelectedStatYear] = useState<number | null>(null)
     const [inventoryData, setInventoryData] = useState<{ type: string; value: number }[]>([])
     const [top10UserScore, setTop10UserScore] = useState<{ name: string; score: number }[]>([])
-    const [registrationStats, setRegistrationStats] = useState<{ year: number; month: number; count: number }[]>([])
+    const [registrationStats, setRegistrationStats] = useState<{ month: string; year: number; count: number }[]>([])
     const [registrationYear, setRegistrationYear] = useState<number[]>([])
-
+    const [top1Followers, setTop1Followers] = useState<UserResource>()
     const fetchTop10UserScore = async () => {
         const response = await adminService.GetTop10UserScore()
         if (response.isSuccess && response.data) {
@@ -43,22 +44,12 @@ const StatisticsPage: React.FC = () => {
         const response = await adminService.GetRegistrationStatsByYear(year)
         setSelectedStatYear(year)
         if (response.isSuccess) {
-            const statsMap = new Map<number, number>()
-            for (let i = 1; i <= 12; i++) {
-                statsMap.set(i, 0)
-            }
-
-            response.data.forEach((stat) => {
-                statsMap.set(stat.month, stat.count)
-            })
-
-            const stats = Array.from(statsMap, ([month, count]) => ({
-                year,
-                month,
-                count
+            const expenseData = response.data.map((stat) => ({
+                month: `Tháng ${stat.month}`,
+                count: stat.count,
+                year: stat.year
             }))
-
-            setRegistrationStats(stats)
+            setRegistrationStats(expenseData)
         }
     }
     const fetchAndUpdateInventoryData = async () => {
@@ -69,8 +60,8 @@ const StatisticsPage: React.FC = () => {
             setCountAllUser(userRes.data)
 
             setInventoryData([
-                { type: 'Tài khoản hoạt động', value: userRes.data - lockedRes.data },
-                { type: 'Tài khoản khóa', value: lockedRes.data }
+                { type: 'Hoạt động', value: userRes.data - lockedRes.data },
+                { type: 'Khóa', value: lockedRes.data }
             ])
         }
     }
@@ -94,6 +85,12 @@ const StatisticsPage: React.FC = () => {
             setCountAllGroup(response.data)
         }
     }
+    const fetchGetTop1Followers = async () => {
+        const response = await adminService.GetTop1Followers()
+        if (response.isSuccess) {
+            setTop1Followers(response.data)
+        }
+    }
     const fetchCountAllReport = async () => {
         const response = await adminService.CountAllReport()
         if (response.isSuccess) {
@@ -109,7 +106,9 @@ const StatisticsPage: React.FC = () => {
         fetchGetAllUserConnection()
         fetchTop10UserScore()
         fetchRegistrationYear()
+        fetchGetTop1Followers()
     }, [])
+
     return (
         <Layout style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
             <Content style={{ flex: 1, overflow: 'hidden' }}>
@@ -161,25 +160,53 @@ const StatisticsPage: React.FC = () => {
                     <Col span={16}>
                         <Row gutter={[12, 12]}>
                             <Col span={12}>
-                                <Card title='Tài khoản' style={{ borderRadius: '10px', height: '180px' }}>
+                                <Card
+                                    title='Tài khoản'
+                                    style={{
+                                        borderRadius: '10px',
+                                        textAlign: 'center',
+                                        height: '180px',
+                                        flexDirection: 'column',
+                                        justifyContent: 'center'
+                                    }}
+                                >
                                     <Pie data={inventoryData} angleField='value' colorField='type' height={110} />
                                 </Card>
                             </Col>
+
                             <Col span={12}>
                                 <Card
-                                    title='Tài khoản có lượt tương tác cao nhất'
-                                    style={{ borderRadius: '10px', textAlign: 'center', height: '180px' }}
+                                    title='Tài khoản có lượt theo dõi nhiều nhất'
+                                    style={{
+                                        borderRadius: '10px',
+                                        textAlign: 'center',
+                                        height: '180px',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
                                 >
-                                    <Statistic value={1000} prefix={<UserOutlined />} />
+                                    <Avatar size={64} icon={<UserOutlined />} />
+                                    <Typography.Text
+                                        style={{
+                                            marginTop: 5,
+                                            fontSize: 16,
+                                            fontWeight: 600
+                                        }}
+                                    >
+                                        {top1Followers?.fullName}
+                                    </Typography.Text>
+                                    <Statistic value={top1Followers?.followerCount} prefix={<UserOutlined />} />
                                 </Card>
                             </Col>
                         </Row>
+
                         <Row gutter={[12, 12]} style={{ marginTop: '10px' }}>
                             <Col span={24} style={{ height: '100%' }}>
                                 <Card
                                     title={
                                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                                            <span>Tổng số tài khoản đăng ký</span>
+                                            <span>Tổng số tài khoản đăng ký năm</span>
                                             <Select
                                                 value={selectedStatYear}
                                                 placeholder='Chọn năm'
@@ -197,9 +224,11 @@ const StatisticsPage: React.FC = () => {
                                     style={{ borderRadius: '10px' }}
                                 >
                                     <Line
+                                        key={selectedStatYear}
                                         data={registrationStats}
                                         xField='month'
                                         yField='count'
+                                        seriesField='type'
                                         height={220}
                                         point={{ size: 5, shape: 'circle' }}
                                     />

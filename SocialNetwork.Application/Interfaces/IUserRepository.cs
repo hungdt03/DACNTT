@@ -20,5 +20,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<int> CountAllUserIsLock();
         Task<List<int>> GetRegistrationYears();
         Task<List<MonthlyRegistrationStatsResponse>> GetRegistrationStatsByYear(int year);
+        Task<User> GetTop1UserFollowers();
     }
 }

@@ -1,7 +1,9 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using SocialNetwork.Application.Common.Helpers;
+using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Auth.Commands;
@@ -19,19 +21,22 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
         private readonly IUnitOfWork unitOfWork;
         private readonly IMailkitService mailkitService;
         private readonly IConfiguration configuration;
+        private readonly IHttpContextAccessor contextAccessor;
 
-        public RegisterCommandHandler(UserManager<Domain.Entity.System.User> userManager, IUnitOfWork unitOfWork, IMailkitService mailkitService, IConfiguration configuration)
+        public RegisterCommandHandler(IHttpContextAccessor contextAccessor,UserManager<Domain.Entity.System.User> userManager, IUnitOfWork unitOfWork, IMailkitService mailkitService, IConfiguration configuration)
         {
             this.userManager = userManager;
             this.unitOfWork = unitOfWork;
             this.mailkitService = mailkitService;
             this.configuration = configuration;
+            this.contextAccessor = contextAccessor;
         }
 
         public async Task<BaseResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
             var checkUser = await unitOfWork.UserRepository.GetUserByEmailIgnoreQuery(request.Email);
-            
+            var getCurrentUserRole = contextAccessor.HttpContext.User.GetUserRole();
+
             if (checkUser != null && checkUser.IsVerification)
                 throw new AppException("Thông tin email đã tồn tại");
             
@@ -49,6 +54,11 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
             user.CoverImage = configuration["ServerHost"] + ShareConstant.PREFIX_FILE_API + ShareConstant.COVER_FILENAME;
             user.IsVerification = false;
             user.DateJoined = DateTime.Now;
+
+            if (getCurrentUserRole.Equals("ADMIN"))
+            {
+                user.IsVerification = true;
+            }
 
             var result = await userManager.CreateAsync(user, request.Password);
 
