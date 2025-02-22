@@ -66,7 +66,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                 Group = report.TargetGroup,
                 GroupId = report.TargetGroupId
             };
-
+            await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             notifications.Add(notification);
 
             if ((report.ReportType == ReportType.COMMENT && request.IsDelete) || (report.ReportType == ReportType.POST && request.IsDelete))
@@ -95,8 +95,8 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                     DateSent = DateTimeOffset.UtcNow
                 };
 
-                notifications.Add(notiToUser);
                 await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiToUser);
+                notifications.Add(notiToUser);
             }
 
             await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
@@ -106,7 +106,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
             foreach (var noti in notifications)
             {
                 var mappedNotification = ApplicationMapper.MapToNotification(noti);
-                await _signalRService.SendNotificationToSpecificUser(mappedNotification.Recipient.FullName, mappedNotification);
+                await _signalRService.SendNotificationToSpecificUser(noti.Recipient.UserName, mappedNotification);
             }
 
             return new BaseResponse

@@ -91,7 +91,7 @@ const MoreThanFiveMedia: FC<MixMediaProps> = ({
                                             />
                                         )}
                                     </div>
-                                    <div className="z-[100] absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center text-white text-lg font-bold">
+                                    <div className="z-[60] absolute inset-0 bg-black bg-opacity-50 flex justify-center items-center text-white text-lg font-bold">
                                         +{extraMedia.length}
                                     </div>
                                 </div>

@@ -28,7 +28,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<JoinGroupRequest?> GetJoinGroupRequestByIdAsync(Guid requestId)
         {
-            return await _context.JoinGroupRequests.SingleOrDefaultAsync(j => j.Id == requestId);
+            return await _context.JoinGroupRequests
+                .Include(j => j.Group)
+                .SingleOrDefaultAsync(j => j.Id == requestId);
         }
 
         public async Task<JoinGroupRequest?> GetJoinGroupRequestByUserIdAndGroupIdAsync(string userId, Guid groupId)

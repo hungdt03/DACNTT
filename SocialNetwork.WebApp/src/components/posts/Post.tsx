@@ -188,8 +188,8 @@ const Post: FC<PostProps> = ({
         }
     }
 
-    const handleReportPost = async (reason: string) => {
-        const response = await reportService.reportPost(post.id, reason, group?.id);
+    const handleReportPost = async (reason: string, groupId?: string) => {
+        const response = await reportService.reportPost(post.id, reason, groupId);
         if (response.isSuccess) {
             message.success(response.message)
             okReport()
@@ -298,6 +298,7 @@ const Post: FC<PostProps> = ({
                 </div>
             </div>
             <Popover className="flex-shrink-0" content={<PostMoreAction
+                post={post}
                 onEditPost={showEditPostModal}
                 onDeletePost={handleDeletePost}
                 onReportPost={showReport}
@@ -463,7 +464,7 @@ const Post: FC<PostProps> = ({
             okText='Gửi báo cáo'
             cancelText='Hủy'
             okButtonProps={{
-                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason),
+                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason, group?.id),
                 disabled: reason.trim().length < 20
             }}
         >

@@ -5,6 +5,7 @@ import { SearchAllResource } from "../../types/search/search-all";
 import SearchUserBlock from "../../components/searchs/blocks/SearchUserBlock";
 import SearchGroupBlock from "../../components/searchs/blocks/SearchGroupBlock";
 import SearchPostBlock from "../../components/searchs/blocks/SearchPostBlock";
+import LoadingIndicator from "../../components/LoadingIndicator";
 
 
 const SearchTopPage: FC = () => {
@@ -40,6 +41,7 @@ const SearchTopPage: FC = () => {
 
     return <div className="flex flex-col gap-y-2 md:gap-y-6 max-w-screen-md w-full mx-auto p-2 md:p-4 rounded-lg">
         {!loading && <div className="text-gray-500 md:text-[16px] mt-2 text-sm text-center">{message}</div>}
+        {loading && <LoadingIndicator title="Đang tìm kiếm" />}
         {<div className="flex flex-col gap-y-4">
             {searchResult.users.length > 0 && <SearchUserBlock searchValue={searchValue} users={searchResult.users} />}
             {searchResult.groups.length > 0 && <SearchGroupBlock searchValue={searchValue} groups={searchResult.groups} />}

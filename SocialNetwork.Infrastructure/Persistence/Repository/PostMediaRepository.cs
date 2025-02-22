@@ -72,7 +72,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             var query = _context.PostMedias
                .Include(s => s.Post)
-               .Where(s => s.Post.UserId == userId && s.MediaType == MediaType.IMAGE)
+               .Where(s => !s.Post.IsGroupPost && s.Post.UserId == userId && s.MediaType == MediaType.IMAGE)
                .AsQueryable();
 
             var totalCount = await query.CountAsync();
@@ -88,7 +88,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             var query = _context.PostMedias
               .Include(s => s.Post)
-              .Where(s => s.Post.UserId == userId && s.MediaType == MediaType.VIDEO)
+              .Where(s => !s.Post.IsGroupPost && s.Post.UserId == userId && s.MediaType == MediaType.VIDEO)
               .AsQueryable();
 
             var totalCount = await query.CountAsync();
@@ -109,7 +109,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             var query = _context.PostMedias
               .Include(s => s.Post)
-              .Where(s => (s.Post.Privacy == PrivacyConstant.PUBLIC || s.Post.Privacy == PrivacyConstant.FRIENDS) && s.Post.UserId == userId && s.MediaType == MediaType.IMAGE)
+              .Where(s => !s.Post.IsGroupPost && (s.Post.Privacy == PrivacyConstant.PUBLIC || s.Post.Privacy == PrivacyConstant.FRIENDS) && s.Post.UserId == userId && s.MediaType == MediaType.IMAGE)
               .AsQueryable();
 
             var totalCount = await query.CountAsync();
@@ -125,7 +125,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             var query = _context.PostMedias
               .Include(s => s.Post)
-              .Where(s => (s.Post.Privacy == PrivacyConstant.PUBLIC || s.Post.Privacy == PrivacyConstant.FRIENDS) && s.Post.UserId == userId && s.MediaType == MediaType.VIDEO)
+              .Where(s => !s.Post.IsGroupPost && (s.Post.Privacy == PrivacyConstant.PUBLIC || s.Post.Privacy == PrivacyConstant.FRIENDS) && s.Post.UserId == userId && s.MediaType == MediaType.VIDEO)
               .AsQueryable();
 
             var totalCount = await query.CountAsync();
@@ -141,7 +141,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             var query = _context.PostMedias
               .Include(s => s.Post)
-              .Where(s => s.Post.Privacy == PrivacyConstant.PUBLIC && s.Post.UserId == userId && s.MediaType == MediaType.IMAGE)
+              .Where(s => !s.Post.IsGroupPost && s.Post.Privacy == PrivacyConstant.PUBLIC && s.Post.UserId == userId && s.MediaType == MediaType.IMAGE)
               .AsQueryable();
 
             var totalCount = await query.CountAsync();
@@ -157,7 +157,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             var query = _context.PostMedias
              .Include(s => s.Post)
-             .Where(s => s.Post.Privacy == PrivacyConstant.PUBLIC && s.Post.UserId == userId && s.MediaType == MediaType.VIDEO)
+             .Where(s => !s.Post.IsGroupPost && s.Post.Privacy == PrivacyConstant.PUBLIC && s.Post.UserId == userId && s.MediaType == MediaType.VIDEO)
              .AsQueryable();
 
             var totalCount = await query.CountAsync();

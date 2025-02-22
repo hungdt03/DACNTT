@@ -22,25 +22,25 @@ const SearchMenuMobile: FC = () => {
 
 
         <div className="flex items-center flex-wrap gap-2">
-            <Link to={`/search/?type=top&?q=${encodeURIComponent(searchValue)}`} className={cn("flex items-center gap-x-3 p-[4px] text-sm rounded-lg hover:bg-gray-100", (!searchParam.get('type') || searchParam.get('type') === 'top') && 'bg-gray-100')}>
+            <Link to={`/search/top/?q=${encodeURIComponent(searchValue)}`} className={cn("flex items-center gap-x-3 p-[4px] text-sm rounded-lg hover:bg-gray-100", location.pathname.includes('top') && 'bg-gray-100')}>
                 <div className="w-7 h-7 rounded-full bg-slate-200 hover:bg-gray-300 flex items-center justify-center">
                     <BookAudio size={13} />
                 </div>
                 <span className="font-normal">Tất cả</span>
             </Link>
-            <Link to={`/search/?type=post&q=${encodeURIComponent(searchValue)}`} className={cn("flex items-center gap-x-3 p-[4px] text-sm rounded-lg hover:bg-gray-100", searchParam.get('type') === 'post' && 'bg-gray-100')}>
+            <Link to={`/search/post/?q=${encodeURIComponent(searchValue)}`} className={cn("flex items-center gap-x-3 p-[4px] text-sm rounded-lg hover:bg-gray-100", location.pathname.includes('post') && 'bg-gray-100')}>
                 <div className="w-7 h-7 rounded-full bg-slate-200 hover:bg-gray-300 flex items-center justify-center">
                     <Newspaper size={13} />
                 </div>
                 <span className="font-normal">Bài viết</span>
             </Link>
-            <Link to={`/search/?type=user&q=${encodeURIComponent(searchValue)}`} className={cn("flex items-center gap-x-3 p-[4px] text-sm rounded-lg hover:bg-gray-100", searchParam.get('type') === 'user' && 'bg-gray-100')}>
+            <Link to={`/search/user/?q=${encodeURIComponent(searchValue)}`} className={cn("flex items-center gap-x-3 p-[4px] text-sm rounded-lg hover:bg-gray-100", location.pathname.includes('user') && 'bg-gray-100')}>
                 <div className="w-7 h-7 rounded-full bg-slate-200 hover:bg-gray-300 flex items-center justify-center">
                     <User2Icon size={13} />
                 </div>
                 <span className="font-normal">Mọi người</span>
             </Link>
-            <Link to={`/search/?type=group&q=${encodeURIComponent(searchValue)}`} className={cn("flex items-center gap-x-3 p-[4px] text-sm rounded-lg hover:bg-gray-100", searchParam.get('type') === 'group' && 'bg-gray-100')}>
+            <Link to={`/search/group/?q=${encodeURIComponent(searchValue)}`} className={cn("flex items-center gap-x-3 p-[4px] text-sm rounded-lg hover:bg-gray-100",  location.pathname.includes('group') && 'bg-gray-100')}>
                 <div className="w-7 h-7 rounded-full bg-slate-200 hover:bg-gray-300 flex items-center justify-center">
                     <Group size={13} />
                 </div>

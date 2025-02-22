@@ -36,6 +36,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<List<GroupMember>> GetAllAdminAndModeratoInGroupAsync(Guid groupId)
         {
             return await _context.GroupMembers
+                .Include(m => m.User)
                 .Where(g => g.GroupId == groupId && (g.Role == MemberRole.ADMIN || g.Role == MemberRole.MODERATOR))
                 .ToListAsync();
         }
@@ -69,6 +70,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .ToListAsync();
 
             return (members, totalCount);
+        }
+
+        public async Task<List<GroupMember>> GetAllMembersInGroupIdAsync(Guid groupId)
+        {
+            return await _context.GroupMembers
+               .Include(m => m.User)
+               .Where(g => g.GroupId == groupId)
+               .ToListAsync();
         }
 
         public async Task<(IEnumerable<GroupMember> Members, int TotalCount)> GetAllNonAdminMembersInGroupAsync(Guid groupId, int page, int size)

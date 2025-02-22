@@ -6,8 +6,11 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Group.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.GroupInfo;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.Group.Handlers
 {
@@ -15,11 +18,13 @@ namespace SocialNetwork.Application.Features.Group.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly ISignalRService _signalRService;
 
-        public AcceptInviteFriendHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public AcceptInviteFriendHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, ISignalRService signalRService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
+            _signalRService = signalRService;
         }
 
         public async Task<BaseResponse> Handle(AcceptInviteFriendCommand request, CancellationToken cancellationToken)
@@ -57,6 +62,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 }
             }
 
+            Domain.Entity.System.Notification? notification = null;
             if (isAllowJoin) {
                 var joinGroupRequest = await _unitOfWork
                    .JoinGroupRequestRepository
@@ -79,9 +85,28 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 };
 
                 await _unitOfWork.GroupMemberRepository.CreateGroupMemberAsync(groupMember);
+
+                notification = new Domain.Entity.System.Notification()
+                {
+                    Title = "Phê duyệt lời mời",
+                    Content = $"Yêu cầu tham gia nhóm {invitation.Group.Name} của bạn đã được phê duyệt",
+                    GroupInvitationId = request.InviteId,
+                    GroupId = invitation.GroupId,
+                    ImageUrl = invitation.Group.CoverImage,
+                    DateSent = DateTimeOffset.UtcNow,
+                    IsRead = false,
+                    Type = NotificationType.APPROVAL_GROUP_INVITATION,
+                    RecipientId = invitation.InviteeId,
+                };
+
+                await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             }
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+           
+            if (notification != null)
+                await _signalRService.SendNotificationToSpecificUser(invitation.Invitee.UserName, ApplicationMapper.MapToNotification(notification));
 
             return new BaseResponse()
             {

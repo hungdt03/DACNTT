@@ -428,6 +428,7 @@ namespace SocialNetwork.Application.Mappers
                 PostId = notification.PostId,
                 StoryId = notification.StoryId,
                 GroupId = notification.GroupId,
+                JoinGroupRequestId = notification.JoinGroupRequestId,
                 GroupInvitationId = notification.GroupInvitationId,
                 GroupRoleInvitationId = notification.GroupRoleInvitationId,
                 Recipient = notification.Recipient != null ? MapToUser(notification.Recipient) : null,

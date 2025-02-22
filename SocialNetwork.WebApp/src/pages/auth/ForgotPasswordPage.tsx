@@ -51,7 +51,6 @@ const ForgotPasswordPage: FC = () => {
     const handleVerifyOTP = async () => {
         setOtpLoading(true)
         const response = await otpService.verifyForgotPassword(otp, email);
-        console.log(response)
         setOtpLoading(false)
         if (response.isSuccess) {
             setOtp('')

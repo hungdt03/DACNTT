@@ -154,10 +154,11 @@ const PostGroup: FC<PostGroupProps> = ({
         }
     }
 
-    const handleReportPost = async (reason: string) => {
-        const response = await reportService.reportPost(post.id, reason, post.group?.id);
+    const handleReportPost = async (reason: string, groupId?: string) => {
+        const response = await reportService.reportPost(post.id, reason, groupId);
         if (response.isSuccess) {
             message.success(response.message)
+            okReport()
             okReportAdmin()
             setReason('')
         } else {
@@ -253,6 +254,7 @@ const PostGroup: FC<PostGroupProps> = ({
             </div>
 
             <Popover className="flex-shrink-0" content={<PostMoreAction
+                post={post}
                 onEditPost={showEditPostModal}
                 onDeletePost={handleDeletePost}
                 onReportPost={showReport}
@@ -395,7 +397,7 @@ const PostGroup: FC<PostGroupProps> = ({
             okText='Gửi báo cáo'
             cancelText='Hủy'
             okButtonProps={{
-                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason),
+                onClick: () => reason.trim().length >= 20 && void handleReportPost(reason, post?.group?.id),
                 disabled: reason.trim().length < 20
             }}
         >

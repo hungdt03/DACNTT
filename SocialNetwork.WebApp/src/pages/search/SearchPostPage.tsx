@@ -75,7 +75,7 @@ const SearchPostPage: FC = ({
     });
 
     return <div className="relative w-full h-full flex flex-col">
-        <div className="sticky top-0 bg-white p-4 shadow border-b-[1px] border-gray-100 flex items-center justify-between">
+        <div className="sticky z-[70] top-0 bg-white p-4 shadow border-b-[1px] border-gray-100 flex items-center justify-between">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-x-1">
                     <Filter size={18} />
@@ -93,6 +93,12 @@ const SearchPostPage: FC = ({
 
             {isFilter && <button
                 onClick={() => {
+                    setFilter({
+                        sortOrder: 'desc',
+                        contentType: 'ALL',
+                        fromDate: undefined,
+                        toDate: undefined,
+                    })
                     fetchPosts(searchValue, 1, 6)
                     setIsFilter(false)
                 }}

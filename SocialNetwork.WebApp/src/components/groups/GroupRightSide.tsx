@@ -68,7 +68,7 @@ const GroupRightSide: FC<GroupRightSideProps> = ({
                     <Book size={20} />
                     <div className="flex flex-col gap-y-1">
                         <span className="font-bold">Đăng bài</span>
-                        {group.onlyAdminCanApprovalMember ? <p>Chỉ quản trị viên và người kiểm duyệt mới đăng tải bài viết</p> : <p>Tất cả thành viên đều có đăng bài</p>}
+                        {group.onlyAdminCanPost ? <p>Chỉ quản trị viên và người kiểm duyệt mới đăng tải bài viết</p> : <p>Tất cả thành viên đều có thể đăng tải bài viết</p>}
                     </div>
                 </div>
 

@@ -14,5 +14,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<int> CountGroupMembersByGroupIdAsync(Guid groupId);
         Task<int> CountAdminsByGroupIdAsync(Guid groupId);
         Task<List<GroupMember>> GetAllAdminAndModeratoInGroupAsync(Guid groupId);
+        Task<List<GroupMember>> GetAllMembersInGroupIdAsync(Guid groupId);
     }
 }

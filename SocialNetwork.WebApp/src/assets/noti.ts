@@ -4,6 +4,9 @@ import notiReaction from './noti/reaction.png'
 import viewStory from './noti/visual.png'
 import notiShare from './noti/next.png'
 import notiTag from './noti/tag.png'
+import notiReport from './noti/report-noti.png'
+import notiApproval from './noti/checkmark.png'
+import notiBell from './noti/notification-bell.png'
 
 const notis = {
     userNoti,
@@ -11,7 +14,10 @@ const notis = {
     notiReaction,
     viewStory,
     notiShare,
-    notiTag
+    notiTag,
+    notiReport,
+    notiApproval,
+    notiBell
 }
 
 export default notis;

@@ -6,7 +6,10 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Report.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.GroupInfo;
 
 namespace SocialNetwork.Application.Features.Report.Handlers
 {
@@ -14,11 +17,13 @@ namespace SocialNetwork.Application.Features.Report.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly ISignalRService _signalRService;
 
-        public ReportPostHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public ReportPostHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, ISignalRService signalRService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
+            _signalRService = signalRService;
         }
 
         public async Task<BaseResponse> Handle(ReportPostCommand request, CancellationToken cancellationToken)
@@ -65,7 +70,47 @@ namespace SocialNetwork.Application.Features.Report.Handlers
 
             await _unitOfWork.ReportRepository.CreateNewReportAsync(newReport);
 
+            List<GroupMember> groupAdmins = [];
+            List<Domain.Entity.System.Notification> notifications = [];
+            if (findGroup != null)
+            {
+                var userFullName = _contextAccessor.HttpContext.User.GetFullName();
+                var userAvatar = _contextAccessor.HttpContext.User.GetFullName();
+                groupAdmins = await _unitOfWork.GroupMemberRepository
+                    .GetAllAdminAndModeratoInGroupAsync(findGroup.Id);
+
+                foreach (var admin in groupAdmins)
+                {
+                    var notification = new Domain.Entity.System.Notification()
+                    {
+                        Title = "Báo cáo bài viết",
+                        Content = $"{userFullName} đã báo cáo một bài viết trong nhóm. Vào trang báo cáo để xem",
+                        ReportId = newReport.Id,
+                        IsRead = false,
+                        DateSent = DateTimeOffset.UtcNow,
+                        ImageUrl = $"{userAvatar}",
+                        Type = NotificationType.REPORT_GROUP_POST,
+                        GroupId = findGroup.Id,
+                        RecipientId = admin.UserId,
+                    };
+
+                    await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+                    notifications.Add(notification);
+                }
+            }
+
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            if (findGroup != null)
+            {
+                foreach (var notification in notifications)
+                {
+                    foreach (var admin in groupAdmins)
+                    {
+                        await _signalRService.SendNotificationToSpecificUser(admin.User.UserName, ApplicationMapper.MapToNotification(notification));
+                    }
+                }
+            }
 
             string messageResponse = findGroup != null ? "Báo cáo bài viết thành công và đã được gửi đi cho quản trị viên của nhóm" : "Báo cáo bài viết thành công và đã được gửi đi cho người quản trị hệ thống";
 

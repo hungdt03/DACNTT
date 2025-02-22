@@ -6,7 +6,6 @@ import { getPrivacyPost } from "../../utils/post";
 import { formatTime, formatVietnamDate } from "../../utils/date";
 import cn from "../../utils/cn";
 import { Link } from "react-router-dom";
-import { Eye } from "lucide-react";
 
 type PostShareItemProps = {
     post: PostResource
@@ -57,11 +56,7 @@ const PostShareItem: FC<PostShareItemProps> = ({
                 <p className="text-sm text-gray-700">{post.content}</p>
             </div>
         </div>
-        <Tooltip title='Xem chi tiết'>
-            <button className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-sky-50 hover:bg-sky-100 border-[1px] border-primary">
-                <Eye size={14} className="text-primary" />
-            </button>
-        </Tooltip>
+
     </div>
 };
 

@@ -52,12 +52,6 @@ namespace SocialNetwork.Infrastructure.JsonWebToken
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
-            //var userRoles = await userManager.GetRolesAsync(user);
-            //foreach (var role in userRoles)
-            //{
-            //    claims.Add(new Claim(ClaimTypes.Role, role));
-            //}
-
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),

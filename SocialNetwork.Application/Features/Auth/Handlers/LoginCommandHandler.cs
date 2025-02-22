@@ -43,6 +43,8 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
             if (!isMatchPassword)
                 throw new AppException("Sai thông tin đăng nhập");
 
+            if (user.IsLock) throw new AppException("Tài khoản này đã bị khóa");
+
             var tokens = await tokenService.GenerateTokenAsync(user);
             var mapUser = ApplicationMapper.MapToUser(user);
 

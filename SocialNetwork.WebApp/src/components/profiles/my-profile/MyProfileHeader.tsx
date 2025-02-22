@@ -122,7 +122,7 @@ const MyProfileHeader: FC<MyProfileHeaderProps> = ({
 
     }
 
-    return <div className="xl:max-w-screen-lg lg:max-w-screen-lg lg:px-0 md:max-w-screen-md max-w-screen-sm px-2 mx-auto w-full bg-white pb-6">
+    return <div className="xl:max-w-screen-lg z-10 lg:max-w-screen-lg lg:px-0 md:max-w-screen-md max-w-screen-sm px-2 mx-auto w-full bg-white pb-6">
         <div className="w-full h-full relative">
             <img alt="Ảnh bìa" className="w-full border-[1px] object-cover max-h-[25vh] h-full md:max-h-[30vh] rounded-lg" src={tempCoverImage || user.coverImage || images.cover} />
             <div className="flex items-center gap-x-2 absolute right-4 top-4 md:top-auto md:bottom-4 shadow">

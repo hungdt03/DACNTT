@@ -22,6 +22,7 @@ namespace SocialNetwork.Application.DTOs
         public Guid? GroupId { get; set; }
         public Guid? GroupInvitationId { get; set; }
         public Guid? GroupRoleInvitationId { get; set; }
+        public Guid? JoinGroupRequestId { get; set; }
 
         // Thời gian gửi thông báo
         public DateTimeOffset DateSent { get; set; }

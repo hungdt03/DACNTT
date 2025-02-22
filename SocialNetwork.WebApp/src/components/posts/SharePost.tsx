@@ -274,6 +274,7 @@ const SharePost: FC<SharePostProps> = ({
             </div>
 
             <Popover content={<PostMoreAction
+                post={post}
                 onEditPost={showEditPostModal}
                 onDeletePost={handleDeletePost}
                 onReportPost={showReport}

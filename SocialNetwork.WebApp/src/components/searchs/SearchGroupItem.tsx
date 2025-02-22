@@ -16,7 +16,7 @@ const SearchGroupItem: FC<SearchGroupItemProps> = ({
 
     return <div onClick={onClick}  className="cursor-pointer p-4 rounded-md bg-white flex items-center justify-between shadow">
         <div className="flex items-center gap-x-3">
-            <img src={suggestGroup.group.coverImage ?? images.cover} className="w-[55px] h-[55px] rounded-md border-[1px] border-gray-100" />
+            <img src={suggestGroup.group.coverImage ?? images.cover} className="w-[55px] object-cover h-[55px] rounded-md border-[1px] border-gray-100" />
             <div className="flex flex-col">
                 <span className="font-semibold text-sm md:text-[16px] line-clamp-1">{suggestGroup.group.name}</span>
                 <div className="flex items-center flex-wrap gap-x-2 md:gap-3">

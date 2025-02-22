@@ -11,6 +11,7 @@ export type NotificationResource = {
     isRead: boolean;
     reportId: string;
     groupId: string; 
+    joinGroupRequestId: string; 
     groupInvitationId: string; 
     groupRoleInvitationId: string; 
     storyId: string; 

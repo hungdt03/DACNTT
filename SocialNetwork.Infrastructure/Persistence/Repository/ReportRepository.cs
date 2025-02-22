@@ -90,12 +90,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                     .Where(r=>r.GroupId==null)
                 .Include(r => r.TargetComment)
                     .ThenInclude(r => r.User)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                 .Include(r => r.TargetPost)
                     .ThenInclude(r => r.User)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                 .Include(r => r.TargetUser)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                 .Include(r => r.Reporter)
                 .ToListAsync();
         }

@@ -26,7 +26,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<Notification?> GetNotificationByIdAsync(Guid id)
         {
-            return await _context.Notifications.SingleOrDefaultAsync(x => x.Id == id);
+            return await _context.Notifications
+                .Include(x => x.Recipient)
+                .SingleOrDefaultAsync(x => x.Id == id);
         }
 
         public void DeleteNotification(Notification notification)

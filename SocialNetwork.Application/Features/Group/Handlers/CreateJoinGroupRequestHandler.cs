@@ -50,19 +50,32 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 joinGroupRequest = new JoinGroupRequest()
                 {
                     GroupId = request.GroupId,
-                    Status = false,
+                    Status = true,
                     UserId = userId,
                 };
+
+                if(group.OnlyAdminCanApprovalMember)
+                {
+                    joinGroupRequest.Status = false;
+                }
 
                 await _unitOfWork.JoinGroupRequestRepository.CreateJoinGroupRequestAsync(joinGroupRequest);
 
                 var userAvatar = _contextAccessor.HttpContext.User.GetAvatar();
                 var userFullname = _contextAccessor.HttpContext.User.GetFullName();
 
-                var adminAndModerators = await _unitOfWork.GroupMemberRepository
-                 .GetAllAdminAndModeratoInGroupAsync(group.Id);
+                List<GroupMember> memberNotis = new();
+                if (group.OnlyAdminCanApprovalMember)
+                {
+                    memberNotis = await _unitOfWork.GroupMemberRepository
+                        .GetAllAdminAndModeratoInGroupAsync(group.Id);
+                } else
+                {
+                    memberNotis = await _unitOfWork.GroupMemberRepository
+                        .GetAllMembersInGroupIdAsync(group.Id);
+                }
 
-                foreach (var member in adminAndModerators)
+                foreach (var member in memberNotis)
                 {
                     var newNotification = new Domain.Entity.System.Notification()
                     {
@@ -73,7 +86,8 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                         Title = "Yêu cầu tham gia nhóm",
                         DateSent = DateTimeOffset.UtcNow,
                         Type = NotificationType.JOIN_GROUP_REQUEST,
-                        RecipientId = member.UserId // Gán ID tại đây
+                        RecipientId = member.UserId, // Gán ID tại đây
+                        Recipient = member.User
                     };
 
                     await _unitOfWork.NotificationRepository.CreateNotificationAsync(newNotification);

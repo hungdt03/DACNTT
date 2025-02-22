@@ -1,7 +1,12 @@
 import { Bookmark, Edit, Flag, FlagOff, Tags, Trash } from "lucide-react"
-import { FC } from "react"
+import { FC, useEffect, useState } from "react"
+import { GroupMemberResource } from "../../types/group-member";
+import groupService from "../../services/groupService";
+import { PostResource } from "../../types/post";
+import { MemberRole } from "../../enums/member-role";
 
 type PostMoreActionProps = {
+    post: PostResource
     isMine: boolean;
     isAdmin?: boolean;
     isHasTag?: boolean;
@@ -17,6 +22,7 @@ type PostMoreActionProps = {
 }
 
 export const PostMoreAction: FC<PostMoreActionProps> = ({
+    post,
     isMine,
     isHasTag,
     isSaved,
@@ -30,6 +36,20 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
     onRemoveSavedPost,
     onRevokeTag
 }) => {
+    const [postUser, setPostUser] = useState<GroupMemberResource>();
+
+    useEffect(() => {
+        const fetchPostUser = async () => {
+            if (post.group.id) {
+                const response = await groupService.getGroupMemberByGroupIdAndUserId(post.group.id, post.user.id);
+                if (response.isSuccess) {
+                    setPostUser(response.data)
+                }
+            }
+        }
+
+        fetchPostUser();
+    }, [post]);
 
     return <div className="flex flex-col items-start rounded-md md:text-sm text-xs">
         {isMine && <button onClick={onEditPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
@@ -51,7 +71,7 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
                 Lưu bài viết
             </button>}
 
-            {!isAdmin && isPostGroup ? <>
+            {!isAdmin && isPostGroup && postUser?.role !== MemberRole.ADMIN ? <>
                 <button onClick={onReportPostGroup} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
                     <FlagOff size={17} className="text-gray-500" />
                     Báo cáo bài viết với quản trị viên nhóm
