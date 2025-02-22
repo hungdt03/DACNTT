@@ -144,24 +144,62 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                         onChange={(e) => setReportSoluton(e.target.value)}
                         rows={2}
                         className='w-full'
+                        disabled={tagetReport.status === 'RESOLVED' || tagetReport.status === 'REJECTED'}
                     />
                 </Form.Item>
-
-                <Form.Item
-                    label={<span style={{ fontWeight: 'bold' }}>Trạng thái</span>}
-                    style={{ marginBottom: '10px' }}
-                >
-                    {statusOptions.map((option) => (
-                        <Button
-                            key={option.status}
-                            type={status === option.status ? 'primary' : 'default'}
-                            onClick={() => setStatus(option.status)}
-                            style={{ marginRight: 4 }}
-                        >
-                            {option.label}
-                        </Button>
-                    ))}
-                </Form.Item>
+                {tagetReport.status === 'RESOLVED' && (
+                    <Form.Item
+                        label={<span style={{ fontWeight: 'bold' }}>Trạng thái</span>}
+                        style={{ marginBottom: '10px' }}
+                    >
+                        {statusOptions.map((option) => (
+                            <Button
+                                key={option.status}
+                                type={status === option.status ? 'primary' : 'default'}
+                                onClick={() => setStatus(option.status)}
+                                style={{ marginRight: 4 }}
+                                disabled={option.status === 'PENDING' || option.status === 'REJECTED'}
+                            >
+                                {option.label}
+                            </Button>
+                        ))}
+                    </Form.Item>
+                )}
+                {tagetReport.status === 'REJECTED' && (
+                    <Form.Item
+                        label={<span style={{ fontWeight: 'bold' }}>Trạng thái</span>}
+                        style={{ marginBottom: '10px' }}
+                    >
+                        {statusOptions.map((option) => (
+                            <Button
+                                key={option.status}
+                                type={status === option.status ? 'primary' : 'default'}
+                                onClick={() => setStatus(option.status)}
+                                style={{ marginRight: 4 }}
+                                disabled={option.status === 'PENDING' || option.status === 'RESOLVED'}
+                            >
+                                {option.label}
+                            </Button>
+                        ))}
+                    </Form.Item>
+                )}
+                {tagetReport.status === 'PENDING' && (
+                    <Form.Item
+                        label={<span style={{ fontWeight: 'bold' }}>Trạng thái</span>}
+                        style={{ marginBottom: '10px' }}
+                    >
+                        {statusOptions.map((option) => (
+                            <Button
+                                key={option.status}
+                                type={status === option.status ? 'primary' : 'default'}
+                                onClick={() => setStatus(option.status)}
+                                style={{ marginRight: 4 }}
+                            >
+                                {option.label}
+                            </Button>
+                        ))}
+                    </Form.Item>
+                )}
 
                 <Form.Item
                     label={<span style={{ fontWeight: 'bold' }}>Người báo cáo</span>}
@@ -193,25 +231,27 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                         >
                             <Typography.Text>{tagetReport.targetPost?.content}</Typography.Text>
                         </Form.Item>
-                        <Form.Item
-                            label={<span style={{ fontWeight: 'bold' }}>Gỡ bài viết</span>}
-                            style={{ marginBottom: '10px' }}
-                        >
-                            <Button
-                                type={btnCheckDelete ? 'primary' : 'default'}
-                                onClick={() => setBtnCheckDelete(!btnCheckDelete)}
-                                style={{ marginRight: 4 }}
+                        {status == 'RESOLVED' && tagetReport.status != 'RESOLVED' && (
+                            <Form.Item
+                                label={<span style={{ fontWeight: 'bold' }}>Gỡ bài viết</span>}
+                                style={{ marginBottom: '10px' }}
                             >
-                                Có
-                            </Button>
-                            <Button
-                                type={!btnCheckDelete ? 'primary' : 'default'}
-                                onClick={() => setBtnCheckDelete(!btnCheckDelete)}
-                                style={{ marginRight: 4 }}
-                            >
-                                Không
-                            </Button>
-                        </Form.Item>
+                                <Button
+                                    type={btnCheckDelete ? 'primary' : 'default'}
+                                    onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                    style={{ marginRight: 4 }}
+                                >
+                                    Có
+                                </Button>
+                                <Button
+                                    type={!btnCheckDelete ? 'primary' : 'default'}
+                                    onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                    style={{ marginRight: 4 }}
+                                >
+                                    Không
+                                </Button>
+                            </Form.Item>
+                        )}
                     </>
                 )}
 
@@ -277,12 +317,12 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                 )}
 
                 <Form.Item style={{ marginBottom: '4px' }}>
-                    {tagetReport.resolvedAt && (
+                    {(tagetReport.status === 'RESOLVED' || tagetReport.status === 'REJECTED') && (
                         <Button type='primary' disabled block>
                             Cập nhật
                         </Button>
                     )}
-                    {!tagetReport.resolvedAt && (
+                    {tagetReport.status === 'PENDING' && (
                         <Button type='primary' onClick={() => handleStatusChange()} loading={loading} block>
                             Cập nhật
                         </Button>

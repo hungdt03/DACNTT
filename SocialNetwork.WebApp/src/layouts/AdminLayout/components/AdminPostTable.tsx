@@ -20,8 +20,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faMinus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import adminService from '../../../services/adminService'
 import { toast } from 'react-toastify'
-import { Popconfirm } from 'antd'
-import { PostResource } from '../../../types/post'
+import { Modal, Popconfirm } from 'antd'
+import { PostMediaResource, PostResource } from '../../../types/post'
 import { PostType } from '../../../enums/post-type'
 
 type PostsTableProps = {
@@ -40,6 +40,15 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
     const [orderBy, setOrderBy] = useState<keyof PostResource>('content')
     const [expanded, setExpanded] = useState<string | null>(null)
     const [open, setOpen] = useState(false)
+    const [selectedMedias, setSelectedMedias] = useState<PostMediaResource[] | null>(null)
+
+    const handleShowModal = (medias: PostMediaResource[] | null) => {
+        setSelectedMedias(medias)
+    }
+
+    const handleCloseModal = () => {
+        setSelectedMedias(null)
+    }
 
     const handleConfirmDelete = (id: string) => {
         handleDeleteClick(id)
@@ -161,11 +170,81 @@ const AdminPostsTable: React.FC<PostsTableProps> = ({ posts, onPostSelect, rowsP
                                         </TableCell>
                                         <TableCell>{post.content}</TableCell>
                                         <TableCell>
-                                            {post.medias && post.medias.length > 0
-                                                ? post.medias.map((media) => (
-                                                      <img key={media.id} src={media.mediaUrl} alt='Media' width={50} />
-                                                  ))
-                                                : 'Không có'}
+                                            {post.medias && post.medias.length > 0 ? (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                    <img
+                                                        key={post.medias[0].id}
+                                                        src={post.medias[0].mediaUrl}
+                                                        alt='Media'
+                                                        style={{
+                                                            width: 50,
+                                                            height: 50,
+                                                            objectFit: 'cover',
+                                                            cursor: 'pointer',
+                                                            borderRadius: 4
+                                                        }}
+                                                        onClick={() => handleShowModal(post.medias)}
+                                                    />
+
+                                                    {post.medias.length > 1 && (
+                                                        <button
+                                                            onClick={() => handleShowModal(post.medias)}
+                                                            style={{
+                                                                padding: '2px 8px',
+                                                                fontSize: 12,
+                                                                cursor: 'pointer',
+                                                                backgroundColor: '#e0e0e0',
+                                                                border: 'none',
+                                                                borderRadius: 4,
+                                                                transition: 'all 0.2s'
+                                                            }}
+                                                        >
+                                                            +{post.medias.length - 1}
+                                                        </button>
+                                                    )}
+
+                                                    <Modal
+                                                        title='Hình ảnh/ Video của bài viết'
+                                                        open={!!selectedMedias}
+                                                        onCancel={handleCloseModal}
+                                                        footer={null}
+                                                        width={600}
+                                                        bodyStyle={{
+                                                            maxHeight: '70vh',
+                                                            overflowY: 'auto',
+                                                            padding: '16px 0'
+                                                        }}
+                                                    >
+                                                        {selectedMedias && (
+                                                            <div
+                                                                style={{
+                                                                    display: 'grid',
+                                                                    gridTemplateColumns:
+                                                                        'repeat(auto-fill, minmax(110px, 1fr))',
+                                                                    gap: 10
+                                                                }}
+                                                            >
+                                                                {selectedMedias.map((media) => (
+                                                                    <img
+                                                                        key={media.id}
+                                                                        src={media.mediaUrl}
+                                                                        alt='Media'
+                                                                        style={{
+                                                                            width: '100%',
+                                                                            height: '120px',
+                                                                            objectFit: 'cover',
+                                                                            borderRadius: 4,
+                                                                            cursor: 'pointer'
+                                                                        }}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </Modal>
+                                                </div>
+                                            ) : (
+                                                'Không có'
+                                            )}
                                         </TableCell>
 
                                         <TableCell>
