@@ -113,12 +113,14 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                 if (report.ReportType == ReportType.GROUP)
                 {
                     // Lấy danh sách tất cả Admin trong nhóm
-                    var adminUsers = report?.TargetGroup?.Members
-                                        .Where(m => m.Role == "ADMIN")
-                                        .Select(m => (m.UserId, m.User))
-                                        .ToList();
+                    var adminUsers = await _unitOfWork.GroupMemberRepository
+                        .GetAllAdminAndModeratoInGroupAsync(report.TargetGroupId.Value);
+                    //var adminUsers = report?.TargetGroup?.Members
+                    //                    .Where(m => m.Role == "ADMIN")
+                    //                    .Select(m => (m.UserId, m.User))
+                    //                    .ToList();
 
-                    foreach (var (targetUserId, targetUser) in adminUsers)
+                    foreach (var adminUser in adminUsers)
                     {
                         var notiToAdmin = new Domain.Entity.System.Notification
                         {
@@ -128,8 +130,8 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                             IsRead = false,
                             Title = "Thông báo giải tán nhóm",
                             Content = "Chúng tôi đã giải tán nhóm của bạn, nhấn vào để xem chi tiết",
-                            RecipientId = targetUserId,
-                            Recipient = targetUser,
+                            RecipientId = adminUser.UserId,
+                            Recipient = adminUser.User,
                             Type = NotificationType.REPORT_DELETE_RESPONSE,
                             DateSent = DateTimeOffset.UtcNow
                         };
