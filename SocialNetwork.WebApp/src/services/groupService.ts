@@ -42,6 +42,9 @@ class GroupService {
     getGroupById(groupId: string) : Promise<DataResponse<GroupResource>> {
         return axiosInterceptor.get('/api/groups/' + groupId)
     }
+    getGroupByIdIgnore(groupId: string) : Promise<DataResponse<GroupResource>> {
+        return axiosInterceptor.get('/api/groups/ignore/' + groupId)
+    }
 
     getInviteJoinGroup(groupId: string) : Promise<DataResponse<GroupInvitationResource>> {
         return axiosInterceptor.get('/api/groups/invite-join/' + groupId)

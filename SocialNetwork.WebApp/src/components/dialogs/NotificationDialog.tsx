@@ -20,6 +20,8 @@ import { GroupResource } from '../../types/group'
 import NotificationDeleteModal from '../modals/NotificationDeleteModal'
 import postService from '../../services/postService'
 import groupService from '../../services/groupService'
+import commentService from '../../services/commentService'
+import { CommentResource } from '../../types/comment'
 
 type NotificationDialogProps = {
     notifications: NotificationResource[]
@@ -48,6 +50,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     const [getReport, setGetReport] = useState<ReportResource>()
     const [getPost, setGetPost] = useState<PostResource>()
     const [getGroup, setGetGroup] = useState<GroupResource>()
+    const [getComment, setGetComment] = useState<CommentResource>()
+
     const navigate = useNavigate()
 
     const getReportById = async (reportId: string) => {
@@ -63,9 +67,15 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         }
     }
     const getGroupById = async (groupId: string) => {
-        const response = await groupService.getGroupById(groupId)
+        const response = await groupService.getGroupByIdIgnore(groupId)
         if (response.isSuccess) {
             setGetGroup(response.data)
+        }
+    }
+    const getCommentById = async (commentId: string) => {
+        const response = await commentService.getCommentByIdIgnore(commentId)
+        if (response.isSuccess) {
+            setGetComment(response.data)
         }
     }
 
@@ -157,6 +167,12 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         await getGroupById(noti.groupId)
         showReportDelete()
     }
+    const handleCommentDeleteReceiverPage = async (noti: NotificationResource) => {
+        handleMarkNotificationAsRead(noti.id)
+        setNotification(noti)
+        await getCommentById(noti.groupId)
+        showReportDelete()
+    }
 
     return (
         <>
@@ -183,6 +199,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                             onReportDeleteNotification={() => handleReportDeleteReceiverPage(notifi)}
                             onPostDeleteNotification={() => handlePostDeleteReceiverPage(notifi)}
                             onGroupDeleteNotification={() => handleGroupDeleteReceiverPage(notifi)}
+                            onCommentDeleteNotification={() => handleCommentDeleteReceiverPage(notifi)}
                         />
                     ))}
 
@@ -339,6 +356,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                     getReport={getReport}
                     getPost={getPost}
                     getGroup={getGroup}
+                    getComment={getComment}
                 />
             )}
         </>

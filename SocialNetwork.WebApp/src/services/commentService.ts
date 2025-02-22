@@ -62,6 +62,9 @@ class CommentService {
     deleteCommentById(commentId: string) : Promise<BaseResponse> {
         return axiosInterceptor.delete('/api/comments/' + commentId)
     }
+    getCommentByIdIgnore(commentId: string) : Promise<DataResponse<CommentResource>> {
+        return axiosInterceptor.delete('/api/comments/ignore/' + commentId)
+    }
 }
 
 export default CommentService.getInstance();

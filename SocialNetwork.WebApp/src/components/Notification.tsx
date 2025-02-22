@@ -18,7 +18,6 @@ type NotificationMoreActionProps = {
     isRead: boolean
 }
 
-
 const NotificationMoreAction: FC<NotificationMoreActionProps> = ({ onMarkAsRead, onDelete, isRead }) => {
     return (
         <div onClick={(e) => e.stopPropagation()} className='flex flex-col items-start rounded-md'>
@@ -57,6 +56,7 @@ type NotificationProps = {
     onReportDeleteNotification: () => void
     onPostDeleteNotification: () => void
     onGroupDeleteNotification: () => void
+    onCommentDeleteNotification: () => void
 }
 
 const Notification: FC<NotificationProps> = ({
@@ -73,13 +73,14 @@ const Notification: FC<NotificationProps> = ({
     onReportUserNotification,
     onReportDeleteNotification,
     onPostDeleteNotification,
-    onGroupDeleteNotification
+    onGroupDeleteNotification,
+    onCommentDeleteNotification
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false)
     const [acceptedFriendRequest, setAcceptedFriendRequest] = useState<'accepted' | 'cancel' | 'none'>('none')
     const [acceptedJoinGroup, setAcceptedJoinGroup] = useState<'accepted' | 'cancel' | 'none'>('none')
-    const [acceptedRole, setAcceptedRole] = useState<'accepted' | 'cancel' | 'none'>('none');
-    const [acceptRequestJoinGroup, setAcceptRequestJoinGroup] = useState<'accepted' | 'reject' | 'none'>('none');
+    const [acceptedRole, setAcceptedRole] = useState<'accepted' | 'cancel' | 'none'>('none')
+    const [acceptRequestJoinGroup, setAcceptRequestJoinGroup] = useState<'accepted' | 'reject' | 'none'>('none')
 
     // FRIEND REQUEST
     const handleCancelFriendRequest = async (requestId: string) => {
@@ -106,9 +107,9 @@ const Notification: FC<NotificationProps> = ({
         }
     }
 
-     // REQUEST JOIN GROUP
+    // REQUEST JOIN GROUP
 
-     const handleRejectRequestJoinGroup = async (requestId: string) => {
+    const handleRejectRequestJoinGroup = async (requestId: string) => {
         const response = await groupService.rejectRequestJoinGroup(requestId)
         if (response.isSuccess) {
             setAcceptRequestJoinGroup('reject')
@@ -217,6 +218,8 @@ const Notification: FC<NotificationProps> = ({
             onPostDeleteNotification()
         } else if (notification.type === NotificationType.GROUP_DELETE_RESPONSE) {
             onGroupDeleteNotification()
+        } else if (notification.type === NotificationType.COMMENT_DELETE_RESPONSE) {
+            onCommentDeleteNotification()
         }
     }
 
@@ -239,26 +242,35 @@ const Notification: FC<NotificationProps> = ({
                     src={
                         notification.type.includes('COMMENT')
                             ? notis.commentNoti
-                            : (notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED ||
-                                notification.type === NotificationType.FRIEND_REQUEST_SENT)
-                                ? notis.userNoti
-                                : (notification.type === NotificationType.JOIN_GROUP_REQUEST || notification.type === NotificationType.APPROVAL_GROUP_INVITATION || notification.type === NotificationType.APPROVAL_JOIN_GROUP_REQUEST || notification.type === NotificationType.INVITE_JOIN_GROUP)
-                                    ? images.group
-                                    : notification.type === NotificationType.POST_SHARED
-                                        ? notis.notiShare
-                                        : notification.type === NotificationType.VIEW_STORY
-                                            ? notis.viewStory
-                                            : notification.type === NotificationType.REACT_STORY ||
-                                                notification.type === NotificationType.POST_REACTION
-                                                ? notis.notiReaction
-                                                : notification.type === NotificationType.ASSIGN_POST_TAG
-                                                    ? notis.notiTag
-                                                    :
-                                                    (notification.type === NotificationType.REPORT_RESPONSE || notification.type === NotificationType.REPORT_DELETE_RESPONSE || notification.type === NotificationType.POST_DELETE_RESPONSE || notification.type === NotificationType.GROUP_DELETE_RESPONSE || notification.type === NotificationType.REPORT_GROUP_POST || notification.type === NotificationType.REPORT_GROUP_COMMENT || notification.type === NotificationType.REPORT_GROUP_MEMBER)
-                                                        ? notis.notiReport
-                                                        : (notification.type === NotificationType.APPROVAL_POST)
-                                                            ? notis.notiApproval
-                                                            : notis.notiBell
+                            : notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED ||
+                                notification.type === NotificationType.FRIEND_REQUEST_SENT
+                              ? notis.userNoti
+                              : notification.type === NotificationType.JOIN_GROUP_REQUEST ||
+                                  notification.type === NotificationType.APPROVAL_GROUP_INVITATION ||
+                                  notification.type === NotificationType.APPROVAL_JOIN_GROUP_REQUEST ||
+                                  notification.type === NotificationType.INVITE_JOIN_GROUP
+                                ? images.group
+                                : notification.type === NotificationType.POST_SHARED
+                                  ? notis.notiShare
+                                  : notification.type === NotificationType.VIEW_STORY
+                                    ? notis.viewStory
+                                    : notification.type === NotificationType.REACT_STORY ||
+                                        notification.type === NotificationType.POST_REACTION
+                                      ? notis.notiReaction
+                                      : notification.type === NotificationType.ASSIGN_POST_TAG
+                                        ? notis.notiTag
+                                        : notification.type === NotificationType.REPORT_RESPONSE ||
+                                            notification.type === NotificationType.REPORT_DELETE_RESPONSE ||
+                                            notification.type === NotificationType.POST_DELETE_RESPONSE ||
+                                            notification.type === NotificationType.GROUP_DELETE_RESPONSE ||
+                                            notification.type === NotificationType.COMMENT_DELETE_RESPONSE ||
+                                            notification.type === NotificationType.REPORT_GROUP_POST ||
+                                            notification.type === NotificationType.REPORT_GROUP_COMMENT ||
+                                            notification.type === NotificationType.REPORT_GROUP_MEMBER
+                                          ? notis.notiReport
+                                          : notification.type === NotificationType.APPROVAL_POST
+                                            ? notis.notiApproval
+                                            : notis.notiBell
                     }
                 />
             </div>

@@ -67,6 +67,12 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new DeleteCommentCommand(commentId));
             return Ok(response);
         }
-        
+        [HttpGet("ignore/{commentId}")]
+        public async Task<IActionResult> GetCommentByIdIgnore([FromRoute] Guid commentId)
+        {
+            var response = await mediator.Send(new GetCommentByIdIgnoreQuery(commentId));
+            return Ok(response);
+        }
+
     }
 }

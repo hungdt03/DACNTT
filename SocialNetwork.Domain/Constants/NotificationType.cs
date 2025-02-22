@@ -28,7 +28,8 @@ namespace SocialNetwork.Domain.Constants
                 public const string REPORT_DELETE_RESPONSE = "REPORT_DELETE_RESPONSE";
                 public const string POST_DELETE_RESPONSE = "POST_DELETE_RESPONSE";
                 public const string GROUP_DELETE_RESPONSE = "GROUP_DELETE_RESPONSE";
-        
+                public const string COMMENT_DELETE_RESPONSE = "COMMENT_DELETE_RESPONSE";
+
 
     }
 }

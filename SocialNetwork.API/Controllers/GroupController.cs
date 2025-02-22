@@ -36,6 +36,12 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetGroupByIdQuery(groupId));
             return Ok(response);
         }
+        [HttpGet("ignore/{groupId}")]
+        public async Task<IActionResult> GetGroupByIdIgnore([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new GetGroupByIdIgnoreQuery(groupId));
+            return Ok(response);
+        }
 
         [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost("upload-cover")]

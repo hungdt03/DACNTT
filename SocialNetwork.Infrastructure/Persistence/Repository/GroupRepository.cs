@@ -96,6 +96,15 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                     .ThenInclude(g => g.User)
                 .SingleOrDefaultAsync(g => g.Id == groupId);    
         }
+        public async Task<Group?> GetGroupByIdIgnoreAsync(Guid groupId)
+        {
+            return await _context.Groups
+                .Include(g => g.Members)
+                    .ThenInclude(g => g.User)
+                .IgnoreQueryFilters()
+                .SingleOrDefaultAsync(g => g.Id == groupId);
+        }
+
 
         public void RemoveGroup(Group group)
         {

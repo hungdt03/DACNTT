@@ -78,6 +78,23 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                  .Include(r => r.Reporter)
                  .SingleOrDefaultAsync(r => r.Id == id);
         }
+        public async Task<Report?> GetReportByIdIgnoreAsync(Guid id)
+        {
+            return await _context.Reports
+                 .Include(r => r.TargetGroup)
+                    .Where(r => r.GroupId == null)
+                    .IgnoreQueryFilters()
+                 .Include(r => r.TargetComment)
+                    .ThenInclude(r => r.User)
+                    .IgnoreQueryFilters()
+                 .Include(r => r.TargetPost)
+                    .ThenInclude(r => r.User)
+                    .IgnoreQueryFilters()
+                 .Include(r => r.TargetUser)
+                    .IgnoreQueryFilters()
+                 .Include(r => r.Reporter)
+                 .SingleOrDefaultAsync(r => r.Id == id);
+        }
 
         public void RemoveReport(Report report)
         {
@@ -96,6 +113,23 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 //.IgnoreQueryFilters()
                 .Include(r => r.TargetUser)
                 //.IgnoreQueryFilters()
+                .Include(r => r.Reporter)
+                .ToListAsync();
+        }
+        public async Task<List<Report?>> GetAllReportsIgnore()
+        {
+            return await _context.Reports
+                .Include(r => r.TargetGroup)
+                    .Where(r => r.GroupId == null)
+                    .IgnoreQueryFilters()
+                .Include(r => r.TargetComment)
+                    .ThenInclude(r => r.User)
+                    .IgnoreQueryFilters()
+                .Include(r => r.TargetPost)
+                    .ThenInclude(r => r.User)
+                    .IgnoreQueryFilters()
+                .Include(r => r.TargetUser)
+                    .IgnoreQueryFilters()
                 .Include(r => r.Reporter)
                 .ToListAsync();
         }

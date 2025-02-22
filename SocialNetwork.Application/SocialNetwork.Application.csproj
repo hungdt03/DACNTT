@@ -24,4 +24,8 @@
     <Folder Include="Behaviors\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Features\Group\Queries\GetGroupByIdIgnoreQuery.cs" />
+  </ItemGroup>
+
 </Project>

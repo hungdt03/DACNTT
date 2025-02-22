@@ -109,6 +109,14 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                     .ThenInclude(cmt => cmt.Group)
                 .SingleOrDefaultAsync(c => c.Id == id);
         }
+        public async Task<Comment?> GetCommentByIdIgnoreAsync(Guid id)
+        {
+            return await _dbContext.Comments
+                .Include(cmt => cmt.Post)
+                    .ThenInclude(cmt => cmt.Group)
+                .IgnoreQueryFilters()
+                .SingleOrDefaultAsync(c => c.Id == id);
+        }
 
         public async Task<Comment?> GetFirstCommentByPostId(Guid postId)
         {

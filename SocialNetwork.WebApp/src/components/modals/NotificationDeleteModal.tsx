@@ -5,6 +5,7 @@ import { NotificationResource } from '../../types/notification'
 import { ReportResource } from '../../types/report'
 import { PostResource } from '../../types/post'
 import { GroupResource } from '../../types/group'
+import { CommentResource } from '../../types/comment'
 
 type NotificationDeleteModalProps = {
     notification: NotificationResource | undefined
@@ -13,6 +14,7 @@ type NotificationDeleteModalProps = {
     getReport: ReportResource | undefined
     getPost: PostResource | undefined
     getGroup: GroupResource | undefined
+    getComment: CommentResource | undefined
 }
 
 const NotificationDeleteModal: FC<NotificationDeleteModalProps> = ({
@@ -21,7 +23,8 @@ const NotificationDeleteModal: FC<NotificationDeleteModalProps> = ({
     notification,
     getReport,
     getPost,
-    getGroup
+    getGroup,
+    getComment
 }) => {
     return (
         <Modal
@@ -41,20 +44,20 @@ const NotificationDeleteModal: FC<NotificationDeleteModalProps> = ({
                 </span>
 
                 <p className='text-sm'>
-                    Chúng tôi xin thông báo rằng bài viết/bình luận/nhóm của bạn đã bị xóa do vi phạm các tiêu chuẩn
-                    cộng đồng của nền tảng.
+                    Chúng tôi xin thông báo rằng{getReport?.reportType === ReportType.POST ? ' Bài viết ' : ''}
+                    {getReport?.reportType === ReportType.GROUP ? ' Nhóm ' : ''}
+                    {getReport?.reportType === ReportType.COMMENT ? ' Bình luận ' : ''}của bạn đã bị xóa do vi phạm các
+                    tiêu chuẩn cộng đồng của nền tảng.
                 </p>
 
                 <p className='text-sm'>
                     <strong>🛑 Nội dung bị xóa:</strong>
-                    {getReport?.reportType === ReportType.POST && (
-                        <span className='block text-red-600'>
-                            📌 Bài viết: "{getReport?.targetPost?.content?.slice(0, 100)}..."
-                        </span>
+                    {getPost && (
+                        <span className='block text-red-600'>📌 Bài viết: "{getPost?.content?.slice(0, 100)}..."</span>
                     )}
-                    {getReport?.reportType === ReportType.COMMENT && (
+                    {getComment && (
                         <span className='block text-red-600'>
-                            📌 Bình luận: "{getReport?.targetComment?.content?.slice(0, 100)}..."
+                            📌 Bình luận: "{getComment?.content?.slice(0, 100)}..."
                         </span>
                     )}
                     {getGroup && (

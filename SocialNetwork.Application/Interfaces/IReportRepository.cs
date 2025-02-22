@@ -17,5 +17,7 @@ namespace SocialNetwork.Application.Interfaces
         Task DeleteAllReport();
         Task UpdateReport(Guid id, string newStatus, string newReportSoluton);
         Task<int> CountAllReport();
+        Task<Report?> GetReportByIdIgnoreAsync(Guid id);
+        Task<List<Report?>> GetAllReportsIgnore();
     }
 }

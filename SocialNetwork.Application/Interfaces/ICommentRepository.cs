@@ -17,5 +17,6 @@ namespace SocialNetwork.Application.Interfaces
         void RemoveRange(IEnumerable<Comment> comments);
         Task<int> CountCommentsByUserIdAsync(string userId);
         Task<Comment?> GetFirstCommentByPostId(Guid postId);
+        Task<Comment?> GetCommentByIdIgnoreAsync(Guid id);
     }
 }
