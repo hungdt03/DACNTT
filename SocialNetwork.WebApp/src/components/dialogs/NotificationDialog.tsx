@@ -259,7 +259,6 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         <p className='text-sm text-gray-600'>
                             <strong>Chúng tôi đã xem xét báo cáo của bạn và xin thông báo:</strong>
                         </p>
-
                         <p className='text-sm text-gray-600'>
                             {(() => {
                                 switch (getReport?.reportType) {
@@ -271,7 +270,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                                                     {' '}
                                                     "{getReport?.targetUser?.fullName}"
                                                 </strong>
-                                                đã được <strong>xử lý</strong>.
+                                                đã {getReport?.status === 'RESOLVED' && <strong>được xử lý.</strong>}
+                                                {getReport?.status === 'REJECTED' && <strong>bị từ chối.</strong>}
                                             </>
                                         )
                                     case ReportType.POST:
@@ -282,7 +282,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                                                     {' '}
                                                     "{getReport?.targetPost?.user?.fullName}"
                                                 </strong>
-                                                đã được <strong>xử lý</strong>.
+                                                đã {getReport?.status === 'RESOLVED' && <strong>được xử lý.</strong>}
+                                                {getReport?.status === 'REJECTED' && <strong>bị từ chối.</strong>}
                                             </>
                                         )
                                     case ReportType.GROUP:
@@ -293,7 +294,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                                                     {' '}
                                                     "{getReport?.targetGroup?.name}"
                                                 </strong>
-                                                đã được <strong>xử lý</strong>.
+                                                đã {getReport?.status === 'RESOLVED' && <strong>được xử lý.</strong>}
+                                                {getReport?.status === 'REJECTED' && <strong>bị từ chối.</strong>}
                                             </>
                                         )
                                     case ReportType.COMMENT:
@@ -304,7 +306,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                                                     {' '}
                                                     "{getReport?.targetComment?.user?.fullName}"
                                                 </strong>
-                                                đã được <strong>xử lý</strong>.
+                                                đã {getReport?.status === 'RESOLVED' && <strong>được xử lý.</strong>}
+                                                {getReport?.status === 'REJECTED' && <strong>bị từ chối.</strong>}
                                             </>
                                         )
                                     default:
