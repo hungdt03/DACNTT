@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Application.Common.Helpers;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Requests;
 using SocialNetwork.Application.Contracts.Responses;
@@ -75,6 +76,16 @@ namespace SocialNetwork.Application.Features.Message.Handlers
             }
 
             var medias = new List<MessageMedia>();
+
+            var totalFiles = request.Images != null && request.Videos != null
+                   ? request.Images.Concat(request.Videos).ToList()
+                   : request.Images ?? request.Videos?.ToList();
+
+            long maxSizeInBytes = 10 * 1024 * 1024;
+            if (FileValidationHelper.AreFilesTooLarge(totalFiles, maxSizeInBytes))
+            {
+                throw new AppException("Tổng kích thước các tệp vượt quá giới hạn 10MB.");
+            }
 
             if (request.Images?.Any() == true)
             {

@@ -304,7 +304,10 @@ const ChatPopup: FC<ChatPopupProps> = ({
             const sentAt = tempMessage.sentAt.toISOString();
             formData.append('sentAt', sentAt);
 
-            await messageService.sendMessage(formData);
+            const response = await messageService.sendMessage(formData);
+            if(!response.isSuccess) {
+                message.error(response.message)
+            }
             
         } else {
 

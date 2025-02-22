@@ -2,6 +2,7 @@
 
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using SocialNetwork.Application.Common.Helpers;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
@@ -40,6 +41,12 @@ namespace SocialNetwork.Application.Features.ChatRoom.Handlers
             var userInChatRoom = await _unitOfWork.ChatRoomMemberRepository
                 .GetChatRoomMemberByRoomIdAndUserId(chatRoom.Id, userId)
                 ?? throw new AppException("Bạn không phải là thành viên của nhóm chat này");
+
+            long maxSizeInBytes = 4 * 1024 * 1024;
+            if (FileValidationHelper.AreFilesTooLarge([request.Image], maxSizeInBytes))
+            {
+                throw new AppException("Kích thước tệp vượt quá giới hạn 4MB.");
+            }
 
             var image = await _cloudinaryService.UploadImageAsync(request.Image);
 

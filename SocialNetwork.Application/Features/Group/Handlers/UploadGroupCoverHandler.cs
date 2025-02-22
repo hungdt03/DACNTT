@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using SocialNetwork.Application.Common.Helpers;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
@@ -39,6 +40,12 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             var group = await _unitOfWork.GroupRepository
                 .GetGroupByIdAsync(request.GroupId)
                 ?? throw new AppException("Nhóm không tồn tại");
+
+            long maxSizeInBytes = 4 * 1024 * 1024;
+            if (FileValidationHelper.AreFilesTooLarge([request.Image], maxSizeInBytes))
+            {
+                throw new AppException("Kích thước tệp vượt quá giới hạn 4MB.");
+            }
 
             var imageUrl = await _cloudinaryService.UploadImageAsync(request.Image);
 

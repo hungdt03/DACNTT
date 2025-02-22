@@ -1,6 +1,7 @@
 ﻿
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using SocialNetwork.Application.Common.Attributes;
 using SocialNetwork.Application.Contracts.Responses;
 using System.ComponentModel.DataAnnotations;
 
@@ -11,6 +12,7 @@ namespace SocialNetwork.Application.Features.ChatRoom.Commands
         [Required(ErrorMessage = "ID của nhóm chat không được để trống")]
         public Guid ChatRoomId { get; set; }
         [Required(ErrorMessage = "Ảnh không được để trống")]
+        [ImageFile]
         public IFormFile Image {  get; set; }
     }
 }

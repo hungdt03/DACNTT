@@ -382,7 +382,7 @@ const ChatArea: FC<ChatAreaProps> = ({
         <div className="flex items-center justify-between p-4 shadow">
             <div className="flex justify-center items-center gap-x-3">
                 <div className="relative">
-                    <Avatar className="w-12 h-12" size='large' src={chatRoom.isPrivate ? chatRoom.friend?.avatar : images.group} />
+                    <Avatar className="w-12 h-12" size='large' src={chatRoom.isPrivate ? chatRoom.friend?.avatar : chatRoom.imageUrl ?? images.group} />
                     {chatRoom.isOnline && (!chatRoom.isPrivate || (chatRoom.isPrivate && chatRoom.friend?.isShowStatus)) && <div className="absolute right-0 bottom-0 w-3 h-3 rounded-full bg-green-500 border-[2px] border-white"></div>}
                 </div>
                 <div className="flex flex-col items-start">

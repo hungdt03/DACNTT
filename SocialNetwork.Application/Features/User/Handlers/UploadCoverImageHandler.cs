@@ -3,6 +3,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using SocialNetwork.Application.Common.Helpers;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
@@ -32,6 +33,12 @@ namespace SocialNetwork.Application.Features.User.Handlers
 
             var user = await _userManager.FindByIdAsync(userId)
                 ?? throw new AppException("User không tồn tại");
+
+            long maxSizeInBytes = 4 * 1024 * 1024;
+            if (FileValidationHelper.AreFilesTooLarge([request.File], maxSizeInBytes))
+            {
+                throw new AppException("Kích thước tệp vượt quá giới hạn 4MB.");
+            }
 
             var coverImage = await _cloudinaryService.UploadImageAsync(request.File);
 

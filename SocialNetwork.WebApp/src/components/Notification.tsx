@@ -207,6 +207,8 @@ const Notification: FC<NotificationProps> = ({
             onPostReactionNotification()
         } else if (
             notification.type === NotificationType.INVITE_JOIN_GROUP ||
+            notification.type === NotificationType.APPROVAL_GROUP_INVITATION ||
+            notification.type === NotificationType.APPROVAL_JOIN_GROUP_REQUEST ||
             notification.type === NotificationType.INVITE_ROLE_GROUP
         ) {
             onGroupNotification()

@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.ComponentModel.DataAnnotations;
-
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace SocialNetwork.Application.Common.Attributes
 {
@@ -8,15 +8,30 @@ namespace SocialNetwork.Application.Common.Attributes
     {
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            if (value != null && value is List<IFormFile> files)
+            if (value is IFormFile file) // Kiểm tra 1 file duy nhất
             {
-                foreach (var file in files)
+                return ValidateFile(file);
+            }
+            else if (value is List<IFormFile> files) // Kiểm tra danh sách file
+            {
+                foreach (var f in files)
                 {
-                    if (file != null && !file.ContentType.StartsWith("image/"))
+                    var result = ValidateFile(f);
+                    if (result != ValidationResult.Success)
                     {
-                        return new ValidationResult($"Tệp '{file.FileName}' không phải là hình ảnh hợp lệ.");
+                        return result;
                     }
                 }
+            }
+
+            return ValidationResult.Success;
+        }
+
+        private ValidationResult? ValidateFile(IFormFile file)
+        {
+            if (file != null && !file.ContentType.StartsWith("image/"))
+            {
+                return new ValidationResult($"Tệp '{file.FileName}' không phải là hình ảnh hợp lệ.");
             }
             return ValidationResult.Success;
         }

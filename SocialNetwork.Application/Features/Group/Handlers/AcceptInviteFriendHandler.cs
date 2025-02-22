@@ -86,27 +86,27 @@ namespace SocialNetwork.Application.Features.Group.Handlers
 
                 await _unitOfWork.GroupMemberRepository.CreateGroupMemberAsync(groupMember);
 
-                notification = new Domain.Entity.System.Notification()
-                {
-                    Title = "Phê duyệt lời mời",
-                    Content = $"Yêu cầu tham gia nhóm {invitation.Group.Name} của bạn đã được phê duyệt",
-                    GroupInvitationId = request.InviteId,
-                    GroupId = invitation.GroupId,
-                    ImageUrl = invitation.Group.CoverImage,
-                    DateSent = DateTimeOffset.UtcNow,
-                    IsRead = false,
-                    Type = NotificationType.APPROVAL_GROUP_INVITATION,
-                    RecipientId = invitation.InviteeId,
-                };
+                //notification = new Domain.Entity.System.Notification()
+                //{
+                //    Title = "Phê duyệt lời mời",
+                //    Content = $"Yêu cầu tham gia nhóm {invitation.Group.Name} của bạn đã được phê duyệt",
+                //    GroupInvitationId = request.InviteId,
+                //    GroupId = invitation.GroupId,
+                //    ImageUrl = invitation.Group.CoverImage,
+                //    DateSent = DateTimeOffset.UtcNow,
+                //    IsRead = false,
+                //    Type = NotificationType.APPROVAL_GROUP_INVITATION,
+                //    RecipientId = invitation.InviteeId,
+                //};
 
-                await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+                //await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             }
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
            
-            if (notification != null)
-                await _signalRService.SendNotificationToSpecificUser(invitation.Invitee.UserName, ApplicationMapper.MapToNotification(notification));
+            //if (notification != null)
+            //    await _signalRService.SendNotificationToSpecificUser(invitation.Invitee.UserName, ApplicationMapper.MapToNotification(notification));
 
             return new BaseResponse()
             {
