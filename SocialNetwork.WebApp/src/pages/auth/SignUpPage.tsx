@@ -6,12 +6,11 @@ import images from "../../assets";
 import authService from "../../services/authService";
 import { toast } from "react-toastify";
 import signUpSchema from "../../schemas/signUpSchema";
-import { Button, Modal } from "antd";
+import {Modal } from "antd";
 import useModal from "../../hooks/useModal";
 import otpService from "../../services/otpService";
 import OTPVerification from "../../components/OTPVerification";
 import useTitle from "../../hooks/useTitle";
-import LoadingIndicator from "../../components/LoadingIndicator";
 import Loading from "../../components/Loading";
 
 export type SignUpRequest = {
@@ -19,6 +18,7 @@ export type SignUpRequest = {
     email: string;
     password: string;
     confirmPassword: string;
+    role?: string;
 }
 
 
@@ -100,6 +100,7 @@ const SignUpPage: FC = () => {
                 fullName: '',
                 password: '',
                 confirmPassword: '',
+                role: 'USER'
             }}
             onSubmit={handleSignUpAsync}
             validationSchema={signUpSchema}

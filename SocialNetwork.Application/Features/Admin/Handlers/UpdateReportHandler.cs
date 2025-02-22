@@ -99,7 +99,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                 notifications.Add(notiToUser);
             }
 
-            await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+            //await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             await _unitOfWork.ReportRepository.UpdateReport(request.Id, request.NewStatus, request.NewReportSolution);
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

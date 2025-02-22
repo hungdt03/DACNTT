@@ -15,5 +15,8 @@ namespace SocialNetwork.Application.Features.Auth.Commands
 
         [Required(ErrorMessage = "Mật khẩu không được để trống")]
         public string Password { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng chọn quyền tài khoản")]
+        public string Role {  get; set; }
     }
 }

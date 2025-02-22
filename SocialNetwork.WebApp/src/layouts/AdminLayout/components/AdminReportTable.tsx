@@ -126,7 +126,6 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
     const columns = [
         { key: 'reporter', label: 'Tài khoản báo cáo' },
         { key: 'reason', label: 'Lý do báo cáo' },
-        { key: 'background', label: 'Ảnh' },
         { key: 'reportType', label: 'Loại báo cáo' },
         { key: 'status', label: 'Trạng thái' },
         { key: 'dateCreatedAt', label: 'Ngày báo cáo' }
@@ -185,43 +184,6 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                         </TableCell>
                                         <TableCell>{report.reporter.fullName}</TableCell>
                                         <TableCell>{report.reason}</TableCell>
-                                        {report.targetUser && report.reportType === ReportType.USER && (
-                                            <TableCell>
-                                                <img
-                                                    key={report.id}
-                                                    src={report.targetUser.avatar}
-                                                    alt='Media'
-                                                    width={25}
-                                                />
-                                            </TableCell>
-                                        )}
-                                        {report.targetPost && report.reportType === ReportType.POST && (
-                                            <TableCell>
-                                                {report.targetPost.medias && report.targetPost.medias.length > 0
-                                                    ? report.targetPost.medias.map((media) => (
-                                                          <img
-                                                              key={media.id}
-                                                              src={media.mediaUrl}
-                                                              alt='Media'
-                                                              width={25}
-                                                          />
-                                                      ))
-                                                    : 'Không có'}
-                                            </TableCell>
-                                        )}
-                                        {report.targetGroup && report.reportType === ReportType.GROUP && (
-                                            <TableCell>
-                                                <img
-                                                    key={report.id}
-                                                    src={report.targetGroup.coverImage}
-                                                    alt='Media'
-                                                    width={25}
-                                                />
-                                            </TableCell>
-                                        )}
-                                        {report.targetComment && report.reportType === ReportType.COMMENT && (
-                                            <TableCell>Không có</TableCell>
-                                        )}
                                         <TableCell>
                                             {report.reportType === ReportType.USER
                                                 ? 'Tài khoản'
@@ -300,14 +262,14 @@ const AdminReportsTable: React.FC<PostsTableProps> = ({ reports, onReportSelect,
                                                     {report.reportType === ReportType.POST && (
                                                         <Grid item xs={6} sx={{ padding: '2px' }}>
                                                             <Typography variant='body2'>{`Người đăng: ${
-                                                                report.targetPost.user?.fullName
+                                                                report?.targetPost?.user?.fullName
                                                             }`}</Typography>
                                                         </Grid>
                                                     )}
                                                     {report.reportType === ReportType.COMMENT && (
                                                         <Grid item xs={6} sx={{ padding: '2px' }}>
                                                             <Typography variant='body2'>{`Người đăng: ${
-                                                                report.targetComment.user.fullName
+                                                                report?.targetComment?.user.fullName
                                                             }`}</Typography>
                                                         </Grid>
                                                     )}

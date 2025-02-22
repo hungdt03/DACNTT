@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Http;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
+using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Story.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.StoryInfo;
 
 namespace SocialNetwork.Application.Features.Story.Handlers
 {
@@ -90,6 +92,15 @@ namespace SocialNetwork.Application.Features.Story.Handlers
                     {
                         haveSeen = await _unitOfWork.ViewerRepository.IsAnViewersByStoryIdAndUserIdAsync(story.Id, userId);
                         if (!haveSeen) break;
+                    }
+
+                    var mapUser = group.FirstOrDefault()?.User;
+                    if (mapUser == null) throw new AppException("Có lỗi xảy ra. Vui lòng thử lại");
+
+                    if (friendShip == null || !friendShip.IsConnect)
+                    {
+                        mapUser.IsShowStatus = false;
+                        mapUser.IsOnline = false;
                     }
 
                     response.Add(new UserStoryResponse

@@ -59,36 +59,53 @@ namespace SocialNetwork.Application.Features.Auth.Handlers
             {
                 user.IsVerification = true;
             }
-
+           
             var result = await userManager.CreateAsync(user, request.Password);
+
+            if (getCurrentUserRole.Equals("ADMIN"))
+            {
+                if (request.Role != "ADMIN" && request.Role != "USER")
+                    throw new AppException("Quyền không hợp lệ");
+
+                await userManager.AddToRoleAsync(user, request.Role);
+            }
+            else
+            {
+                await userManager.AddToRoleAsync(user, "USER");
+            }
 
             if (!result.Succeeded)
                 throw new AppException(result.Errors.First().Description);
 
-            await userManager.AddToRoleAsync(user, "USER");
-
-            string otpCode;
+            string? otpCode = null;
             bool isExisted;
 
-            do
+            if (!user.IsVerification)
             {
-                otpCode = OtpHelper.GenerateSecureOTP();
-                isExisted = await unitOfWork.OTPRepository.IsExistOtpAsync(user.Id, otpCode, OTPType.ACCOUNT_VERIFICATION);
-            } while (isExisted);
+                do
+                {
+                    otpCode = OtpHelper.GenerateSecureOTP();
+                    isExisted = await unitOfWork.OTPRepository.IsExistOtpAsync(user.Id, otpCode, OTPType.ACCOUNT_VERIFICATION);
+                } while (isExisted);
 
-            var otp = new Domain.Entity.System.OTP
-            {
-                Code = otpCode,
-                ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(5),
-                Type = OTPType.ACCOUNT_VERIFICATION,
-                UserId = user.Id,
-            };
+                var otp = new Domain.Entity.System.OTP
+                {
+                    Code = otpCode,
+                    ExpiresAt = DateTimeOffset.UtcNow.AddMinutes(5),
+                    Type = OTPType.ACCOUNT_VERIFICATION,
+                    UserId = user.Id,
+                };
 
-            
-            await unitOfWork.OTPRepository.CreateNewOTPAsync(otp);
+
+                await unitOfWork.OTPRepository.CreateNewOTPAsync(otp);
+            }
+
             await unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            await mailkitService.SendOtpAccountVerificationAsync(user.Email, otpCode, user.FullName);
+           if(!user.IsVerification && otpCode != null)
+            {
+                await mailkitService.SendOtpAccountVerificationAsync(user.Email, otpCode, user.FullName);
+            }
 
             return new BaseResponse()
             {
