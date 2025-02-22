@@ -31,14 +31,18 @@ namespace SocialNetwork.Application.Features.Search.Handlers
             var myFriendsIds = myFriends.Select(f => f.UserId == userId ? f.FriendId : f.UserId).ToHashSet();
 
             var response = new List<SearchUserSuggestResponse>();
-
+            int minus = 0;
             foreach (var user in users)
             {
                 if (user.Id != userId)
                 {
                     var blockUser = await _unitOfWork.BlockListRepository
                           .GetBlockListByUserIdAndUserIdAsync(user.Id, userId);
-                    if (blockUser != null) continue;
+                    if (blockUser != null)
+                    {
+                        minus++;
+                        continue;
+                    }
                 }
 
                 var mapUser = ApplicationMapper.MapToUser(user);
@@ -86,7 +90,7 @@ namespace SocialNetwork.Application.Features.Search.Handlers
             {
                 Data = response,
                 IsSuccess = true,
-                Message = $"Tìm thấy {totalCount} kết quả cho '{request.Query}'",
+                Message = $"Tìm thấy {totalCount - minus} kết quả cho '{request.Query}'",
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Pagination = new Pagination()
                 {
