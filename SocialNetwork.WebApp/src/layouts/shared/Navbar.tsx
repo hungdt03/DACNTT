@@ -97,7 +97,7 @@ const Navbar: FC = () => {
                 </button>
             </Popover>
         </Badge>
-        <Badge count={1}>
+        <Badge count={chatRooms.filter(c => !c.isRead).length}>
             <Popover trigger='click' placement="bottomRight" content={<MessengerDialog
                 chatRooms={chatRooms}
                 loading={chatRoomLoading}

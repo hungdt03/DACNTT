@@ -38,6 +38,11 @@ namespace SocialNetwork.Application.Features.FriendShip.Handlers
             var receiver = await _userManager.FindByIdAsync(request.ReceiverId)
                 ?? throw new AppException("Thông tin người nhận không tồn tại");
 
+            var existedBlockeeUser = await _unitOfWork.BlockListRepository
+             .GetBlockListByUserIdAndUserIdAsync(userId, request.ReceiverId);
+
+            if (existedBlockeeUser != null) throw new AppException("Không thể theo dõi người này");
+
             var existedRequest = await _unitOfWork.FriendShipRepository
                 .GetFriendShipByUserIdAndFriendIdAsync(userId, request.ReceiverId);
 

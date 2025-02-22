@@ -13,7 +13,7 @@ const SearchHistoryTextItem: FC<SearchHistoryTextItemProps> = ({
     onRemove
 }) => {
     return <div className="py-2 rounded-md hover:bg-gray-100 flex items-center justify-between cursor-pointer px-2">
-        <Link to={`/search/?q=${encodeURIComponent(searchValue)}`} className="hover:text-black flex items-center gap-x-2">
+        <Link to={`/search/top/?q=${encodeURIComponent(searchValue)}`} className="hover:text-black flex items-center gap-x-2">
             <span className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center">
                 <History size={14} strokeWidth={3} className="text-gray-500" />
             </span>

@@ -69,6 +69,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return (follows, totalCount);
         }
 
+        public async Task<IEnumerable<Follow>> GetAllFollowersByUserIdAsync(string userId)
+        {
+            return await _context.Follows.Where(s => s.FolloweeId == userId).ToListAsync();
+        }
+
         public async Task<Follow?> GetFollowByFollowerIdAndFolloweeIdAsync(string followerId, string followeeId)
         {
             return await _context.Follows
@@ -77,6 +82,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .SingleOrDefaultAsync(f => f.FollowerId == followerId && f.FolloweeId == followeeId);
         }
 
-        
+        public async Task<bool> IsFollowUserByFollowerIdAsync(string userId, string followerId)
+        {
+            return await _context.Follows.AnyAsync(f => f.FolloweeId == userId && f.FollowerId.Equals(followerId));
+        }
     }
 }

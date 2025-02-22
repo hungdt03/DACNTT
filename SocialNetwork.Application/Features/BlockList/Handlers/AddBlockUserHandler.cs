@@ -30,10 +30,13 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
 
         public async Task<BaseResponse> Handle(AddBlockUserCommand request, CancellationToken cancellationToken)
         {
+            var userId = _contextAccessor.HttpContext.User.GetUserId();
+
+            if (userId == request.UserId) throw new AppException("Không thể tự chặn chính mình");
+
             var blockeeUser = await _userManager.FindByIdAsync(request.UserId)
                 ?? throw new NotFoundException("Thông tin người bị chặn không tồn tại");
-
-            var userId = _contextAccessor.HttpContext.User.GetUserId();
+           
             var existedBlockeeUser = await _unitOfWork.BlockListRepository
                 .GetBlockListByBlockeeIdAndBlockerIdAsync(request.UserId, userId);
 
@@ -44,7 +47,20 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
             var friendShip = await _unitOfWork
                 .FriendShipRepository.GetFriendShipByUserIdAndFriendIdAsync(request.UserId, userId);
 
-            if(friendShip != null)
+            var follow = await _unitOfWork.FollowRepository.GetFollowByFollowerIdAndFolloweeIdAsync(request.UserId, userId);
+            var reverseFollow = await _unitOfWork.FollowRepository.GetFollowByFollowerIdAndFolloweeIdAsync(userId, request.UserId);
+
+            if(follow != null)
+            {
+                _unitOfWork.FollowRepository.DeleteFollow(follow);
+            }
+
+            if (reverseFollow != null)
+            {
+                _unitOfWork.FollowRepository.DeleteFollow(reverseFollow);
+            }
+
+            if (friendShip != null)
             {
                 friendShip.Status = FriendShipStatus.BLOCKED;
                 friendShip.IsConnect = false;
@@ -63,7 +79,10 @@ namespace SocialNetwork.Application.Features.BlockList.Handlers
             var chatRoom = await _unitOfWork.ChatRoomRepository
                .GetPrivateChatRoomByMemberIds(new List<string> { userId, blockeeUser.Id });
 
-            await _signalRService.SendBlockSignalToSpecificUser(blockeeUser.UserName, chatRoom.Id);
+            if(chatRoom != null)
+            {
+                await _signalRService.SendBlockSignalToSpecificUser(blockeeUser.UserName, chatRoom.Id);
+            }
 
             return new BaseResponse()
             {

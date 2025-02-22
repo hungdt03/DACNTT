@@ -46,7 +46,7 @@ namespace SocialNetwork.API.Controllers
 
         [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPost("group")]
-        public async Task<IActionResult> ReportGroup([FromBody] ReportPostCommand command)
+        public async Task<IActionResult> ReportGroup([FromBody] ReportGroupCommand command)
         {
             var response = await _mediator.Send(command);
             return Ok(response);

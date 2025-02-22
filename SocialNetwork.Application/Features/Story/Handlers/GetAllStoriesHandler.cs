@@ -9,6 +9,7 @@ using SocialNetwork.Application.Features.Story.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Domain.Entity.StoryInfo;
 
 namespace SocialNetwork.Application.Features.Story.Handlers
@@ -66,24 +67,32 @@ namespace SocialNetwork.Application.Features.Story.Handlers
                     var takeStories = new List<StoryResponse>();
                     foreach (var story in userStories)
                     {
-                        if(story.Privacy == PrivacyConstant.PRIVATE) continue;
+                        if (story.Privacy == PrivacyConstant.PRIVATE) continue;
 
-                        if (story.Privacy == PrivacyConstant.FRIENDS)
-                        {
-                            if (friendShip == null || friendShip.Status != FriendShipStatus.ACCEPTED)
-                            {
-                                continue;
-                            }
-                        }
+                        bool isFriend = friendShip != null && friendShip.Status == FriendShipStatus.ACCEPTED;
+                        bool isConnected = friendShip != null && friendShip.IsConnect;
 
-                        if (friendShip == null || !friendShip.IsConnect)
+                        if (!isConnected)
                         {
                             story.User.IsShowStatus = false;
                             story.User.IsOnline = false;
                         }
 
-                        takeStories.Add(story);
+                        switch (story.Privacy)
+                        {
+                            case PrivacyConstant.FRIENDS:
+                                if (isFriend) takeStories.Add(story);
+                                break;
+
+                            case PrivacyConstant.PUBLIC:
+                                if (isFriend || await _unitOfWork.FollowRepository.IsFollowUserByFollowerIdAsync(story.User.Id, userId))
+                                {
+                                    takeStories.Add(story);
+                                }
+                                break;
+                        }
                     }
+
 
                     if (takeStories.Count == 0) continue;
 

@@ -21,6 +21,8 @@ import ChooseNewAdminModal from "../modals/ChooseNewAdminModal";
 import MyGroupManageSidebar from "./components/MyGroupManageSidebar";
 import { RcFile, UploadProps } from "antd/es/upload";
 import { getBase64, isValidImage } from "../../utils/file";
+import ReportPostModal from "../modals/reports/ReportPostModal";
+import reportService from "../../services/reportService";
 
 export type InviteFriendsRequest = {
     inviteeIds: string[];
@@ -59,6 +61,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     const navigate = useNavigate()
     const { handleCancel, handleOk, showModal, isModalOpen } = useModal();
     const { handleCancel: cancelLeave, handleOk: okLeave, showModal: showLeave, isModalOpen: openLeave } = useModal();
+    const { handleCancel: cancelReport, handleOk: okReport, showModal: showReport, isModalOpen: openReport } = useModal();
 
     const [openSetting, setOpenSetting] = useState(false);
     const [openManage, setOpenManage] = useState(false);
@@ -69,6 +72,8 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     const [isDisabledSectionFriends, setIsDisabledSectionFriends] = useState(false);
     const [isDisabledApprovalPost, setIsDisabledApprovalPost] = useState(false);
     const [isChange, setIsChange] = useState(false);
+
+    const [reason, setReason] = useState('')
 
     const [form] = Form.useForm<EditGroupRequest>();
 
@@ -248,9 +253,20 @@ const GroupHeader: FC<GroupHeaderProps> = ({
 
     const handleRemoveGroup = async () => {
         const response = await groupService.deleteGroup(group.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
             navigate('/groups')
+        } else {
+            message.error(response.message)
+        }
+    }
+
+    const handleReportGroup = async () => {
+        const response = await reportService.reportGroup(group.id, reason);
+        if(response.isSuccess) {
+            message.success(response.message);
+            okReport();
+            setReason('')
         } else {
             message.error(response.message)
         }
@@ -364,13 +380,16 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                             )
                         )}
 
-                        
+
                         {group.isMember && <Popover trigger={'click'} content={<div className="flex flex-col">
                             <Link to={`/groups/${group.id}/my-content/`} className="p-2 rounded-md hover:bg-gray-100 hover:text-black">Nội dung của bạn</Link>
-                            {group.isMine && 
+                            {group.isMine &&
                                 <Popconfirm onConfirm={handleRemoveGroup} title='Giải tán nhóm' description='Bạn có chắc là muốn giải tán nhóm?'>
                                     <button className="text-left p-2 rounded-md hover:bg-gray-100 hover:text-black">Giải tán nhóm</button>
                                 </Popconfirm>
+                            }
+                            {!group.isMine &&
+                                <button onClick={showReport} className="text-left p-2 rounded-md hover:bg-gray-100 hover:text-black">Báo cáo nhóm</button>
                             }
                         </div>}>
                             <Button icon={<MoreHorizontal size={16} />} type="primary">
@@ -585,6 +604,28 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                 selectMember={selectMember}
                 onChange={(newSelect) => setSelectMember(newSelect)}
                 group={group}
+            />
+        </Modal>
+
+        {/* REPORT TO ADMIN OF APP */}
+        <Modal
+            title={<p className="text-center font-bold text-lg">Báo cáo nhóm này</p>}
+            centered
+            open={openReport}
+            onOk={okReport}
+            onCancel={cancelReport}
+            okText='Gửi báo cáo'
+            cancelText='Hủy'
+            okButtonProps={{
+                onClick: () => reason.trim().length >= 20 && void handleReportGroup(),
+                disabled: reason.trim().length < 20
+            }}
+        >
+            <ReportPostModal
+                value={reason}
+                onChange={(newValue) => setReason(newValue)}
+                title="Tại sao bạn báo cáo nhóm này"
+                description="Nếu bạn nhận thấy ai đó đang gặp nguy hiểm, đừng chần chừ mà hãy tìm ngay sự giúp đỡ trước khi báo cáo với LinkUp."
             />
         </Modal>
 

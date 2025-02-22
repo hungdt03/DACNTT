@@ -32,21 +32,29 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var filteredPosts = new List<Domain.Entity.PostInfo.Post>();
             foreach (var post in allPosts)
             {
-               
                 bool isMe = post.UserId == userId;
               
                 if (!isMe)
                 {
+                    var friendShip = await unitOfWork.FriendShipRepository
+                           .GetFriendShipByUserIdAndFriendIdAsync(post.UserId, userId, FriendShipStatus.ACCEPTED);
+
                     if (post.Privacy.Equals(PrivacyConstant.PUBLIC))
                     {
+                        if(friendShip == null)
+                        {
+                            var isFollow = await unitOfWork.FollowRepository.IsFollowUserByFollowerIdAsync(post.UserId, userId);
+                            if (isFollow)
+                                filteredPosts.Add(post);
+                        } else
+                        {
+                            filteredPosts.Add(post);
+                        }
                        
-                        filteredPosts.Add(post);
                     }
                     else if (post.Privacy.Equals(PrivacyConstant.FRIENDS))
                     {
-                        var friendShip = await unitOfWork.FriendShipRepository
-                            .GetFriendShipByUserIdAndFriendIdAsync(post.UserId, userId, FriendShipStatus.ACCEPTED);
-
+                       
                         if (friendShip != null)
                         {
                             filteredPosts.Add(post);

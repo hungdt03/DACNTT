@@ -35,6 +35,8 @@ namespace SocialNetwork.Application.Features.Report.Handlers
             {
                 var member = await _unitOfWork.GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(group.Id, userId)
                     ?? throw new AppException("Bạn không phải là thành viên của nhóm nên không thể báo cáo bài viết của một nhóm riêng tư");
+
+                if (member.Role == MemberRole.ADMIN) throw new AppException("Không thể báo cáo nhóm do bạn quản lí");
             }
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
