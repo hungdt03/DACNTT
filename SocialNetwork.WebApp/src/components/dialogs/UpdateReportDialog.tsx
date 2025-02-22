@@ -76,7 +76,6 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
             setLoading(true)
             const response = await adminService.UpdateReport(updatedPayload)
             const rp = await adminService.DeleteOneGroup(tagetReport?.targetGroup?.id)
-            console.error(tagetReport?.targetGroup?.id)
             setLoading(false)
             if (response.isSuccess && rp.isSuccess) {
                 fetchReports()

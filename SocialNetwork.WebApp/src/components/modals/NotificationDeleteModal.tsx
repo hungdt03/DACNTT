@@ -57,9 +57,6 @@ const NotificationDeleteModal: FC<NotificationDeleteModalProps> = ({
                             📌 Bình luận: "{getReport?.targetComment?.content?.slice(0, 100)}..."
                         </span>
                     )}
-                    {getPost && (
-                        <span className='block text-red-600'>📌 Bài viết: "{getPost?.content?.slice(0, 100)}..."</span>
-                    )}
                     {getGroup && (
                         <>
                             <span className='block text-red-600'>
