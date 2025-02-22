@@ -113,7 +113,7 @@ class GroupService {
         })
     }
 
-    getAllMembersByGroupId(groupId: string, page: number, size: number, query: string, role: RoleFilter) : Promise<PaginationResponse<GroupMemberResource[]>> {
+    getAllMembersByGroupId(groupId: string, page: number, size: number, query?: string, role?: RoleFilter) : Promise<PaginationResponse<GroupMemberResource[]>> {
         return axiosInterceptor.get('/api/groups/members/' + groupId, {
             params: {
                 page,

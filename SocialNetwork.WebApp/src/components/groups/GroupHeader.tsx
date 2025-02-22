@@ -72,6 +72,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
     const [isDisabledSectionFriends, setIsDisabledSectionFriends] = useState(false);
     const [isDisabledApprovalPost, setIsDisabledApprovalPost] = useState(false);
     const [isChange, setIsChange] = useState(false);
+    const [groupMembers, setGroupMembers] = useState<GroupMemberResource[]>([])
 
     const [reason, setReason] = useState('')
 
@@ -122,11 +123,19 @@ const GroupHeader: FC<GroupHeaderProps> = ({
         }
     }
 
+    const fetchGroupMembers = async () => {
+        const response = await groupService.getAllMembersByGroupId(group.id, 1, 9);
+        if(response.isSuccess) {
+            setGroupMembers(response.data)
+        }
+    }
+
     useEffect(() => {
         if (group.privacy === GroupPrivacy.PUBLIC) setIsDisabled(true);
         if (group.isHidden) setIsDisabledSectionFriends(true);
         if (group.onlyAdminCanPost) setIsDisabledApprovalPost(true);
         handleGetRoleInvitation();
+        fetchGroupMembers()
     }, [group])
 
     const onFinish: FormProps<EditGroupRequest>['onFinish'] = async (values) => {
@@ -307,10 +316,10 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                 <div className="flex md:flex-row flex-col items-start gap-4 md:gap-0 md:items-center justify-between">
                     {(group.privacy === GroupPrivacy.PUBLIC || group.isMember) && (
                         <Avatar.Group>
-                            {group.members.map(member => (
+                            {groupMembers.map(member => (
                                 <Link key={member.id} to={`/profile/${member.id}`}>
-                                    <Tooltip title={member.fullName}>
-                                        <Avatar src={member.avatar} />
+                                    <Tooltip title={member.user.fullName}>
+                                        <Avatar src={member.user.avatar} />
                                     </Tooltip>
                                 </Link>
                             ))}

@@ -8,6 +8,7 @@ using SocialNetwork.Application.Features.Group.Queries;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.Group.Handlers
@@ -27,15 +28,20 @@ namespace SocialNetwork.Application.Features.Group.Handlers
         {
             var userId = _contextAccessor.HttpContext.User.GetUserId();
 
+            
             var member = await _unitOfWork.GroupMemberRepository
                 .GetGroupMemberByGroupIdAndUserId(request.GroupId, request.UserId)
                 ?? throw new AppException("Không tìm thấy thông tin nào");
 
-            //var meInGroup = await _unitOfWork.GroupMemberRepository
-            //    .GetGroupMemberByGroupIdAndUserId(request.GroupId, userId);
+            var meInGroup = await _unitOfWork
+              .GroupMemberRepository.GetGroupMemberByGroupIdAndUserId(request.GroupId, userId);
 
-            //if (meInGroup == null && member.Group.Privacy == GroupPrivacy.PRIVATE)
-            //    throw new AppException("Quyền truy cập bị từ chối");
+
+            var checkBlock = await _unitOfWork.BlockListRepository
+                   .GetBlockListByUserIdAndUserIdAsync(member.UserId, userId);
+
+            if (checkBlock != null && (meInGroup == null || meInGroup.Role == MemberRole.MEMBER)) throw new AppException("Không tìm thấy thông tin nào");
+
 
             var mapMember = ApplicationMapper.MapToGroupMember(member);
             if (userId != request.UserId)

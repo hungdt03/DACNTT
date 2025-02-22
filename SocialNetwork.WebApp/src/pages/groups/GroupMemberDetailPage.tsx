@@ -18,7 +18,6 @@ const GroupMemberDetailPage: FC = () => {
     const fetchGroupMember = async () => {
         if (id && userId) {
             const response = await groupService.getGroupMemberByGroupIdAndUserId(id, userId);
-            console.log(response)
             if (response.isSuccess) {
                 setGroupMember(response.data)
             } else {
