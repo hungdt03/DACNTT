@@ -37,8 +37,8 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
 
     useEffect(() => {
         if (tagetReport) {
-            setStatus(tagetReport.status)
-            setReportSoluton(tagetReport.resolutionNotes)
+            setStatus(tagetReport?.status)
+            setReportSoluton(tagetReport?.resolutionNotes)
         }
     }, [tagetReport])
 
@@ -53,7 +53,7 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
         if (btnCheckDelete && tagetReport.reportType === ReportType.POST) {
             setLoading(true)
             const response = await adminService.UpdateReport(updatedPayload)
-            const rp = await adminService.DeleteOnePost(tagetReport.targetPost.id)
+            const rp = await adminService.DeleteOnePost(tagetReport?.targetPost?.id)
             setLoading(false)
             if (response.isSuccess && rp.isSuccess) {
                 fetchReports()
@@ -64,11 +64,23 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
         } else if (btnCheckDelete && tagetReport.reportType === ReportType.COMMENT) {
             setLoading(true)
             const response = await adminService.UpdateReport(updatedPayload)
-            const rp = await adminService.DeleteOneComment(tagetReport.targetComment.id)
+            const rp = await adminService.DeleteOneComment(tagetReport?.targetComment?.id)
             setLoading(false)
             if (response.isSuccess && rp.isSuccess) {
                 fetchReports()
                 toast.success('Cập nhật trạng thái và gỡ bình luận thành công')
+            } else {
+                toast.error(response.message)
+            }
+        } else if (btnCheckDelete && tagetReport.reportType === ReportType.GROUP) {
+            setLoading(true)
+            const response = await adminService.UpdateReport(updatedPayload)
+            const rp = await adminService.DeleteOneGroup(tagetReport?.targetGroup?.id)
+            console.error(tagetReport?.targetGroup?.id)
+            setLoading(false)
+            if (response.isSuccess && rp.isSuccess) {
+                fetchReports()
+                toast.success('Cập nhật trạng thái và giải tán nhóm thành công')
             } else {
                 toast.error(response.message)
             }
@@ -119,7 +131,7 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                             marginBottom: '4px'
                         }}
                     >
-                        {tagetReport.reason}
+                        {tagetReport?.reason}
                     </Typography.Paragraph>
                 </Form.Item>
 
@@ -130,7 +142,7 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                     {reportTypeOptions.map((option) => (
                         <Button
                             key={option.type}
-                            type={tagetReport.reportType === option.type ? 'primary' : 'default'}
+                            type={tagetReport?.reportType === option.type ? 'primary' : 'default'}
                             style={{ marginRight: 4, cursor: 'not-allowed' }}
                         >
                             {option.label}
@@ -269,35 +281,59 @@ const UpdateReportDialog: React.FC<UpdateReportDialogProps> = ({ tagetReport, is
                         >
                             <Typography.Text>{tagetReport.targetComment?.content}</Typography.Text>
                         </Form.Item>
-                        <Form.Item
-                            label={<span style={{ fontWeight: 'bold' }}>Gỡ bình luận</span>}
-                            style={{ marginBottom: '10px' }}
-                        >
-                            <Button
-                                type={!btnCheckDelete ? 'primary' : 'default'}
-                                onClick={() => setBtnCheckDelete(!btnCheckDelete)}
-                                style={{ marginRight: 4 }}
+                        {status == 'RESOLVED' && tagetReport.status != 'RESOLVED' && (
+                            <Form.Item
+                                label={<span style={{ fontWeight: 'bold' }}>Gỡ bình luận</span>}
+                                style={{ marginBottom: '10px' }}
                             >
-                                Có
-                            </Button>
-                            <Button
-                                type={btnCheckDelete ? 'primary' : 'default'}
-                                onClick={() => setBtnCheckDelete(!btnCheckDelete)}
-                                style={{ marginRight: 4 }}
-                            >
-                                Không
-                            </Button>
-                        </Form.Item>
+                                <Button
+                                    type={btnCheckDelete ? 'primary' : 'default'}
+                                    onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                    style={{ marginRight: 4 }}
+                                >
+                                    Có
+                                </Button>
+                                <Button
+                                    type={!btnCheckDelete ? 'primary' : 'default'}
+                                    onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                    style={{ marginRight: 4 }}
+                                >
+                                    Không
+                                </Button>
+                            </Form.Item>
+                        )}
                     </>
                 )}
-
                 {tagetReport?.reportType === ReportType.GROUP && (
-                    <Form.Item
-                        label={<span style={{ fontWeight: 'bold' }}>Nhóm bị báo cáo</span>}
-                        style={{ marginBottom: '10px' }}
-                    >
-                        <Typography.Text>{tagetReport.targetGroup?.name}</Typography.Text>
-                    </Form.Item>
+                    <>
+                        <Form.Item
+                            label={<span style={{ fontWeight: 'bold' }}>Nhóm bị báo cáo</span>}
+                            style={{ marginBottom: '10px' }}
+                        >
+                            <Typography.Text>{tagetReport?.targetGroup?.name}</Typography.Text>
+                        </Form.Item>
+                        {status == 'RESOLVED' && tagetReport.status != 'RESOLVED' && (
+                            <Form.Item
+                                label={<span style={{ fontWeight: 'bold' }}>Giải tán nhóm</span>}
+                                style={{ marginBottom: '10px' }}
+                            >
+                                <Button
+                                    type={btnCheckDelete ? 'primary' : 'default'}
+                                    onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                    style={{ marginRight: 4 }}
+                                >
+                                    Có
+                                </Button>
+                                <Button
+                                    type={!btnCheckDelete ? 'primary' : 'default'}
+                                    onClick={() => setBtnCheckDelete(!btnCheckDelete)}
+                                    style={{ marginRight: 4 }}
+                                >
+                                    Không
+                                </Button>
+                            </Form.Item>
+                        )}
+                    </>
                 )}
 
                 <Form.Item

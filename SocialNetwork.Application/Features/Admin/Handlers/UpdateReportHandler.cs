@@ -69,35 +69,102 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
             await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             notifications.Add(notification);
 
-            if ((report.ReportType == ReportType.COMMENT && request.IsDelete) || (report.ReportType == ReportType.POST && request.IsDelete))
-            {
-                var targetEntity = report.ReportType == ReportType.COMMENT ? (object)report.TargetComment : report.TargetPost;
-                var targetUserId = report.ReportType == ReportType.COMMENT ? report.TargetComment.UserId : report.TargetPost.UserId;
-                var targetUser = report.ReportType == ReportType.COMMENT ? report.TargetComment.User : report.TargetPost.User;
+            //if ((report.ReportType == ReportType.COMMENT && request.IsDelete) || (report.ReportType == ReportType.POST && request.IsDelete))
+            //{
+            //    var targetEntity = report.ReportType == ReportType.COMMENT ? (object)report.TargetComment : report.TargetPost;
+            //    var targetUserId = report.ReportType == ReportType.COMMENT ? report.TargetComment.UserId : report.TargetPost.UserId;
+            //    var targetUser = report.ReportType == ReportType.COMMENT ? report.TargetComment.User : report.TargetPost.User;
 
-                var notiToUser = new Domain.Entity.System.Notification
+            //    var notiToUser = new Domain.Entity.System.Notification
+            //    {
+            //        ReportId = request.Id,
+            //        CommentId = report.TargetCommentId,
+            //        PostId = report.TargetPostId,
+            //        ImageUrl = userAvatar,
+            //        IsRead = false,
+            //        Title = report.ReportType == ReportType.COMMENT ? "Thông báo gỡ bình luận" : "Thông báo gỡ bài viết",
+            //        Content = report.ReportType switch
+            //        {
+            //            ReportType.COMMENT => $"Chúng tôi đã xóa bình luận của bạn, nhấn vào để xem chi tiết",
+            //            ReportType.POST => $"Chúng tôi đã xóa bài viết của bạn, nhấn vào để xem chi tiết",
+            //            _ => string.Empty
+            //        },
+            //        RecipientId = targetUserId,
+            //        Recipient = targetUser,
+            //        Type = NotificationType.REPORT_DELETE_RESPONSE,
+            //        DateSent = DateTimeOffset.UtcNow
+            //    };
+
+            //    await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiToUser);
+            //    notifications.Add(notiToUser);
+            //}
+            if ((report.ReportType == ReportType.COMMENT && request.IsDelete) ||
+    (report.ReportType == ReportType.GROUP && request.IsDelete) ||
+    (report.ReportType == ReportType.POST && request.IsDelete))
+            {
+                var targetEntity = report.ReportType switch
                 {
-                    ReportId = request.Id,
-                    CommentId = report.TargetCommentId,
-                    PostId = report.TargetPostId,
-                    ImageUrl = userAvatar,
-                    IsRead = false,
-                    Title = report.ReportType == ReportType.COMMENT ? "Thông báo gỡ bình luận" : "Thông báo gỡ bài viết",
-                    Content = report.ReportType switch
-                    {
-                        ReportType.COMMENT => $"Chúng tôi đã xóa bình luận của bạn, nhấn vào để xem chi tiết",
-                        ReportType.POST => $"Chúng tôi đã xóa bài viết của bạn, nhấn vào để xem chi tiết",
-                        _ => string.Empty
-                    },
-                    RecipientId = targetUserId,
-                    Recipient = targetUser,
-                    Type = NotificationType.REPORT_DELETE_RESPONSE,
-                    DateSent = DateTimeOffset.UtcNow
+                    ReportType.COMMENT => (object)report.TargetComment,
+                    ReportType.POST => report.TargetPost,
+                    ReportType.GROUP => report.TargetGroup,
+                    _ => null
                 };
 
-                await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiToUser);
-                notifications.Add(notiToUser);
+                if (report.ReportType == ReportType.GROUP)
+                {
+                    // Lấy danh sách tất cả Admin trong nhóm
+                    var adminUsers = report?.TargetGroup?.Members
+                                        .Where(m => m.Role == "ADMIN")
+                                        .Select(m => (m.UserId, m.User))
+                                        .ToList();
+
+                    foreach (var (targetUserId, targetUser) in adminUsers)
+                    {
+                        var notiToAdmin = new Domain.Entity.System.Notification
+                        {
+                            ReportId = request.Id,
+                            GroupId = report?.TargetGroupId,
+                            ImageUrl = userAvatar,
+                            IsRead = false,
+                            Title = "Thông báo giải tán nhóm",
+                            Content = "Chúng tôi đã giải tán nhóm của bạn, nhấn vào để xem chi tiết",
+                            RecipientId = targetUserId,
+                            Recipient = targetUser,
+                            Type = NotificationType.REPORT_DELETE_RESPONSE,
+                            DateSent = DateTimeOffset.UtcNow
+                        };
+
+                        await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiToAdmin);
+                        notifications.Add(notiToAdmin);
+                    }
+                }
+                else
+                {
+                    var targetUserId = report.ReportType == ReportType.COMMENT ? report?.TargetComment?.UserId : report?.TargetPost?.UserId;
+                    var targetUser = report?.ReportType == ReportType.COMMENT ? report?.TargetComment?.User : report?.TargetPost?.User;
+
+                    var notiToUser = new Domain.Entity.System.Notification
+                    {
+                        ReportId = request.Id,
+                        CommentId = report?.TargetCommentId,
+                        PostId = report?.TargetPostId,
+                        ImageUrl = userAvatar,
+                        IsRead = false,
+                        Title = report?.ReportType == ReportType.COMMENT ? "Thông báo gỡ bình luận" : "Thông báo gỡ bài viết",
+                        Content = report?.ReportType == ReportType.COMMENT
+                            ? "Chúng tôi đã xóa bình luận của bạn, nhấn vào để xem chi tiết"
+                            : "Chúng tôi đã xóa bài viết của bạn, nhấn vào để xem chi tiết",
+                        RecipientId = targetUserId,
+                        Recipient = targetUser,
+                        Type = NotificationType.REPORT_DELETE_RESPONSE,
+                        DateSent = DateTimeOffset.UtcNow
+                    };
+
+                    await _unitOfWork.NotificationRepository.CreateNotificationAsync(notiToUser);
+                    notifications.Add(notiToUser);
+                }
             }
+
 
             //await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
             await _unitOfWork.ReportRepository.UpdateReport(request.Id, request.NewStatus, request.NewReportSolution);
