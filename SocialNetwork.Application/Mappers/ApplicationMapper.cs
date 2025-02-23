@@ -1,6 +1,7 @@
 ﻿
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.DTOs.Admin;
+using SocialNetwork.Application.DTOs.Score;
 using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
 using SocialNetwork.Domain.Entity.GroupInfo;
@@ -57,7 +58,7 @@ namespace SocialNetwork.Application.Mappers
                 IsShowStatus = true,
             }).ToList();
         }
-        public static List<ScoreResponse> MapToUserScore(List<UserScoreCommand> userScores)
+        public static List<ScoreResponse> MapToUserScore(List<UserScore> userScores)
         {
             return userScores.Select(user => new ScoreResponse
             {

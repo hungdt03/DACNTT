@@ -7,8 +7,9 @@ using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Report.Commands;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Interfaces.Services;
+using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
-using System.Security.Cryptography;
 
 namespace SocialNetwork.Application.Features.Report.Handlers
 {
@@ -16,11 +17,13 @@ namespace SocialNetwork.Application.Features.Report.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly ISignalRService _signalRService;
 
-        public ReportGroupHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor)
+        public ReportGroupHandler(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, ISignalRService signalRService)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
+            _signalRService = signalRService;
         }
 
         public async Task<BaseResponse> Handle(ReportGroupCommand request, CancellationToken cancellationToken)
@@ -52,7 +55,41 @@ namespace SocialNetwork.Application.Features.Report.Handlers
 
             await _unitOfWork.ReportRepository.CreateNewReportAsync(newReport);
 
+            var adminUsers = await _unitOfWork.UserRepository
+                  .GetAllRoleAdmin();
+
+            var userFullName = _contextAccessor.HttpContext.User.GetFullName();
+            var userAvatar = _contextAccessor.HttpContext.User.GetAvatar();
+            List<Domain.Entity.System.Notification> notifications = [];
+            foreach (var admin in adminUsers)
+            {
+                var notification = new Domain.Entity.System.Notification()
+                {
+                    Title = "Báo cáo người dùng",
+                    Content = $"{userFullName} đã báo cáo nhóm {group.Name}. Vào trang báo cáo để xem",
+                    ReportId = newReport.Id,
+                    IsRead = false,
+                    DateSent = DateTimeOffset.UtcNow,
+                    ImageUrl = $"{userAvatar}",
+                    Type = NotificationType.REPORT_GROUP,
+                    GroupId = null,
+                    RecipientId = admin.Id,
+                    Recipient = admin
+                };
+
+                await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+                notifications.Add(notification);
+            }
+
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+            foreach (var notification in notifications)
+            {
+                foreach (var admin in adminUsers)
+                {
+                    await _signalRService.SendNotificationToSpecificUser(admin.UserName, ApplicationMapper.MapToNotification(notification));
+                }
+            }
 
             return new BaseResponse()
             {

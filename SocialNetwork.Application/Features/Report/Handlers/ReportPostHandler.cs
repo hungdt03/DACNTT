@@ -10,6 +10,7 @@ using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.GroupInfo;
+using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.Report.Handlers
 {
@@ -70,16 +71,17 @@ namespace SocialNetwork.Application.Features.Report.Handlers
 
             await _unitOfWork.ReportRepository.CreateNewReportAsync(newReport);
 
-            List<GroupMember> groupAdmins = [];
+            List<Domain.Entity.System.User> adminUsers = [];
             List<Domain.Entity.System.Notification> notifications = [];
+            var userFullName = _contextAccessor.HttpContext.User.GetFullName();
+            var userAvatar = _contextAccessor.HttpContext.User.GetAvatar();
             if (findGroup != null)
             {
-                var userFullName = _contextAccessor.HttpContext.User.GetFullName();
-                var userAvatar = _contextAccessor.HttpContext.User.GetFullName();
-                groupAdmins = await _unitOfWork.GroupMemberRepository
-                    .GetAllAdminAndModeratoInGroupAsync(findGroup.Id);
+             
+                adminUsers = (await _unitOfWork.GroupMemberRepository
+                     .GetAllAdminAndModeratoInGroupAsync(findGroup.Id)).Select(gr => gr.User).ToList();
 
-                foreach (var admin in groupAdmins)
+                foreach (var admin in adminUsers)
                 {
                     var notification = new Domain.Entity.System.Notification()
                     {
@@ -91,7 +93,34 @@ namespace SocialNetwork.Application.Features.Report.Handlers
                         ImageUrl = $"{userAvatar}",
                         Type = NotificationType.REPORT_GROUP_POST,
                         GroupId = findGroup.Id,
-                        RecipientId = admin.UserId,
+                        RecipientId = admin.Id,
+                        Recipient = admin
+                    };
+
+                    await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+                    notifications.Add(notification);
+                }
+            }
+            else
+            {
+                // REPORT FOR ADMIN OF APP
+                adminUsers = await _unitOfWork.UserRepository
+                   .GetAllRoleAdmin();
+
+                foreach (var admin in adminUsers)
+                {
+                    var notification = new Domain.Entity.System.Notification()
+                    {
+                        Title = "Báo cáo bài viết",
+                        Content = $"{userFullName} đã báo cáo một bài viết trong nhóm. Vào trang báo cáo để xem",
+                        ReportId = newReport.Id,
+                        IsRead = false,
+                        DateSent = DateTimeOffset.UtcNow,
+                        ImageUrl = $"{userAvatar}",
+                        Type = NotificationType.REPORT_POST,
+                        GroupId = null,
+                        RecipientId = admin.Id,
+                        Recipient = admin
                     };
 
                     await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
@@ -101,14 +130,11 @@ namespace SocialNetwork.Application.Features.Report.Handlers
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            if (findGroup != null)
+            foreach (var notification in notifications)
             {
-                foreach (var notification in notifications)
+                foreach (var admin in adminUsers)
                 {
-                    foreach (var admin in groupAdmins)
-                    {
-                        await _signalRService.SendNotificationToSpecificUser(admin.User.UserName, ApplicationMapper.MapToNotification(notification));
-                    }
+                    await _signalRService.SendNotificationToSpecificUser(admin.UserName, ApplicationMapper.MapToNotification(notification));
                 }
             }
 

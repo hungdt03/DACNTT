@@ -1,9 +1,9 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Domain.Entity.UserInfo;
 using SocialNetwork.Infrastructure.DBContext;
-
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -96,6 +96,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(f => f.Followee)
                 .SingleOrDefaultAsync(f => f.FollowerId == followerId && f.FolloweeId == followeeId);
         }
+
 
         public async Task<bool> IsFollowUserByFollowerIdAsync(string userId, string followerId)
         {

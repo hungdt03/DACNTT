@@ -24,7 +24,14 @@ namespace SocialNetwork.Domain.Constants
                 public const string REPORT_GROUP_POST = "REPORT_GROUP_POST";
                 public const string REPORT_GROUP_COMMENT = "REPORT_GROUP_COMMENT";
 
-                public const string REPORT_RESPONSE = "REPORT_RESPONSE";
+                public const string REPORT_USER = "REPORT_USER";
+                public const string REPORT_COMMENT = "REPORT_COMMENT";
+                public const string REPORT_POST = "REPORT_POST";
+                public const string REPORT_GROUP = "REPORT_GROUP";
+
+        public const string REPORT_RESPONSE_REPORTER = "REPORT_RESPONSE_REPORTER";
+                public const string REPORT_RESPONSE_REPORTEE = "REPORT_RESPONSE_REPORTEE";
+
                 public const string REPORT_DELETE_RESPONSE = "REPORT_DELETE_RESPONSE";
                 public const string POST_DELETE_RESPONSE = "POST_DELETE_RESPONSE";
                 public const string GROUP_DELETE_RESPONSE = "GROUP_DELETE_RESPONSE";

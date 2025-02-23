@@ -12,16 +12,8 @@ import notificationService from '../../services/notificationService'
 import { toast } from 'react-toastify'
 import NotificationSkeleton from '../skeletons/NotificationSkeleton'
 import { ReportResource } from '../../types/report'
-import adminService from '../../services/adminService'
-import { ReportType } from '../../enums/report-type'
 import { useElementInfinityScroll } from '../../hooks/useElementInfinityScroll'
-import { PostResource } from '../../types/post'
-import { GroupResource } from '../../types/group'
-import NotificationDeleteModal from '../modals/NotificationDeleteModal'
-import postService from '../../services/postService'
-import groupService from '../../services/groupService'
-import commentService from '../../services/commentService'
-import { CommentResource } from '../../types/comment'
+import reportService from '../../services/reportService'
 
 type NotificationDialogProps = {
     notifications: NotificationResource[]
@@ -46,36 +38,14 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     const [notification, setNotification] = useState<NotificationResource>()
 
     const { isModalOpen: openReport, handleCancel: cancelReport, showModal: showReport } = useModal()
-    const { isModalOpen: openReportDelete, handleCancel: cancelReportDelete, showModal: showReportDelete } = useModal()
     const [getReport, setGetReport] = useState<ReportResource>()
-    const [getPost, setGetPost] = useState<PostResource>()
-    const [getGroup, setGetGroup] = useState<GroupResource>()
-    const [getComment, setGetComment] = useState<CommentResource>()
-
     const navigate = useNavigate()
 
     const getReportById = async (reportId: string) => {
-        const response = await adminService.GetReportById(reportId)
+        const response = await reportService.getReportById(reportId)
+        console.log(response)
         if (response.isSuccess) {
             setGetReport(response.data)
-        }
-    }
-    const getPostById = async (postId: string) => {
-        const response = await postService.getPostById(postId)
-        if (response.isSuccess) {
-            setGetPost(response.data)
-        }
-    }
-    const getGroupById = async (groupId: string) => {
-        const response = await groupService.getGroupByIdIgnore(groupId)
-        if (response.isSuccess) {
-            setGetGroup(response.data)
-        }
-    }
-    const getCommentById = async (commentId: string) => {
-        const response = await commentService.getCommentByIdIgnore(commentId)
-        if (response.isSuccess) {
-            setGetComment(response.data)
         }
     }
 
@@ -103,8 +73,6 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
             )
 
             onUpdateNotifications(updateNotifications)
-        } else {
-            // toast.error(response.message)
         }
     }
 
@@ -149,29 +117,10 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         await getReportById(notification.reportId)
         showReport()
     }
-    const handleReportDeleteReceiverPage = async (noti: NotificationResource) => {
-        handleMarkNotificationAsRead(noti.id)
-        setNotification(noti)
-        await getReportById(noti.reportId)
-        showReportDelete()
-    }
-    const handlePostDeleteReceiverPage = async (noti: NotificationResource) => {
-        handleMarkNotificationAsRead(noti.id)
-        setNotification(noti)
-        await getPostById(noti.postId)
-        showReportDelete()
-    }
-    const handleGroupDeleteReceiverPage = async (noti: NotificationResource) => {
-        handleMarkNotificationAsRead(noti.id)
-        setNotification(noti)
-        await getGroupById(noti.groupId)
-        showReportDelete()
-    }
-    const handleCommentDeleteReceiverPage = async (noti: NotificationResource) => {
-        handleMarkNotificationAsRead(noti.id)
-        setNotification(noti)
-        await getCommentById(noti.groupId)
-        showReportDelete()
+
+    const handleRedirectToAdminReportPage = async (notification: NotificationResource) => {
+        handleMarkNotificationAsRead(notification.id)
+        navigate(`/admin/reports`)
     }
 
     return (
@@ -195,11 +144,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                             onAcceptRequestFriendNotification={() => handleRedirectToProfileReceiverPage(notifi)}
                             onPostReactionNotification={() => handleOpenMentionComment(notifi)}
                             onGroupNotification={() => handleRedirectToGroupPage(notifi)}
-                            onReportUserNotification={() => handleReportReceiverPage(notifi)}
-                            onReportDeleteNotification={() => handleReportDeleteReceiverPage(notifi)}
-                            onPostDeleteNotification={() => handlePostDeleteReceiverPage(notifi)}
-                            onGroupDeleteNotification={() => handleGroupDeleteReceiverPage(notifi)}
-                            onCommentDeleteNotification={() => handleCommentDeleteReceiverPage(notifi)}
+                            onReportResponseNotification={() => handleReportReceiverPage(notifi)}
+                            onReportAdminNotification={() => handleRedirectToAdminReportPage(notifi)}
                         />
                     ))}
 
@@ -245,11 +191,15 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         }
                     }}
                 >
-                    {(notification?.type.includes('COMMENT') ||
+                    {(
+                        notification?.type === NotificationType.COMMENTED_ON_POST ||
+                        notification?.type === NotificationType.REPLIED_TO_COMMENT ||
                         notification?.type === NotificationType.ASSIGN_POST_TAG ||
-                        (notification?.type === NotificationType.POST_REACTION && notification.postId)) && (
+                        (notification?.type === NotificationType.POST_REACTION && notification.postId))
+                        && (
                         <MentionPostModal postId={notification.postId} commentId={notification.commentId} />
                     )}
+
                     {notification?.type === NotificationType.POST_SHARED && notification.postId && (
                         <MentionSharePostModal postId={notification.postId} />
                     )}
@@ -276,7 +226,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         <p className='text-sm text-gray-600'>
                             <strong>Chúng tôi đã xem xét báo cáo của bạn và xin thông báo:</strong>
                         </p>
-                        <p className='text-sm text-gray-600'>
+                        {/* <p className='text-sm text-gray-600'>
                             {(() => {
                                 switch (getReport?.reportType) {
                                     case ReportType.USER:
@@ -331,7 +281,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                                         return <strong>Báo cáo của bạn đã được xử lý.</strong>
                                 }
                             })()}
-                        </p>
+                        </p> */}
 
                         <p className='text-sm text-gray-600'>
                             <strong>📌 Kết quả xử lý: </strong>
@@ -347,17 +297,6 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         </p>
                     </div>
                 </Modal>
-            )}
-            {openReportDelete && (
-                <NotificationDeleteModal
-                    notification={notification}
-                    openDeleteModal={openReportDelete}
-                    cancelDeleteModal={cancelReportDelete}
-                    getReport={getReport}
-                    getPost={getPost}
-                    getGroup={getGroup}
-                    getComment={getComment}
-                />
             )}
         </>
     )

@@ -52,11 +52,8 @@ type NotificationProps = {
     onAcceptRequestFriendNotification: () => void
     onPostReactionNotification: () => void
     onGroupNotification: () => void
-    onReportUserNotification: () => void
-    onReportDeleteNotification: () => void
-    onPostDeleteNotification: () => void
-    onGroupDeleteNotification: () => void
-    onCommentDeleteNotification: () => void
+    onReportResponseNotification: () => void
+    onReportAdminNotification: () => void
 }
 
 const Notification: FC<NotificationProps> = ({
@@ -70,11 +67,9 @@ const Notification: FC<NotificationProps> = ({
     onAcceptRequestFriendNotification,
     onPostReactionNotification,
     onGroupNotification,
-    onReportUserNotification,
-    onReportDeleteNotification,
-    onPostDeleteNotification,
-    onGroupDeleteNotification,
-    onCommentDeleteNotification
+    onReportResponseNotification,
+    onReportAdminNotification,
+
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false)
     const [acceptedFriendRequest, setAcceptedFriendRequest] = useState<'accepted' | 'cancel' | 'none'>('none')
@@ -190,7 +185,10 @@ const Notification: FC<NotificationProps> = ({
     }
 
     const handleSelectNotification = () => {
-        if (notification.type.includes('COMMENT')) {
+        if (
+            notification.type === NotificationType.COMMENTED_ON_POST ||
+            notification.type === NotificationType.REPLIED_TO_COMMENT
+        ) {
             onCommentNotification()
         } else if (notification.type === NotificationType.POST_SHARED) {
             onShareNotification()
@@ -212,16 +210,18 @@ const Notification: FC<NotificationProps> = ({
             notification.type === NotificationType.INVITE_ROLE_GROUP
         ) {
             onGroupNotification()
-        } else if (notification.type === NotificationType.REPORT_RESPONSE) {
-            onReportUserNotification()
-        } else if (notification.type === NotificationType.REPORT_DELETE_RESPONSE) {
-            onReportDeleteNotification()
-        } else if (notification.type === NotificationType.POST_DELETE_RESPONSE) {
-            onPostDeleteNotification()
-        } else if (notification.type === NotificationType.GROUP_DELETE_RESPONSE) {
-            onGroupDeleteNotification()
-        } else if (notification.type === NotificationType.COMMENT_DELETE_RESPONSE) {
-            onCommentDeleteNotification()
+        } else if (
+            notification.type === NotificationType.REPORT_RESPONSE_REPORTEE
+            || notification.type === NotificationType.REPORT_RESPONSE_REPORTER
+        ) {
+            onReportResponseNotification()
+        } else if (
+            notification.type === NotificationType.REPORT_POST ||
+            notification.type === NotificationType.REPORT_COMMENT ||
+            notification.type === NotificationType.REPORT_USER ||
+            notification.type === NotificationType.REPORT_GROUP
+        ) {
+            onReportAdminNotification()
         }
     }
 
@@ -246,33 +246,28 @@ const Notification: FC<NotificationProps> = ({
                             ? notis.commentNoti
                             : notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED ||
                                 notification.type === NotificationType.FRIEND_REQUEST_SENT
-                              ? notis.userNoti
-                              : notification.type === NotificationType.JOIN_GROUP_REQUEST ||
-                                  notification.type === NotificationType.APPROVAL_GROUP_INVITATION ||
-                                  notification.type === NotificationType.APPROVAL_JOIN_GROUP_REQUEST ||
-                                  notification.type === NotificationType.INVITE_JOIN_GROUP
-                                ? images.group
-                                : notification.type === NotificationType.POST_SHARED
-                                  ? notis.notiShare
-                                  : notification.type === NotificationType.VIEW_STORY
-                                    ? notis.viewStory
-                                    : notification.type === NotificationType.REACT_STORY ||
-                                        notification.type === NotificationType.POST_REACTION
-                                      ? notis.notiReaction
-                                      : notification.type === NotificationType.ASSIGN_POST_TAG
-                                        ? notis.notiTag
-                                        : notification.type === NotificationType.REPORT_RESPONSE ||
-                                            notification.type === NotificationType.REPORT_DELETE_RESPONSE ||
-                                            notification.type === NotificationType.POST_DELETE_RESPONSE ||
-                                            notification.type === NotificationType.GROUP_DELETE_RESPONSE ||
-                                            notification.type === NotificationType.COMMENT_DELETE_RESPONSE ||
-                                            notification.type === NotificationType.REPORT_GROUP_POST ||
-                                            notification.type === NotificationType.REPORT_GROUP_COMMENT ||
-                                            notification.type === NotificationType.REPORT_GROUP_MEMBER
-                                          ? notis.notiReport
-                                          : notification.type === NotificationType.APPROVAL_POST
-                                            ? notis.notiApproval
-                                            : notis.notiBell
+                                ? notis.userNoti
+                                : notification.type === NotificationType.JOIN_GROUP_REQUEST ||
+                                    notification.type === NotificationType.APPROVAL_GROUP_INVITATION ||
+                                    notification.type === NotificationType.APPROVAL_JOIN_GROUP_REQUEST ||
+                                    notification.type === NotificationType.INVITE_JOIN_GROUP
+                                    ? images.group
+                                    : notification.type === NotificationType.POST_SHARED
+                                        ? notis.notiShare
+                                        : notification.type === NotificationType.VIEW_STORY
+                                            ? notis.viewStory
+                                            : notification.type === NotificationType.REACT_STORY ||
+                                                notification.type === NotificationType.POST_REACTION
+                                                ? notis.notiReaction
+                                                : notification.type === NotificationType.ASSIGN_POST_TAG
+                                                    ? notis.notiTag
+                                                    :
+                                                    (notification.type === NotificationType.REPORT_RESPONSE_REPORTEE
+                                                        || notification.type === NotificationType.REPORT_RESPONSE_REPORTER)
+                                                        ? notis.notiReport
+                                                        : notification.type === NotificationType.APPROVAL_POST
+                                                            ? notis.notiApproval
+                                                            : notis.notiBell
                     }
                 />
             </div>

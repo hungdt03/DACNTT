@@ -66,23 +66,23 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Reports
                  .Include(r => r.TargetGroup)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                  .Include(r => r.TargetComment)
                     .ThenInclude(r => r.User)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                  .Include(r => r.TargetPost)
                     .ThenInclude(r => r.User)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                  .Include(r => r.TargetUser)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                  .Include(r => r.Reporter)
                  .SingleOrDefaultAsync(r => r.Id == id);
         }
         public async Task<Report?> GetReportByIdIgnoreAsync(Guid id)
         {
             return await _context.Reports
-                 .IgnoreQueryFilters()
-                    .Where(r => r.GroupId == null)
+                  .Where(r => r.GroupId == null)
+                   .IgnoreQueryFilters()
                  .Include(r => r.TargetGroup)
                     .IgnoreQueryFilters()
                  .Include(r => r.TargetComment)
@@ -203,11 +203,12 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             if (report == null) { return; }
             report.Status = newStatus;
             report.ResolutionNotes = newReportSolution;
-            report.DateUpdated = DateTime.UtcNow;
-            report.ResolvedAt = DateTime.UtcNow;
+            report.DateUpdated = DateTimeOffset.UtcNow;
+            report.ResolvedAt = DateTimeOffset.UtcNow;
             _context.Reports.Update(report);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
+
         public async Task<int> CountAllReport()
         {
             return await _context.Reports.CountAsync();

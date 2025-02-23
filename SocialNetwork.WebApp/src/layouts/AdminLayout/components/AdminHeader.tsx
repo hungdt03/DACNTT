@@ -5,7 +5,7 @@ import { ChevronDown } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { selectAuth } from '../../../features/slices/auth-slice'
 import images from '../../../assets'
-import AdminAccountDialog from './AdminAccountDialog'
+import AdminAccountDialog from '../comp/AdminAccountDialog'
 
 type HeaderProps = {
     title: string

@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CloudinaryDotNet;
+using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Contracts.Requests;
+using SocialNetwork.Application.DTOs.Admin;
 using SocialNetwork.Application.Interfaces;
+using SocialNetwork.Application.Mappers;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.DBContext;
 
@@ -189,12 +192,32 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             monthlyStats = monthlyStats.OrderBy(stat => stat.Month).ToList();
             return monthlyStats;
         }
-        public async Task<User> GetTop1UserFollowers()
+
+        public async Task<List<UserFollow>> GetTop5UserFollowers()
         {
-            return await _context.Users
-                .OrderByDescending(u => _context.Follows.Count(f => f.FolloweeId == u.Id))
-                .FirstOrDefaultAsync();
+            var top5 = await _context.Follows
+                .GroupBy(f => f.FolloweeId)
+                .OrderByDescending(g => g.Count()) // Sắp xếp theo số lượng follower giảm dần
+                .Take(5) // Chỉ lấy top 5
+                .Select(g => new { FolloweeId = g.Key, FollowerCount = g.Count() })
+                .ToListAsync(); // Chạy truy vấn trước để tránh async trong Select
+
+            var result = new List<UserFollow>();
+
+            foreach (var item in top5)
+            {
+                var user = await _context.Users.FindAsync(item.FolloweeId);
+                if (user != null)
+                {
+                    result.Add(new UserFollow(ApplicationMapper.MapToUser(user), item.FollowerCount));
+                }
+            }
+
+            return result;
         }
+
+
+
 
         public async Task<List<User>> GetAllRoleUser()
         {
@@ -212,6 +235,29 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .ToListAsync();
 
             return users;
+        }
+
+        public async Task<List<User>> GetAllRoleAdmin()
+        {
+            var userRoleId = await _context.Roles
+                .Where(r => r.Name == "ADMIN")
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+            return await _context.Users
+                .Where(u => _context.UserRoles
+                    .Any(ur => ur.UserId == u.Id && ur.RoleId == userRoleId))
+                .ToListAsync();
+        }
+
+        public async Task<int> CountOnlineUsersAsync()
+        {
+            return await _context.Users.Where(u => u.IsOnline).CountAsync();
+        }
+
+        public async Task<int> CountOfflineUsersAsync()
+        {
+            return await _context.Users.Where(u => u.IsOnline).CountAsync();
         }
     }
 }

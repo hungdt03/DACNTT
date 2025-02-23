@@ -1,7 +1,7 @@
 
 import axiosInterceptor from '../configurations/axiosInterceptor'
 import { ReportResource } from '../types/report';
-import { BaseResponse, PaginationResponse } from '../types/response';
+import { BaseResponse, DataResponse, PaginationResponse } from '../types/response';
 
 class ReportService {
     private static instance: ReportService;
@@ -12,6 +12,10 @@ class ReportService {
         if (!ReportService.instance)
          ReportService.instance = new ReportService();
         return ReportService.instance;
+    }
+
+    getReportById(reportId: string) : Promise<DataResponse<ReportResource>> {
+        return axiosInterceptor.get('/api/reports/' + reportId)
     }
 
     reportUser(userId: string, reason: string, groupId?: string) : Promise<BaseResponse> {

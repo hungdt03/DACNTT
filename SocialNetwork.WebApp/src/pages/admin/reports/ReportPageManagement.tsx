@@ -1,20 +1,24 @@
-import { Table, TableProps, Space, Dropdown, Tag, Tooltip, Button, Popconfirm, Avatar } from "antd";
+import { Table, TableProps, Space, Dropdown, Tag, Button, Avatar, Modal, message } from "antd";
 import { FC, useEffect, useState } from "react";
 import { PostResource } from "../../../types/post";
-import { CONTENT_TYPES, REPORT_STATUSES, REPORT_TYPES, ReportStatusKey, ReportTypeKey, SORT_ORDER } from "../../../utils/filter";
-import { CheckCheck, Eye, Filter, FilterX, Search, Trash } from "lucide-react";
+import { REPORT_STATUSES, REPORT_TYPES, ReportStatusKey, ReportTypeKey } from "../../../utils/filter";
+import { Eye, Filter } from "lucide-react";
 import adminService from "../../../services/adminService";
 import { Pagination } from "../../../types/response";
 import { inititalValues } from "../../../utils/pagination";
-import { PostType } from "../../../enums/post-type";
 import { TableRowSelection } from "antd/es/table/interface";
-import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { ReportResource } from "../../../types/report";
 import { ReportType } from "../../../enums/report-type";
 import { formatDateStandard } from "../../../utils/date";
+import useModal from "../../../hooks/useModal";
+import ResolveReportModal from "../../../components/reports/admin/ResolveReportModal";
 
+export type UpdateReport = {
+    id: string
+    newStatus: string
+}
 
 const ReportPageManagement: FC = () => {
     const [reports, setReports] = useState<ReportResource[]>([]);
@@ -24,7 +28,10 @@ const ReportPageManagement: FC = () => {
     const [type, setType] = useState<ReportTypeKey>('ALL')
 
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-    const [pagination, setPagination] = useState<Pagination>(inititalValues)
+    const [pagination, setPagination] = useState<Pagination>(inititalValues);
+
+    const { isModalOpen, handleCancel, handleOk, showModal } = useModal();
+    const [report, setReport] = useState<ReportResource>()
 
     const fetchReports = async (page: number, size: number) => {
         setLoading(true)
@@ -132,15 +139,24 @@ const ReportPageManagement: FC = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Link to={`/admin/posts/${record.id}`}>
-                        <Button className="!bg-green-500" type="primary" size="small" icon={<Eye size={14} />}>Chi tiết</Button>
-                    </Link>
-                    <Popconfirm onConfirm={() => { }} okText='Chắc chắn' cancelText='Hủy bỏ' title='Xóa' description='Bạn có chắc là muốn xóa bài viết này'>
+                    <Button
+                        onClick={() => {
+                            setReport(record)
+                            showModal()
+                        }}
+                        className="!bg-green-500"
+                        type="primary"
+                        size="small"
+                        icon={<Eye size={14} />}
+                    >
+                        Chi tiết
+                    </Button>
+                    {/* <Popconfirm onConfirm={() => { }} okText='Chắc chắn' cancelText='Hủy bỏ' title='Xóa' description='Bạn có chắc là muốn xóa bài viết này'>
                         <Button icon={<CheckCheck size={14} />} type="primary" size="small">Xử lí</Button>
                     </Popconfirm>
                     <Popconfirm onConfirm={() => { }} okText='Chắc chắn' cancelText='Hủy bỏ' title='Xóa' description='Bạn có chắc là muốn xóa bài viết này'>
                         <Button icon={<Trash size={14} />} danger type="primary" size="small">Từ chối</Button>
-                    </Popconfirm>
+                    </Popconfirm> */}
                 </Space>
             ),
         },
@@ -158,6 +174,20 @@ const ReportPageManagement: FC = () => {
     };
 
     const hasSelected = selectedRowKeys.length > 0;
+
+    const handleResolvedReport = async (newStatus: string, reportId: string) => {
+        const response = await adminService.UpdateReport({
+            id: reportId,
+            newStatus: newStatus
+        })
+
+        if(response.isSuccess) {
+            message.success(response.message);
+            handleOk()
+        } else {
+            message.error(response.message)
+        }
+    }
 
     return <div className="flex flex-col gap-4 h-full">
         <div className="z-10 flex items-center justify-between bg-white p-4 rounded-md shadow">
@@ -250,6 +280,24 @@ const ReportPageManagement: FC = () => {
             // rowSelection={rowSelection}
             />
         </div>
+
+        <Modal
+            style={{ top: 100 }}
+            title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Xử lí báo cáo</p>}
+            open={isModalOpen}
+            width={'900px'}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            classNames={{
+                footer: 'hidden'
+            }}
+        >
+            {report && <ResolveReportModal
+                report={report}
+                onRemove={() => handleResolvedReport('RESOLVED', report.id)}
+                onKeep={() => handleResolvedReport('REJECTED', report.id)}
+            />}
+        </Modal>
     </div>
 };
 

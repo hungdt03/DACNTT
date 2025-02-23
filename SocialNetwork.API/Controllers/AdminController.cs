@@ -1,12 +1,10 @@
-﻿using CloudinaryDotNet;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Features.Admin.Commands;
-using SocialNetwork.Application.Features.Admin.Handlers;
 using SocialNetwork.Application.Features.Admin.Queries;
 using SocialNetwork.Application.Features.Post.Commands;
-using SocialNetwork.Application.Features.Post.Queries;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -167,54 +165,14 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new DeleteManyUserQuery(listUserId));
             return Ok(response);
         }
-        [HttpGet("count-all-user")]
-        public async Task<IActionResult> CountAllUser()
+
+        [HttpGet("statistics")]
+        public async Task<IActionResult> GetStatistics()
         {
-            var response = await mediator.Send(new CountAllUserQuery());
+            var response = await mediator.Send(new GetStatisticSummaryQuery());
             return Ok(response);
         }
-        [HttpGet("count-all-user-islock")]
-        public async Task<IActionResult> CountAllUserIsLock()
-        {
-            var response = await mediator.Send(new CountAllUserIsLockQuery());
-            return Ok(response);
-        }
-        [HttpGet("get-all-user-connection")]
-        public async Task<IActionResult> GetAllConnections() {
-            var response = await mediator.Send(new GetAllUserConnectionQuery());
-            return Ok(response);
-        }
-        [HttpGet("get-top-10-user-score")]
-        public async Task<IActionResult> GetTop10UserScore()
-        {
-            var response = await mediator.Send(new GetTop10UserActiveQuery());
-            return Ok(response);
-        }
-        [HttpGet("get-year")]
-        public async Task<IActionResult> GetYear()
-        {
-            var response = await mediator.Send(new GetRegistrationYearsQuery());
-            return Ok(response);
-        }
-        [HttpGet("get-top1-followers")]
-        public async Task<IActionResult> GetTop1Followers()
-        {
-            var response = await mediator.Send(new GetTop1FollowersQuery());
-            return Ok(response);
-        }
-        [HttpGet("get-registration-stats-by-year/{year}")]
-        public async Task<IActionResult> GetRegistrationStatsByYear([FromRoute] int year)
-        {
-            var response = await mediator.Send(new GetRegistrationStatsByYearsQuery(year));
-            return Ok(response);
-        }
-        // POST
-        [HttpGet("count-all-post")]
-        public async Task<IActionResult> CountAllPost()
-        {
-            var response = await mediator.Send(new CountAllPostQuery());
-            return Ok(response);
-        }
+       
         [HttpDelete("delete-post/{postId}")]
         public async Task<IActionResult> DeleteOnePost([FromRoute] Guid postId)
         {
@@ -234,12 +192,7 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
         // GROUP
-        [HttpGet("count-all-group")]
-        public async Task<IActionResult> CountAllGroup()
-        {
-            var response = await mediator.Send(new CountAllGroupQuery());
-            return Ok(response);
-        }
+      
         [HttpDelete("delete-group/{groupId}")]
         public async Task<IActionResult> DeleteOneGroup([FromRoute] Guid groupId)
         {
@@ -259,12 +212,9 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
         // REPORT
-        [HttpGet("count-all-report")]
-        public async Task<IActionResult> CountAllReport()
-        {
-            var response = await mediator.Send(new CountAllReportQuery());
-            return Ok(response);
-        }
+     
+
+        [ServiceFilter(typeof(InputValidationFilter))]
         [HttpPut("update-report")]
         public async Task<IActionResult> UpdateReport([FromBody] UpdateReportCommand command)
         {

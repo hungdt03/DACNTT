@@ -15,6 +15,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _dbContext = dbContext;
         }
 
+
         public async Task<int> CountCommentsByPostIdAsync(Guid postId)
         {
             return await _dbContext.Comments.CountAsync(s => s.PostId == postId);

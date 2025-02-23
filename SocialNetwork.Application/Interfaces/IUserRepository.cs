@@ -1,4 +1,5 @@
 ﻿using SocialNetwork.Application.Contracts.Requests;
+using SocialNetwork.Application.DTOs.Admin;
 using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Interfaces
@@ -9,6 +10,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<User?> GetUserByEmailIgnoreQuery(string email);
         Task<List<User>> GetAllUsers();
         Task<List<User>> GetAllRoleUser();
+        Task<List<User>> GetAllRoleAdmin();
         Task<(List<User> Users, int TotalCount)> GetAllRoleUser(int page, int size, string search);
         Task DeleteUser(string id); 
         Task DeleteAllUser();
@@ -21,6 +23,8 @@ namespace SocialNetwork.Application.Interfaces
         Task<int> CountAllUserIsLock();
         Task<List<int>> GetRegistrationYears();
         Task<List<MonthlyRegistrationStatsResponse>> GetRegistrationStatsByYear(int year);
-        Task<User> GetTop1UserFollowers();
+        Task<List<UserFollow>> GetTop5UserFollowers();
+        Task<int> CountOnlineUsersAsync();
+        Task<int> CountOfflineUsersAsync();
     }
 }

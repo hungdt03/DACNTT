@@ -50,6 +50,7 @@ import GroupDetailPage from '../pages/admin/groups/GroupDetailPage'
 import UserPageManagement from '../pages/admin/users/UserPageManagement'
 import UserDetailPage from '../pages/admin/users/UserDetailPage'
 import ReportPageManagement from '../pages/admin/reports/ReportPageManagement'
+import AdminStatisticsPage from '../pages/admin/statistics/AdminStatisticsPage'
 
 const appRouter = createBrowserRouter([
     {
@@ -68,6 +69,10 @@ const appRouter = createBrowserRouter([
         path: '/admin',
         element: <AdminGuard element={<AdminLayout />} />,
         children: [
+            {
+                path: '',
+                element: <AdminStatisticsPage />
+            },
             {
                 path: 'posts',
                 element: <PostPageManagement />,

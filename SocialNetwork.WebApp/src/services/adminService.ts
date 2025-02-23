@@ -1,5 +1,4 @@
 import { MonthlyRegistrationStatsResource } from './../types/monthly-registration-stats';
-import { UpdateReport } from "../components/dialogs/UpdateReportDialog";
 import axiosInterceptor from "../configurations/axiosInterceptor";
 import { GroupAdminResponse, GroupResource } from "../types/group";
 import { PostResource } from "../types/post";
@@ -12,6 +11,8 @@ import { GroupMemberResource } from '../types/group-member';
 import { PostTabQueryFilter } from '../pages/admin/groups/GroupPostTabs';
 import { FriendResource } from '../types/friend';
 import { UserPostTabQueryFilter } from '../pages/admin/users/UserPostTabs';
+import { UpdateReport } from '../pages/admin/reports/ReportPageManagement';
+import { StatisticResource } from '../types/statistic';
 
 
 class AdminService {
@@ -128,6 +129,10 @@ class AdminService {
 
     GetTop1Followers(): Promise<DataResponse<UserResource>> {
         return axiosInterceptor.get('/api/admin/get-top1-followers')
+    }
+
+    getStatistics() : Promise<DataResponse<StatisticResource>> {
+        return axiosInterceptor.get('/api/admin/statistics')
     }
 
     //POSt

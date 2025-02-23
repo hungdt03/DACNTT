@@ -8,5 +8,6 @@ namespace SocialNetwork.Common
         public const string COVER_FILENAME = "image.png";
         public const string GROUP_FILENAME = "groups.png";
         public const string COVER_GROUP_FILENAME = "cover-group.png";
+        public const string LOGO_FILENAME = "facebook.png";
     }
 }

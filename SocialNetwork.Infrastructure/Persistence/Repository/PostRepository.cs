@@ -5,7 +5,6 @@ using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
-using SocialNetwork.Domain.Entity.UserInfo;
 using SocialNetwork.Infrastructure.DBContext;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
@@ -855,5 +854,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
             return (posts, totalCount);
         }
+
+      
     }
 }

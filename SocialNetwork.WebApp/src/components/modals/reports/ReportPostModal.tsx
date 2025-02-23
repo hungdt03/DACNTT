@@ -1,5 +1,5 @@
 import { Input } from "antd";
-import { FC, useState } from "react";
+import { FC } from "react";
 
 type ReportPostModalProps = {
     value: string;
