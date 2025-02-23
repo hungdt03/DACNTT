@@ -81,8 +81,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<Report?> GetReportByIdIgnoreAsync(Guid id)
         {
             return await _context.Reports
-                 .Include(r => r.TargetGroup)
+                 .IgnoreQueryFilters()
                     .Where(r => r.GroupId == null)
+                 .Include(r => r.TargetGroup)
                     .IgnoreQueryFilters()
                  .Include(r => r.TargetComment)
                     .ThenInclude(r => r.User)
@@ -103,36 +104,65 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<List<Report>> GetAllReports()
         {
             return await _context.Reports
-                .Include(r => r.TargetGroup)
                     .Where(r => r.GroupId == null)
+                .Include(r => r.TargetGroup)
                 .Include(r => r.TargetComment)
                     .ThenInclude(r => r.User)
-                //.IgnoreQueryFilters()
+                  .IgnoreQueryFilters()
                 .Include(r => r.TargetPost)
                     .ThenInclude(r => r.User)
-                //.IgnoreQueryFilters()
+                     .IgnoreQueryFilters()
                 .Include(r => r.TargetUser)
-                //.IgnoreQueryFilters()
+                    .IgnoreQueryFilters()
                 .Include(r => r.Reporter)
                 .ToListAsync();
         }
-        public async Task<List<Report?>> GetAllReportsIgnore()
+        public async Task<(List<Report> Reports, int TotalCount)> GetAllReportsIgnore(int page, int size, string status, string type)
         {
-            return await _context.Reports
+            var query = _context.Reports
+                    .IgnoreQueryFilters().Where(r => r.GroupId == null);
+
+            if(type != "ALL")
+            {
+                query = type switch
+                {
+                    ReportType.GROUP => query.Where(p => p.ReportType == ReportType.GROUP),
+                    ReportType.COMMENT => query.Where(p => p.ReportType == ReportType.COMMENT),
+                    ReportType.USER => query.Where(p => p.ReportType == ReportType.USER),
+                    ReportType.POST => query.Where(p => p.ReportType == ReportType.POST),
+                    _ => query
+                };
+            }
+
+            if(status != null)
+            {
+                query = status switch
+                {
+                    ReportStatus.PENDING => query.Where(p => p.Status == ReportStatus.PENDING),
+                    ReportStatus.RESOLVED => query.Where(p => p.Status == ReportStatus.RESOLVED),
+                    ReportStatus.REJECTED => query.Where(p => p.Status == ReportStatus.REJECTED),
+                    _ => query
+                };
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var reports =  await query
+                //.IgnoreQueryFilters()
                 .Include(r => r.TargetGroup)
-                    .Where(r => r.GroupId == null)
-                    .IgnoreQueryFilters()
                 .Include(r => r.TargetComment)
                     .ThenInclude(r => r.User)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                 .Include(r => r.TargetPost)
                     .ThenInclude(r => r.User)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                 .Include(r => r.TargetUser)
-                    .IgnoreQueryFilters()
+                    //.IgnoreQueryFilters()
                 .Include(r => r.Reporter)
-                .Where(r=>r.IsDeleted==false)
+                //.Where(r=>r.IsDeleted==false)
                 .ToListAsync();
+
+            return (reports, totalCount);
         }
 
         public async Task DeleteOneReport(Guid id)

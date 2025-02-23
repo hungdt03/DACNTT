@@ -213,8 +213,15 @@ class AdminService {
         return axiosInterceptor.get('/api/admin/count-all-group')
     }
     //REPORT
-    getAllReport(): Promise<DataResponse<ReportResource[]>> {
-        return axiosInterceptor.get('/api/admin/get-all-report')
+    getAllReport(page: number, size: number, status: string, type: string): Promise<PaginationResponse<ReportResource[]>> {
+        return axiosInterceptor.get('/api/admin/get-all-report', {
+            params: {
+                page,
+                size,
+                status,
+                type
+            }
+        })
     }
     DeleteOneReport(reportId: string): Promise<BaseResponse> {
         return axiosInterceptor.delete('/api/admin/delete-report/' + reportId)

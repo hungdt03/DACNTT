@@ -130,9 +130,9 @@ namespace SocialNetwork.API.Controllers
         }
 
         [HttpGet("get-all-report")]
-        public async Task<IActionResult> GetAllReport()
+        public async Task<IActionResult> GetAllReport([FromQuery] int page, [FromQuery] int size, [FromQuery] string status = "ALL", [FromQuery] string type = "ALL")
         {
-            var response = await mediator.Send(new GetAllReportQuery());
+            var response = await mediator.Send(new GetAllReportQuery(page, size, status, type));
             return Ok(response);
         }
         // USER

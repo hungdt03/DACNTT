@@ -49,6 +49,7 @@ import GroupPageManagement from '../pages/admin/groups/GroupPageManagement'
 import GroupDetailPage from '../pages/admin/groups/GroupDetailPage'
 import UserPageManagement from '../pages/admin/users/UserPageManagement'
 import UserDetailPage from '../pages/admin/users/UserDetailPage'
+import ReportPageManagement from '../pages/admin/reports/ReportPageManagement'
 
 const appRouter = createBrowserRouter([
     {
@@ -90,6 +91,10 @@ const appRouter = createBrowserRouter([
             {
                 path: 'users/:userId',
                 element: <UserDetailPage />,
+            },
+            {
+                path: 'reports',
+                element: <ReportPageManagement />,
             },
         ]
     },

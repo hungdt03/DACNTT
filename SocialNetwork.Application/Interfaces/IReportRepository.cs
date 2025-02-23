@@ -18,6 +18,6 @@ namespace SocialNetwork.Application.Interfaces
         Task UpdateReport(Guid id, string newStatus, string newReportSoluton);
         Task<int> CountAllReport();
         Task<Report?> GetReportByIdIgnoreAsync(Guid id);
-        Task<List<Report?>> GetAllReportsIgnore();
+        Task<(List<Report> Reports, int TotalCount)> GetAllReportsIgnore(int page, int size, string status, string type);
     }
 }
