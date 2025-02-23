@@ -131,6 +131,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(r => r.TargetUser)
                     .IgnoreQueryFilters()
                 .Include(r => r.Reporter)
+                .Where(r=>r.IsDeleted==false)
                 .ToListAsync();
         }
 
