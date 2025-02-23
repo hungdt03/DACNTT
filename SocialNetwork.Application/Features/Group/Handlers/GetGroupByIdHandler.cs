@@ -37,7 +37,7 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             response.CountTodayPosts = todayPosts;
             response.CountMembers = await _unitOfWork.GroupMemberRepository.CountGroupMembersByGroupIdAsync(request.GroupId);
 
-            response.FriendMembers = new List<UserResponse>();
+            response.FriendMembers = [];
             foreach (var friend in group.Members)
             {
                 if (friend.UserId == userId) continue;

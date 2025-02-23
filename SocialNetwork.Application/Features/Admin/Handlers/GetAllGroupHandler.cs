@@ -18,15 +18,22 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         }
         public async Task<BaseResponse> Handle(GetAllGroupQuery request, CancellationToken cancellationToken)
         {
-            var groups = await unitOfWork.GroupRepository.GetAllGroupsAsync()
-               ?? throw new AppException("Không có group nào");
+            var (groups, totalCount) = await unitOfWork.GroupRepository.GetAllGroupsAsync(request.Page, request.Size, request.Search, request.Privacy);
 
-            return new DataResponse<IEnumerable<GroupResponse>>()
+            return new PaginationResponse<IEnumerable<GroupResponse>>()
             {
                 Data = ApplicationMapper.MapToListGroup(groups),
                 IsSuccess = true,
                 Message = "Lấy thông tin groups thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
+                Pagination = new Pagination()
+                {
+                    Page = request.Page,
+                    Size = request.Size,
+                    HasMore = request.Page * request.Size < totalCount,
+                    TotalCount = totalCount,
+                    TotalPages = (int) Math.Ceiling((double) totalCount / request.Size)
+                }
             };
         }
     }

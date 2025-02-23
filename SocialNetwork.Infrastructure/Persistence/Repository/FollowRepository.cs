@@ -41,29 +41,44 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             _context.Follows.Remove(follow);
         }
 
-        public async Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFolloweesByUserIdAsync(string userId, int page, int size)
+        public async Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFolloweesByUserIdAsync(string userId, int page, int size, string? search = "")
         {
-            var queryable = _context.Follows.Where(s => s.FollowerId == userId);
+            var queryable = _context.Follows
+                  .Include(f => f.Followee)
+                .Where(s => s.FollowerId == userId);
+
+            if(!string.IsNullOrEmpty(search))
+            {
+                queryable = queryable
+                    .Where(s => s.Followee.FullName.ToLower().Contains(search.ToLower()));
+            }
+
             var totalCount = await queryable.CountAsync();
 
             var follows = await queryable
                 .Skip((page - 1) * size)
                 .Take(size)
-                 .Include(f => f.Followee)
                 .ToListAsync();
 
             return (follows, totalCount);
         }
 
-        public async Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFollowersByUserIdAsync(string userId, int page, int size)
+        public async Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFollowersByUserIdAsync(string userId, int page, int size, string? search = "")
         {
-            var queryable = _context.Follows.Where(s => s.FolloweeId == userId);
+            var queryable = _context.Follows
+                 .Include(f => f.Follower)
+                .Where(s => s.FolloweeId == userId);
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                queryable = queryable.Where(s => s.Follower.FullName.ToLower().Contains(search.ToLower()));
+            }
+
             var totalCount = await queryable.CountAsync();
 
             var follows = await queryable
                 .Skip((page - 1) * size)
                 .Take(size)
-                 .Include(f => f.Follower)
                 .ToListAsync();
 
             return (follows, totalCount);

@@ -9,6 +9,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<User?> GetUserByEmailIgnoreQuery(string email);
         Task<List<User>> GetAllUsers();
         Task<List<User>> GetAllRoleUser();
+        Task<(List<User> Users, int TotalCount)> GetAllRoleUser(int page, int size, string search);
         Task DeleteUser(string id); 
         Task DeleteAllUser();
         Task DeleteManyUser(List<string> listUserId);

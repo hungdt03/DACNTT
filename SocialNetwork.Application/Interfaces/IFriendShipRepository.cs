@@ -18,5 +18,6 @@ namespace SocialNetwork.Application.Interfaces
         Task<int> CountFriendsByUserIdAsync(string userId);
         Task<(IEnumerable<FriendShip> FriendRequests, int TotalCount)> GetAllPendingFriendRequestByUserId(string userId, int page, int size);
         Task<IEnumerable<FriendShip>> GetAllConnectedUsers(string userId);
+        Task<(IEnumerable<FriendShip> FriendShips, int TotalCount)> GetAllFriendsAsyncByUserId(string userId, int page, int size, string search);
     }
 }

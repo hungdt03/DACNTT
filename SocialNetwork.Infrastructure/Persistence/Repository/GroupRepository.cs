@@ -3,6 +3,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Infrastructure.DBContext;
+using System.Linq;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -25,7 +26,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(setters => setters
                     .SetProperty(u => u.IsDeleted, true)
-                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                    .SetProperty(u => u.DeletedAt, DateTimeOffset.UtcNow)
                 );
         }
 
@@ -34,7 +35,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             await _context.Groups
               .ExecuteUpdateAsync(setters => setters
                   .SetProperty(u => u.IsDeleted, true)
-                  .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                  .SetProperty(u => u.DeletedAt, DateTimeOffset.UtcNow)
               );
         }
 
@@ -44,13 +45,36 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Where(u => listGroupId.Contains(u.Id.ToString()))
                 .ExecuteUpdateAsync(setters => setters
                     .SetProperty(u => u.IsDeleted, true)
-                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                    .SetProperty(u => u.DeletedAt, DateTimeOffset.UtcNow)
                 );
         }
 
-        public async Task<IEnumerable<Group>> GetAllGroupsAsync()
+        public async Task<(IEnumerable<Group> Groups, int TotalCount)> GetAllGroupsAsync(int page, int size, string search, string privacy)
         {
-            return await _context.Groups.ToListAsync();
+            var query = _context.Groups
+                 .Where(g => g.Name.ToLower().Contains(search))
+                 .AsQueryable();
+
+            if(privacy != "ALL")
+            {
+                query = privacy switch
+                {
+                    GroupPrivacy.PUBLIC => query.Where(p => p.Privacy == GroupPrivacy.PUBLIC),
+                    GroupPrivacy.PRIVATE => query.Where(p => p.Privacy == GroupPrivacy.PRIVATE),
+                    _ => query
+                };
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var groups = await query
+               .Skip((page - 1) * size)
+               .Take(size)
+                .Include(g => g.Members)
+                   .ThenInclude(g => g.User)
+               .ToListAsync();
+
+            return (groups, totalCount);
         }
 
         public async Task<(IEnumerable<Group> Groups, int TotalCount)> GetAllGroupsContainsKey(string key, int page, int size)

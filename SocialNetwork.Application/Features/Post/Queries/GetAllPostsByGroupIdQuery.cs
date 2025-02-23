@@ -1,7 +1,6 @@
 ﻿
 using MediatR;
 using SocialNetwork.Application.Contracts.Responses;
-using SocialNetwork.Domain.Entity.System;
 
 namespace SocialNetwork.Application.Features.Post.Queries
 {

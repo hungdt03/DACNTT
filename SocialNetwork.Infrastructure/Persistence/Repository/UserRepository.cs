@@ -34,22 +34,31 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.Users
                 .ToListAsync();
         }
-        public async Task<List<User>> GetAllRoleUser()
+        public async Task<(List<User> Users, int TotalCount)> GetAllRoleUser(int page, int size, string search)
         {
             var userRoleId = await _context.Roles
                 .Where(r => r.Name == "USER")
                 .Select(r => r.Id)
                 .FirstOrDefaultAsync();
-            var users = await _context.Users
+
+            var query = _context.Users
+                .Where(u => u.FullName.ToLower().Contains(search))
                 .Where(u => _context.UserRoles
                     .Any(ur => ur.UserId == u.Id && ur.RoleId == userRoleId))
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+
+            var users = await query
+                 .Skip((page - 1) * size)
+                .Take(size)
                 .Include(u => u.Location)
                 .Include(u => u.HomeTown)
                 .Include(u=>u.Followers)
                 .Include(u => u.Followings)
                 .ToListAsync();
 
-            return users;
+            return (users, totalCount);
         }
         public async Task<(IEnumerable<User> Users, int TotalCount)> GetAllUsersContainsKeyAsync(string key, int page, int size)
         {
@@ -108,7 +117,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(setters => setters
                     .SetProperty(u => u.IsDeleted, true)
-                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                    .SetProperty(u => u.DeletedAt, DateTimeOffset.UtcNow)
                 );
         }
 
@@ -121,7 +130,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Where(u => userIds.Contains(u.Id))
                 .ExecuteUpdateAsync(setters => setters
                     .SetProperty(u => u.IsDeleted, true)
-                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                    .SetProperty(u => u.DeletedAt, DateTimeOffset.UtcNow)
                 );
         }
 
@@ -131,7 +140,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Where(u => listUserId.Contains(u.Id))
                 .ExecuteUpdateAsync(setters => setters
                     .SetProperty(u => u.IsDeleted, true)
-                    .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                    .SetProperty(u => u.DeletedAt, DateTimeOffset.UtcNow)
                 );
         }
         public async Task<int> CountAllUser()
@@ -187,5 +196,22 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<List<User>> GetAllRoleUser()
+        {
+            var userRoleId = await _context.Roles
+                .Where(r => r.Name == "USER")
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+            var users = await _context.Users
+                .Where(u => _context.UserRoles
+                    .Any(ur => ur.UserId == u.Id && ur.RoleId == userRoleId))
+                .Include(u => u.Location)
+                .Include(u => u.HomeTown)
+                .Include(u => u.Followers)
+                .Include(u => u.Followings)
+                .ToListAsync();
+
+            return users;
+        }
     }
 }

@@ -6,8 +6,8 @@ namespace SocialNetwork.Application.Interfaces
     {
         Task CreateFollowAsync(Follow follow);
         Task<Follow?> GetFollowByFollowerIdAndFolloweeIdAsync(string followerId, string followeeId);
-        Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFolloweesByUserIdAsync(string userId, int page, int size);
-        Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFollowersByUserIdAsync(string userId, int page, int size);
+        Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFolloweesByUserIdAsync(string userId, int page, int size, string? search = "");
+        Task<(IEnumerable<Follow> Follows, int TotalCount)> GetAllFollowersByUserIdAsync(string userId, int page, int size, string? search = "");
         Task<IEnumerable<Follow>> GetAllFollowersByUserIdAsync(string userId);
         Task<int> CountFollowersByUserIdAsync(string userId);
         Task<int> CountFolloweesByUserIdAsync(string userId);

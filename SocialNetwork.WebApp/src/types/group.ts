@@ -24,3 +24,22 @@ export type GroupResource = {
     isMember: boolean;
     isModerator: boolean;
 }
+
+export type GroupAdminResponse = {
+    id: string;
+    name: string;
+    description: string;
+    coverImage: string;
+    privacy: string;
+    countMembers: number;
+    countTodayPosts: number;
+    countPosts: number;
+    onlyAdminCanPost: boolean;
+    requireApproval: boolean;
+    requireApprovalPost: boolean;
+    onlyAdminCanApprovalMember: boolean;
+    isHidden: boolean;
+    adminCount: number;
+    moderatorCount: number;
+    dateCreated: Date; // Hoặc Date nếu bạn sẽ parse thành Date object trong JS
+};

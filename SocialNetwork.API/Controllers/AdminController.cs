@@ -1,9 +1,12 @@
-﻿using MediatR;
+﻿using CloudinaryDotNet;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Application.Features.Admin.Commands;
+using SocialNetwork.Application.Features.Admin.Handlers;
 using SocialNetwork.Application.Features.Admin.Queries;
 using SocialNetwork.Application.Features.Post.Commands;
+using SocialNetwork.Application.Features.Post.Queries;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -18,25 +21,114 @@ namespace SocialNetwork.API.Controllers
             this.mediator = mediator;
         }
         [HttpGet("get-all-user")]
-        public async Task<IActionResult> GetAllUser()
+        public async Task<IActionResult> GetAllUser([FromQuery] int page = 1, [FromQuery] int size = 6, [FromQuery] string search = "")
         {
-            var response = await mediator.Send(new GetAllUserQuery());
+            var response = await mediator.Send(new GetAllUserQuery(page, size, search));
+            return Ok(response);
+        }
+
+        [HttpGet("users/{userId}")]
+        public async Task<IActionResult> GetUserById([FromRoute] string userId)
+        {
+            var response = await mediator.Send(new GetUserByIdQuery(userId));
+            return Ok(response);
+        }
+
+        [HttpGet("users/followers/{userId}")]
+        public async Task<IActionResult> GetAllFollowersByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string search = "")
+        {
+            var response = await mediator.Send(new GetAllFollowersByUserIdQuery(userId, page, size, search));
+            return Ok(response);
+        }
+
+
+        [HttpGet("users/followees/{userId}")]
+        public async Task<IActionResult> GetAllFolloweesByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string search = "")
+        {
+            var response = await mediator.Send(new GetAllFolloweesByUserIdQuery(userId, page, size, search));
+            return Ok(response);
+        }
+
+        [HttpGet("users/friends/{userId}")]
+        public async Task<IActionResult> GetAllFriendsByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string search = "")
+        {
+            var response = await mediator.Send(new GetAllFriendsByUserIdQuery(userId, page, size, search));
+            return Ok(response);
+        }
+
+        [HttpGet("users/posts/{userId}")]
+        public async Task<IActionResult> GetPostsByUserId([FromRoute] string userId, [FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string search = "", [FromQuery] string sortOrder = "desc", [FromQuery] string contentType = "ALL", [FromQuery] DateTimeOffset? fromDate = default, [FromQuery] DateTimeOffset? toDate = default)
+        {
+            if (fromDate == default)
+            {
+                fromDate = null;
+            }
+
+            if (toDate == default)
+            {
+                toDate = null;
+            }
+
+            var response = await mediator.Send(new Application.Features.Admin.Queries.GetAllPostByUserIdQuery(userId, page, size,  contentType, sortOrder, search, fromDate, toDate));
             return Ok(response);
         }
 
         [HttpGet("get-all-post")]
-        public async Task<IActionResult> GetALlPosts()
+        public async Task<IActionResult> GetALlPosts([FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string search = "", [FromQuery] string sortOrder = "desc", [FromQuery] string contentType = "ALL", [FromQuery] DateTimeOffset? fromDate = default, [FromQuery] DateTimeOffset? toDate = default)
         {
-            var response = await mediator.Send(new GetAllPostQuery());
+            if (fromDate == default)
+            {
+                fromDate = null;
+            }
+
+            if (toDate == default)
+            {
+                toDate = null;
+            }
+
+            var response = await mediator.Send(new Application.Features.Admin.Queries.GetAllPostQuery(page, size, search, sortOrder, contentType, fromDate, toDate));
             return Ok(response);
         }
 
         [HttpGet("get-all-group")]
-        public async Task<IActionResult> GetAllGroup()
+        public async Task<IActionResult> GetAllGroup([FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string search = "", [FromQuery] string privacy = "ALL")
         {
-            var response = await mediator.Send(new GetAllGroupQuery());
+            var response = await mediator.Send(new GetAllGroupQuery(page, size, search, privacy));
             return Ok(response);
         }
+
+        [HttpGet("groups/{groupId}")]
+        public async Task<IActionResult> GetGroupById([FromRoute] Guid groupId)
+        {
+            var response = await mediator.Send(new GetGroupByIdQuery(groupId));
+            return Ok(response);
+        }
+
+        [HttpGet("groups/posts/{groupId}")]
+        public async Task<IActionResult> GetAllPostsByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6, [FromQuery] string search = "", [FromQuery] string authorId = "", [FromQuery] string sortOrder = "desc", [FromQuery] string contentType = "all", [FromQuery] DateTimeOffset? fromDate = default, [FromQuery] DateTimeOffset? toDate = default)
+        {
+
+            if (fromDate == default)
+            {
+                fromDate = null;
+            }
+
+            if (toDate == default)
+            {
+                toDate = null;
+            }
+
+            var response = await mediator.Send(new Application.Features.Admin.Queries.GetAllPostByGroupIdQuery(groupId , page, size, search, authorId, sortOrder, contentType, fromDate, toDate));
+            return Ok(response);
+        }
+
+        [HttpGet("groups/members/{groupId}")]
+        public async Task<IActionResult> GetAllMembersByGroupId([FromRoute] Guid groupId, [FromQuery] int page = 1, [FromQuery] int size = 6, [FromQuery] string search = "", [FromQuery] string role = "ALL")
+        {
+            var response = await mediator.Send(new GetAllMembersByGroupIdQuery(groupId, page, size, search, role));
+            return Ok(response);
+        }
+
         [HttpGet("get-all-report")]
         public async Task<IActionResult> GetAllReport()
         {

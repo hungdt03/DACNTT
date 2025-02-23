@@ -16,7 +16,7 @@ import { MemberRole } from "../../enums/member-role";
 import Loading from "../../components/Loading";
 import useDebounce from "../../hooks/useDebounce";
 
-const MEMBER_VALUES = [
+export const MEMBER_VALUES = [
     { key: "ALL", label: "Tất cả" },
     { key: "ADMIN", label: "Quản trị viên" },
     { key: "MODERATOR", label: "Người kiểm duyệt" },

@@ -1,5 +1,6 @@
 ﻿
 using SocialNetwork.Application.DTOs;
+using SocialNetwork.Application.DTOs.Admin;
 using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
 using SocialNetwork.Domain.Entity.GroupInfo;
@@ -103,6 +104,26 @@ namespace SocialNetwork.Application.Mappers
                 Members = group.Members != null ? group.Members.Select(m => m.User != null ? MapToUser(m.User) : null).ToList() : new(),
             };
         }
+
+        public static GroupAdminResponse MapToGroupAdmin(Group group)
+        {
+            return new GroupAdminResponse()
+            {
+                Id = group.Id,
+                Name = group.Name,
+                Description = group.Description,
+                CoverImage = group.CoverImage,
+                Privacy = group.Privacy,
+                IsHidden = group.IsHidden,
+                OnlyAdminCanApprovalMember = group.OnlyAdminCanApprovalMember,
+                OnlyAdminCanPost = group.OnlyAdminCanPost,
+                RequireApproval = group.RequireApproval,
+                RequireApprovalPost = group.RequirePostApproval,
+                DateCreated = group.DateCreated,
+                //Members = group.Members != null ? group.Members.Select(m => m.User != null ? MapToUser(m.User) : null).ToList() : new(),
+            };
+        }
+
         public static List<GroupResponse> MapToListGroup(IEnumerable<Group> groups)
         {
             return groups.Select(group => new GroupResponse()

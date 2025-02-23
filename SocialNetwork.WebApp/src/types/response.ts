@@ -22,6 +22,8 @@ export type Pagination = {
     page: number;
     size: number;
     hasMore: boolean;
+    totalPages?: number;
+    totalCount?: number;
     havePrevPage?: boolean;
     haveNextPage?: boolean;
 }

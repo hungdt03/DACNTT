@@ -1,10 +1,7 @@
 ﻿using MediatR;
 using SocialNetwork.Application.Contracts.Responses;
-using SocialNetwork.Application.DTOs;
-using SocialNetwork.Application.Exceptions;
 using SocialNetwork.Application.Features.Admin.Queries;
 using SocialNetwork.Application.Interfaces;
-using SocialNetwork.Application.Mappers;
 
 namespace SocialNetwork.Application.Features.Admin.Handlers
 {

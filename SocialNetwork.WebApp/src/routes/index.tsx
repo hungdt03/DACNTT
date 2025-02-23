@@ -43,6 +43,12 @@ import SearchUserPage from '../pages/search/SearchUserPage'
 import SearchPostPage from '../pages/search/SearchPostPage'
 import SearchGroupPage from '../pages/search/SearchGroupPage'
 import SearchTopPage from '../pages/search/SearchTopPage'
+import PostPageManagement from '../pages/admin/posts/PostPageManagement'
+import PostDetailPage from '../pages/admin/posts/PostDetailPage'
+import GroupPageManagement from '../pages/admin/groups/GroupPageManagement'
+import GroupDetailPage from '../pages/admin/groups/GroupDetailPage'
+import UserPageManagement from '../pages/admin/users/UserPageManagement'
+import UserDetailPage from '../pages/admin/users/UserDetailPage'
 
 const appRouter = createBrowserRouter([
     {
@@ -59,7 +65,33 @@ const appRouter = createBrowserRouter([
     {
         errorElement: <ErrorBoundaryPage />,
         path: '/admin',
-        element: <AdminGuard element={<AdminLayout />} />
+        element: <AdminGuard element={<AdminLayout />} />,
+        children: [
+            {
+                path: 'posts',
+                element: <PostPageManagement />,
+            },
+            {
+                path: 'posts/:postId',
+                element: <PostDetailPage />
+            },
+            {
+                path: 'groups',
+                element: <GroupPageManagement />,
+            },
+            {
+                path: 'groups/:groupId',
+                element: <GroupDetailPage />,
+            },
+            {
+                path: 'users',
+                element: <UserPageManagement />,
+            },
+            {
+                path: 'users/:userId',
+                element: <UserDetailPage />,
+            },
+        ]
     },
     {
         path: '/',

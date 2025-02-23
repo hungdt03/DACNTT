@@ -1,15 +1,13 @@
 ﻿using MediatR;
 using SocialNetwork.Application.Contracts.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SocialNetwork.Application.Features.Admin.Queries
 {
-    public class GetAllGroupQuery : IRequest<BaseResponse>
+    public class GetAllGroupQuery(int page, int size, string search, string privacy) : IRequest<BaseResponse>
     {
-        public GetAllGroupQuery() { }
+        public int Page { get; set; } = page;
+        public int Size { get; set; } = size;
+        public string Search { get; set; } = search;
+        public string Privacy { get; set; } = privacy;
     }
 }

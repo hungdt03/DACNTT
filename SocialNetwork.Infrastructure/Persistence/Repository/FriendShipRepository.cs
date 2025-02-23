@@ -137,6 +137,32 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .ToListAsync();
         }
 
+        public async Task<(IEnumerable<FriendShip> FriendShips, int TotalCount)> GetAllFriendsAsyncByUserId(string userId, int page, int size, string search)
+        {
+            var queryable = _context.FriendShips
+                 .Include(f => f.User)
+                 .Include(f => f.Friend)
+                 .Where(f => (f.FriendId == userId || f.UserId == userId) && f.Status == FriendShipStatus.ACCEPTED);
+           
+            if (!string.IsNullOrEmpty(search))
+            {
+                var searchLower = search.ToLower();
+                queryable = queryable.Where(q =>
+                    (q.FriendId == userId && q.User.FullName.ToLower().Contains(searchLower)) ||
+                    (q.UserId == userId && q.Friend.FullName.ToLower().Contains(searchLower))
+                );
+            }
 
+
+            var totalCount = await queryable.CountAsync();
+
+            var friendShips = await queryable
+                     .OrderByDescending(f => f.DateCreated)
+                     .Skip((page - 1) * size)
+                     .Take(size)
+                        .ToListAsync();
+
+            return (friendShips, totalCount);
+        }
     }
 }

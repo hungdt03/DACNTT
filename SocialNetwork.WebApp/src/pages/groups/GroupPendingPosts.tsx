@@ -34,9 +34,10 @@ const GroupPendingPosts: FC<GroupPendingPostsProps> = ({
     const [searchValue, setSearchValue] = useState('')
 
     const [pagination, setPagination] = useState<Pagination>(inititalValues);
-    const [memberPagination, setMemberPagination] = useState<Pagination>(inititalValues);
-
+    
     const [loading, setLoading] = useState(false);
+    
+    const [memberPagination, setMemberPagination] = useState<Pagination>(inititalValues);
     const [memberLoading, setMemberLoading] = useState(false);
 
     const [filter, setFilter] = useState<PendingPostsFilter>({

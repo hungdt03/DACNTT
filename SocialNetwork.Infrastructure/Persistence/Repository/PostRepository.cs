@@ -5,8 +5,8 @@ using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
+using SocialNetwork.Domain.Entity.UserInfo;
 using SocialNetwork.Infrastructure.DBContext;
-using System.Linq;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -385,7 +385,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<int> CountPostsByUserIdAsync(string userId)
         {
-            return await _context.Posts.Where(p => p.OriginalPostId == null && p.UserId == userId).CountAsync();
+            return await _context.Posts.Where(p =>
+                    p.UserId == userId
+                    && (!p.IsGroupPost || (p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.APPROVED))
+                ).CountAsync();
         }
 
         public async Task<int> CountSharePostsByUserIdAsync(string userId)
@@ -640,6 +643,214 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                     .ThenInclude(p => p.User)
                 .Include(p => p.OriginalPost)
                     .ThenInclude(p => p.Medias)
+                .ToListAsync();
+
+            return (posts, totalCount);
+        }
+
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsAsync(int page, int size, string search, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        {
+
+            var query = _context.Posts
+                  .Include(p => p.Group)
+                .Include(p => p.User)
+                .Include(p => p.Tags)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.Comments)
+                .Include(p => p.Medias)
+                .Include(p => p.SharePost)
+                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags).ThenInclude(o => o.User)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(p => 
+                    p.Content.ToLower().Contains(search.ToLower())
+                    || p.User.FullName.ToLower().Contains(search.ToLower())
+                );
+            }
+
+            if (fromDate.HasValue)
+            {
+                var startDate = fromDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date >= startDate);
+            }
+
+            if (toDate.HasValue)
+            {
+                var endDate = toDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date <= endDate);
+            }
+
+
+            if (contentType != "ALL")
+            {
+                query = contentType switch
+                {
+                    PostContentType.TEXT => query.Where(p => (p.Medias == null || p.Medias.Count == 0) && p.Background == null && p.PostType != PostType.SHARE_POST),
+                    PostContentType.MEDIA => query.Where(p => p.Medias != null && p.Medias.Count > 0),
+                    PostContentType.BACKGROUND => query.Where(p => p.Background != null),
+                    PostContentType.SHARE => query.Where(p => p.PostType == PostType.SHARE_POST),
+                    _ => query
+                };
+            }
+
+            if (sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.OrderBy(p => p.DateCreated);
+            }
+            else
+            {
+                query = query.OrderByDescending(p => p.DateCreated);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var posts = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (posts, totalCount);
+        }
+
+        public async Task<int> CountPostsByGroupIdAsync(Guid groupId)
+        {
+            return await _context.Posts.Where(p => p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.APPROVED && p.GroupId == groupId).CountAsync();
+        }
+
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsByGroupIdAsync(Guid groupId, int page, int size, string search, string authorId, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        {
+            var query = _context.Posts
+                 .Include(p => p.Group)
+                .Include(p => p.User)
+                .Include(p => p.Tags)
+                    .ThenInclude(p => p.User)
+                .Include(p => p.Comments)
+                .Include(p => p.Medias)
+                .Include(p => p.SharePost)
+                  .Include(p => p.OriginalPost).ThenInclude(o => o.User)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Medias)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Group)
+                 .Include(p => p.OriginalPost).ThenInclude(o => o.Tags).ThenInclude(o => o.User)
+                .Where(p => p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.APPROVED && p.GroupId == groupId).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(p => 
+                    p.Content.ToLower().Contains(search.ToLower())
+                    || p.User.FullName.ToLower().Contains(search.ToLower())
+                );
+            }
+
+            if (!string.IsNullOrEmpty(authorId))
+            {
+                query = query.Where(p => p.UserId == authorId);
+            }
+
+            if (fromDate.HasValue)
+            {
+                var startDate = fromDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date >= startDate);
+            }
+
+            if (toDate.HasValue)
+            {
+                var endDate = toDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date <= endDate);
+            }
+
+
+            if (contentType != "ALL")
+            {
+                query = contentType switch
+                {
+                    PostContentType.TEXT => query.Where(p => (p.Medias == null || p.Medias.Count == 0) && p.Background == null && p.PostType != PostType.SHARE_POST),
+                    PostContentType.MEDIA => query.Where(p => p.Medias != null && p.Medias.Count > 0),
+                    PostContentType.BACKGROUND => query.Where(p => p.Background != null),
+                    PostContentType.SHARE => query.Where(p => p.PostType == PostType.SHARE_POST),
+                    _ => query
+                };
+            }
+
+            if (sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.OrderBy(p => p.DateCreated);
+            }
+            else
+            {
+                query = query.OrderByDescending(p => p.DateCreated);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var posts = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return (posts, totalCount);
+        }
+
+        public async Task<(List<Post> Posts, int TotalCount)> GetAllPostsByUserIdByAdminAsync(string userId, int page, int size, string search, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        {
+            var query = _context.Posts
+                .Include(p => p.Group)
+                .Include(p => p.User)
+                    .Where(p =>
+                    p.UserId == userId
+                    && (!p.IsGroupPost || (p.IsGroupPost && p.ApprovalStatus == ApprovalStatus.APPROVED))
+                );
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => 
+                    p.Content.ToLower().Contains(search.ToLower())
+                );
+            }
+
+            if (fromDate.HasValue)
+            {
+                var startDate = fromDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date >= startDate);
+            }
+
+            if (toDate.HasValue)
+            {
+                var endDate = toDate.Value.Date;
+                query = query.Where(p => p.DateCreated.Date <= endDate);
+            }
+
+
+            if (contentType != "ALL")
+            {
+                query = contentType switch
+                {
+                    PostContentType.TEXT => query.Where(p => (p.Medias == null || p.Medias.Count == 0) && p.Background == null && p.OriginalPostId == null),
+                    PostContentType.MEDIA => query.Where(p => p.Medias != null && p.Medias.Count > 0),
+                    PostContentType.BACKGROUND => query.Where(p => p.Background != null),
+                    PostContentType.SHARE => query.Where(p => p.OriginalPostId != null),
+                    _ => query
+                };
+            }
+
+            if (sortOrder.Equals("desc", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.OrderByDescending(p => p.DateCreated);
+            }
+            else
+            {
+                query = query.OrderBy(p => p.DateCreated);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var posts = await query
+                .Skip((page - 1) * size)
+                .Take(size)
                 .ToListAsync();
 
             return (posts, totalCount);

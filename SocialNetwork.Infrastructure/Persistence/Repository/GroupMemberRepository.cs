@@ -28,6 +28,20 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return await _context.GroupMembers.Where(m => m.GroupId == groupId).CountAsync();
         }
 
+        public async Task<int> CountModeratorsByGroupIdAsync(Guid groupId)
+        {
+            return await _context.GroupMembers
+                .Where(m => m.GroupId == groupId && m.Role == MemberRole.MODERATOR)
+                .CountAsync();
+        }
+
+        public async Task<int> CountNonAdminMembersByGroupIdAsync(Guid groupId)
+        {
+            return await _context.GroupMembers
+                .Where(m => m.GroupId == groupId && m.Role == MemberRole.MEMBER)
+                .CountAsync();
+        }
+
         public async Task CreateGroupMemberAsync(GroupMember groupMember)
         {
             await _context.GroupMembers.AddAsync(groupMember);
