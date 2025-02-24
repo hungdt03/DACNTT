@@ -44,7 +44,6 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
 
     const getReportById = async (reportId: string) => {
         const response = await reportService.getReportById(reportId)
-        console.log(response)
         if (response.isSuccess) {
             setGetReport(response.data)
         }
@@ -198,8 +197,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         notification?.type === NotificationType.ASSIGN_POST_TAG ||
                         (notification?.type === NotificationType.POST_REACTION && notification.postId))
                         && (
-                        <MentionPostModal postId={notification.postId} commentId={notification.commentId} />
-                    )}
+                            <MentionPostModal postId={notification.postId} commentId={notification.commentId} />
+                        )}
 
                     {notification?.type === NotificationType.POST_SHARED && notification.postId && (
                         <MentionSharePostModal postId={notification.postId} />
@@ -224,78 +223,8 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                             Xin chào, <span className='text-blue-600'>{notification?.recipient?.fullName}</span>
                         </span>
 
-                        <p className='text-sm text-gray-600'>
-                            <strong>Chúng tôi đã xem xét báo cáo của bạn và xin thông báo:</strong>
-                        </p>
-                        <p className='text-sm text-gray-600'>
-                            {(() => {
-                                switch (getReport?.reportType) {
-                                    case ReportType.USER:
-                                        return (
-                                            <>
-                                                Báo cáo của bạn về tài khoản
-                                                <strong className='text-blue-600'>
-                                                    {' '}
-                                                    "{getReport?.targetUser?.fullName}"
-                                                </strong>
-                                                đã {getReport?.status === 'RESOLVED' && <strong>được xử lý.</strong>}
-                                                {getReport?.status === 'REJECTED' && <strong>bị từ chối.</strong>}
-                                            </>
-                                        )
-                                    case ReportType.POST:
-                                        return (
-                                            <>
-                                                Báo cáo của bạn về bài viết của
-                                                <strong className='text-blue-600'>
-                                                    {' '}
-                                                    "{getReport?.targetPost?.user?.fullName}"
-                                                </strong>
-                                                đã {getReport?.status === 'RESOLVED' && <strong>được xử lý.</strong>}
-                                                {getReport?.status === 'REJECTED' && <strong>bị từ chối.</strong>}
-                                            </>
-                                        )
-                                    case ReportType.GROUP:
-                                        return (
-                                            <>
-                                                Báo cáo của bạn về nhóm
-                                                <strong className='text-blue-600'>
-                                                    {' '}
-                                                    "{getReport?.targetGroup?.name}"
-                                                </strong>
-                                                đã {getReport?.status === 'RESOLVED' && <strong>được xử lý.</strong>}
-                                                {getReport?.status === 'REJECTED' && <strong>bị từ chối.</strong>}
-                                            </>
-                                        )
-                                    case ReportType.COMMENT:
-                                        return (
-                                            <>
-                                                Báo cáo của bạn về bình luận của
-                                                <strong className='text-blue-600'>
-                                                    {' '}
-                                                    "{getReport?.targetComment?.user?.fullName}"
-                                                </strong>
-                                                đã {getReport?.status === 'RESOLVED' && <strong>được xử lý.</strong>}
-                                                {getReport?.status === 'REJECTED' && <strong>bị từ chối.</strong>}
-                                            </>
-                                        )
-                                    default:
-                                        return <strong>Báo cáo của bạn đã được xử lý.</strong>
-                                }
-                            })()}
-                        </p>
-
-                        <p className='text-sm text-gray-600'>
-                            <strong>📌 Kết quả xử lý: </strong>
-                            {getReport?.resolutionNotes ? (
-                                <span className='text-green-600'>{getReport?.resolutionNotes}</span>
-                            ) : (
-                                'Chúng tôi đã thực hiện các biện pháp cần thiết theo chính sách cộng đồng.'
-                            )}
-                        </p>
-                        <p className='text-sm text-gray-600'>
-                            Cảm ơn bạn đã giúp chúng tôi xây dựng một <strong>cộng đồng an toàn và lành mạnh!</strong>{' '}
-                            🚀
-                        </p>
+                        {notification?.type === NotificationType.REPORT_RESPONSE_REPORTEE && <ReporteeResponse content={notification?.content ?? 'Nội dung của bạn đã vi phạm các quy tắc, chính sách của chúng tôi'} />}
+                        {notification?.type === NotificationType.REPORT_RESPONSE_REPORTER && getReport && <ReporterResponse content={notification.content} />}
                     </div>
                 </Modal>
             )}
@@ -303,4 +232,44 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
     )
 }
 
-export default NotificationDialog
+export default NotificationDialog;
+
+type ReporteeResponseProps = {
+    content: string
+}
+
+const ReporteeResponse:FC<ReporteeResponseProps> = ({
+    content
+}) => {
+    return <div>
+        <p className='text-sm text-gray-600'>
+            <strong>Chúng tôi đã nhận được báo cáo về nội dung của bạn trên LinkUp</strong>
+        </p>
+        <p>{content}</p>
+        Chúng tôi mong muốn tạo ra một không gian tích cực và an toàn cho tất cả mọi người. Vui lòng đảm bảo tuân thủ các quy tắc trong tương lai. Nếu bạn cần hỗ trợ, hãy liên hệ với chúng tôi.
+        🚀
+    </div>
+}
+
+type ReporterResponseProps = {
+    content: string;
+}
+
+const ReporterResponse: FC<ReporterResponseProps> = ({
+    content
+}) => {
+    return <>
+        <p className='text-sm text-gray-600'>
+            <strong>📌 KẾT QUẢ XỬ LÍ BÁO CÁO:</strong>
+        </p>
+
+        <p className='text-sm text-gray-600'>
+           {content}
+        </p>
+       
+        <p className='text-sm text-gray-600'>
+            Cảm ơn bạn đã giúp chúng tôi xây dựng một <strong>cộng đồng an toàn và lành mạnh!</strong>{' '}
+            🚀
+        </p>
+    </>
+}

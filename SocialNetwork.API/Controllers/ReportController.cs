@@ -19,7 +19,7 @@ namespace SocialNetwork.API.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{reportId}")]
         public async Task<IActionResult> GetReportById([FromRoute] Guid reportId)
         {
             var response = await _mediator.Send(new GetReportIgnoreByIdQuery(reportId));

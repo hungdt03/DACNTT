@@ -21,7 +21,7 @@ const PostShareInner: FC<PostShareInnerProps> = ({
 }) => {
     const { user } = useSelector(selectAuth)
 
-    if(post.isGroupPost && post.group === null) return <PostNotFound />;
+    if (post.isGroupPost && post.group === null) return <PostNotFound />;
 
     return <div className="flex flex-col gap-y-2 bg-white rounded-xl overflow-hidden border-[1px] border-gray-200">
         {post.medias.length > 0 && <PostMedia files={post.medias} />}
@@ -57,7 +57,10 @@ const PostShareInner: FC<PostShareInnerProps> = ({
 
                     <div className="flex flex-col gap-y-[1px]">
                         <div className="text-[14px] text-gray-600">
-                            <Link to={`/profile/${post.user.id}`} className="font-bold text-[13px] md:text-sm hover:text-gray-600 hover:underline">{post.user?.fullName}</Link>
+                            {post.isGroupPost 
+                                ? <Link to={`/groups/${post.group.id}`} className="font-bold text-[15px] hover:underline hover:text-gray-600">{post.group?.name}</Link>
+                                :
+                                <Link to={`/profile/${post.user.id}`} className="font-bold text-[13px] md:text-sm hover:text-gray-600 hover:underline">{post.user?.fullName}</Link>}
                             {post.tags.length > 0 &&
                                 (() => {
                                     const maxDisplay = 3;
@@ -79,6 +82,7 @@ const PostShareInner: FC<PostShareInnerProps> = ({
                                 })()}
                         </div>
                         <div className="flex items-center gap-x-2">
+                            {post.isGroupPost && <Link className="font-bold hover:underline text-[13px] text-gray-500 hover:text-gray-600" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>}
                             <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
                                 <span className="text-[11px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                             </Tooltip>

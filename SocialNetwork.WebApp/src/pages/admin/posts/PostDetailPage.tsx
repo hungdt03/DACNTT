@@ -125,7 +125,7 @@ const PostDetailPage: FC = () => {
 
             {post?.postType === PostType.SHARE_POST && <div className="p-4 rounded-md bg-white shadow">
                 <span className="text-lg font-bold mb-2 inline-block">Bài viết gốc</span>
-                <PostItem post={post.originalPost} />
+                {post?.originalPost?.isGroupPost ? <PostItemGroup post={post.originalPost} /> : <PostItem post={post.originalPost} />}
             </div>}
 
         </div>

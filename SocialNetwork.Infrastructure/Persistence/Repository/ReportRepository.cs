@@ -67,15 +67,11 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await _context.Reports
                  .Include(r => r.TargetGroup)
-                    //.IgnoreQueryFilters()
                  .Include(r => r.TargetComment)
                     .ThenInclude(r => r.User)
-                    //.IgnoreQueryFilters()
                  .Include(r => r.TargetPost)
                     .ThenInclude(r => r.User)
-                    //.IgnoreQueryFilters()
                  .Include(r => r.TargetUser)
-                    //.IgnoreQueryFilters()
                  .Include(r => r.Reporter)
                  .SingleOrDefaultAsync(r => r.Id == id);
         }

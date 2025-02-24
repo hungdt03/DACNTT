@@ -29,7 +29,7 @@ namespace SocialNetwork.Domain.Constants
                 public const string REPORT_POST = "REPORT_POST";
                 public const string REPORT_GROUP = "REPORT_GROUP";
 
-        public const string REPORT_RESPONSE_REPORTER = "REPORT_RESPONSE_REPORTER";
+                public const string REPORT_RESPONSE_REPORTER = "REPORT_RESPONSE_REPORTER";
                 public const string REPORT_RESPONSE_REPORTEE = "REPORT_RESPONSE_REPORTEE";
 
                 public const string REPORT_DELETE_RESPONSE = "REPORT_DELETE_RESPONSE";
