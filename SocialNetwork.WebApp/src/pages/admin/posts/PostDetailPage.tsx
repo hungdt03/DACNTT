@@ -15,6 +15,7 @@ import { svgReaction } from "../../../assets/svg";
 import { PostType } from "../../../enums/post-type";
 import PostGroup from "../../../components/posts/PostGroup";
 import LoadingIndicator from "../../../components/LoadingIndicator";
+import PostItemGroup from "../../../components/posts/admin/PostGroupItem";
 
 export const getReactionPercentages = (reactions?: ReactionResource[]) => {
     if (!reactions?.length) return { total: 0, data: [] };
@@ -120,7 +121,7 @@ const PostDetailPage: FC = () => {
 
     return postLoading ? <LoadingIndicator title="Đang tải dữ liệu bài viết" /> : <div className="grid grid-cols-2 h-full overflow-hidden gap-4">
         <div className="flex flex-col gap-y-4 h-full overflow-y-auto custom-scrollbar">
-            {post?.isGroupPost ? post && <PostGroup post={post} /> : post && <PostItem post={post} />}
+            {post?.isGroupPost ? post && <PostItemGroup post={post} /> : post && <PostItem post={post} />}
 
             {post?.postType === PostType.SHARE_POST && <div className="p-4 rounded-md bg-white shadow">
                 <span className="text-lg font-bold mb-2 inline-block">Bài viết gốc</span>

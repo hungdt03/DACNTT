@@ -16,29 +16,16 @@ import ExpandableText from "../../../components/ExpandableText";
 import PostMedia from "../../../components/posts/PostMedia";
 import PostReactionModal from "../../../components/modals/PostReactionModal";
 import ListSharePostModal from "../../../components/modals/ListSharePostModal";
+import { getTopReactions } from "./PostItem";
 import PostNotFound from "../PostNotFound";
 
-export const getTopReactions = (reactions?: ReactionResource[], top: number = 3) => {
-    const counts = reactions?.reduce((acc, reaction) => {
-        acc[reaction.reactionType] = (acc[reaction.reactionType] || 0) + 1;
-        return acc;
-    }, {} as Record<string, number>);
-
-    return counts
-        ? Object.entries(counts)
-            .sort(([, countA], [, countB]) => countB - countA)
-            .slice(0, top) // Lấy top N
-            .map(([reactionType, count]) => ({ reactionType, count }))
-        : [];
-};
-
-type PostItemProps = {
+type PostGroupItemProps = {
     group?: GroupResource;
     post: PostResource;
 }
 
 
-const PostItem: FC<PostItemProps> = ({
+const PostItemGroup: FC<PostGroupItemProps> = ({
     post: postParam,
     group,
 }) => {
@@ -75,46 +62,50 @@ const PostItem: FC<PostItemProps> = ({
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-x-2">
-                <div className="relative">
-                    <Avatar className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0" src={post.user.avatar ?? images.user} />
-                    {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute bottom-0 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
-                </div>
-
-                <div className="flex flex-col md:gap-y-[1px]">
-                    <div className="text-gray-600 text-[13px] md:text-sm">
-                        <Link className="font-bold text-[13px] hover:text-gray-600 hover:underline md:text-sm" to={`/admin/users/${post.user.id}`}>{post.user?.fullName}</Link>
-                        {post.tags.length > 0 &&
-                            (() => {
-                                const maxDisplay = 3;
-                                const displayedTags = post.tags.slice(0, maxDisplay);
-                                const remainingTagsCount = post.tags.length - maxDisplay;
-                                const remainingTags = post.tags.slice(maxDisplay)
-
-                                return (
-                                    <>
-                                        {' cùng với '}
-                                        {displayedTags.map((tag, index) => (
-                                            <Link className="font-bold hover:underline hover:text-gray-600 text-sm" to={`/profile/${tag.user.id}`} key={tag.id}>
-                                                {tag.user.fullName}
-                                                {index < displayedTags.length - 1 ? ', ' : ''}
-                                            </Link>
-                                        ))}
-                                        <Tooltip title={<PostOtherTags tags={remainingTags} />}>
-                                            {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
-                                        </Tooltip>
-                                    </>
-                                );
-                            })()}
+                <div className="flex items-center gap-x-2">
+                    <div className="relative">
+                        <img alt="Ảnh nhóm" className="w-10 hed-md object-cover" src={post.group?.coverImage ?? images.cover} />
+                        <Avatar className="w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} />
+                        {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-2 -right-2 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                     </div>
-                    <div className="flex items-center gap-x-2">
-                        <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
-                            <span className="text-[11px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
-                        </Tooltip>
-                        <button>{getPrivacyPost(post.privacy)}</button>
+                    <div className="flex flex-col gap-y-[1px]">
+                        <div className="font-semibold text-[15px] text-gray-600">
+                            <Link to={`/admin/groups/${post.group.id}`} className="font-bold text-[15px] hover:underline hover:text-gray-600">{post.group?.name}</Link>
+                            {post.tags.length > 0 &&
+                                (() => {
+                                    const maxDisplay = 3;
+                                    const displayedTags = post.tags.slice(0, maxDisplay);
+                                    const remainingTagsCount = post.tags.length - maxDisplay;
+                                    const remainingTags = post.tags.slice(maxDisplay)
+
+                                    return (
+                                        <>
+                                            {' cùng với '}
+                                            {displayedTags.map((tag, index) => (
+                                                <Link className="hover:underline hover:text-gray-600 font-bold" to={`/admin/users/${tag.user.id}`} key={tag.id}>
+                                                    {tag.user.fullName}
+                                                    {index < displayedTags.length - 1 ? ', ' : ''}
+                                                </Link>
+                                            ))}
+                                            <Tooltip title={<PostOtherTags tags={remainingTags} />}>
+                                                {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
+                                            </Tooltip>
+                                        </>
+                                    );
+                                })()}
+                        </div>
+                        <div className="flex items-center gap-x-2">
+                            <Link className="font-bold hover:underline text-[13px] text-gray-600 hover:text-gray-600" to={`/profile/${post.user.id}`}>{post.user?.fullName}</Link>
+                            <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
+                                <span className="text-[12px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
+                            </Tooltip>
+                            {getPrivacyPost(post.privacy)}
+                        </div>
                     </div>
                 </div>
+              
             </div>
-            
+
         </div>
 
         <div className="flex flex-col gap-y-3">
@@ -153,4 +144,4 @@ const PostItem: FC<PostItemProps> = ({
     </div>
 };
 
-export default PostItem;
+export default PostItemGroup;

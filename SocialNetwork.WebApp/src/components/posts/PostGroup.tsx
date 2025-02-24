@@ -29,6 +29,7 @@ import EditPostModal from "../modals/EditPostModal";
 import ExpandableText from "../ExpandableText";
 import ReportPostModal from "../modals/reports/ReportPostModal";
 import reportService from "../../services/reportService";
+import PostNotFound from "./PostNotFound";
 
 type PostGroupProps = {
     post: PostResource;
@@ -203,6 +204,8 @@ const PostGroup: FC<PostGroupProps> = ({
             message.error(response.message)
         }
     }
+
+    if(post === null) return <PostNotFound />
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">

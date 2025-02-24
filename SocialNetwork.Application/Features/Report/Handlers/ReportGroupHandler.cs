@@ -85,10 +85,7 @@ namespace SocialNetwork.Application.Features.Report.Handlers
 
             foreach (var notification in notifications)
             {
-                foreach (var admin in adminUsers)
-                {
-                    await _signalRService.SendNotificationToSpecificUser(admin.UserName, ApplicationMapper.MapToNotification(notification));
-                }
+                await _signalRService.SendNotificationToSpecificUser(notification.Recipient.UserName, ApplicationMapper.MapToNotification(notification));
             }
 
             return new BaseResponse()

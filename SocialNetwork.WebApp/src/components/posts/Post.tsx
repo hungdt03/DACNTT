@@ -31,6 +31,7 @@ import reportService from "../../services/reportService";
 import ReportPostModal from "../modals/reports/ReportPostModal";
 import ChangePostPrivacyModal from "../modals/ChangePostPrivacyModal";
 import ExpandableText from "../ExpandableText";
+import PostNotFound from "./PostNotFound";
 
 export type CommentRequest = {
     postId: string;
@@ -251,6 +252,8 @@ const Post: FC<PostProps> = ({
             message.error(response.message)
         }
     }
+
+    if(post === null) return <PostNotFound />
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">

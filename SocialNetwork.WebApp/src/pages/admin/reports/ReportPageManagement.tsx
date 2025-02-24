@@ -36,6 +36,7 @@ const ReportPageManagement: FC = () => {
     const fetchReports = async (page: number, size: number) => {
         setLoading(true)
         const response = await adminService.getAllReport(page, size, status, type);
+        console.log(response)
         setLoading(false)
         if (response.isSuccess) {
             setPagination(response.pagination)

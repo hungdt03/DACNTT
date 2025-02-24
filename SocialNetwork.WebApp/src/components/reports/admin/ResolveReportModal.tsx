@@ -5,6 +5,8 @@ import { Avatar, Button, Divider, Popconfirm, Tag } from "antd";
 import { formatDateStandard, formatDateTimeStandard } from "../../../utils/date";
 import ReportCommentItem from "./ReportCommentItem";
 import errors from "../../../assets/error";
+import ReportUserItem from "./ReportUserItem";
+import ReportGroupItem from "./ReportGroupItem";
 
 type ResolveReportModalProps = {
     report: ReportResource;
@@ -38,6 +40,8 @@ const ResolveReportModal: FC<ResolveReportModalProps> = ({
                     <div className="p-3 border-[1px] rounded-md border-gray-100">
                         {report.reportType === 'POST' && <ReportPostItem post={report.targetPost} />}
                         {report.reportType === 'COMMENT' && <ReportCommentItem comment={report.targetComment} />}
+                        {report.reportType === 'USER' && <ReportUserItem user={report.targetUser} />}
+                        {report.reportType === 'GROUP' && <ReportGroupItem group={report.targetGroup} />}
                     </div>
                 }
             </div>
@@ -51,6 +55,15 @@ const ResolveReportModal: FC<ResolveReportModalProps> = ({
                         <span className="text-xs">Vào lúc {formatDateTimeStandard(new Date(report.dateCreatedAt))}</span>
                     </div>
                 </div>
+                <span className="text-[15px] font-bold">Loại báo cáo</span>
+                <div className="border-[1px] border-gray-300 bg-slate-50 p-3 flex items-center gap-x-3 rounded-md">
+                    <span className="font-bold">
+                        {report.reportType === 'COMMENT' && 'Bình luận'}
+                        {report.reportType === 'USER' && 'Người dùng'}
+                        {report.reportType === 'GROUP' && 'Nhóm'}
+                        {report.reportType === 'POST' && 'Bài viết'}
+                    </span>
+                </div>
                 <span className="text-[15px] font-bold">Lí do báo cáo</span>
                 <div className="border-[1px] border-gray-300 bg-slate-50 p-3 rounded-md">
                     {report.reason}
@@ -58,20 +71,22 @@ const ResolveReportModal: FC<ResolveReportModalProps> = ({
                 <Divider className="my-0" />
                 {report.status === 'PENDING' ? <>
                     <span className="text-[15px] font-bold">Hướng giải quyết</span>
-                    <div className="flex items-center gap-x-2">
-                        <Popconfirm onConfirm={onKeep} title='Cảnh báo' description='Bạn có chắc chắn với hướng giải quyết này' cancelText='Hủy bỏ'>
-                            <Button type="primary">Giữ lại</Button>
-                        </Popconfirm>
-                        <Popconfirm onConfirm={onRemove} title='Cảnh báo' description='Bạn có chắc chắn với hướng giải quyết này' cancelText='Hủy bỏ'>
-                            <Button danger type="primary">
-                                {report.reportType === "USER" ?
-                                    'Khóa tài khoản'
-                                    : report.reportType === 'GROUP' ? 'Giải tán nhóm'
-                                        : 'Gỡ nội dung'
-                                }
-                            </Button>
-                        </Popconfirm>
-                    </div>
+                    {
+                        (!report.targetComment && !report.targetGroup && !report.targetPost && !report.targetUser)
+                            ? <p>Nội dung cần xử lí không tồn tại</p> : <div className="flex items-center gap-x-2">
+                                <Popconfirm onConfirm={onKeep} title='Cảnh báo' description='Bạn có chắc chắn với hướng giải quyết này' cancelText='Hủy bỏ'>
+                                    <Button type="primary">Giữ lại</Button>
+                                </Popconfirm>
+                                <Popconfirm onConfirm={onRemove} title='Cảnh báo' description='Bạn có chắc chắn với hướng giải quyết này' cancelText='Hủy bỏ'>
+                                    <Button danger type="primary">
+                                        {report.reportType === "USER" && 'Khóa tài khoản'}
+                                        {report.reportType === 'GROUP' && 'Giải tán nhóm'}  
+                                        {(report.reportType === 'COMMENT' || report.reportType === 'POST') && 'Gỡ nội dung'}  
+                                    </Button>
+                                </Popconfirm>
+                            </div>
+                    }
+
                 </>
                     : <div className="flex flex-col gap-y-2">
                         <span className="text-[15px] font-bold">Nội dung phản hồi</span>
