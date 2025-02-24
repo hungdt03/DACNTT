@@ -2214,19 +2214,23 @@ namespace SocialNetwork.Infrastructure.Persistence.Migrations
 
                     b.HasOne("SocialNetwork.Domain.Entity.PostInfo.Comment", "TargetComment")
                         .WithMany()
-                        .HasForeignKey("TargetCommentId");
+                        .HasForeignKey("TargetCommentId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialNetwork.Domain.Entity.GroupInfo.Group", "TargetGroup")
                         .WithMany()
-                        .HasForeignKey("TargetGroupId");
+                        .HasForeignKey("TargetGroupId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialNetwork.Domain.Entity.PostInfo.Post", "TargetPost")
                         .WithMany()
-                        .HasForeignKey("TargetPostId");
+                        .HasForeignKey("TargetPostId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialNetwork.Domain.Entity.System.User", "TargetUser")
                         .WithMany()
-                        .HasForeignKey("TargetUserId");
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Group");
 

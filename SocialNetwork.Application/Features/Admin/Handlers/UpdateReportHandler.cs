@@ -9,6 +9,7 @@ using SocialNetwork.Application.Interfaces.Services;
 using SocialNetwork.Application.Mappers;
 using SocialNetwork.Common;
 using SocialNetwork.Domain.Constants;
+using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Features.Admin.Handlers
 {
@@ -47,12 +48,18 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
 
             if (report.ReportType == ReportType.COMMENT && report.TargetCommentId.HasValue)
             {
-                reportee = report?.TargetComment?.User;
+                reportee = report.TargetComment.User;
                 if (request.NewStatus == ReportStatus.RESOLVED)
                 {
                     var comment = await _unitOfWork.CommentRepository
                         .GetCommentByIdAsync(report.TargetCommentId.Value)
                             ?? throw new AppException("Bình luận này có thể đã bị gỡ");
+
+                    var replies = await _unitOfWork.CommentRepository.GetAllRepliesByCommentIdAsync(comment.Id);
+                    foreach (var commentItem in replies)
+                    {
+                        commentItem.ParentCommentId = comment.ParentCommentId;
+                    }
 
                     _unitOfWork.CommentRepository.DeleteComment(comment);
 
@@ -64,15 +71,25 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                     report.Status = ReportStatus.REJECTED;
                     responseContentForReporter = "Cảm ơn bạn đã báo cáo. Sau khi xem xét, chúng tôi nhận thấy bình luận này không vi phạm chính sách cộng đồng của chúng tôi, vì vậy sẽ không tiến hành gỡ bỏ. Tuy nhiên, chúng tôi luôn khuyến khích một môi trường thảo luận văn minh và tôn trọng lẫn nhau.";
                 }
+
             } else if(report.ReportType == ReportType.POST && report.TargetPostId.HasValue)
             {
-                reportee = report?.TargetPost?.User;
+                reportee = report.TargetPost.User;
                 if (request.NewStatus == ReportStatus.RESOLVED)
                 {
                     var post = await _unitOfWork.PostRepository
                         .GetPostByIdAsync(report.TargetPostId.Value)
                             ?? throw new AppException("Bài viết này có thể đã bị gỡ");
 
+                    var reactions = await _unitOfWork.ReactionRepository.GetAllReactionsByPostIdAsync(report.TargetPostId.Value);
+                    var comments = await _unitOfWork.CommentRepository.GetAllCommentsByPostIdAsync(report.TargetPostId.Value);
+                    var sharePosts = await _unitOfWork.PostRepository.GetAllSharePostsByOriginalPostId(report.TargetPostId.Value);
+                    var tags = await _unitOfWork.TagRepository.GetAllTagsByPostIdAsync(post.Id);
+
+                    _unitOfWork.ReactionRepository.RemoveRange(reactions);
+                    _unitOfWork.CommentRepository.RemoveRange(comments);
+                    _unitOfWork.TagRepository.RemoveRange(tags);
+                    UpdateSharedPosts(sharePosts, post);
                     _unitOfWork.PostRepository.DeletePost(post);
 
                     report.Status = ReportStatus.RESOLVED;
@@ -81,7 +98,6 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                 }
                 else if (request.NewStatus == ReportStatus.REJECTED)
                 {
-
                     report.Status = ReportStatus.REJECTED;
                     responseContentForReporter = "Cảm ơn bạn đã báo cáo. Sau khi xem xét, chúng tôi nhận thấy bài viết này không vi phạm chính sách cộng đồng của chúng tôi, vì vậy sẽ không tiến hành gỡ bỏ. Tuy nhiên, chúng tôi luôn khuyến khích một môi trường thảo luận văn minh và tôn trọng lẫn nhau.";
                 }
@@ -128,15 +144,15 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
            
             var notiReporter = new Domain.Entity.System.Notification
             {
-                ReportId = report.Id,
+                ReportId = report?.Id,
                 CommentId = report?.TargetCommentId,
                 PostId = report?.TargetPostId,
                 ImageUrl = notiImage,
                 IsRead = false,
                 Title = "Phản hồi báo cáo",
                 Content = responseContentForReporter,
-                RecipientId = reportee.Id,
-                Recipient = report.Reporter,
+                RecipientId = report?.ReporterId,
+                Recipient = report?.Reporter,
                 Type = NotificationType.REPORT_RESPONSE_REPORTER,
                 DateSent = DateTimeOffset.UtcNow
             };
@@ -148,14 +164,14 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
             if(request.NewStatus == ReportStatus.RESOLVED && !string.IsNullOrEmpty(responseContentForReportee)) {
                 notiReportee = new Domain.Entity.System.Notification
                 {
-                    ReportId = report.Id,
+                    ReportId = report?.Id,
                     CommentId = report?.TargetCommentId,
                     PostId = report?.TargetPostId,
                     ImageUrl = notiImage,
                     IsRead = false,
                     Title = "Thông báo gỡ nội dung",
                     Content = responseContentForReportee,
-                    RecipientId = reportee.Id,
+                    RecipientId = reportee?.Id,
                     Recipient = reportee,
                     Type = NotificationType.REPORT_RESPONSE_REPORTEE,
                     DateSent = DateTimeOffset.UtcNow
@@ -179,6 +195,22 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                 Message = "Xử lí báo cáo thành công",
                 StatusCode = System.Net.HttpStatusCode.OK
             };
+        }
+
+        private void UpdateSharedPosts(IEnumerable<Domain.Entity.PostInfo.Post> sharePosts, Domain.Entity.PostInfo.Post post)
+        {
+            foreach (var p in sharePosts)
+            {
+                if (post.PostType == PostType.ORIGINAL_POST)
+                {
+                    p.SharePostId = (p.SharePostId == p.OriginalPostId) ? null : p.SharePostId;
+                    p.OriginalPostId = null;
+                }
+                else
+                {
+                    p.SharePostId = null;
+                }
+            }
         }
 
     }

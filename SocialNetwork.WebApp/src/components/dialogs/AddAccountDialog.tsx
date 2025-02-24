@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal, Button, Form, Input, Radio } from 'antd'
+import { Modal, Button, Form, Input } from 'antd'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { toast } from 'react-toastify'
@@ -10,16 +10,17 @@ import { Role } from '../../enums/role'
 type AddAccountDialogProps = {
     isVisible: boolean
     onClose: () => void
-    fetchUsers: () => void
+    fetchUsers: () => void;
+    title: string;
+    role: Role
 }
-const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ isVisible, onClose, fetchUsers }) => {
+const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ title, isVisible, onClose, fetchUsers, role }) => {
     const [loading, setLoading] = useState(false)
 
     const signUpSchema = Yup.object().shape({
         fullName: Yup.string().required('Họ và tên không được để trống'),
         email: Yup.string().email('Email không hợp lệ').required('Email không được để trống'),
         password: Yup.string().required('Mật khẩu không được để trống'),
-        role: Yup.string().required('Vui lòng chọn quyền'),
         confirmPassword: Yup.string()
             .oneOf([Yup.ref('password'), ''], 'Mật khẩu xác nhận không khớp')
             .required('Xác nhận mật khẩu không được để trống')
@@ -48,7 +49,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ isVisible, onClose,
                         paddingBottom: '5px'
                     }}
                 >
-                    THÊM TÀI KHOẢN
+                    {title}
                 </div>
             }
             open={isVisible}
@@ -57,7 +58,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ isVisible, onClose,
             centered
         >
             <Formik
-                initialValues={{ fullName: '', email: '', password: '', confirmPassword: '', role: Role.USER }}
+                initialValues={{ fullName: '', email: '', password: '', confirmPassword: '', role: role }}
                 validationSchema={signUpSchema}
                 onSubmit={handleAddAccountAsync}
             >
@@ -101,16 +102,7 @@ const AddAccountDialog: React.FC<AddAccountDialogProps> = ({ isVisible, onClose,
                             />
                         </Form.Item>
 
-                        <Form.Item
-                            label="Phân quyền"
-                            name="role"
-                        >
-                            <Radio.Group>
-                                <Radio value={Role.ADMIN}>Quản trị viên</Radio>
-                                <Radio value={Role.USER}>Người dùng</Radio>
-                            </Radio.Group>
-                        </Form.Item>
-
+                       
                         <Form.Item>
                             <Button type='primary' htmlType='submit' loading={loading} block>
                                 Thêm tài khoản

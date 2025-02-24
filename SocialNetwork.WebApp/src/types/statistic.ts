@@ -1,3 +1,4 @@
+import { TopReactionResource } from "./top-reaction";
 import { UserResource } from "./user";
 
 export type StatisticResource = {
@@ -10,6 +11,7 @@ export type StatisticResource = {
     countReports: number;
     top10UserScores: UserScore[];
     top5Followers: UserFollow[];
+    topReactionWeeks: TopReactionResource[]
 }
 
 export interface UserScore {

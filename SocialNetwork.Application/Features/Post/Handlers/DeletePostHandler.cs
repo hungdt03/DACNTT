@@ -28,8 +28,24 @@ namespace SocialNetwork.Application.Features.Post.Handlers
 
         public async Task<BaseResponse> Handle(DeletePostCommand request, CancellationToken cancellationToken)
         {
+            var userId = _contextAccessor.HttpContext.User.GetUserId();
             var post = await _unitOfWork.PostRepository.GetPostByIdAsync(request.PostId)
                 ?? throw new NotFoundException("Không tìm thấy bài viết");
+
+            if(post.GroupId != null)
+            {
+                var groupMember = await _unitOfWork.GroupMemberRepository
+                    .GetGroupMemberByGroupIdAndUserId(post.GroupId.Value, userId)
+                        ?? throw new AppException("Bạn không thể xóa bài viết này");
+
+                if(groupMember.Role != MemberRole.ADMIN && post.UserId != userId)
+                {
+                    throw new AppException("Bạn không thể xóa bài viết này");
+                }
+            }
+
+            if (userId != post.UserId)
+                throw new AppException("Không thể xóa bài viết");
 
             var reactions = await _unitOfWork.ReactionRepository.GetAllReactionsByPostIdAsync(request.PostId);
             var comments = await _unitOfWork.CommentRepository.GetAllCommentsByPostIdAsync(request.PostId);
@@ -43,10 +59,10 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             UpdateSharedPosts(sharePosts, post);
             _unitOfWork.PostRepository.DeletePost(post);
 
-            if (_contextAccessor.HttpContext.User.GetUserRole() == "ADMIN")
-            {
-                await NotifyUser(post);
-            }
+            //if (_contextAccessor.HttpContext.User.GetUserRole() == "ADMIN")
+            //{
+            //    await NotifyUser(post);
+            //}
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
@@ -74,25 +90,25 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 }
             }
         }
-        private async Task NotifyUser(Domain.Entity.PostInfo.Post post)
-        {
-            var notification = new Domain.Entity.System.Notification
-            {
-                ImageUrl = _contextAccessor.HttpContext.User.GetAvatar(),
-                IsRead = false,
-                Title = "Thông báo gỡ bài viết",
-                RecipientId = post.UserId,
-                Recipient = post.User,
-                Type = NotificationType.POST_DELETE_RESPONSE,
-                DateSent = DateTimeOffset.UtcNow,
-                Content = "Chúng tôi đã xóa bài viết của bạn, nhấn vào để xem chi tiết",
-                Post = post,
-                PostId = post.Id
-            };
+        //private async Task NotifyUser(Domain.Entity.PostInfo.Post post)
+        //{
+        //    var notification = new Domain.Entity.System.Notification
+        //    {
+        //        ImageUrl = _contextAccessor.HttpContext.User.GetAvatar(),
+        //        IsRead = false,
+        //        Title = "Thông báo gỡ bài viết",
+        //        RecipientId = post.UserId,
+        //        Recipient = post.User,
+        //        Type = NotificationType.POST_DELETE_RESPONSE,
+        //        DateSent = DateTimeOffset.UtcNow,
+        //        Content = "Chúng tôi đã xóa bài viết của bạn, nhấn vào để xem chi tiết",
+        //        Post = post,
+        //        PostId = post.Id
+        //    };
 
-            await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
-            var mappedNotification = ApplicationMapper.MapToNotification(notification);
-            await _signalRService.SendNotificationToSpecificUser(mappedNotification.Recipient.FullName, mappedNotification);
-        }
+        //    await _unitOfWork.NotificationRepository.CreateNotificationAsync(notification);
+        //    var mappedNotification = ApplicationMapper.MapToNotification(notification);
+        //    await _signalRService.SendNotificationToSpecificUser(mappedNotification.Recipient.FullName, mappedNotification);
+        //}
     }
 }

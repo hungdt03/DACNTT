@@ -47,6 +47,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                                 .ToList();
 
             var top5Followers = await _unitOfWork.UserRepository.GetTop5UserFollowers();
+            var topReactions = await _unitOfWork.ReactionRepository.GetTopReactionInWeekly();
 
             var response = new StatisticResponse()
             {
@@ -59,6 +60,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
                 CountReports = countReports,
                 Top10UserScores = top10Users,
                 Top5Followers = top5Followers,
+                TopReactionWeeks = topReactions
             };
 
             return new DataResponse<StatisticResponse>()

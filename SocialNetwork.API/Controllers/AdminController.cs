@@ -5,6 +5,7 @@ using SocialNetwork.API.Filters;
 using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Application.Features.Admin.Queries;
 using SocialNetwork.Application.Features.Post.Commands;
+using SocialNetwork.Application.Features.User.Queries;
 
 namespace SocialNetwork.API.Controllers
 {
@@ -25,10 +26,17 @@ namespace SocialNetwork.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("get-all-admin")]
+        public async Task<IActionResult> GetAllAdmins([FromQuery] int page = 1, [FromQuery] int size = 6, [FromQuery] string search = "")
+        {
+            var response = await mediator.Send(new GetAllAdminAccountQuery(page, size, search));
+            return Ok(response);
+        }
+
         [HttpGet("users/{userId}")]
         public async Task<IActionResult> GetUserById([FromRoute] string userId)
         {
-            var response = await mediator.Send(new GetUserByIdQuery(userId));
+            var response = await mediator.Send(new Application.Features.Admin.Queries.GetUserByIdQuery(userId));
             return Ok(response);
         }
 
@@ -172,7 +180,30 @@ namespace SocialNetwork.API.Controllers
             var response = await mediator.Send(new GetStatisticSummaryQuery());
             return Ok(response);
         }
-       
+
+        [HttpGet("get-registration-stats-by-year/{year}")]
+        public async Task<IActionResult> GetRegistrationStatsByYear([FromRoute] int year)
+        {
+            var response = await mediator.Send(new GetRegistrationStatsByYearsQuery(year));
+            return Ok(response);
+        }
+
+        [HttpGet("get-top-trending-posts")]
+        public async Task<IActionResult> GetTopTrendingPosts([FromQuery] string type ="", [FromQuery] DateTimeOffset? from = default, [FromQuery] DateTimeOffset? to = default)
+        {
+            if(from == default)
+            {
+                from = null;
+            }
+
+            if (to == default)
+            {
+                to = null;
+            }
+            var response = await mediator.Send(new GetTopTrendingPostQuery(type, from, to));
+            return Ok(response);
+        }
+
         [HttpDelete("delete-post/{postId}")]
         public async Task<IActionResult> DeleteOnePost([FromRoute] Guid postId)
         {

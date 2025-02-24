@@ -13,14 +13,16 @@ const UserScoreChart: React.FC<UserScoreChartProps> = ({
     const chartOptions: ApexOptions = {
         chart: {
             type: "bar",
-            toolbar: { show: false }
+            toolbar: { show: false },
         },
         xaxis: {
             categories: data.map((u) => u.user.fullName),
-            title: { text: "Người dùng" }
+            title: { text: "Người dùng", style: { fontSize: "14px", fontWeight: "bold", fontFamily: "'Nunito', 'Segoe UI', 'Roboto', 'Arial', sans-serif" } },
+            labels: { style: { fontSize: "14px", fontFamily: "'Nunito', 'Segoe UI', 'Roboto', 'Arial', sans-serif" } }, 
         },
         yaxis: {
-            title: { text: "Điểm số" }
+            title: { text: "Điểm số", style: { fontSize: "14px", fontWeight: "bold", fontFamily: "'Nunito', 'Segoe UI', 'Roboto', 'Arial', sans-serif" } },
+            labels: { style: { fontSize: "14px", fontFamily: "'Nunito', 'Segoe UI', 'Roboto', 'Arial', sans-serif" } }, 
         },
         colors: ["#4CAF50"], // Màu xanh lá cây
         plotOptions: {
@@ -48,8 +50,8 @@ const UserScoreChart: React.FC<UserScoreChartProps> = ({
     ];
 
     return (
-        <div className="w-[600px] mx-auto p-4 bg-white shadow-lg rounded-xl">
-            <h2 className="text-center font-bold text-2xl text-gray-700 mb-4">
+        <div className="w-full p-4 bg-white shadow-lg rounded-xl">
+            <h2 className="text-left font-bold text-lg text-gray-700 mb-4">
                 📊 Top người dùng có tương tác nhiều nhất
             </h2>
             <Chart options={chartOptions} series={chartSeries} type="bar" height={350} />

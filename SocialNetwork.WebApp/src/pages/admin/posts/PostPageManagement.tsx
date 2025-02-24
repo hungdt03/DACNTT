@@ -258,6 +258,8 @@ const PostPageManagement: FC = () => {
                 <RangePicker
                     onChange={handleChangeDate}
                     placeholder={["Từ ngày", "Đến ngày"]}
+                    variant="borderless"
+                    rootClassName="rounded-md bg-gray-100 hover:bg-gray-200"
                 />
             </div>
 
@@ -280,7 +282,7 @@ const PostPageManagement: FC = () => {
                     >
                         {selectedRowKeys.length > 0 && <Button type="primary" danger>Xóa {selectedRowKeys.length} dòng đã chọn</Button>}
                     </Popconfirm>
-                    <Popconfirm
+                    {posts.length > 1 && <Popconfirm
                         title={`Xóa tất cả bài viết`}
                         description={`Bạn có chắc là muốn xóa tất cả bài viết?`}
                         onConfirm={() => handleDeleteAll()}
@@ -288,7 +290,7 @@ const PostPageManagement: FC = () => {
                         okText='Xóa'
                     >
                         <Button type="primary" danger>Xóa tất cả</Button>
-                    </Popconfirm>
+                    </Popconfirm>}
 
                 </div>
             </div>

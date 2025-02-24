@@ -13,6 +13,8 @@ import { FriendResource } from '../types/friend';
 import { UserPostTabQueryFilter } from '../pages/admin/users/UserPostTabs';
 import { UpdateReport } from '../pages/admin/reports/ReportPageManagement';
 import { StatisticResource } from '../types/statistic';
+import { TrendingPostResource } from '../types/trending-post';
+import { TopReactionResource } from '../types/top-reaction';
 
 
 class AdminService {
@@ -28,6 +30,16 @@ class AdminService {
     //USER
     getAllUser(page: number, size: number, search: string): Promise<PaginationResponse<UserResource[]>> {
         return axiosInterceptor.get('/api/admin/get-all-user', {
+            params: {
+                page,
+                size,
+                search
+            }
+        })
+    }
+
+    getAllAdmins(page: number, size: number, search: string): Promise<PaginationResponse<UserResource[]>> {
+        return axiosInterceptor.get('/api/admin/get-all-admin', {
             params: {
                 page,
                 size,
@@ -103,24 +115,8 @@ class AdminService {
         return axiosInterceptor.delete('/api/admin/delete-all-user')
     }
 
-    CountAllUser(): Promise<DataResponse<number>> {
-        return axiosInterceptor.get('/api/admin/count-all-user')
-    }
-
-    CountAllUserIsLock(): Promise<DataResponse<number>> {
-        return axiosInterceptor.get('/api/admin/count-all-user-islock')
-    }
-
     GetAllUserConnection(): Promise<DataResponse<number>> {
         return axiosInterceptor.get('/api/admin/get-all-user-connection')
-    }
-
-    GetTop10UserScore(): Promise<DataResponse<UserScoreResource[]>> {
-        return axiosInterceptor.get('/api/admin/get-top-10-user-score')
-    }
-
-    GetYear(): Promise<DataResponse<number[]>> {
-        return axiosInterceptor.get('/api/admin/get-year')
     }
 
     GetRegistrationStatsByYear(year: number): Promise<DataResponse<MonthlyRegistrationStatsResource[]>> {
@@ -133,6 +129,16 @@ class AdminService {
 
     getStatistics() : Promise<DataResponse<StatisticResource>> {
         return axiosInterceptor.get('/api/admin/statistics')
+    }
+
+    getTopTrendingPosts(type: string, from?: Date, to?: Date) : Promise<DataResponse<TrendingPostResource[]>> {
+        return axiosInterceptor.get('/api/admin/get-top-trending-posts', {
+            params: {
+                type,
+                from,
+                to
+            }
+        })
     }
 
     //POSt
@@ -157,10 +163,7 @@ class AdminService {
     DeleteAllPost(): Promise<BaseResponse> {
         return axiosInterceptor.delete('/api/admin/delete-all-post')
     }
-
-    CountAllPost(): Promise<DataResponse<number>> {
-        return axiosInterceptor.get('/api/admin/count-all-post')
-    }
+    
 
     //GROUP
     getAllGroup(page: number, size: number, search: string, privacy: string): Promise<PaginationResponse<GroupResource[]>> {
@@ -243,9 +246,7 @@ class AdminService {
     GetReportById(reportId: string): Promise<DataResponse<ReportResource>> {
         return axiosInterceptor.get('/api/admin/get-report-by-id/' + reportId)
     }
-    CountAllReport(): Promise<DataResponse<number>> {
-        return axiosInterceptor.get('/api/admin/count-all-report')
-    }
+    
     // COMMENT
     DeleteOneComment(commentId: string): Promise<BaseResponse> {
         return axiosInterceptor.delete('/api/comments/' + commentId)

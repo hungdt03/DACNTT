@@ -43,7 +43,6 @@ const UserPostTabs: FC<UserPostTabsProps> = ({
     const fetchPosts = async (page: number, size: number, filter: UserPostTabQueryFilter) => {
         setLoading(true)
         const response = await adminService.getAllPostByUserId(userId, page, size, filter);
-        console.log(response)
         setLoading(false)
         if (response.isSuccess) {
             setPagination(response.pagination)
@@ -74,18 +73,18 @@ const UserPostTabs: FC<UserPostTabsProps> = ({
         }
     }
 
-    
-        const handleDeleteMany = async (postIds: string[]) => {
-            const response = await adminService.DeleteManyPost(postIds);
-            if (response.isSuccess) {
-                message.success(response.message);
-                setSelectedRowKeys([])
-                fetchPosts(1, 6, filter)
-            } else {
-                message.error(response.message)
-            }
+
+    const handleDeleteMany = async (postIds: string[]) => {
+        const response = await adminService.DeleteManyPost(postIds);
+        if (response.isSuccess) {
+            message.success(response.message);
+            setSelectedRowKeys([])
+            fetchPosts(1, 6, filter)
+        } else {
+            message.error(response.message)
         }
-    
+    }
+
 
     const handleContentTypeChange = (key: ContentTypeKey) => {
         const updatedFilter = { ...filter, contentType: key };
@@ -239,6 +238,8 @@ const UserPostTabs: FC<UserPostTabsProps> = ({
                 <RangePicker
                     onChange={handleChangeDate}
                     placeholder={["Từ ngày", "Đến ngày"]}
+                    variant="borderless"
+                    rootClassName="rounded-md bg-gray-100 hover:bg-gray-200"
                 />
 
                 <button onClick={handleClearFilter} className="flex-shrink-0 py-1 px-2 hover:bg-gray-200 rounded-md bg-gray-100 flex items-center gap-x-1">

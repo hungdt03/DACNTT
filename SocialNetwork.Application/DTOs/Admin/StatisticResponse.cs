@@ -15,5 +15,6 @@ namespace SocialNetwork.Application.DTOs.Admin
         public int CountConnections { get; set; }
         public List<UserScore> Top10UserScores { get; set; }
         public List<UserFollow> Top5Followers { get; set; }
+        public List<TopReactionWeek> TopReactionWeeks { get; set; }
     }
 }

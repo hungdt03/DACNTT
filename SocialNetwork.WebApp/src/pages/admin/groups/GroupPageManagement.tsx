@@ -259,7 +259,7 @@ const GroupPageManagement: FC = () => {
                     >
                         {selectedRowKeys.length > 0 && <Button type="primary" danger>Xóa {selectedRowKeys.length} dòng đã chọn</Button>}
                     </Popconfirm>
-                    <Popconfirm
+                    {groups.length > 1 && <Popconfirm
                         title={`Xóa tất cả nhóm`}
                         description={`Bạn có chắc là muốn xóa tất cả nhóm?`}
                         onConfirm={() => handleDeleteAll()}
@@ -267,7 +267,7 @@ const GroupPageManagement: FC = () => {
                         okText='Xóa'
                     >
                         <Button type="primary" danger>Xóa tất cả</Button>
-                    </Popconfirm>
+                    </Popconfirm>}
 
                 </div>
             </div>

@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Application.DTOs.Admin;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Infrastructure.DBContext;
@@ -44,6 +45,24 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         {
             return await appDbContext.Reactions
                 .SingleOrDefaultAsync(s => s.UserId == userId && s.PostId == postId);
+        }
+
+        public async Task<List<TopReactionWeek>> GetTopReactionInWeekly()
+        {
+            var weekAgo = DateTimeOffset.UtcNow.Date.AddDays(-6).Date; // Lấy đủ 7 ngày (tính cả hôm nay)
+            var today = DateTimeOffset.UtcNow.Date;
+
+            return await appDbContext.Reactions
+                .Where(r => r.DateCreated.Date >= weekAgo && r.DateCreated.Date <= today)
+                .GroupBy(r => new { Date = r.DateCreated.Date, Type = r.Type }) // Nhóm theo ngày + loại reaction
+                .Select(g => new TopReactionWeek()
+                {
+                    Date = g.Key.Date,
+                    Type = g.Key.Type,
+                    Count = g.Count()
+                })
+                .OrderBy(g => g.Date) // Sắp xếp theo ngày
+                .ToListAsync();
         }
 
         public void RemoveRange(IEnumerable<Reaction> reactions)

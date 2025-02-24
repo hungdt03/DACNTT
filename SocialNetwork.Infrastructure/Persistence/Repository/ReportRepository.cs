@@ -4,6 +4,7 @@ using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.System;
 using SocialNetwork.Infrastructure.DBContext;
+using System;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -120,7 +121,7 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
         public async Task<(List<Report> Reports, int TotalCount)> GetAllReportsIgnore(int page, int size, string status, string type)
         {
             var query = _context.Reports
-                    .IgnoreQueryFilters().Where(r => r.GroupId == null);
+                    .Where(r => r.GroupId == null);
 
             if(type != "ALL")
             {
@@ -147,20 +148,15 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
             var totalCount = await query.CountAsync();
 
-            var reports =  await query
-                //.IgnoreQueryFilters()
-                .Include(r => r.TargetGroup)
-                .Include(r => r.TargetComment)
-                    .ThenInclude(r => r.User)
-                    //.IgnoreQueryFilters()
-                .Include(r => r.TargetPost)
-                    .ThenInclude(r => r.User)
-                    //.IgnoreQueryFilters()
-                .Include(r => r.TargetUser)
-                    //.IgnoreQueryFilters()
-                .Include(r => r.Reporter)
-                //.Where(r=>r.IsDeleted==false)
-                .ToListAsync();
+            var reports = await query
+             .Include(r => r.TargetGroup)
+             .Include(r => r.TargetComment)
+                 .ThenInclude(c => c.User) 
+             .Include(r => r.TargetPost)
+                 .ThenInclude(p => p.User)  
+             .Include(r => r.TargetUser)
+             .Include(r => r.Reporter)
+            .ToListAsync();
 
             return (reports, totalCount);
         }

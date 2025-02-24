@@ -14,6 +14,7 @@ import NotificationSkeleton from '../skeletons/NotificationSkeleton'
 import { ReportResource } from '../../types/report'
 import { useElementInfinityScroll } from '../../hooks/useElementInfinityScroll'
 import reportService from '../../services/reportService'
+import { ReportType } from '../../enums/report-type'
 
 type NotificationDialogProps = {
     notifications: NotificationResource[]
@@ -226,7 +227,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         <p className='text-sm text-gray-600'>
                             <strong>Chúng tôi đã xem xét báo cáo của bạn và xin thông báo:</strong>
                         </p>
-                        {/* <p className='text-sm text-gray-600'>
+                        <p className='text-sm text-gray-600'>
                             {(() => {
                                 switch (getReport?.reportType) {
                                     case ReportType.USER:
@@ -281,7 +282,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                                         return <strong>Báo cáo của bạn đã được xử lý.</strong>
                                 }
                             })()}
-                        </p> */}
+                        </p>
 
                         <p className='text-sm text-gray-600'>
                             <strong>📌 Kết quả xử lý: </strong>

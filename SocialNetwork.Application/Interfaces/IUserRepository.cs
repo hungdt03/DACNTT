@@ -11,6 +11,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<List<User>> GetAllUsers();
         Task<List<User>> GetAllRoleUser();
         Task<List<User>> GetAllRoleAdmin();
+        Task<(List<User> Users, int TotalCount)> GetAllRoleAdmin(int page, int size, string search);
         Task<(List<User> Users, int TotalCount)> GetAllRoleUser(int page, int size, string search);
         Task DeleteUser(string id); 
         Task DeleteAllUser();

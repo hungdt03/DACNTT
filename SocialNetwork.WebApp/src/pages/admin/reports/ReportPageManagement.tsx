@@ -1,8 +1,8 @@
-import { Table, TableProps, Space, Dropdown, Tag, Button, Avatar, Modal, message } from "antd";
+import { Table, TableProps, Space, Dropdown, Tag, Button, Avatar, Modal, message, Popconfirm } from "antd";
 import { FC, useEffect, useState } from "react";
 import { PostResource } from "../../../types/post";
 import { REPORT_STATUSES, REPORT_TYPES, ReportStatusKey, ReportTypeKey } from "../../../utils/filter";
-import { Eye, Filter } from "lucide-react";
+import { Eye, Filter, Trash } from "lucide-react";
 import adminService from "../../../services/adminService";
 import { Pagination } from "../../../types/response";
 import { inititalValues } from "../../../utils/pagination";
@@ -56,38 +56,38 @@ const ReportPageManagement: FC = () => {
         fetchReports(1, pagination.size)
     }, [status, type]);
 
-    // const handleDeletePost = async (postId: string) => {
-    //     const response = await adminService.DeleteOnePost(postId);
-    //     if (response.isSuccess) {
-    //         message.success(response.message);
-    //         fetchReports(pagination.page, pagination.size, filter)
-    //     } else {
-    //         message.error(response.message)
-    //     }
-    // }
+    const handleDeleteReport = async (reportId: string) => {
+        const response = await adminService.DeleteOneReport(reportId);
+        if (response.isSuccess) {
+            message.success(response.message);
+            fetchReports(pagination.page, pagination.size)
+        } else {
+            message.error(response.message)
+        }
+    }
 
-    // const handleDeleteMany = async (postIds: string[]) => {
-    //     const response = await adminService.DeleteManyPost(postIds);
-    //     if (response.isSuccess) {
-    //         message.success(response.message);
-    //         setSelectedRowKeys([])
-    //         fetchReports(1, 6, filter)
-    //     } else {
-    //         message.error(response.message)
-    //     }
-    // }
+    const handleDeleteMany = async (reportIds: string[]) => {
+        const response = await adminService.DeleteManyReport(reportIds);
+        if (response.isSuccess) {
+            message.success(response.message);
+            setSelectedRowKeys([])
+            fetchReports(1, 6)
+        } else {
+            message.error(response.message)
+        }
+    }
 
 
 
-    // const handleDeleteAll = async () => {
-    //     const response = await adminService.DeleteAllPost();
-    //     if (response.isSuccess) {
-    //         message.success(response.message);
-    //         fetchPosts(1, 6, filter)
-    //     } else {
-    //         message.error(response.message)
-    //     }
-    // }
+    const handleDeleteAll = async () => {
+        const response = await adminService.DeleteAllReport();
+        if (response.isSuccess) {
+            message.success(response.message);
+            fetchReports(1, 6)
+        } else {
+            message.error(response.message)
+        }
+    }
 
     const columns: TableProps<ReportResource>['columns'] = [
         {
@@ -125,7 +125,7 @@ const ReportPageManagement: FC = () => {
                 if (value === 'RESOLVED')
                     return <Tag color="cyan">Đã xử lí</Tag>
                 if (value === 'REJECTED')
-                    return <Tag color="red">Đã từ chối</Tag>
+                    return <Tag color="lime">Giữ nguyên nội dung</Tag>
             }
         },
         {
@@ -142,6 +142,7 @@ const ReportPageManagement: FC = () => {
                     <Button
                         onClick={() => {
                             setReport(record)
+                            console.log(record)
                             showModal()
                         }}
                         className="!bg-green-500"
@@ -151,12 +152,9 @@ const ReportPageManagement: FC = () => {
                     >
                         Chi tiết
                     </Button>
-                    {/* <Popconfirm onConfirm={() => { }} okText='Chắc chắn' cancelText='Hủy bỏ' title='Xóa' description='Bạn có chắc là muốn xóa bài viết này'>
-                        <Button icon={<CheckCheck size={14} />} type="primary" size="small">Xử lí</Button>
+                    <Popconfirm onConfirm={() => handleDeleteReport(record.id)} okText='Chắc chắn' cancelText='Hủy bỏ' title='Xóa' description='Bạn có chắc là muốn xóa báo cáo này'>
+                        <Button icon={<Trash size={14} />} danger type="primary" size="small">Xóa</Button>
                     </Popconfirm>
-                    <Popconfirm onConfirm={() => { }} okText='Chắc chắn' cancelText='Hủy bỏ' title='Xóa' description='Bạn có chắc là muốn xóa bài viết này'>
-                        <Button icon={<Trash size={14} />} danger type="primary" size="small">Từ chối</Button>
-                    </Popconfirm> */}
                 </Space>
             ),
         },
@@ -168,7 +166,7 @@ const ReportPageManagement: FC = () => {
         setSelectedRowKeys(newSelectedRowKeys);
     };
 
-    const rowSelection: TableRowSelection<PostResource> = {
+    const rowSelection: TableRowSelection<ReportResource> = {
         selectedRowKeys,
         onChange: onSelectChange,
     };
@@ -184,6 +182,7 @@ const ReportPageManagement: FC = () => {
         if(response.isSuccess) {
             message.success(response.message);
             handleOk()
+            fetchReports(pagination.page, pagination.size)
         } else {
             message.error(response.message)
         }
@@ -240,7 +239,7 @@ const ReportPageManagement: FC = () => {
             <div className="flex items-center justify-between">
                 <span className="text-[15px]">{hasSelected ? `Đã chọn ${selectedRowKeys.length} dòng` : null}</span>
 
-                {/* <div className="flex items-center gap-x-2">
+                <div className="flex items-center gap-x-2">
                     <Popconfirm
                         title={`Xóa ${selectedRowKeys.length} dòng`}
                         description={`Bạn có chắc là muốn xóa ${selectedRowKeys.length} bài viết đã chọn không`}
@@ -250,7 +249,7 @@ const ReportPageManagement: FC = () => {
                     >
                         {selectedRowKeys.length > 0 && <Button type="primary" danger>Xóa {selectedRowKeys.length} dòng đã chọn</Button>}
                     </Popconfirm>
-                    <Popconfirm
+                    {reports.length > 1 && <Popconfirm
                         title={`Xóa tất cả bài viết`}
                         description={`Bạn có chắc là muốn xóa tất cả bài viết?`}
                         onConfirm={() => handleDeleteAll()}
@@ -258,9 +257,9 @@ const ReportPageManagement: FC = () => {
                         okText='Xóa'
                     >
                         <Button type="primary" danger>Xóa tất cả</Button>
-                    </Popconfirm>
+                    </Popconfirm>}
 
-                </div> */}
+                </div>
             </div>
             <Table
                 columns={columns}
@@ -277,7 +276,7 @@ const ReportPageManagement: FC = () => {
                         fetchReports(paginate.current, pagination.size)
                     }
                 }}
-            // rowSelection={rowSelection}
+                rowSelection={rowSelection}
             />
         </div>
 

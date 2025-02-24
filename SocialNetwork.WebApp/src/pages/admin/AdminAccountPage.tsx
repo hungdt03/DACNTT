@@ -1,20 +1,20 @@
 import { Table, TableProps, Space, Button, Popconfirm, message, Avatar } from "antd";
 import { FC, useEffect, useState } from "react";
 import { Eye, Lock, Search, Trash, Unlock } from "lucide-react";
-import adminService from "../../../services/adminService";
-import { Pagination } from "../../../types/response";
-import { inititalValues } from "../../../utils/pagination";
-import { Link } from "react-router-dom";
-import { UserResource } from "../../../types/user";
-import useDebounce from "../../../hooks/useDebounce";
-import { formatDateStandard } from "../../../utils/date";
-import AddAccountDialog from "../../../components/dialogs/AddAccountDialog";
+import adminService from "../../services/adminService";
+import { Pagination } from "../../types/response";
+import { inititalValues } from "../../utils/pagination";
+import { UserResource } from "../../types/user";
+import useDebounce from "../../hooks/useDebounce";
+import AddAccountDialog from "../../components/dialogs/AddAccountDialog";
 import { PlusOutlined } from '@ant-design/icons'
-import { Role } from "../../../enums/role";
+import { Role } from "../../enums/role";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../../features/slices/auth-slice";
 
 
-const UserPageManagement: FC = () => {
-
+const AdminAccountPage: FC = () => {
+    const { user } = useSelector(selectAuth)
     const [users, setUsers] = useState<UserResource[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState('');
@@ -29,7 +29,7 @@ const UserPageManagement: FC = () => {
 
     const fetchUsers = async (page: number, size: number, search: string) => {
         setLoading(true)
-        const response = await adminService.getAllUser(page, size, search);
+        const response = await adminService.getAllAdmins(page, size, search);
         setLoading(false)
         if (response.isSuccess) {
             setPagination(response.pagination)
@@ -88,25 +88,10 @@ const UserPageManagement: FC = () => {
             key: 'email'
         },
         {
-            title: 'Ngày sinh',
-            dataIndex: 'dateOfBirth',
-            key: 'dateOfBirth',
-            render: (value) => formatDateStandard(new Date(value)) === '01/01/1' ? 'Chưa cập nhật' : formatDateStandard(new Date(value))
-        },
-        {
-            title: 'Ngày tham gia',
-            dataIndex: 'dateJoined',
-            key: 'dateJoined',
-            render: (value) => formatDateStandard(new Date(value))
-        },
-        {
             title: 'Thao tác',
             key: 'action',
             render: (_, record) => (
-                <Space size="middle">
-                    <Link to={`/admin/users/${record.id}`}>
-                        <Button type="primary" size="small" icon={<Eye size={14} />}>Chi tiết</Button>
-                    </Link>
+                user?.id !== record.id && <Space size="middle">
                     {record.isLock ? <Popconfirm onConfirm={() => handleToggleLockAccount(record.id)} okText='Chắc chắn' cancelText='Hủy bỏ' title='Mở khỏa' description='Bạn có chắc là muốn mở khóa tài khoản này'>
                         <Button className="!bg-green-500" icon={<Unlock size={14} />} danger type="primary" size="small">Mở khóa</Button>
                     </Popconfirm> : <Popconfirm onConfirm={() => handleToggleLockAccount(record.id)} okText='Chắc chắn' cancelText='Hủy bỏ' title='Khóa' description='Bạn có chắc là muốn khóa tài khoản này'>
@@ -161,12 +146,12 @@ const UserPageManagement: FC = () => {
             <AddAccountDialog
                 isVisible={isSignUpDialogOpen}
                 onClose={handleCloseSignUpDialog}
-                role={Role.USER}
-                title="THÊM TÀI KHOẢN NGƯỜI DÙNG"
+                title='THÊM TÀI KHOẢN QUẢN TRỊ VIÊN'
+                role={Role.ADMIN}
                 fetchUsers={() => fetchUsers(pagination.page, pagination.size, debouncedValue)}
             />
         </div>
     </div>
 };
 
-export default UserPageManagement;
+export default AdminAccountPage;

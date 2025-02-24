@@ -325,6 +325,8 @@ const GroupPostTabs: FC<GroupPostTabsProps> = ({
                 <RangePicker
                     onChange={handleChangeDate}
                     placeholder={["Từ ngày", "Đến ngày"]}
+                    variant="borderless"
+                    rootClassName="rounded-md bg-gray-100 hover:bg-gray-200"
                 />
 
                 <button onClick={handleClearFilter} className="flex-shrink-0 py-1 px-2 hover:bg-gray-200 rounded-md bg-gray-100 flex items-center gap-x-1">

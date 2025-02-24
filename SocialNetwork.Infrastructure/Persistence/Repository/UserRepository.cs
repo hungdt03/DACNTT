@@ -257,7 +257,34 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
 
         public async Task<int> CountOfflineUsersAsync()
         {
-            return await _context.Users.Where(u => u.IsOnline).CountAsync();
+            return await _context.Users.Where(u => !u.IsOnline).CountAsync();
+        }
+
+        public async Task<(List<User> Users, int TotalCount)> GetAllRoleAdmin(int page, int size, string search)
+        {
+            var userRoleId = await _context.Roles
+               .Where(r => r.Name == "ADMIN")
+               .Select(r => r.Id)
+               .FirstOrDefaultAsync();
+
+            var query = _context.Users
+                .Where(u => u.FullName.ToLower().Contains(search))
+                .Where(u => _context.UserRoles
+                    .Any(ur => ur.UserId == u.Id && ur.RoleId == userRoleId))
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+
+            var users = await query
+                 .Skip((page - 1) * size)
+                .Take(size)
+                .Include(u => u.Location)
+                .Include(u => u.HomeTown)
+                .Include(u => u.Followers)
+                .Include(u => u.Followings)
+                .ToListAsync();
+
+            return (users, totalCount);
         }
     }
 }

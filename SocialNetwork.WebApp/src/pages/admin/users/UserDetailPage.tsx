@@ -13,12 +13,15 @@ import UserFolloweeTabs from "./UserFolloweeTabs";
 import UserPostTabs from "./UserPostTabs";
 
 const UserDetailPage: FC = () => {
-    const [user, setUser] = useState<UserResource>()
+    const [user, setUser] = useState<UserResource>();
+    const [loading, setLoading] = useState(false)
     const { userId } = useParams();
 
     const fetchUser = async () => {
         if (userId) {
+            setLoading(true)
             const response = await adminService.getUserById(userId);
+            setLoading(false)
             if (response.isSuccess) {
                 setUser(response.data)
             }
@@ -29,7 +32,7 @@ const UserDetailPage: FC = () => {
         fetchUser()
     }, [userId])
 
-    return <div className="grid grid-cols-12 gap-4">
+    return loading ? <LoadingIndicator title="Đang tải dữ liệu người dùng" /> : <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12">
             <div className="grid grid-cols-4 gap-4">
                 <div className="px-4 py-8 rounded-md bg-white shadow flex items-center justify-between">
@@ -116,7 +119,6 @@ const UserDetailPage: FC = () => {
                 ]}
             />
         </div>
-
     </div>
 };
 

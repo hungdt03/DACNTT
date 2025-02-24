@@ -24,8 +24,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
         }
         public async Task<BaseResponse> Handle(GetRegistrationStatsByYearsQuery request, CancellationToken cancellationToken)
         {
-            var years = await unitOfWork.UserRepository.GetRegistrationStatsByYear(request.year)
-               ?? throw new AppException("Không có năm nào");
+            var years = await unitOfWork.UserRepository.GetRegistrationStatsByYear(request.year);
 
             return new DataResponse<List<MonthlyRegistrationStatsResponse>>()
             {

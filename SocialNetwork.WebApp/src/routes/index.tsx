@@ -51,6 +51,7 @@ import UserPageManagement from '../pages/admin/users/UserPageManagement'
 import UserDetailPage from '../pages/admin/users/UserDetailPage'
 import ReportPageManagement from '../pages/admin/reports/ReportPageManagement'
 import AdminStatisticsPage from '../pages/admin/statistics/AdminStatisticsPage'
+import AdminAccountPage from '../pages/admin/AdminAccountPage'
 
 const appRouter = createBrowserRouter([
     {
@@ -92,6 +93,10 @@ const appRouter = createBrowserRouter([
             {
                 path: 'users',
                 element: <UserPageManagement />,
+            },
+            {
+                path: 'accounts',
+                element: <AdminAccountPage />,
             },
             {
                 path: 'users/:userId',

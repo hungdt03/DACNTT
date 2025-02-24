@@ -2,10 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Configuration;
+using SocialNetwork.Application.DTOs.Admin;
+using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
 using SocialNetwork.Infrastructure.DBContext;
+using SocialNetwork.Application.Mappers;
 
 namespace SocialNetwork.Infrastructure.Persistence.Repository
 {
@@ -855,6 +858,35 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return (posts, totalCount);
         }
 
-      
+        public async Task<List<TrendingPost>> GetTopTrendingPosts(DateTimeOffset? from, DateTimeOffset? to)
+        {
+            var queryable = _context.Posts
+                .Include(p => p.User).AsQueryable();
+
+            if(from != null)
+            {
+                queryable = queryable.Where(p => p.DateCreated >= from);
+            } 
+
+            if(to != null)
+            {
+                queryable = queryable.Where(p => p.DateCreated <= to);
+            }
+
+            var trendingPosts = await queryable
+                .Select(p => new TrendingPost
+                {
+                    Post = ApplicationMapper.MapToPost(p),
+                    Reactions = _context.Reactions.Count(r => r.PostId == p.Id),
+                    Comments = _context.Comments.Count(c => c.PostId == p.Id),
+                    Shares = _context.Posts.Count(s => s.OriginalPostId == p.Id)
+                })
+                .OrderByDescending(tp => tp.Reactions + tp.Comments + tp.Shares)
+                .Take(5)
+                .ToListAsync();
+
+            return trendingPosts;
+        }
+
     }
 }

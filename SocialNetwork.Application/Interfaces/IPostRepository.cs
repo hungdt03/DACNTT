@@ -1,4 +1,5 @@
-﻿using SocialNetwork.Domain.Entity.PostInfo;
+﻿using SocialNetwork.Application.DTOs.Admin;
+using SocialNetwork.Domain.Entity.PostInfo;
 
 namespace SocialNetwork.Application.Interfaces
 {
@@ -34,5 +35,6 @@ namespace SocialNetwork.Application.Interfaces
         Task DeleteManyPost(List<string> listPostId);
         Task DeleteAllPost();
         Task<int> CountAllPost();
+        Task<List<TrendingPost>> GetTopTrendingPosts(DateTimeOffset? from, DateTimeOffset? to);
     }
 }

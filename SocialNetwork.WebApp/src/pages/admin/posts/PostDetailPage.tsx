@@ -7,13 +7,14 @@ import { PostCommentList } from "../../../components/comments/admin/PostCommentL
 import { CommentResource } from "../../../types/comment";
 import commentService from "../../../services/commentService";
 import { Pagination } from "../../../types/response";
-import { Empty, Flex, Progress } from "antd";
+import { Progress } from "antd";
 import { ReactionResource } from "../../../types/reaction";
 import reactionService from "../../../services/reactionService";
 import { ReactionType } from "../../../enums/reaction";
 import { svgReaction } from "../../../assets/svg";
 import { PostType } from "../../../enums/post-type";
 import PostGroup from "../../../components/posts/PostGroup";
+import LoadingIndicator from "../../../components/LoadingIndicator";
 
 export const getReactionPercentages = (reactions?: ReactionResource[]) => {
     if (!reactions?.length) return { total: 0, data: [] };
@@ -40,6 +41,7 @@ const PostDetailPage: FC = () => {
     const [post, setPost] = useState<PostResource>();
     const [comments, setComments] = useState<CommentResource[]>([]);
     const [loading, setLoading] = useState(false);
+    const [postLoading, setPostLoading] = useState(false)
 
     const [reactions, setReactions] = useState<ReactionResource[]>();
 
@@ -61,7 +63,9 @@ const PostDetailPage: FC = () => {
 
     const fetchPost = async () => {
         if (postId) {
+            setPostLoading(true)
             const response = await postService.getPostById(postId);
+            setPostLoading(false)
             if (response.isSuccess) {
                 setPost(response.data)
             }
@@ -114,7 +118,7 @@ const PostDetailPage: FC = () => {
 
     const { total, data } = getReactionPercentages(reactions);
 
-    return <div className="grid grid-cols-2 h-full overflow-hidden gap-4">
+    return postLoading ? <LoadingIndicator title="Đang tải dữ liệu bài viết" /> : <div className="grid grid-cols-2 h-full overflow-hidden gap-4">
         <div className="flex flex-col gap-y-4 h-full overflow-y-auto custom-scrollbar">
             {post?.isGroupPost ? post && <PostGroup post={post} /> : post && <PostItem post={post} />}
 
