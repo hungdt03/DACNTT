@@ -1,16 +1,9 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { ReportResource } from "../../../types/report";
 import ReportPostItem from "./ReportPostItem";
 import { Avatar, Button, Divider, Popconfirm, Tag } from "antd";
-import { formatDateStandard } from "../../../utils/date";
-import { PostResource } from "../../../types/post";
-import { GroupResource } from "../../../types/group";
-import { CommentResource } from "../../../types/comment";
-import groupService from "../../../services/groupService";
-import commentService from "../../../services/commentService";
-import { ReportType } from "../../../enums/report-type";
+import { formatDateStandard, formatDateTimeStandard } from "../../../utils/date";
 import ReportCommentItem from "./ReportCommentItem";
-import images from "../../../assets";
 import errors from "../../../assets/error";
 
 type ResolveReportModalProps = {
@@ -55,7 +48,7 @@ const ResolveReportModal: FC<ResolveReportModalProps> = ({
                     <Avatar size={'large'} src={report.reporter.avatar} />
                     <div className="flex flex-col">
                         <span className="font-bold">{report.reporter.fullName}</span>
-                        <span className="text-xs">Vào lúc {formatDateStandard(new Date(report.dateCreatedAt))}</span>
+                        <span className="text-xs">Vào lúc {formatDateTimeStandard(new Date(report.dateCreatedAt))}</span>
                     </div>
                 </div>
                 <span className="text-[15px] font-bold">Lí do báo cáo</span>

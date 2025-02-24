@@ -2,7 +2,6 @@
 using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.DTOs.Admin;
 using SocialNetwork.Application.DTOs.Score;
-using SocialNetwork.Application.Features.Admin.Commands;
 using SocialNetwork.Domain.Entity.ChatRoomInfo;
 using SocialNetwork.Domain.Entity.GroupInfo;
 using SocialNetwork.Domain.Entity.MessageInfo;
@@ -33,6 +32,7 @@ namespace SocialNetwork.Application.Mappers
                 IsShowStatus = true,
                 PhoneNumber = user.PhoneNumber,
                 IsLock = user.IsLock,
+                DateJoined = user.DateJoined,
             };
         }
         public static List<UserResponse> MapToListUser(List<User> users)

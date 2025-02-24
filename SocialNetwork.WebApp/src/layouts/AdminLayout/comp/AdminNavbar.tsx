@@ -54,6 +54,8 @@ const AdminNavbar: FC = () => {
                 setNotifications((prev) => [notification, ...prev])
             }
         )
+
+        return () => SignalRConnector.unsubscribeEvents()
     }, [])
 
     return <div className="flex items-center gap-x-4">

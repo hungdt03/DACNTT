@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { formatTime, formatVietnamDate } from "../../../utils/date";
 import { getPrivacyPost } from "../../../utils/post";
 import PostMedia from "../../posts/PostMedia";
+import PostNotFound from "../../posts/PostNotFound";
 
 type ReportPostItemProps = {
     post: PostResource
@@ -14,6 +15,8 @@ type ReportPostItemProps = {
 const ReportPostItem: FC<ReportPostItemProps> = ({
     post
 }) => {
+
+    if(post === null) return <PostNotFound />
     return <div className="flex flex-col gap-y-2">
         <div className="flex flex-col gap-y-2">
             <div className="flex items-center justify-between">

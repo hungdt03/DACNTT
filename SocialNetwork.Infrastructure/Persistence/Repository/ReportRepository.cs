@@ -156,6 +156,9 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                  .ThenInclude(p => p.User)  
              .Include(r => r.TargetUser)
              .Include(r => r.Reporter)
+             .OrderByDescending(r => r.DateCreated)
+             .Skip((page - 1) * size)
+             .Take(size)
             .ToListAsync();
 
             return (reports, totalCount);

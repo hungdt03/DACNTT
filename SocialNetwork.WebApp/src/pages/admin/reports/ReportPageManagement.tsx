@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { ReportResource } from "../../../types/report";
 import { ReportType } from "../../../enums/report-type";
-import { formatDateStandard } from "../../../utils/date";
+import { formatDateStandard, formatDateTimeStandard } from "../../../utils/date";
 import useModal from "../../../hooks/useModal";
 import ResolveReportModal from "../../../components/reports/admin/ResolveReportModal";
 
@@ -132,7 +132,7 @@ const ReportPageManagement: FC = () => {
             title: 'Gửi lúc',
             key: 'dateCreatedAt',
             dataIndex: 'dateCreatedAt',
-            render: (value) => formatDateStandard(new Date(value)),
+            render: (value) => formatDateTimeStandard(new Date(value)),
         },
         {
             title: 'Thao tác',
