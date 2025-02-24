@@ -21,7 +21,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
             {
           
                 IsSuccess = true,
-                Message = "các tài khoản thành công",
+                Message = "Cập nhật trạng thái các tài khoản thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
             };
         }

@@ -32,6 +32,7 @@ namespace SocialNetwork.Application.Mappers
                 IsShowStory = true,
                 IsShowStatus = true,
                 PhoneNumber = user.PhoneNumber,
+                IsLock = user.IsLock,
             };
         }
         public static List<UserResponse> MapToListUser(List<User> users)

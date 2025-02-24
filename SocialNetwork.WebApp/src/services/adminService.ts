@@ -5,7 +5,6 @@ import { PostResource } from "../types/post";
 import { ReportResource } from "../types/report";
 import { BaseResponse, DataResponse, PaginationResponse } from "../types/response";
 import { UserResource } from "../types/user";
-import { UserScoreResource } from "../types/userScore";
 import { PostQueryFilter } from '../pages/admin/posts/PostPageManagement';
 import { GroupMemberResource } from '../types/group-member';
 import { PostTabQueryFilter } from '../pages/admin/groups/GroupPostTabs';
@@ -14,7 +13,6 @@ import { UserPostTabQueryFilter } from '../pages/admin/users/UserPostTabs';
 import { UpdateReport } from '../pages/admin/reports/ReportPageManagement';
 import { StatisticResource } from '../types/statistic';
 import { TrendingPostResource } from '../types/trending-post';
-import { TopReactionResource } from '../types/top-reaction';
 
 
 class AdminService {

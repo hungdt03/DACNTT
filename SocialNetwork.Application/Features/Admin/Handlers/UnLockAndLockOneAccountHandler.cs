@@ -23,7 +23,7 @@ namespace SocialNetwork.Application.Features.Admin.Handlers
             return new BaseResponse()
             {
                 IsSuccess = true,
-                Message = "tài khoản thành công",
+                Message = "Cập nhật trạng thái tài khoản thành công",
                 StatusCode = System.Net.HttpStatusCode.OK,
             };
         }
