@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: socialnetwork-api
+    plan: free
+    dockerfilePath: ./SocialNetwork.API/Dockerfile
+    autoDeploy: true
+    runtime: docker
