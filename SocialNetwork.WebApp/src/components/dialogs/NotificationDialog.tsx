@@ -222,7 +222,6 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                         <span className='text-[16px] font-bold'>
                             Xin chào, <span className='text-blue-600'>{notification?.recipient?.fullName}</span>
                         </span>
-
                         {notification?.type === NotificationType.REPORT_RESPONSE_REPORTEE && <ReporteeResponse content={notification?.content ?? 'Nội dung của bạn đã vi phạm các quy tắc, chính sách của chúng tôi'} />}
                         {notification?.type === NotificationType.REPORT_RESPONSE_REPORTER && getReport && <ReporterResponse content={notification.content} />}
                     </div>

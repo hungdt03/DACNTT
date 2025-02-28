@@ -75,6 +75,8 @@ const Navbar: FC = () => {
                 setNotifications((prev) => [notification, ...prev])
             }
         )
+
+        return () => SignalRConnector.unsubscribeEvents()
     }, [])
 
     return <div className="flex items-center gap-x-2 md:gap-x-3 flex-shrink-0">
