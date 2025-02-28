@@ -264,7 +264,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                 </div>
             </div>
         </div>
-        <button onClick={handleCreatePost} disabled={!postRequest.content} className="sm:py-[8px] py-[3px] w-full rounded-md font-semibold text-sm sm:text-[16px] text-white bg-sky-500">Đăng</button>
+        <button onClick={handleCreatePost} disabled={!postRequest.content && postRequest.images.length === 0 && postRequest.videos.length === 0} className="sm:py-[8px] py-[3px] w-full rounded-md font-semibold text-sm sm:text-[16px] text-white bg-sky-500">Đăng</button>
 
     </div>
 };
