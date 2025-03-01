@@ -36,7 +36,7 @@ const FriendRequestsPage: FC = () => {
 
 
     useElementInfinityScroll({
-        elementId: "group-layout",
+        elementId: "friend-request-page",
         onLoadMore: fetchNext,
         isLoading: loading,
         hasMore: pagination.hasMore,
@@ -62,7 +62,7 @@ const FriendRequestsPage: FC = () => {
         }
     };
 
-    return <div className="w-full h-full p-4 overflow-y-auto">
+    return <div id="friend-request-page" className="w-full h-full p-4 overflow-y-auto">
         <div className="grid grid-cols-5 gap-4">
             {listFriendRequests.map(request => <RequestFriend onReject={() => handleRejectRequestFriend(request.id)} onAccept={() => handleAcceptFriendRequest(request.id)} key={request.id} request={request} />)}
         </div>

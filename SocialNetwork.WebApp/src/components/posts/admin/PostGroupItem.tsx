@@ -64,7 +64,7 @@ const PostItemGroup: FC<PostGroupItemProps> = ({
             <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-x-2">
                     <div className="relative">
-                        <img alt="Ảnh nhóm" className="w-10 hed-md object-cover" src={post.group?.coverImage ?? images.cover} />
+                        <img alt="Ảnh nhóm" className="w-10 h-10 aspect-square rounded-md object-cover" src={post.group?.coverImage ?? images.cover} />
                         <Avatar className="w-7 h-7 absolute -right-2 -bottom-2 border-[1px] border-gray-50" src={post.user.avatar ?? images.user} />
                         {(post.user.isOnline || post.user.id === user?.id) && <div className="absolute -bottom-2 -right-2 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                     </div>

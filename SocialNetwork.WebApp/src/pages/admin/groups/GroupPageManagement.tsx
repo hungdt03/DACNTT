@@ -155,14 +155,16 @@ const GroupPageManagement: FC = () => {
             dataIndex: 'members',
             key: 'members',
             render: (value: UserResource[]) => {
-                return <Avatar.Group>
-                    {value.slice(0, 3).map(item => (
-                        <Tooltip key={item.id} title={item.fullName}>
-                            <Avatar size="small" src={item.avatar} />
-                        </Tooltip>
-                    ))}
+                return <div className="flex items-center gap-x-2">
+                    <Avatar.Group>
+                        {value.slice(0, 3).map(item => (
+                            <Tooltip key={item.id} title={item.fullName}>
+                                <Avatar size="small" src={item.avatar} />
+                            </Tooltip>
+                        ))}
+                    </Avatar.Group>
                     {value.length > 3 && <span>và {value.length - 3} người khác</span>}
-                </Avatar.Group>
+                </div>
             }
         },
         {

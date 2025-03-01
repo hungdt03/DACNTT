@@ -109,24 +109,6 @@ export const PostCommentItem: React.FC<PostCommentItemProps> = ({
                             </p>
                         </div>
 
-                        <Popover
-                            content={
-                                <div className="flex flex-col items-start gap-y-2">
-                                    <button
-                                        onClick={() => onDeleteComment(comment.id)}
-                                        className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100"
-                                    >
-                                        Xóa bình luận
-                                    </button>
-
-                                </div>
-                            }
-                        >
-                            <button className="hidden group-hover:flex w-7 h-7 items-center justify-center rounded-full hover:bg-gray-100">
-                                <MoreHorizontal size={16} />
-                            </button>
-                        </Popover>
-
                     </div>
                     {comment.mediaType === MediaType.IMAGE && comment.mediaUrl && <Image preview={{
                         mask: 'Xem'

@@ -3,6 +3,7 @@ import { FriendRequestResource } from "../../types/friendRequest";
 import images from "../../assets";
 import { Button } from "antd";
 import { CheckOutlined } from '@ant-design/icons'
+import { Link } from "react-router-dom";
 
 type RequestFriendProps = {
     request: FriendRequestResource;
@@ -23,7 +24,7 @@ const RequestFriend: FC<RequestFriendProps> = ({
         </div>
 
         <div className="flex flex-col gap-y-2 p-4">
-            <span className="text-[16px] font-bold">{request.sender.fullName}</span>
+            <Link to={`/profile/${request.sender.id}`} className="text-[16px] font-bold line-clamp-1">{request.sender.fullName}</Link>
             <span className="text-sm text-gray-500">5 bạn chung</span>
             <button onClick={onReject} className="w-full text-center py-[5px] rounded-md bg-gray-100 hover:bg-gray-200">Gỡ lời mời</button>
             <Button onClick={onAccept} icon={<CheckOutlined />} type="primary">Chấp nhận</Button>

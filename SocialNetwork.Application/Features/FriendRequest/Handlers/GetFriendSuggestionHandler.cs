@@ -82,7 +82,7 @@ namespace SocialNetwork.Application.Features.FriendRequest.Handlers
                 {
                     Size = request.Size,
                     Page = request.Page,
-                    HasMore = request.Page * request.Size < suggestedUsers.Count
+                    HasMore = request.Page * request.Size < dictUsers.Count
                 }
             };
         }

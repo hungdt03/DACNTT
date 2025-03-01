@@ -39,6 +39,7 @@ const PostPageManagement: FC = () => {
         const response = await adminService.getAllPost(page, size, filter);
         setLoading(false)
         if (response.isSuccess) {
+            console.log(response)
             setPagination(response.pagination)
             if (page === 1) {
                 setPosts(response.data)

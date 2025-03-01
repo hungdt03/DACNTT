@@ -22,7 +22,6 @@ import { BlockResource } from "../../types/block";
 import userService from "../../services/userService";
 import LoadingIndicator from "../LoadingIndicator";
 import chatRoomService from "../../services/chatRoomService";
-import { FriendRequestResource } from "../../types/friendRequest";
 
 export type MessageRequest = {
     content: string;
@@ -172,8 +171,6 @@ const ChatPopup: FC<ChatPopupProps> = ({
 
                     setMessages((prevMessages) => {
                         const updatedMessages = [...prevMessages];
-
-
 
                         if (userId !== user?.id) {
                             const findIndex = updatedMessages.findIndex(msg => msg.reads?.some(t => t.userId === userId));

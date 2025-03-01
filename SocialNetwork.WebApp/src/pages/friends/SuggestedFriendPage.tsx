@@ -6,6 +6,7 @@ import SuggestedFriend from "../../components/friends/SuggestedFriend";
 import LoadingIndicator from "../../components/LoadingIndicator";
 import friendRequestService from "../../services/friendRequestService";
 import { message } from "antd";
+import { useElementInfinityScroll } from "../../hooks/useElementInfinityScroll";
 
 const SuggestedFriendPage: FC = () => {
     const [suggestFriends, setSuggestFriends] = useState<SuggestedFriendResource[]>([]);
@@ -30,14 +31,27 @@ const SuggestedFriendPage: FC = () => {
         fetchSuggestedFriends(pagination.page, pagination.size)
     }, []);
 
+
+    const fetchNext = () => {
+        if (!pagination.hasMore || loading) return;
+        fetchSuggestedFriends(pagination.page + 1, pagination.size);
+    }
+
+    useElementInfinityScroll({
+        elementId: "friend-suggestion-page",
+        onLoadMore: fetchNext,
+        isLoading: loading,
+        hasMore: pagination.hasMore,
+    });
+
     const handleAddFriend = async (userId: string) => {
         const response = await friendRequestService.createFriendRequest(userId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
             setSuggestFriends(prev => {
                 const updated = [...prev];
                 const findIndex = updated.findIndex(f => f.user.id === userId);
-                if(findIndex !== -1) updated[findIndex].isAdd = true;
+                if (findIndex !== -1) updated[findIndex].isAdd = true;
                 return updated;
             })
         } else {
@@ -47,12 +61,12 @@ const SuggestedFriendPage: FC = () => {
 
     const handleCancelRequest = async (userId: string) => {
         const response = await friendRequestService.cancelFriendRequestByUserId(userId);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             message.success(response.message);
             setSuggestFriends(prev => {
                 const updated = [...prev];
                 const findIndex = updated.findIndex(f => f.user.id === userId);
-                if(findIndex !== -1) updated[findIndex].isAdd = false;
+                if (findIndex !== -1) updated[findIndex].isAdd = false;
                 return updated;
             })
         } else {
@@ -60,13 +74,13 @@ const SuggestedFriendPage: FC = () => {
         }
     }
 
-    return <div className="w-full h-full p-4 overflow-y-auto">
+    return <div id="friend-suggestion-page" className="w-full h-full p-4 overflow-y-auto">
         <div className="grid grid-cols-5 gap-4">
             {suggestFriends.map(suggest => <SuggestedFriend onCancel={() => handleCancelRequest(suggest.user.id)} onAddFriend={() => handleAddFriend(suggest.user.id)} key={suggest.user.id} suggest={suggest} />)}
         </div>
         {loading && <LoadingIndicator />}
         {suggestFriends.length === 0 && !loading && <div className="flex items-center justify-center w-full h-full">
-            <p className="text-center text-gray-500">Không có gợi ý kết bạn phù hợp</p>    
+            <p className="text-center text-gray-500">Không có gợi ý kết bạn phù hợp</p>
         </div>}
     </div>
 };

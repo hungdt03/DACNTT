@@ -184,6 +184,7 @@ const FriendSuggestionsTab: FC<FriendSuggestionsTabProps> = ({
         const response = await friendService.getSuggestedFriends(1, 6);
         setLoading(false)
         if (response.isSuccess) {
+            console.log(response    )
             setHasNext(response.pagination.hasMore);
             setFriendSuggestions(response.data)
         }
