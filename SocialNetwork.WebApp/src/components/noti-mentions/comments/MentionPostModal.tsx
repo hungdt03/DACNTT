@@ -13,6 +13,7 @@ import postService from "../../../services/postService";
 import MentionPostInner from "./MentionPostInner";
 import { MentionCommentList } from "./MentionCommentList";
 import { CommentMentionPagination } from "../../../utils/pagination";
+import PostNotFound from "../../posts/PostNotFound";
 
 export type BoxCommendStateType = {
     fileList: UploadFile[];
@@ -294,6 +295,8 @@ const MentionPostModal: FC<MentionPostModalProps> = ({
             message.error(response.message)
         }
     }
+
+    if(!post) return <PostNotFound title="Bài viết không còn nữa" />
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md h-[550px] pb-10 overflow-y-auto custom-scrollbar">
         {post && <>

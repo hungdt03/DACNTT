@@ -29,7 +29,7 @@ class FriendRequestService {
     }
 
     cancelFriendRequestByUserId(userId: string): Promise<BaseResponse> {
-        return axiosInterceptor.put('/api/friend-requests/cancelled/user' + userId)
+        return axiosInterceptor.put('/api/friend-requests/cancelled/user/' + userId)
     }
 
     getFriendRequestByUserId(userId: string) : Promise<DataResponse<FriendRequestResource>> {

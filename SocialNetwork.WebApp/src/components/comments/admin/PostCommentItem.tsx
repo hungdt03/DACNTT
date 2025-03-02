@@ -3,13 +3,12 @@ import { CommentResource } from "../../../types/comment";
 import { Pagination } from "../../../types/response";
 import commentService from "../../../services/commentService";
 import images from "../../../assets";
-import { Avatar, Image, Popover } from "antd";
+import { Avatar, Image } from "antd";
 import cn from "../../../utils/cn";
 import { formatTime } from "../../../utils/date";
 import { MediaType } from "../../../enums/media";
 import { Link } from "react-router-dom";
 import CommentSkeleton from "../../skeletons/CommentSkeleton";
-import { MoreHorizontal } from "lucide-react";
 import { GroupResource } from "../../../types/group";
 import { PostResource } from "../../../types/post";
 import { NodeContent } from "../BoxReplyComment";
@@ -27,13 +26,13 @@ export const extractContentFromJSON = (commentJSON: string): JSX.Element => {
                                 key={index + item.id}
                                 to={`/profile/${item.id}`}
                                 style={{ fontWeight: 'bold' }}
-                                className="hover:text-black md:text-sm text-xs"
+                                className="hover:text-black md:text-[13px] text-xs"
                             >
                                 {item.content}
                             </Link>
                         );
                     } else {
-                        return <span className="md:text-sm text-xs" key={index + item.content}>{item.content || ' '}</span>;
+                        return <span className="md:text-[13px] text-xs" key={index + item.content}>{item.content || ' '}</span>;
                     }
                 })}
             </>
@@ -87,23 +86,20 @@ export const PostCommentItem: React.FC<PostCommentItemProps> = ({
 
     return (
         <div className={cn("relative flex flex-col pl-4", comment.parentCommentId !== null ? "gap-y-5" : "gap-y-3")}>
-            {comment.isHaveChildren && <div className={cn("absolute left-8 w-[2px] top-[28px] border-b-[2px] rounded-lg bg-gray-200", (comment?.replies?.length ?? 0) === 0 ? 'bottom-8' : 'bottom-16')}></div>}
             {/* Comment nội dung */}
             <div className="relative flex items-start gap-x-2">
-                {comment.parentCommentId && (
-                    <div className="absolute -left-[24px] w-7 top-[0px] h-[20px] bg-transparent border-b-[2px] border-l-[2px] rounded-bl-lg border-gray-200"></div>
-                )}
+              
                 <div className="relative">
                     {!comment.user.haveStory
-                        ? <Avatar className="flex-shrink-0 w-[25px] h-[25px] md:w-[32px] md:h-[32px]" src={comment.user.avatar ?? images.user} />
-                        : <Link className="p-[1px] border-[2px] inline-block border-primary rounded-full" to={`/stories/${comment.user.id}`}><Avatar className="flex-shrink-0 w-[24px] h-[24px] md:w-[30px] md:h-[30px]" src={comment.user.avatar ?? images.user} /> </Link>
+                        ? <Avatar className="flex-shrink-0 w-[22px] h-[22px] md:w-[28px] md:h-[28px]" src={comment.user.avatar ?? images.user} />
+                        : <Link className="p-[1px] border-[2px] inline-block border-primary rounded-full" to={`/stories/${comment.user.id}`}><Avatar className="flex-shrink-0 w-[22px] h-[22px] md:w-[28px] md:h-[28px]" src={comment.user.avatar ?? images.user} /> </Link>
                     }
                     {comment.user.isShowStatus && comment.user.isOnline && <div className="absolute -bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                 </div>
                 <div className="flex flex-col gap-y-2">
                     <div className="flex items-center gap-x-2 group">
-                        <div className={cn("py-2 rounded-2xl flex flex-col items-start", comment.content ? 'bg-gray-100 px-4' : '-mt-1')}>
-                            <Link to={`/profile/${comment.user.id}`} className="hover:text-black font-semibold text-xs md:text-sm">{comment?.user?.fullName}</Link>
+                        <div className={cn("py-[6px] rounded-md flex flex-col items-start", comment.content ? 'bg-gray-100 px-3' : '-mt-1')}>
+                            <Link to={`/profile/${comment.user.id}`} className="hover:text-black font-semibold text-xs md:text-[13px]">{comment?.user?.fullName}</Link>
                             <p className="text-left overflow-hidden break-words break-all">
                                 {extractContentFromJSON(comment.content)}
                             </p>
@@ -130,12 +126,9 @@ export const PostCommentItem: React.FC<PostCommentItemProps> = ({
                     </div>
                 </div>
 
-                {/* LINE */}
-                {isReplying && !comment.isHaveChildren && level < 3 && <div className="absolute left-4 w-[66px] top-[31px] h-full bg-transparent border-l-[2px] border-gray-200"></div>}
             </div>
 
             {comment.isHaveChildren && (comment?.replies?.length ?? 0) === 0 && <>
-                <div className={cn("absolute left-8 border-gray-200 border-l-[2px] border-b-[2px] w-6 h-1/2", comment.parentCommentId ? "bottom-[26px] rounded-bl-lg" : "bottom-[19px] rounded-bl-xl")}></div>
                 <button onClick={() => {
                     setIsReplying(true)
                     handleFetchReplies(comment.id, pagination.page, pagination.size)

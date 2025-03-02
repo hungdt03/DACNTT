@@ -245,7 +245,7 @@ const Post: FC<PostProps> = ({
 
     const handleRevokeTag = async () => {
         const response = await postService.revokeTag(post.id);
-        if(response.isSuccess) {
+        if (response.isSuccess) {
             fetchPostById()
             message.success(response.message)
         } else {
@@ -253,7 +253,7 @@ const Post: FC<PostProps> = ({
         }
     }
 
-    if(post === null) return <PostNotFound />
+    if (post === null) return <PostNotFound />
 
     return <div className="flex flex-col gap-y-2 p-4 bg-white rounded-md shadow">
         <div className="flex items-center justify-between">
@@ -286,8 +286,14 @@ const Post: FC<PostProps> = ({
                                             </Link>
                                         ))}
                                         <Tooltip title={<PostOtherTags tags={remainingTags} />}>
-                                            {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
+                                            {remainingTagsCount > 0 && (
+                                                <>
+                                                    {" và "}
+                                                    <span className="font-bold hover:underline hover:text-gray-600 text-sm">{`${remainingTagsCount} người khác`}</span>
+                                                </>
+                                            )}
                                         </Tooltip>
+
                                     </>
                                 );
                             })()}

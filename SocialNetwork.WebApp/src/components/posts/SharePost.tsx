@@ -257,8 +257,13 @@ const SharePost: FC<SharePostProps> = ({
                                         ))}
                                         {remainingTagsCount > 0 && (
                                             <Tooltip title={<PostOtherTags tags={remainingTags} />}>
-                                                <span> và {remainingTagsCount} người khác</span>
-                                            </Tooltip>
+                                            {remainingTagsCount > 0 && (
+                                                <>
+                                                    {" và "}
+                                                    <span className="font-bold hover:underline hover:text-gray-600 text-sm">{`${remainingTagsCount} người khác`}</span>
+                                                </>
+                                            )}
+                                        </Tooltip>
                                         )}
                                     </>
                                 );

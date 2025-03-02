@@ -193,6 +193,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                 >
                     {(
                         notification?.type === NotificationType.COMMENTED_ON_POST ||
+                        notification?.type === NotificationType.COMMENT_MENTION ||
                         notification?.type === NotificationType.REPLIED_TO_COMMENT ||
                         notification?.type === NotificationType.ASSIGN_POST_TAG ||
                         (notification?.type === NotificationType.POST_REACTION && notification.postId))

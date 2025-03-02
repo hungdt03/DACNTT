@@ -120,19 +120,19 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
     return <div className="flex items-center gap-x-2">
         <div className="flex-shrink-0 -mb-2">
             <Upload {...props}>
-                <div className="p-1 rounded-full bg-gray-400 hover:bg-gray-500 cursor-pointer">
-                    <CameraIcon className="text-white" size={16} strokeWidth={2} />
+                <div className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
+                    <CameraIcon className="text-black" size={16} strokeWidth={2} />
                 </div>
             </Upload>
         </div>
 
         <Popover content={<Picker onEmojiSelect={handleEmojiSelect} theme='light' data={data} />} trigger={'click'}>
-            <button className="p-1 rounded-full bg-gray-200 hover:bg-gray-300 cursor-pointer">
+            <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 cursor-pointer">
                 <Laugh size={16} />
             </button>
         </Popover>
 
-        <div className={cn("bg-gray-100 px-1 rounded-3xl w-full overflow-hidden", state.files.length ? 'py-2' : 'py-[2px]')}>
+        <div className={cn("bg-gray-100 px-1 rounded-md w-full overflow-hidden", state.files.length ? 'py-1' : 'py-[7px]')}>
             <div className={cn("flex flex-col items-start overflow-x-hidden", state.files.length > 0 && 'gap-y-1')}>
                 <div className="w-full overflow-x-auto custom-scrollbar">
                     {state.files.length > 0 && (
@@ -172,15 +172,15 @@ const BoxSendMessage: FC<BoxSendMessageProps> = ({
 
                 </div>
                 <div className="flex items-center justify-between w-full">
-
                     <input onFocus={onFocus} value={state.content} onChange={e => handleContentChange(e.target.value)} className="text-sm px-2 flex-1 outline-none border-none bg-gray-100" placeholder="Nhập tin nhắn" />
-                    <button disabled={!state.content.trim() && state.files.length === 0} onClick={handleSubmit} className="flex-shrink-0 w-8 h-8 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
-                        <SendHorizonal size={18} className="text-sky-500" />
-                    </button>
+
                 </div>
             </div>
 
         </div>
+        <button disabled={!state.content.trim() && state.files.length === 0} onClick={handleSubmit} className="flex-shrink-0 w-8 h-8 flex items-center justify-center p-1 rounded-md bg-primary text-white">
+            <SendHorizonal size={18} className="text-white" />
+        </button>
     </div>
 };
 

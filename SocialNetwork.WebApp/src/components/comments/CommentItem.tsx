@@ -30,13 +30,13 @@ export const extractContentFromJSON = (commentJSON: string): JSX.Element => {
                                 key={index + item.id}
                                 to={`/profile/${item.id}`}
                                 style={{ fontWeight: 'bold' }}
-                                className="hover:text-black md:text-sm text-xs"
+                                className="hover:text-black md:text-[13px] text-xs"
                             >
                                 {item.content}
                             </Link>
                         );
                     } else {
-                        return <span className="md:text-sm text-xs" key={index + item.content}>{item.content || ' '}</span>;
+                        return <span className="md:text-[13px] text-xs" key={index + item.content}>{item.content || ' '}</span>;
                     }
                 })}
             </>
@@ -110,15 +110,15 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                 )}
                 <div className="relative">
                     {!comment.user.haveStory
-                        ? <Avatar className="flex-shrink-0 w-[25px] h-[25px] md:w-[32px] md:h-[32px]" src={comment.user.avatar ?? images.user} />
-                        : <Link className="p-[1px] border-[2px] inline-block border-primary rounded-full" to={`/stories/${comment.user.id}`}><Avatar className="flex-shrink-0 w-[24px] h-[24px] md:w-[30px] md:h-[30px]" src={comment.user.avatar ?? images.user} /> </Link>
+                        ? <Avatar className="flex-shrink-0 w-[22px] h-[22px] md:w-[28px] md:h-[28px]" src={comment.user.avatar ?? images.user} />
+                        : <Link className="p-[1px] border-[2px] inline-block border-primary rounded-full" to={`/stories/${comment.user.id}`}><Avatar className="flex-shrink-0 w-[22px] h-[22px] md:w-[28px] md:h-[28px]" src={comment.user.avatar ?? images.user} /> </Link>
                     }
                     {comment.user.isShowStatus && comment.user.isOnline && <div className="absolute -bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>}
                 </div>
                 <div className="flex flex-col gap-y-2">
                     <div className="flex items-center gap-x-2 group">
-                        <div className={cn("py-2 rounded-2xl flex flex-col items-start", comment.content ? 'bg-gray-100 px-4' : '-mt-1')}>
-                            <Link to={`/profile/${comment.user.id}`} className="hover:text-black font-semibold text-xs md:text-sm">{comment?.user?.fullName}</Link>
+                        <div className={cn("py-[6px] rounded-md flex flex-col items-start", comment.content ? 'bg-gray-100 px-3' : '-mt-1')}>
+                            <Link to={`/profile/${comment.user.id}`} className="hover:text-black font-bold text-xs md:text-[13px]">{comment?.user?.fullName}</Link>
                             <p className="text-left overflow-hidden break-words break-all">
                                 {extractContentFromJSON(comment.content)}
                             </p>

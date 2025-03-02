@@ -109,17 +109,17 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
             const isValidFile = (file: UploadFile) => {
                 return isValidImage(file.originFileObj as File) || isValidVideo(file.originFileObj as File);
             };
-    
+
             const totalSize = info.fileList.reduce((acc, file) => acc + (file.originFileObj as File).size, 0);
             const invalidFile = info.fileList.find(file => !isValidFile(file));
-    
+
             if (invalidFile) {
                 message.error('Vui lòng chọn tệp ảnh hoặc video hợp lệ!');
                 return;
             } else if (totalSize > COMMENT_MAX_SIZE_IN_BYTES) {
                 message.error('Vui lòng chọn tệp có kích thước từ 10MB trở xuống!');
                 return;
-            } 
+            }
 
             setFileList(info.fileList)
         },
@@ -256,7 +256,7 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
                 <Avatar size='small' className="flex-shrink-0" src={user?.avatar ?? images.user} />
                 <div className="absolute -bottom-1 -right-1 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
             </div>
-            <div className={cn("relative bg-gray-100 px-1 rounded-xl w-full flex items-center justify-between py-[2px]")}>
+            <div className={cn("relative bg-gray-100 px-1 rounded-md w-full flex items-center justify-between py-[1px]")}>
                 {initialEditorState && <LexicalComposer initialConfig={{
                     ...editorConfig,
                     editorState: initialEditorState
@@ -288,19 +288,18 @@ const BoxReplyComment: FC<BoxReplyCommentProps> = ({
                     </div>
                 )}
 
-                <div className="flex items-center gap-x-2 py-1 px-1">
-                    {fileList.length === 0 && <button className="-mb-2">
-                        <Upload {...props}>
-                            <div className="p-1 rounded-full bg-gray-400">
-                                <CameraIcon className="text-white" size={16} strokeWidth={2} />
-                            </div>
-                        </Upload>
-                    </button>}
-                    <button disabled={content.trim().length === 0 && fileList.length === 0} onClick={handleSubmit} className="w-7 h-7 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
-                        <SendHorizonal size={18} className="text-sky-500" />
-                    </button>
-                </div>
             </div>
+
+            {fileList.length === 0 && <button className="-mb-2 flex-shrink-0">
+                <Upload {...props}>
+                    <div className="p-3 rounded-md bg-gray-200">
+                        <CameraIcon className="text-gray-600" size={16} strokeWidth={2} />
+                    </div>
+                </Upload>
+            </button>}
+            <button disabled={content.trim().length === 0 && fileList.length === 0} onClick={handleSubmit} className="flex-shrink-0 w-10 h-10 flex items-center justify-center p-2 rounded-md bg-primary">
+                <SendHorizonal size={18} className="text-white" />
+            </button>
         </div>
 
         {fileList.length > 0 && <div className="w-full flex items-center gap-x-2 px-8 py-1">

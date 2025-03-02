@@ -10,6 +10,7 @@ import reportService from "../../../services/reportService";
 import { message, Modal } from "antd";
 import useModal from "../../../hooks/useModal";
 import ReportPostModal from "../../modals/reports/ReportPostModal";
+import { toast } from "react-toastify";
 
 type MentionCommentListProps = {
     post: PostResource;
@@ -51,6 +52,8 @@ export const MentionCommentList: React.FC<MentionCommentListProps> = ({
             if (commentElement) {
                 commentElement.scrollIntoView({ behavior: 'smooth' });
                 observer.disconnect(); // Ngừng theo dõi sau khi đã scroll
+            } else {
+                toast.warning('Bình luận không còn nữa')
             }
         });
 

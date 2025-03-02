@@ -1,7 +1,7 @@
 import { Avatar, Image, message, Upload, UploadFile, UploadProps } from "antd";
 import { FC, useEffect, useRef, useState } from "react";
 import { CloseOutlined } from '@ant-design/icons'
-import { CameraIcon,SendHorizonal } from "lucide-react";
+import { CameraIcon, SendHorizonal } from "lucide-react";
 import cn from "../../utils/cn";
 import images from "../../assets";
 import { useSelector } from "react-redux";
@@ -227,53 +227,66 @@ const BoxSendComment: FC<BoxSendCommentProps> = ({
                 <div className="absolute -bottom-1 right-0 p-1 rounded-full border-[2px] border-white bg-green-500"></div>
             </div>
 
-            <div className={cn("bg-gray-100 px-1 rounded-xl w-full flex items-center justify-between sm:py-[2px]")}>
+            <div className="flex items-center gap-x-2 flex-1">
+                <div className={cn("bg-gray-100 px-1 rounded-md w-full flex items-center justify-between sm:py-[2px]")}>
 
-                {initialEditorState &&
-                    <LexicalComposer initialConfig={{
-                        ...editorConfig,
-                        editorState: initialEditorState
-                    }}>
-                        <div className="w-full relative">
-                            <RichTextPlugin
-                                contentEditable={<ContentEditable
-                                    className="w-full min-h-[30px] border-none outline-none px-4 z-0"
-                                />}
-                                placeholder={
-                                    <p className="text-xs md:text-sm line-clamp-1 text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
-                                        Nhập bình luận...
-                                    </p>
-                                }
-                                ErrorBoundary={LexicalErrorBoundary}
-                            />
-                            <OnChangePlugin onChange={onChange} />
-                            <HistoryPlugin />
+                    {initialEditorState &&
+                        <LexicalComposer initialConfig={{
+                            ...editorConfig,
+                            editorState: initialEditorState
+                        }}>
+                            <div className="w-full relative">
+                                <RichTextPlugin
+                                    contentEditable={<ContentEditable
+                                        className="w-full min-h-[30px] border-none outline-none px-4 z-0"
+                                    />}
+                                    placeholder={
+                                        <p className="text-xs md:text-sm line-clamp-1 text-gray-400 absolute top-1/2 left-4 -translate-y-1/2 z-10 pointer-events-none">
+                                            Nhập bình luận...
+                                        </p>
+                                    }
+                                    ErrorBoundary={LexicalErrorBoundary}
+                                />
+                                <OnChangePlugin onChange={onChange} />
+                                <HistoryPlugin />
+                            </div>
+                        </LexicalComposer>}
+
+                    {isMentioning && suggestedFriends.length > 0 && (
+                        <div className="absolute bottom-full z-10 bg-white border p-2 rounded-md shadow-lg mt-1">
+                            {suggestedFriends.map((friend) => (
+                                <div onClick={() => handleSelectFriend(friend)} key={friend.id} className="flex items-center gap-2 p-1 cursor-pointer hover:bg-gray-200">
+                                    <Avatar src={friend.avatar} size="small" />
+                                    <span>{friend.fullName}</span>
+                                </div>
+                            ))}
                         </div>
-                    </LexicalComposer>}
-
-                {isMentioning && suggestedFriends.length > 0 && (
-                    <div className="absolute bottom-full z-10 bg-white border p-2 rounded-md shadow-lg mt-1">
-                        {suggestedFriends.map((friend) => (
-                            <div onClick={() => handleSelectFriend(friend)} key={friend.id} className="flex items-center gap-2 p-1 cursor-pointer hover:bg-gray-200">
-                                <Avatar src={friend.avatar} size="small" />
-                                <span>{friend.fullName}</span>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                <div className="flex items-center gap-x-2 py-1 px-1">
-                    {fileList.length === 0 && <button className="-mb-2">
-                        <Upload {...props}>
-                            <div className="p-1 rounded-full bg-gray-400">
-                                <CameraIcon className="text-white" size={16} strokeWidth={2} />
-                            </div>
-                        </Upload>
-                    </button>}
-                    <button disabled={!content.trim() && fileList.length === 0} onClick={handleSubmit} className="w-7 h-7 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
-                        <SendHorizonal size={18} className="text-sky-500" />
-                    </button>
-                </div>
+                    )}
+                    {/* <div className="flex items-center gap-x-2 py-1 px-1">
+    {fileList.length === 0 && <button className="-mb-2">
+        <Upload {...props}>
+            <div className="p-1 rounded-full bg-gray-400">
+                <CameraIcon className="text-white" size={16} strokeWidth={2} />
             </div>
+        </Upload>
+    </button>}
+    <button disabled={!content.trim() && fileList.length === 0} onClick={handleSubmit} className="w-7 h-7 flex items-center justify-center p-1 rounded-full hover:bg-sky-100">
+        <SendHorizonal size={18} className="text-sky-500" />
+    </button>
+</div> */}
+                </div>
+                {fileList.length === 0 && <button className="-mb-2 flex-shrink-0">
+                    <Upload {...props}>
+                        <div className="p-3 rounded-md bg-gray-200">
+                            <CameraIcon className="text-gray-600" size={16} strokeWidth={2} />
+                        </div>
+                    </Upload>
+                </button>}
+                <button disabled={content.trim().length === 0 && fileList.length === 0} onClick={handleSubmit} className="flex-shrink-0 w-10 h-10 flex items-center justify-center p-2 rounded-md bg-primary">
+                    <SendHorizonal size={18} className="text-white" />
+                </button>
+            </div>
+
         </div>
 
         {fileList.length > 0 && <div className="w-full flex items-center gap-x-2 px-8 py-1">

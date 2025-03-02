@@ -11,6 +11,7 @@ import { toast } from 'react-toastify'
 import notificationService from '../services/notificationService'
 import groupService from '../services/groupService'
 import notis from '../assets/noti'
+import { getNotificationIcon } from '../utils/noti-icon'
 
 type NotificationMoreActionProps = {
     onMarkAsRead?: () => void
@@ -187,7 +188,8 @@ const Notification: FC<NotificationProps> = ({
     const handleSelectNotification = () => {
         if (
             notification.type === NotificationType.COMMENTED_ON_POST ||
-            notification.type === NotificationType.REPLIED_TO_COMMENT
+            notification.type === NotificationType.REPLIED_TO_COMMENT ||
+            notification.type === NotificationType.COMMENT_MENTION
         ) {
             onCommentNotification()
         } else if (notification.type === NotificationType.POST_SHARED) {
@@ -240,36 +242,10 @@ const Notification: FC<NotificationProps> = ({
                     src={notification.imageUrl ?? images.user}
                 />
                 <img
-                    className='absolute -right-[6px] -bottom-[4px] w-6 h-6'
-                    src={
-                        notification.type.includes('COMMENT')
-                            ? notis.commentNoti
-                            : notification.type === NotificationType.FRIEND_REQUEST_ACCEPTED ||
-                                notification.type === NotificationType.FRIEND_REQUEST_SENT
-                                ? notis.userNoti
-                                : notification.type === NotificationType.JOIN_GROUP_REQUEST ||
-                                    notification.type === NotificationType.APPROVAL_GROUP_INVITATION ||
-                                    notification.type === NotificationType.APPROVAL_JOIN_GROUP_REQUEST ||
-                                    notification.type === NotificationType.INVITE_JOIN_GROUP
-                                    ? images.group
-                                    : notification.type === NotificationType.POST_SHARED
-                                        ? notis.notiShare
-                                        : notification.type === NotificationType.VIEW_STORY
-                                            ? notis.viewStory
-                                            : notification.type === NotificationType.REACT_STORY ||
-                                                notification.type === NotificationType.POST_REACTION
-                                                ? notis.notiReaction
-                                                : notification.type === NotificationType.ASSIGN_POST_TAG
-                                                    ? notis.notiTag
-                                                    :
-                                                    (notification.type === NotificationType.REPORT_RESPONSE_REPORTEE
-                                                        || notification.type === NotificationType.REPORT_RESPONSE_REPORTER)
-                                                        ? notis.notiReport
-                                                        : notification.type === NotificationType.APPROVAL_POST
-                                                            ? notis.notiApproval
-                                                            : notis.notiBell
-                    }
+                    className="absolute -right-[6px] -bottom-[4px] w-6 h-6"
+                    src={getNotificationIcon(notification.type as NotificationType)}
                 />
+
             </div>
             <div className='flex flex-col gap-y-3 items-start'>
                 <div className='flex flex-col items-start'>
