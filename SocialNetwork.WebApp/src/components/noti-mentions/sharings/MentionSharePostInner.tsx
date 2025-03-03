@@ -183,6 +183,7 @@ const MentionSharePostInnner: FC<MentionSharePostInnnerProps> = ({
                 </div>
             </div>
             <Popover className="flex-shrink-0" content={<PostMoreAction
+                post={post}
                 isMine={user?.id === post.user.id}
                 onEditPost={showEditPostModal}
             />}>

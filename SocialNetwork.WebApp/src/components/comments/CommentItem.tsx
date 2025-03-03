@@ -147,7 +147,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                                         </button>
                                     )}
 
-                                    {!group?.isMine && user?.id !== post.user.id && (
+                                    {group && !group?.isMine && user?.id !== post.user.id && (
                                         <>
                                             <button
                                                 onClick={onReportComment}

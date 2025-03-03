@@ -265,7 +265,12 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
                                             </Link>
                                         ))}
                                         <Tooltip title={<PostOtherTags tags={remainingTags} />}>
-                                            {remainingTagsCount > 0 && ` và ${remainingTagsCount} người khác`}
+                                            {remainingTagsCount > 0 && (
+                                                <>
+                                                    {" và "}
+                                                    <span className="font-bold hover:underline hover:text-gray-600 text-sm">{`${remainingTagsCount} người khác`}</span>
+                                                </>
+                                            )}
                                         </Tooltip>
                                     </>
                                 );
@@ -275,11 +280,12 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
                         <Tooltip title={formatVietnamDate(new Date(post.createdAt))}>
                             <span className="text-[11px] md:text-xs md:font-semibold text-gray-400 hover:underline transition-all ease-linear duration-75">{formatTime(new Date(post.createdAt))}</span>
                         </Tooltip>
-                         <button onClick={post.isGroupPost || post.user.id !== user?.id ? undefined : showPrivacy}>{getPrivacyPost(post.privacy)}</button>
+                        <button onClick={post.isGroupPost || post.user.id !== user?.id ? undefined : showPrivacy}>{getPrivacyPost(post.privacy)}</button>
                     </div>
                 </div>
             </div>
             <Popover className="flex-shrink-0" content={<PostMoreAction
+                post={post}
                 onEditPost={showEditPostModal}
                 onDeletePost={handleDeletePost}
                 onReportPost={showReport}
@@ -385,7 +391,7 @@ const MentionPostInner: FC<MentionPostInnerProps> = ({
             <ListSharePostModal post={post} />
         </Modal>
 
-        
+
         {/* MODAL CHANGE PRIVACY*/}
         <Modal
             title={<p className="text-center sm:font-bold font-semibold text-sm sm:text-lg">Chọn đối tượng</p>}

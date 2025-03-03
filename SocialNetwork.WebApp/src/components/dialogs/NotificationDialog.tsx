@@ -14,7 +14,6 @@ import NotificationSkeleton from '../skeletons/NotificationSkeleton'
 import { ReportResource } from '../../types/report'
 import { useElementInfinityScroll } from '../../hooks/useElementInfinityScroll'
 import reportService from '../../services/reportService'
-import { ReportType } from '../../enums/report-type'
 
 type NotificationDialogProps = {
     notifications: NotificationResource[]

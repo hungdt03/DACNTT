@@ -63,7 +63,7 @@ const FriendRequestsPage: FC = () => {
     };
 
     return <div id="friend-request-page" className="w-full h-full p-4 overflow-y-auto">
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid lg:grid-cols-5 md:grid-cols-3 grid-cols-2 gap-4">
             {listFriendRequests.map(request => <RequestFriend onReject={() => handleRejectRequestFriend(request.id)} onAccept={() => handleAcceptFriendRequest(request.id)} key={request.id} request={request} />)}
         </div>
         {loading && <LoadingIndicator />}

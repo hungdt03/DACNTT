@@ -1,0 +1,26 @@
+﻿# Bỏ qua thư mục bin và obj (không cần thiết khi build)
+bin/
+obj/
+
+# Bỏ qua thư mục .vs của Visual Studio
+.vs/
+
+# Bỏ qua thư mục chứa thư viện được tải về
+packages/
+node_modules/
+
+# Bỏ qua file cấu hình môi trường local
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Bỏ qua file thư viện hệ thống
+*.mdf
+*.ldf
+
+# Bỏ qua file log
+*.log
+logs/
+
+# Bỏ qua file xuất bản của Visual Studio
+publish/

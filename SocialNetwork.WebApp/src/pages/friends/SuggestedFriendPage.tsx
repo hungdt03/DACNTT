@@ -75,7 +75,7 @@ const SuggestedFriendPage: FC = () => {
     }
 
     return <div id="friend-suggestion-page" className="w-full h-full p-4 overflow-y-auto">
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid lg:grid-cols-5 md:grid-cols-3 grid-cols-2 gap-4">
             {suggestFriends.map(suggest => <SuggestedFriend onCancel={() => handleCancelRequest(suggest.user.id)} onAddFriend={() => handleAddFriend(suggest.user.id)} key={suggest.user.id} suggest={suggest} />)}
         </div>
         {loading && <LoadingIndicator />}

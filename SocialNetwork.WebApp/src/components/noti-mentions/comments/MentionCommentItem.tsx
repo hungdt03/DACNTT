@@ -169,7 +169,7 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
                                             </button>
                                         )}
 
-                                        {!group?.isMine && user?.id !== post.user.id && (
+                                        {group && !group?.isMine && user?.id !== post.user.id && (
                                             <>
                                                 <button
                                                     onClick={onReportComment}
