@@ -51,6 +51,13 @@ namespace SocialNetwork.Application.Features.Group.Handlers
                 group.OnlyAdminCanPost = false;
             } else
             {
+                var groupPosts = await _unitOfWork.PostRepository
+                    .GetAllPostsByGroupIdAsync(group.Id);
+                groupPosts.ForEach(p =>
+                {
+                    p.Privacy = PrivacyConstant.GROUP_PRIVATE;
+                });
+
                 group.RequireApproval = request.Group.IsApprovalMember;
                 group.RequirePostApproval = request.Group.IsApprovalPost;
                 group.OnlyAdminCanApprovalMember = request.Group.OnlyAdminCanApprovalMember;

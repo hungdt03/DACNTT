@@ -10,8 +10,6 @@ import reportService from "../../../services/reportService";
 import { message, Modal } from "antd";
 import useModal from "../../../hooks/useModal";
 import ReportPostModal from "../../modals/reports/ReportPostModal";
-import { toast } from "react-toastify";
-import commentService from "../../../services/commentService";
 
 type MentionCommentListProps = {
     post: PostResource;
@@ -46,6 +44,7 @@ export const MentionCommentList: React.FC<MentionCommentListProps> = ({
     const { handleCancel, handleOk, isModalOpen, showModal } = useModal();
     const { handleCancel: cancelAdmin, handleOk: okAdmin, isModalOpen: openAdmin, showModal: showAdmin } = useModal();
     const [commentId, setCommentId] = useState<string>();
+    const [type, setType] = useState('ADMIN')
 
     useEffect(() => {
         const observer = new MutationObserver(() => {
@@ -66,10 +65,12 @@ export const MentionCommentList: React.FC<MentionCommentListProps> = ({
 
 
     const handleReportComment = async (commentId: string, reason: string) => {
-        const response = await reportService.reportComment(commentId, reason, group?.id);
+        const response = await reportService.reportComment(commentId, reason, type === 'ADMIN' ? undefined : group?.id);
         if (response.isSuccess) {
-            message.success(response.message)
-            handleOk()
+            message.success(response.message);
+            if(type === 'ADMIN')
+                handleOk()
+            else okAdmin()
             setReason('')
         } else {
             message.error(response.message)
@@ -94,9 +95,12 @@ export const MentionCommentList: React.FC<MentionCommentListProps> = ({
                     replyComment={replyComment}
                     activeCommentId={activeCommentId}
                     onDeleteComment={onDeleteComment}
-                    onReportComment={() => {
-                        setCommentId(comment.id)
-                        showAdmin()
+                    onReportComment={(commentId, type) => {
+                        setCommentId(commentId)
+                        setType(type)
+                        if(type === 'GROUP')
+                            showAdmin()
+                        else showModal()
                     }}
                 />
             ))}

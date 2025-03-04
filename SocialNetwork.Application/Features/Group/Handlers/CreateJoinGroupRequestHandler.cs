@@ -96,6 +96,14 @@ namespace SocialNetwork.Application.Features.Group.Handlers
             }
             else
             {
+                var inviteJoinGroup = await _unitOfWork.GroupInvitationRepository
+                    .GetGroupInvitationByInviteeIdAndGroupIdAsync(userId, group.Id);
+
+                if(inviteJoinGroup != null)
+                {
+                    _unitOfWork.GroupInvitationRepository.RemoveGroupInvitation(inviteJoinGroup);
+                }
+
                 var newGroupMember = new GroupMember()
                 {
                     GroupId = request.GroupId,

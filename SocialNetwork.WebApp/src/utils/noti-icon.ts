@@ -3,7 +3,9 @@ import notis from "../assets/noti";
 import { NotificationType } from "../enums/notification-type";
 
 export const getNotificationIcon = (notificationType: NotificationType) => {
-    if (notificationType.includes('COMMENT')) return notis.commentNoti;
+    if (notificationType === NotificationType.COMMENTED_ON_POST ||
+        notificationType === NotificationType.COMMENT_MENTION ||
+        notificationType === NotificationType.REPLIED_TO_COMMENT) return notis.commentNoti;
 
     const userNotiTypes = [
         NotificationType.FRIEND_REQUEST_ACCEPTED,
@@ -17,6 +19,7 @@ export const getNotificationIcon = (notificationType: NotificationType) => {
         NotificationType.APPROVAL_JOIN_GROUP_REQUEST,
         NotificationType.INVITE_JOIN_GROUP,
     ];
+
     if (groupNotiTypes.includes(notificationType)) return images.group;
 
     if (notificationType === NotificationType.POST_SHARED) return notis.notiShare;
@@ -27,6 +30,7 @@ export const getNotificationIcon = (notificationType: NotificationType) => {
         NotificationType.POST_REACTION,
     ];
     if (reactionNotiTypes.includes(notificationType)) return notis.notiReaction;
+    if (notificationType.includes('REPORT_GROUP')) return notis.notiReport;
 
     if (notificationType === NotificationType.ASSIGN_POST_TAG) return notis.notiTag;
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CommentResource } from "../../types/comment";
 import { Pagination } from "../../types/response";
 import commentService from "../../services/commentService";
@@ -16,6 +16,9 @@ import { GroupResource } from "../../types/group";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../features/slices/auth-slice";
 import { PostResource } from "../../types/post";
+import { GroupMemberResource } from "../../types/group-member";
+import groupService from "../../services/groupService";
+import { MemberRole } from "../../enums/member-role";
 
 export const extractContentFromJSON = (commentJSON: string): JSX.Element => {
     try {
@@ -58,7 +61,7 @@ type CommentItemProps = {
     updatedComments: (commentId: string, fetchedReplies: CommentResource[]) => void;
     replyComment: (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void;
     onDeleteComment: (commentId: string) => void
-    onReportComment: () => void
+    onReportComment: (commentId: string, type: 'GROUP' | 'ADMIN') => void
 }
 
 export const CommentItem: React.FC<CommentItemProps> = ({
@@ -77,6 +80,8 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     const [replyToUser, setReplyToUser] = useState<UserResource>(comment.user);
     const [content, setContent] = useState<string>('');
     const [loading, setLoading] = useState(false);
+    const [commentOwner, setCommentOwner] = useState<GroupMemberResource>()
+
     const { user } = useSelector(selectAuth)
 
     const [pagination, setPagination] = useState<Pagination>({
@@ -99,6 +104,19 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     const handleReplyComment = (values: BoxReplyCommentType, parentCommentId: string | null) => {
         replyComment(values, parentCommentId, replyToUser?.id, level);
     }
+
+    const fetchCommentOwner = async () => {
+        if (group) {
+            const response = await groupService.getGroupMemberByGroupIdAndUserId(group.id, comment.user.id);
+            if (response.isSuccess) {
+                setCommentOwner(response.data)
+            }
+        }
+    }
+
+    useEffect(() => {
+        fetchCommentOwner()
+    }, [])
 
     return (
         <div className={cn("relative flex flex-col pl-4", comment.parentCommentId !== null ? "gap-y-5" : "gap-y-3")}>
@@ -138,25 +156,25 @@ export const CommentItem: React.FC<CommentItemProps> = ({
                                     )}
 
                                     {/* Kiểm tra điều kiện để hiển thị các tùy chọn báo cáo */}
-                                    {!group && user?.id !== post.user.id && (
+                                    {!group && user?.id !== post.user.id && comment.user.id !== user?.id && (
                                         <button
-                                            onClick={onReportComment}
+                                            onClick={() => onReportComment(comment.id, 'ADMIN')}
                                             className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100"
                                         >
                                             Báo cáo bình luận
                                         </button>
                                     )}
 
-                                    {group && !group?.isMine && user?.id !== post.user.id && (
+                                    {group && !group.isMine && user?.id !== post.user.id && comment.user.id !== user?.id && (
                                         <>
-                                            <button
-                                                onClick={onReportComment}
+                                            {commentOwner && commentOwner.role !== MemberRole.ADMIN && <button
+                                                onClick={() => onReportComment(comment.id, 'GROUP')}
                                                 className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100"
                                             >
                                                 Báo cáo bình luận với quản trị viên nhóm
-                                            </button>
+                                            </button>}
                                             <button
-                                                onClick={onReportComment}
+                                                onClick={() => onReportComment(comment.id, 'ADMIN')}
                                                 className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100"
                                             >
                                                 Báo cáo bình luận

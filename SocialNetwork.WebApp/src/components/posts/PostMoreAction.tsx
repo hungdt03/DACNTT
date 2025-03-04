@@ -40,7 +40,7 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
 
     useEffect(() => {
         const fetchPostUser = async () => {
-            if (post.group.id) {
+            if (post.group) {
                 const response = await groupService.getGroupMemberByGroupIdAndUserId(post.group.id, post.user.id);
                 if (response.isSuccess) {
                     setPostUser(response.data)
@@ -71,19 +71,21 @@ export const PostMoreAction: FC<PostMoreActionProps> = ({
                 Lưu bài viết
             </button>}
 
-            {!isAdmin && isPostGroup && postUser?.role !== MemberRole.ADMIN ? <>
-                <button onClick={onReportPostGroup} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+            {!isAdmin && isPostGroup ? <>
+                {postUser?.role !== MemberRole.ADMIN && <button onClick={onReportPostGroup} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
                     <FlagOff size={17} className="text-gray-500" />
                     Báo cáo bài viết với quản trị viên nhóm
-                </button>
+                </button>}
                 <button onClick={onReportPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
                     <Flag size={17} className="text-gray-500" />
                     Báo cáo bài viết
                 </button>
-            </> : !isPostGroup && <button onClick={onReportPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
-                <Flag size={17} className="text-gray-500" />
-                Báo cáo bài viết
-            </button>}
+
+            </>
+                : !isPostGroup && <button onClick={onReportPost} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+                    <Flag size={17} className="text-gray-500" />
+                    Báo cáo bài viết
+                </button>}
 
             {isHasTag && <button onClick={onRevokeTag} className="w-full flex items-center gap-x-2 py-2 text-left px-2 rounded-md hover:bg-gray-100 cursor-pointer">
                 <Tags size={17} className="text-gray-500" />

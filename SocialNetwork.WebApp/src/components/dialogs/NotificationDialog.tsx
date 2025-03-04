@@ -110,6 +110,12 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
         handleMarkNotificationAsRead(notification.id)
         navigate(`/groups/${notification.groupId}`)
     }
+
+    const handleRedirectToGroupReportPage = async (notification: NotificationResource) => {
+        handleMarkNotificationAsRead(notification.id)
+        navigate(`/groups/${notification.groupId}/pending-reports`)
+    }
+
     const handleReportReceiverPage = async (notification: NotificationResource) => {
         handleMarkNotificationAsRead(notification.id)
         setNotification(notification)
@@ -145,6 +151,7 @@ const NotificationDialog: FC<NotificationDialogProps> = ({
                             onGroupNotification={() => handleRedirectToGroupPage(notifi)}
                             onReportResponseNotification={() => handleReportReceiverPage(notifi)}
                             onReportAdminNotification={() => handleRedirectToAdminReportPage(notifi)}
+                            onGroupReportNotification={() => handleRedirectToGroupReportPage(notifi)}
                         />
                     ))}
 

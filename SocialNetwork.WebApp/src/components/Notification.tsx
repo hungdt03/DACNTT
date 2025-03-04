@@ -54,7 +54,8 @@ type NotificationProps = {
     onPostReactionNotification: () => void
     onGroupNotification: () => void
     onReportResponseNotification: () => void
-    onReportAdminNotification: () => void
+    onReportAdminNotification: () => void;
+    onGroupReportNotification: () => void
 }
 
 const Notification: FC<NotificationProps> = ({
@@ -70,6 +71,7 @@ const Notification: FC<NotificationProps> = ({
     onGroupNotification,
     onReportResponseNotification,
     onReportAdminNotification,
+    onGroupReportNotification
 
 }) => {
     const [showMoreAction, setShowMoreAction] = useState(false)
@@ -224,6 +226,8 @@ const Notification: FC<NotificationProps> = ({
             notification.type === NotificationType.REPORT_GROUP
         ) {
             onReportAdminNotification()
+        } else if(notification.type.includes('REPORT_GROUP')) {
+            onGroupReportNotification()
         }
     }
 

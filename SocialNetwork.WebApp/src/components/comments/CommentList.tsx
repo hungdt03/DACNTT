@@ -11,6 +11,7 @@ import ReportPostModal from "../modals/reports/ReportPostModal";
 import reportService from "../../services/reportService";
 import { PostResource } from "../../types/post";
 
+
 type CommentListProps = {
     post: PostResource
     group?: GroupResource
@@ -41,13 +42,19 @@ export const CommentList: React.FC<CommentListProps> = ({
 
     const { handleCancel, handleOk, isModalOpen, showModal } = useModal();
     const { handleCancel: cancelAdmin, handleOk: okAdmin, isModalOpen: openAdmin, showModal: showAdmin } = useModal();
-    const [commentId, setCommentId] = useState<string>()
+    const [commentId, setCommentId] = useState<string>();
+    const [type, setType] = useState('ADMIN')
+  
 
     const handleReportComment = async (commentId: string, reason: string) => {
-        const response = await reportService.reportComment(commentId, reason, group?.id);
+        const response = await reportService.reportComment(commentId, reason, type === 'ADMIN' ? undefined : group?.id);
         if(response.isSuccess) {
             message.success(response.message)
-            handleOk()
+            if(type === 'ADMIN') {
+                handleOk()
+            } else {
+                okAdmin()
+            }
             setReason('')
         } else {
             message.error(response.message)
@@ -69,9 +76,16 @@ export const CommentList: React.FC<CommentListProps> = ({
                     updatedComments={updatedComments}
                     replyComment={replyComment}
                     onDeleteComment={onDeleteComment}
-                    onReportComment={() => {
-                        setCommentId(comment.id)
-                        showAdmin()
+                    onReportComment={(commentId, type) => {
+                        setType(type)
+                        if(type === 'ADMIN') {
+                            showModal()
+                        } else {
+                            showAdmin()
+                        }
+
+                        setCommentId(commentId)
+                        
                     }}
                 />
             ))}

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.DTOs.Admin;
-using SocialNetwork.Application.DTOs;
 using SocialNetwork.Application.Interfaces;
 using SocialNetwork.Domain.Constants;
 using SocialNetwork.Domain.Entity.PostInfo;
@@ -249,11 +248,13 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
                 .Include(p => p.Group)
                 .ThenInclude(p => p.Members)
                 .Where(p => p.Group != null
-                    && (
-                        (_context.GroupMembers
-                            .Where(m => m.UserId == userId && m.GroupId == p.GroupId.Value)
-                            .Any(m => m.Role != MemberRole.MEMBER)
-                        ) || !blockedUsers.Contains(p.UserId)
+                     && (
+                        (p.Group.Privacy != GroupPrivacy.PRIVATE ||
+                         _context.GroupMembers.Any(m => m.UserId == userId && m.GroupId == p.GroupId.Value))
+                        && (!blockedUsers.Contains(userId) ||
+                            _context.GroupMembers.Any(m => m.UserId == userId
+                                                           && m.GroupId == p.GroupId.Value
+                                                           && m.Role != MemberRole.MEMBER))
                     )
                     && p.ApprovalStatus == ApprovalStatus.APPROVED);
 
@@ -888,5 +889,10 @@ namespace SocialNetwork.Infrastructure.Persistence.Repository
             return trendingPosts;
         }
 
+        public async Task<List<Post>> GetAllPostsByGroupIdAsync(Guid groupId)
+        {
+            return await _context.Posts
+                .Where(p => p.GroupId == groupId).ToListAsync();
+        }
     }
 }

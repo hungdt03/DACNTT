@@ -14,8 +14,8 @@ const GroupRowItem: FC<GroupRowItemProps> = ({
         <img className="w-[45px] h-[45px] rounded-md border-[1px] border-gray-300 object-cover" src={group.coverImage ?? images.cover} />
 
         <div className="flex flex-col gap-y-1">
-            <span className="text-[14px] font-semibold">{group.name}</span>
-            <span className="text-xs text-gray-500">{group.description}</span>
+            <span className="text-[14px] font-semibold line-clamp-1">{group.name}</span>
+            <span className="text-xs text-gray-500 line-clamp-2">{group.description}</span>
         </div>
     </Link>
 };

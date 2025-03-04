@@ -33,7 +33,8 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             foreach (var post in allPosts)
             {
                 bool isMe = post.UserId == userId;
-              
+            
+
                 if (!isMe)
                 {
                     var friendShip = await unitOfWork.FriendShipRepository
@@ -71,6 +72,14 @@ namespace SocialNetwork.Application.Features.Post.Handlers
                 }
                 else
                 {
+                    if (post.IsGroupPost && post.Group != null && post.GroupId.HasValue)
+                    {
+                        var member = await unitOfWork.GroupMemberRepository
+                           .GetGroupMemberByGroupIdAndUserId(post.GroupId.Value, userId);
+
+                        if (member == null || post.ApprovalStatus != ApprovalStatus.APPROVED) continue;
+                    }
+                  
                     filteredPosts.Add(post);
                 }
             }

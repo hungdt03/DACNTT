@@ -14,6 +14,7 @@ namespace SocialNetwork.Application.Interfaces
         Task<int> CountSharePostsByUserIdAsync(string userId);
         Task<(List<Post> Posts, int TotalCount)> GetAllPostsByGroupIdAsync(Guid groupId, int page, int size);
         Task<(List<Post> Posts, int TotalCount)> GetAllPostsByGroupIdAsync(Guid groupId, int page, int size, string search, string authorId, string sortOrder, string contentType, DateTimeOffset? fromDate, DateTimeOffset? toDate);
+        Task<List<Post>> GetAllPostsByGroupIdAsync(Guid groupId);
         Task<(List<Post> Posts, int TotalCount)> GetAllGroupPostsByUserIdAsync(string userId, int page, int size);
         Task<(List<Post> Posts, int TotalCount)> GetAllMemberGroupPostsByGroupIdAsync(Guid groupId, string userId, int page, int size);
      

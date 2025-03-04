@@ -17,6 +17,9 @@ import { GroupResource } from "../../../types/group";
 import { MoreHorizontal } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectAuth } from "../../../features/slices/auth-slice";
+import { GroupMemberResource } from "../../../types/group-member";
+import groupService from "../../../services/groupService";
+import { MemberRole } from "../../../enums/member-role";
 
 type MentionCommentItemProps = {
     post: PostResource;
@@ -32,7 +35,7 @@ type MentionCommentItemProps = {
     updatedComments: (commentId: string, fetchedReplies: CommentResource[], isPrev: boolean) => void;
     replyComment: (values: BoxReplyCommentType, parentCommentId: string | null, replyToUserId: string | undefined, level: number) => void;
     onDeleteComment: (commentId: string) => void
-    onReportComment: () => void
+    onReportComment: (commentId: string, type: 'ADMIN' | 'GROUP') => void
 }
 
 export const MentionCommentItem: FC<MentionCommentItemProps> = (
@@ -55,7 +58,7 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
         const [isReplying, setIsReplying] = useState(false)
         const [replyToUser, setReplyToUser] = useState<UserResource>(comment.user);
         const [content, setContent] = useState<string>('')
-        const [expandLine, setExpandLine] = useState(false);
+        const [commentOwner, setCommentOwner] = useState<GroupMemberResource>()
 
         const { user } = useSelector(selectAuth)
 
@@ -117,7 +120,18 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
             if (comment.pagination) {
                 setPagination(comment.pagination)
             }
+
+            fetchPostOwner()
         }, [])
+
+        const fetchPostOwner = async () => {
+            if (group) {
+                const response = await groupService.getGroupMemberByGroupIdAndUserId(group.id, comment.user.id);
+                if (response.isSuccess) {
+                    setCommentOwner(response.data)
+                }
+            }
+        }
 
         return (
             <div className={cn("relative flex flex-col pl-4", comment.parentCommentId !== null ? "gap-y-5" : "gap-y-3")}>
@@ -134,10 +148,8 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
                         <div className="flex items-center gap-x-2 group">
                             <div className={cn(
                                 "py-[6px] rounded-md flex flex-col items-start",
-                                comment.id === activeCommentId
-                                    ? "bg-sky-100 px-3"
-                                    : comment.content
-                                        ? "bg-gray-100 px-3"
+                                comment.id === activeCommentId ? "bg-sky-100 px-3"
+                                    : comment.content ? "bg-gray-100 px-3"
                                         : "-mt-1"
                             )}>
                                 <Link to={`/profile/${comment.user.id}`} className="hover:text-black font-bold text-xs md:text-[13px]">{comment?.user?.fullName}</Link>
@@ -160,25 +172,25 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
                                         )}
 
                                         {/* Kiểm tra điều kiện để hiển thị các tùy chọn báo cáo */}
-                                        {!group && user?.id !== post.user.id && (
+                                        {!group && user?.id !== post.user.id && comment.user.id !== user?.id && (
                                             <button
-                                                onClick={onReportComment}
+                                                onClick={() => onReportComment(comment.id, 'ADMIN')}
                                                 className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100"
                                             >
                                                 Báo cáo bình luận
                                             </button>
                                         )}
 
-                                        {group && !group?.isMine && user?.id !== post.user.id && (
+                                        {comment.user.id !== user?.id && group && !group.isMine && user?.id !== post.user.id && (
                                             <>
-                                                <button
-                                                    onClick={onReportComment}
+                                                {commentOwner && commentOwner.role !== MemberRole.ADMIN && <button
+                                                    onClick={() => onReportComment(comment.id, 'GROUP')}
                                                     className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100"
                                                 >
                                                     Báo cáo bình luận với quản trị viên nhóm
-                                                </button>
+                                                </button>}
                                                 <button
-                                                    onClick={onReportComment}
+                                                    onClick={() => onReportComment(comment.id, 'ADMIN')}
                                                     className="w-full text-left px-2 py-[5px] rounded-md hover:bg-gray-100"
                                                 >
                                                     Báo cáo bình luận
@@ -267,10 +279,6 @@ export const MentionCommentItem: FC<MentionCommentItemProps> = (
                                 }}
                                 onExpandLine={(expandComment) => {
                                     console.log(expandComment)
-                                    const commentIndex = comment.replies.findIndex(cmt => cmt.id === expandComment.id);
-                                    if (commentIndex === comment.replies.length - 1) {
-                                        setExpandLine(true)
-                                    }
                                 }}
                             />
                         ))}
