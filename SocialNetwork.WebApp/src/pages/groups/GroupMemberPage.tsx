@@ -5,7 +5,6 @@ import { Pagination } from "../../types/response";
 import { inititalValues } from "../../utils/pagination";
 import groupService from "../../services/groupService";
 import GroupMember from "../../components/groups/components/GroupMember";
-import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import LoadingIndicator from "../../components/LoadingIndicator";
 import { Search } from "lucide-react";
 import { GroupResource } from "../../types/group";
@@ -15,6 +14,7 @@ import useModal from "../../hooks/useModal";
 import { MemberRole } from "../../enums/member-role";
 import Loading from "../../components/Loading";
 import useDebounce from "../../hooks/useDebounce";
+import { useElementInfinityScroll } from "../../hooks/useElementInfinityScroll";
 
 export const MEMBER_VALUES = [
     { key: "ALL", label: "Tất cả" },
@@ -40,14 +40,6 @@ const GroupMemberPage: FC = () => {
     const [groupLoading, setGroupLoading] = useState(false);
     const [role, setRole] = useState<RoleFilter>('ALL');
     const debouncedValue = useDebounce(searchValue, 300)
-
-    const { containerRef } = useInfiniteScroll({
-        fetchMore: () => void fetchMoreMembers(),
-        hasMore: pagination.hasMore,
-        loading: loading,
-        rootMargin: "50px",
-        triggerId: "members-scroll-trigger",
-    });
 
     const fetchGroup = async () => {
         if (id) {
@@ -82,10 +74,17 @@ const GroupMemberPage: FC = () => {
         }
     }
 
-    const fetchMoreMembers = async () => {
+    const fetchMoreMembers = () => {
         if (!pagination.hasMore || loading) return;
         fetchMembers(pagination.page + 1, pagination.size);
     };
+
+    useElementInfinityScroll({
+        elementId: "group-layout",
+        hasMore: pagination.hasMore,
+        isLoading: loading,
+        onLoadMore: fetchMoreMembers
+    })
 
     const handleKickMember = async (memberId: string) => {
         const response = await groupService.kickMember(memberId);
@@ -199,7 +198,7 @@ const GroupMemberPage: FC = () => {
         <div className="w-full flex items-center justify-center bg-white shadow sticky top-0 z-10">
             <div className="lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm mx-auto px-4 w-full py-3 flex flex-col gap-y-3">
                 <div className="flex items-center gap-x-2">
-                    <span className="text-xl font-bold">Tổng số thành viên</span>
+                    <span className="text-xl font-bold">Số thành viên đã tải</span>
                     <span className="w-1 h-1 rounded-full bg-gray-500"></span>
                     <span className="text-xl font-bold">{members.length}</span>
                 </div>
@@ -229,8 +228,8 @@ const GroupMemberPage: FC = () => {
             </div>
         </div>
 
-        <div className="w-full h-full lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm mx-auto py-6 px-2">
-            <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="w-full h-full overflow-y-auto custom-scrollbar lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm mx-auto py-6 px-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {!groupLoading && group && members.map(member => <GroupMember
                     group={group}
                     countMember={members.length}
@@ -248,8 +247,6 @@ const GroupMemberPage: FC = () => {
                     onRevokeRole={() => handleRevokeRole(member.id)}
                 />)}
             </div>
-
-            <div id="members-scroll-trigger" className="w-full h-1" />
             {!loading && members.length === 0 && <Empty description='Không có thành viên nào' />}
             {loading && (
                 <LoadingIndicator />

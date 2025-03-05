@@ -13,7 +13,6 @@ import reactionService from "../../../services/reactionService";
 import { ReactionType } from "../../../enums/reaction";
 import { svgReaction } from "../../../assets/svg";
 import { PostType } from "../../../enums/post-type";
-import PostGroup from "../../../components/posts/PostGroup";
 import LoadingIndicator from "../../../components/LoadingIndicator";
 import PostItemGroup from "../../../components/posts/admin/PostGroupItem";
 

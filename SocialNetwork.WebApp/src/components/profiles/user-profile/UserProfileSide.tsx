@@ -43,7 +43,7 @@ const UserProfileSide: FC<UserProfileSideProps> = ({
                                 {(friend.isOnline || friend.id === user?.id) && <div className="absolute bottom-0 -right-1 p-2 rounded-full border-[2px] border-white bg-green-500"></div>}
                             </div>
                             <span className="text-sm font-semibold line-clamp-1 leading-[2]">{friend.fullName}</span>
-                            {currentUser?.id !== friend.id && <span className="text-xs text-gray-400">{friend.mutualFriends} bạn chung</span>}
+                            <span className="text-xs text-gray-400">{friend.id === currentUser?.id ? 'Bạn' : `${friend.mutualFriends} bạn chung`}</span>
                         </Link>
                     ))}
                 </div>
