@@ -33,15 +33,7 @@ const GroupMembersTab: FC<GroupMembersTabProps> = ({
         const response = await adminService.getAllMembersByGroupId(groupId, page, size, searchValue, role);
         setLoading(false)
         if (response.isSuccess) {
-            if (page === 1) {
-                setMembers(response.data);
-            } else {
-                setMembers(prevMembers => {
-                    const existingIds = new Set(prevMembers.map(m => m.user.id));
-                    const newMembers = response.data.filter(m => !existingIds.has(m.user.id));
-                    return [...prevMembers, ...newMembers];
-                });
-            }
+            setMembers(response.data);
             setPagination(response.pagination)
         }
     }

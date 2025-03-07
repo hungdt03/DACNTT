@@ -40,16 +40,7 @@ const ReportPageManagement: FC = () => {
         setLoading(false)
         if (response.isSuccess) {
             setPagination(response.pagination)
-            if (page === 1) {
-                setReports(response.data)
-            } else {
-                setReports(prev => {
-                    const news = response.data.filter(report =>
-                        !prev.some(item => item.id === report.id)
-                    );
-                    return [...prev, ...news];
-                });
-            }
+            setReports(response.data)
         }
     }
 

@@ -97,16 +97,7 @@ const GroupPostTabs: FC<GroupPostTabsProps> = ({
         setLoading(false)
         if (response.isSuccess) {
             setPagination(response.pagination)
-            if (page === 1) {
-                setPosts(response.data)
-            } else {
-                setPosts(prev => {
-                    const newPosts = response.data.filter(newPost =>
-                        !prev.some(existingPost => existingPost.id === newPost.id)
-                    );
-                    return [...prev, ...newPosts];
-                });
-            }
+            setPosts(response.data);
         }
     }
 

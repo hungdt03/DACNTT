@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using SocialNetwork.Application.Configuration;
 using SocialNetwork.Application.Contracts.Responses;
 using SocialNetwork.Application.DTOs;
@@ -18,12 +19,14 @@ namespace SocialNetwork.Application.Features.Post.Handlers
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ISignalRService _signalRService;
+        private readonly UserManager<Domain.Entity.System.User> _userManager;
 
-        public DeletePostHandler(ISignalRService signalRService, IHttpContextAccessor contextAccessor, IUnitOfWork unitOfWork)
+        public DeletePostHandler(ISignalRService signalRService, UserManager<Domain.Entity.System.User> userManager, IHttpContextAccessor contextAccessor, IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             _signalRService = signalRService;
+            _userManager = userManager;
         }
 
         public async Task<BaseResponse> Handle(DeletePostCommand request, CancellationToken cancellationToken)
@@ -32,20 +35,28 @@ namespace SocialNetwork.Application.Features.Post.Handlers
             var post = await _unitOfWork.PostRepository.GetPostByIdAsync(request.PostId)
                 ?? throw new NotFoundException("Không tìm thấy bài viết");
 
-            if(post.GroupId != null)
+            var user = await _userManager.FindByIdAsync(userId)
+                ?? throw new AppException("Vui lòng đăng nhập lại");
+
+            var userRole = await _userManager.GetRolesAsync(user);
+
+            if(userRole[0] == "USER")
             {
-                var groupMember = await _unitOfWork.GroupMemberRepository
-                    .GetGroupMemberByGroupIdAndUserId(post.GroupId.Value, userId)
-                        ?? throw new AppException("Bạn không thể xóa bài viết này");
-
-                if(groupMember.Role != MemberRole.ADMIN && post.UserId != userId)
+                if (post.GroupId != null)
                 {
-                    throw new AppException("Bạn không thể xóa bài viết này");
-                }
-            }
+                    var groupMember = await _unitOfWork.GroupMemberRepository
+                        .GetGroupMemberByGroupIdAndUserId(post.GroupId.Value, userId)
+                            ?? throw new AppException("Bạn không thể xóa bài viết này");
 
-            if (userId != post.UserId)
-                throw new AppException("Không thể xóa bài viết");
+                    if (groupMember.Role != MemberRole.ADMIN && post.UserId != userId)
+                    {
+                        throw new AppException("Bạn không thể xóa bài viết này");
+                    }
+                }
+
+                if (userId != post.UserId)
+                    throw new AppException("Không thể xóa bài viết");
+            } 
 
             var reactions = await _unitOfWork.ReactionRepository.GetAllReactionsByPostIdAsync(request.PostId);
             var comments = await _unitOfWork.CommentRepository.GetAllCommentsByPostIdAsync(request.PostId);

@@ -41,16 +41,7 @@ const PostPageManagement: FC = () => {
         if (response.isSuccess) {
             console.log(response)
             setPagination(response.pagination)
-            if (page === 1) {
-                setPosts(response.data)
-            } else {
-                setPosts(prev => {
-                    const newPosts = response.data.filter(newPost =>
-                        !prev.some(existingPost => existingPost.id === newPost.id)
-                    );
-                    return [...prev, ...newPosts];
-                });
-            }
+            setPosts(response.data)
         }
     }
 
@@ -303,11 +294,12 @@ const PostPageManagement: FC = () => {
                 pagination={{
                     current: pagination.page,
                     total: pagination.totalCount,
-                    pageSize: pagination.size
-                }}
-                onChange={(paginate) => {
-                    if (paginate.current) {
-                        fetchPosts(paginate.current, pagination.size, filter)
+                    pageSize: pagination.size,
+                    showSizeChanger: false,
+                    showLessItems: true,
+                    onChange: (value) => {  
+                        console.log(value)
+                        fetchPosts(value, pagination.size, filter)
                     }
                 }}
                 rowSelection={rowSelection}

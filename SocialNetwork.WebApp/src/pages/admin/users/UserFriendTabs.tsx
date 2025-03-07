@@ -28,15 +28,7 @@ const UserFriendTabs: FC<UserFriendTabsProps> = ({
         console.log(response)
         setLoading(false)
         if (response.isSuccess) {
-            if (page === 1) {
-                setFriends(response.data);
-            } else {
-                setFriends(prevFriends => {
-                    const existingIds = new Set(prevFriends.map(m => m.id));
-                    const newMembers = response.data.filter(m => !existingIds.has(m.id));
-                    return [...prevFriends, ...newMembers];
-                });
-            }
+            setFriends(response.data);
             setPagination(response.pagination)
         }
     }

@@ -317,7 +317,7 @@ const GroupHeader: FC<GroupHeaderProps> = ({
                     {(group.privacy === GroupPrivacy.PUBLIC || group.isMember) && (
                         <Avatar.Group>
                             {groupMembers.map(member => (
-                                <Link key={member.id} to={`/profile/${member.id}`}>
+                                <Link key={member.id} to={`/profile/${member?.user?.id}`}>
                                     <Tooltip title={member.user.fullName}>
                                         <Avatar src={member.user.avatar} />
                                     </Tooltip>

@@ -28,15 +28,7 @@ const UserFolloweeTabs: FC<UserFolloweeTabsProps> = ({
         const response = await adminService.getAllFolloweesByUserId(userId, page, size, searchValue);
         setLoading(false)
         if (response.isSuccess) {
-            if (page === 1) {
-                setFollowees(response.data);
-            } else {
-                setFollowees(prevs => {
-                    const existingIds = new Set(prevs.map(m => m.id));
-                    const news = response.data.filter(m => !existingIds.has(m.id));
-                    return [...prevs, ...news];
-                });
-            }
+            setFollowees(response.data);
             setPagination(response.pagination)
         }
     }

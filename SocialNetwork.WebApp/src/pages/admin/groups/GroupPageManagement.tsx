@@ -42,16 +42,7 @@ const GroupPageManagement: FC = () => {
         setLoading(false)
         if (response.isSuccess) {
             setPagination(response.pagination)
-            if (page === 1) {
-                setGroups(response.data)
-            } else {
-                setGroups(prev => {
-                    const newGroups = response.data.filter(newGroup =>
-                        !prev.some(existingGroups => existingGroups.id === newGroup.id)
-                    );
-                    return [...prev, ...newGroups];
-                });
-            }
+            setGroups(response.data)
         }
     }
 

@@ -33,16 +33,7 @@ const UserPageManagement: FC = () => {
         setLoading(false)
         if (response.isSuccess) {
             setPagination(response.pagination)
-            if (page === 1) {
-                setUsers(response.data)
-            } else {
-                setUsers(prev => {
-                    const newUsers = response.data.filter(newUser =>
-                        !prev.some(existedUsers => existedUsers.id === newUser.id)
-                    );
-                    return [...prev, ...newUsers];
-                });
-            }
+            setUsers(response.data)
         }
     }
 
